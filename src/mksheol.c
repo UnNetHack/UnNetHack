@@ -51,7 +51,6 @@ static void carve_path(floorprob* probs);
 static void fuzzy_circle(coordxy x, coordxy y,
                          int guaranteed_passage_radius, int fallout,
                          floorprob* floorprobs);
-static void wallify_map(void);
 
 static void finalize_map(void);
 static int under_middle(void);
@@ -367,31 +366,6 @@ fuzzy_circle(coordxy x, coordxy y, int guaranteed_passage_radius, int fallout, f
     }
 }
 
-static void
-wallify_map(void)
-{
-
-    int x, y, xx, yy;
-
-    for (x = 1; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (levl[x][y].typ == STONE) {
-                for (yy = y - 1; yy <= y+1; yy++) {
-                    for (xx = x - 1; xx <= x+1; xx++) {
-                        if (isok(xx, yy) && levl[xx][yy].typ == ROOM) {
-                            if (yy != y) {
-                                levl[x][y].typ = HWALL;
-                            } else {
-                                levl[x][y].typ = VWALL;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 #define VALID_PASSABLE(x, y) (levl[x][y].typ == ICE || \
                               levl[x][y].typ == POOL || \
                               levl[x][y].typ == ROOM)
@@ -575,7 +549,7 @@ finalize_map(void) {
         }
     }
 
-    wallify_map();
+    wallify_map(1, 0, COLNO-1, ROWNO-1);
 
     level.flags.is_maze_lev = FALSE;
     level.flags.is_cavernous_lev = TRUE;

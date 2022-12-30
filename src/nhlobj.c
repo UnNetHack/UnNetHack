@@ -165,8 +165,6 @@ nhl_obj_u_giveobj(lua_State *L)
     return 0;
 }
 
-DISABLE_WARNING_UNREACHABLE_CODE
-
 /* Get a table of object class data. */
 /* local odata = obj.class(otbl.otyp); */
 /* local odata = obj.class(obj.new("rock")); */
@@ -229,8 +227,7 @@ l_obj_objects_to_table(lua_State *L)
     nhl_add_table_entry_int(L, "material", o->oc_material); /* TODO: convert to text */
     /* TODO: oc_subtyp, oc_skill, oc_armcat */
     nhl_add_table_entry_int(L, "oprop", o->oc_oprop);
-    nhl_add_table_entry_char(L, "class",
-                             def_oc_syms[(uchar) o->oc_class].sym);
+    nhl_add_table_entry_char(L, "class", def_oc_syms[(uchar) o->oc_class]);
     nhl_add_table_entry_int(L, "delay", o->oc_delay);
     nhl_add_table_entry_int(L, "color", o->oc_color); /* TODO: text? */
     nhl_add_table_entry_int(L, "prob", o->oc_prob);
@@ -243,8 +240,6 @@ l_obj_objects_to_table(lua_State *L)
 
     return 1;
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /* Create a lua table representation of the object, unpacking all the
    object fields.
@@ -279,6 +274,7 @@ l_obj_to_table(lua_State *L)
     nhl_add_table_entry_int(L, "quan", obj->quan);
     nhl_add_table_entry_int(L, "spe", obj->spe);
 
+#if 0 // TODO
     if (obj->otyp == STATUE) {
         nhl_add_table_entry_int(L, "historic", (obj->spe & CORPSTAT_HISTORIC) != 0);
     }
@@ -286,9 +282,9 @@ l_obj_to_table(lua_State *L)
         nhl_add_table_entry_int(L, "male", (obj->spe & CORPSTAT_MALE) != 0);
         nhl_add_table_entry_int(L, "female", (obj->spe & CORPSTAT_FEMALE) != 0);
     }
+#endif
 
-    nhl_add_table_entry_char(L, "oclass",
-                             def_oc_syms[(uchar) obj->oclass].sym);
+    nhl_add_table_entry_char(L, "oclass", def_oc_syms[(uchar) obj->oclass]);
     nhl_add_table_entry_char(L, "invlet", obj->invlet);
     /* TODO: nhl_add_table_entry_char(L, "oartifact", obj->oartifact);*/
     nhl_add_table_entry_int(L, "where", obj->where);
@@ -332,7 +328,7 @@ l_obj_to_table(lua_State *L)
     if (obj->corpsenm != NON_PM &&
         (obj->otyp == TIN || obj->otyp == CORPSE || obj->otyp == EGG ||
           obj->otyp == FIGURINE || obj->otyp == STATUE)) {
-        nhl_add_table_entry_str(L, "corpsenm_name", mons[obj->corpsenm].pmnames[NEUTRAL]);
+        nhl_add_table_entry_str(L, "corpsenm_name", mons[obj->corpsenm].mname);
     }
     /* TODO: leashmon, fromsink, novelidx, record_achieve_special */
     nhl_add_table_entry_int(L, "usecount", obj->usecount);
@@ -348,8 +344,6 @@ l_obj_to_table(lua_State *L)
 
     return 1;
 }
-
-DISABLE_WARNING_UNREACHABLE_CODE
 
 /* create a new object via wishing routine */
 /* local o = obj.new("rock"); */
@@ -388,7 +382,7 @@ l_obj_at(lua_State *L)
         cvt_to_abscoord(&x, &y);
 
         lua_pop(L, 2);
-        (void) l_obj_push(L, gl.level.objects[x][y]);
+        (void) l_obj_push(L, level.objects[x][y]);
         return 1;
     } else {
         nhl_error(L, "l_obj_at: Wrong args");
@@ -425,8 +419,6 @@ l_obj_placeobj(lua_State *L)
 
     return 0;
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /* Get the next object in the object chain */
 /* local o = obj.at(x, y);
@@ -482,8 +474,6 @@ l_obj_isnull(lua_State *L)
     lua_pushboolean(L, !lobj_is_ok(lo));
     return 1;
 }
-
-DISABLE_WARNING_UNREACHABLE_CODE
 
 /* does object have a timer of certain type? */
 /* local hastimer = o:has_timer("rot-organic"); */
@@ -571,8 +561,6 @@ l_obj_timer_stop(lua_State *L)
     }
     return 0;
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /* start an object timer. */
 /* o:start_timer("hatch-egg", 10); */

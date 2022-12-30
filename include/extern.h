@@ -187,6 +187,7 @@ extern int wiz_where(void);
 extern int wiz_wish(void);
 # endif /* WIZARD */
 #endif /* USE_TRAMPOLI */
+extern const char *levltyp_to_name(int);
 extern void reset_occupations(void);
 extern void set_occupation(int (*)(void), const char *, int);
 #ifdef REDO
@@ -284,7 +285,7 @@ extern boolean detecting(void(*)(coordxy, coordxy, void *));
 extern void find_trap(struct trap *);
 extern int dosearch0(int);
 extern int dosearch(void);
-extern void sokoban_detect(void);
+extern void premap_detect(void);
 extern void reveal_terrain(int, int);
 
 /* ### dig.c ### */
@@ -964,10 +965,12 @@ extern char *strip_newline(char *);
 extern char *eos(char *);
 extern void sanitizestr(char *);
 extern boolean str_end_is(const char *, const char *);
+extern int str_lines_maxlen(const char *);
 extern char *strkitten(char *, char);
 extern void copynchars(char *, const char *, int);
 extern char *strcasecpy(char *, const char *);
 extern char *s_suffix(const char *);
+extern char *ing_suffix(const char *);
 extern char *xcrypt(const char *, char *);
 extern boolean onlyspace(const char *);
 extern char *tabexpand(char *);
@@ -1031,6 +1034,10 @@ extern void strip_brackets(char *);
     nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...);
+#define FITSint(x) FITSint_(x, __func__, __LINE__)
+extern int FITSint_(long long, const char *, int);
+#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
+extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 /* ### insight.c ### */
 
@@ -1348,6 +1355,7 @@ extern void add_subroom(struct mkroom *, int, int, int, int, boolean, schar, boo
 extern void makecorridors(int);
 extern void add_door(coordxy, coordxy, struct mkroom *);
 extern void mkpoolroom(void);
+extern void count_level_features(void);
 extern void mklev(void);
 #ifdef SPECIALIZATION
 extern void topologize(struct mkroom *, boolean);
@@ -1359,7 +1367,7 @@ extern boolean occupied(coordxy, coordxy);
 extern int okdoor(coordxy, coordxy);
 extern void dodoor(coordxy, coordxy, struct mkroom *);
 extern void mktrap(int, int, struct mkroom *, coord*);
-extern void mkstairs(coordxy, coordxy, char, struct mkroom *);
+extern void mkstairs(coordxy, coordxy, char, struct mkroom *, boolean);
 extern void mkinvokearea(void);
 extern void wallwalk_right(coordxy, coordxy, schar, schar, schar, int);
 #ifdef ADVENT_CALENDAR
@@ -1370,17 +1378,22 @@ extern d_level * get_floating_branch(d_level *, branch *);
 
 /* ### mkmap.c ### */
 
-void flood_fill_rm(int, int, int, boolean, boolean);
-void remove_rooms(int, int, int, int);
+extern void flood_fill_rm(int, int, int, boolean, boolean);
+extern void remove_rooms(int, int, int, int);
+extern boolean litstate_rnd(int);
 
 /* ### mkmaze.c ### */
 
+extern boolean set_levltyp(coordxy, coordxy, schar);
+extern boolean set_levltyp_lit(coordxy, coordxy, schar, schar);
+extern void create_maze(int, int, boolean);
 extern void wallification(int, int, int, int);
+extern void fix_wall_spines(coordxy, coordxy, coordxy, coordxy);
 extern void wall_extends(int, int, int, int);
 extern void walkfrom(coordxy, coordxy, schar);
 extern void makemaz(const char *);
 extern void mazexy(coord *);
-extern void get_level_extends(int *, int *, int *, int *);
+extern void get_level_extends(coordxy *, coordxy *, coordxy *, coordxy *) NONNULLPTRS;
 extern void bound_digging(void);
 extern void mkportal(coordxy, coordxy, xint16, xint16);
 extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
@@ -1765,6 +1778,58 @@ extern void lan_mail_finish(void);
 extern void lan_mail_terminate(void);
 # endif
 #endif
+
+/* ### nhlsel.c ### */
+
+extern struct selectionvar *l_selection_check(lua_State *, int) NONNULLARG1;
+extern int l_selection_register(lua_State *) NONNULLARG1;
+extern void l_selection_push_copy(lua_State *, struct selectionvar *) NONNULLARG12;
+extern int l_obj_register(lua_State *) NONNULLARG1;
+
+/* ### nhlobj.c ### */
+
+extern void nhl_push_obj(lua_State *, struct obj *);
+extern int nhl_obj_u_giveobj(lua_State *);
+extern int l_obj_register(lua_State *);
+
+/* ### nhlua.c ### */
+
+extern void l_nhcore_init(void);
+extern void l_nhcore_done(void);
+extern void l_nhcore_call(int);
+extern lua_State * nhl_init(nhl_sandbox_info *);
+extern void nhl_done(lua_State *);
+extern boolean nhl_loadlua(lua_State *, const char *, const char *);
+extern int nhl_pcall(lua_State *, int, int, const char *) NONNULLARG1;
+extern int nhl_pcall_handle(lua_State *, int, int, const char *,
+                            NHL_pcall_action) NONNULLARG1;
+extern boolean load_lua(const char *, const char *, nhl_sandbox_info *);
+extern void nhl_error(lua_State *, const char *) NORETURN;
+extern void lcheck_param_table(lua_State *);
+extern schar get_table_mapchr(lua_State *, const char *);
+extern schar get_table_mapchr_opt(lua_State *, const char *, schar);
+extern short nhl_get_timertype(lua_State *, int);
+extern boolean nhl_get_xy_params(lua_State *, lua_Integer *, lua_Integer *);
+extern void nhl_add_table_entry_int(lua_State *, const char *, lua_Integer);
+extern void nhl_add_table_entry_char(lua_State *, const char *, char);
+extern void nhl_add_table_entry_str(lua_State *, const char *, const char *);
+extern void nhl_add_table_entry_bool(lua_State *, const char *, boolean);
+extern void nhl_add_table_entry_region(lua_State *, const char *,
+                                       coordxy, coordxy, coordxy, coordxy);
+extern schar splev_chr2typ(char);
+extern schar check_mapchr(const char *);
+extern int get_table_int(lua_State *, const char *);
+extern int get_table_int_opt(lua_State *, const char *, int);
+extern char *get_table_str(lua_State *, const char *);
+extern char *get_table_str_opt(lua_State *, const char *, char *);
+extern int get_table_boolean(lua_State *, const char *);
+extern int get_table_boolean_opt(lua_State *, const char *, int);
+extern int get_table_option(lua_State *, const char *, const char *,
+                            const char *const *);
+extern int str_lines_max_width(const char *);
+extern char *stripdigits(char *);
+extern const char *get_lua_version(void);
+extern void nhl_pushhooked_open_table(lua_State *L);
 
 /* ### nhregex.c ### */
 extern struct nhregex *regex_init(void);
@@ -2187,6 +2252,7 @@ extern void forget_objects(int);
 extern void forget_levels(int);
 extern void forget_traps(void);
 extern void forget_map(int);
+extern boolean valid_cloud_pos(coordxy, coordxy);
 extern int seffects(struct obj *);
 #ifdef USE_TRAMPOLI
 extern void set_lit(int, int, genericptr_t);
@@ -2206,8 +2272,10 @@ extern boolean create_particular_from_buffer(const char*);
 /* ### rect.c ### */
 
 extern void init_rect(void);
+extern void free_rect(void);
 extern NhRect *get_rect(NhRect *);
 extern NhRect *rnd_rect(void);
+extern void rect_bounds(NhRect, NhRect, NhRect *);
 extern void remove_rect(NhRect *);
 extern void add_rect(NhRect *);
 extern void split_rects(NhRect *, NhRect *);
@@ -2223,7 +2291,8 @@ extern NhRegion *visible_region_at(coordxy, coordxy);
 extern void show_region(NhRegion*, coordxy, coordxy);
 extern void save_regions(NHFILE *) NONNULLARG1;
 extern void rest_regions(NHFILE *) NONNULLARG1;
-extern NhRegion* create_gas_cloud(coordxy, coordxy, int, size_t, int);
+extern NhRegion *create_gas_cloud(coordxy, coordxy, int, int, int);
+extern NhRegion *create_gas_cloud_selection(struct selectionvar *, int);
 extern NhRegion* create_cthulhu_death_cloud(coordxy, coordxy, int, size_t, int);
 extern boolean region_danger(void);
 extern void region_safety(void);
@@ -2324,6 +2393,42 @@ extern void store_plname_in_file(NHFILE *) NONNULLARG1;
 extern void free_dungeons(void);
 extern void freedynamicdata(void);
 extern void store_savefileinfo(NHFILE *) NONNULLARG1;
+
+/* ### selvar.c ### */
+
+extern struct selectionvar *selection_new(void);
+extern void selection_free(struct selectionvar *, boolean) NO_NNARGS;
+extern void selection_clear(struct selectionvar *, int) NONNULLARG1;
+extern struct selectionvar *selection_clone(struct selectionvar *) NONNULLARG1;
+extern void selection_getbounds(struct selectionvar *, NhRect *) NO_NNARGS;
+extern void selection_recalc_bounds(struct selectionvar *) NONNULLARG1;
+extern coordxy selection_getpoint(coordxy, coordxy, struct selectionvar *) NO_NNARGS;
+extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
+extern struct selectionvar * selection_not(struct selectionvar *);
+extern struct selectionvar *selection_filter_percent(struct selectionvar *,
+                                                     int);
+extern struct selectionvar *selection_filter_mapchar(struct selectionvar *,
+                                                     xint16, int);
+extern int selection_rndcoord(struct selectionvar *, coordxy *, coordxy *,
+                              boolean);
+extern void selection_do_grow(struct selectionvar *, int);
+extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
+extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
+                                boolean);
+extern void selection_do_ellipse(struct selectionvar *, int, int, int, int,
+                                 int);
+extern void selection_do_gradient(struct selectionvar *, long, long, long,
+                                  long, long, long, long);
+extern void selection_do_line(coordxy, coordxy, coordxy, coordxy,
+                              struct selectionvar *);
+extern void selection_do_randline(coordxy, coordxy, coordxy, coordxy,
+                                  schar, schar, struct selectionvar *);
+extern void selection_iterate(struct selectionvar *, select_iter_func,
+                              genericptr_t);
+extern boolean selection_is_irregular(struct selectionvar *);
+extern char *selection_size_description(struct selectionvar *, char *);
+extern struct selectionvar *selection_from_mkroom(struct mkroom *) NO_NNARGS;
+extern void selection_force_newsyms(struct selectionvar *) NONNULLARG1;
 
 /* ### sfstruct.c ### */
 
@@ -2454,19 +2559,67 @@ extern int assign_soundcard(char *);
 #endif
 
 /* ### sp_lev.c ### */
-
+extern boolean match_maptyps(xint16, xint16);
+extern void create_des_coder(void);
+extern void reset_xystart_size(void);
+extern struct mapfragment *mapfrag_fromstr(char *);
+extern void mapfrag_free(struct mapfragment **);
+extern schar mapfrag_get(struct mapfragment *, int, int);
+extern boolean mapfrag_canmatch(struct mapfragment *);
+extern const char * mapfrag_error(struct mapfragment *);
+extern boolean mapfrag_match(struct mapfragment *, int, int);
+extern void flip_level(int, boolean);
+extern void flip_level_rnd(int, boolean);
 extern boolean check_room(coordxy *, coordxy *, coordxy *, coordxy *, boolean);
 extern boolean create_room(coordxy, coordxy, coordxy, coordxy,
                       coordxy, coordxy, xint16, xint16);
 extern void create_secret_door(struct mkroom *, coordxy);
 extern boolean dig_corridor(coord *, coord *, boolean, schar, schar);
 extern void fill_room(struct mkroom *, boolean);
-extern boolean load_special(const char *);
+extern void wallify_map(coordxy, coordxy, coordxy, coordxy);
+extern boolean load_special_des(const char *);
+extern boolean load_special_lua(const char *);
+extern coordxy random_wdir(void);
 extern coordxy op_selection_getpoint(coordxy, coordxy, struct opvar *);
 extern struct opvar *op_selection_opvar(char *);
+
+extern coordxy selection_getpoint(coordxy, coordxy, struct selectionvar *);
+extern struct selectionvar *selection_new(void);
+extern void selection_free(struct selectionvar *, boolean);
+extern void selection_clear(struct selectionvar *, int);
+extern struct selectionvar *selection_clone(struct selectionvar *);
+extern void selection_getbounds(struct selectionvar *, NhRect *);
+extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
+                                boolean);
+extern void get_location_coord(coordxy *, coordxy *, int, struct mkroom *,
+                               long);
+extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
+extern struct selectionvar *selection_not(struct selectionvar *);
+extern struct selectionvar *selection_filter_percent(struct selectionvar *,
+                                                     int);
+extern int selection_rndcoord(struct selectionvar *, coordxy *, coordxy *,
+                              boolean);
+extern void selection_do_grow(struct selectionvar *, int);
+extern void selection_do_line(coordxy, coordxy, coordxy, coordxy,
+                              struct selectionvar *);
+extern void selection_do_randline(coordxy, coordxy, coordxy, coordxy,
+                                  schar, schar, struct selectionvar *);
+extern struct selectionvar *selection_filter_mapchar(struct selectionvar *,
+                                                     xint16, int);
+extern void set_floodfillchk_match_under(coordxy);
+
 extern void opvar_free_x(struct opvar *);
 extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
 extern void op_selection_floodfill(struct opvar *, coordxy, coordxy, boolean);
+
+extern boolean get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
+extern void cvt_to_abscoord(coordxy *, coordxy *);
+extern void cvt_to_relcoord(coordxy *, coordxy *);
+extern int nhl_abs_coord(lua_State *);
+extern struct selectionvar *selection_from_mkroom(struct mkroom *);
+extern void update_croom(void);
+extern const char *get_trapname_bytype(int);
+extern void l_register_des(lua_State *);
 
 /* ### spell.c ### */
 

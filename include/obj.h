@@ -66,7 +66,8 @@ struct obj {
 #define OBJ_MIGRATING  5 /* object sent off to another level */
 #define OBJ_BURIED     6 /* object buried */
 #define OBJ_ONBILL     7 /* object on shk bill */
-#define NOBJ_STATES    8
+#define OBJ_LUAFREE    8   /* object has been dealloc'd, but is ref'd by lua */
+#define NOBJ_STATES    9
     xint16 timed;        /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);
@@ -128,6 +129,7 @@ struct obj {
     long quiver_priority;   /* priority for automatic quivering of objects */
     xint16 omigr_from_dnum; /* where obj is migrating from */
     xint16 omigr_from_dlevel; /* where obj is migrating from */
+    unsigned lua_ref_cnt;  /* # of lua script references for this object */
     struct oextra *oextra;  /* pointer to oextra struct */
 };
 

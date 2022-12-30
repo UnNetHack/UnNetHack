@@ -6,6 +6,7 @@
 #define SP_LEV_H
 
 /* wall directions */
+#define W_RANDOM   -1
 #define W_NORTH     1
 #define W_SOUTH     2
 #define W_EAST      4
@@ -37,14 +38,17 @@
 #define SHEOL_LEV           0x00020000L
 #define FLAG_RNDVAULT       0x00040000L
 
-
 /* different level layout initializers */
-#define LVLINIT_NONE        0
-#define LVLINIT_SOLIDFILL   1
-#define LVLINIT_MAZEGRID    2
-#define LVLINIT_MINES       3
-#define LVLINIT_SHEOL       4
-#define LVLINIT_ROGUE       5
+enum lvlinit_types {
+    LVLINIT_NONE = 0,
+    LVLINIT_SOLIDFILL,
+    LVLINIT_MAZEGRID,
+    LVLINIT_MAZE,
+    LVLINIT_MINES,
+    LVLINIT_SHEOL,
+    LVLINIT_ROGUE,
+    LVLINIT_SWAMP
+};
 
 /* max. layers of object containment */
 #define MAX_CONTAINMENT 10
@@ -325,19 +329,21 @@ struct sp_frame {
 };
 
 
+
 struct sp_coder {
     struct splevstack *stack;
     struct sp_frame *frame;
-    int allow_flips;
     int premapped;
     boolean solidify;
     struct mkroom *croom;
+    int room_stack;
     struct mkroom *tmproomlist[MAX_NESTED_ROOMS+1];
     boolean failed_room[MAX_NESTED_ROOMS+1];
     int n_subroom;
     boolean exit_script;
     int lvl_is_joined;
     boolean check_inaccessibles;
+    int allow_flips;
 
     int opcode;  /* current opcode */
     struct opvar *opdat; /* current push data (req. opcode == SPO_PUSH) */
@@ -354,6 +360,7 @@ struct sp_coder {
  */
 
 #define packed_coord long
+typedef uint32_t getloc_flags_t;
 typedef struct {
     xint16 is_random;
     long getloc_flags;
@@ -383,6 +390,8 @@ typedef struct {
     boolean smoothed, joined;
     xint16 lit, walled;
     boolean icedpools;
+    int corrwid, wallthick;
+    boolean rm_deadends;
 } lev_init;
 
 typedef struct {
@@ -393,19 +402,24 @@ typedef struct {
     packed_coord coord;
     coordxy x, y;
     xint16 type;
-} trap;
+    boolean spider_on_web;
+    boolean seen;
+    boolean novictim;
+} spltrap;
 
 typedef struct {
     Str_or_Len name, appear_as;
     short id;
+    unsigned int sp_amask; /* splev amask */
     aligntyp align;
     packed_coord coord;
     coordxy x, y;
     xint16 class, appear;
     schar peaceful, asleep;
-    short female, invis, cancelled, revived, avenge, fleeing, blinded, paralyzed, stunned, confused;
+    short female, invis, cancelled, revived, avenge, fleeing, blinded, paralyzed, stunned, confused, waiting;
     long seentraps;
     short has_invent;
+    mmflags_nht mm_flags; /* makemon flags */
 } monster;
 
 typedef struct {
@@ -426,6 +440,7 @@ typedef struct {
     packed_coord coord;
     coordxy x, y;
     aligntyp align;
+    unsigned int sp_amask; /* splev amask */
     xint16 shrine;
 } altar;
 
@@ -459,7 +474,8 @@ typedef struct _room {
     coordxy x, y;
     xint16 w, h;
     xint16 xalign, yalign;
-    xint16 rtype, chance, rlit, filled, joined;
+    xint16 rtype, chance, rlit, needfill;
+    boolean joined;
 } room;
 
 typedef struct {
@@ -522,6 +538,11 @@ struct lc_breakdef {
     struct lc_breakdef *next;
     struct opvar *breakpoint;
     int break_depth;
+};
+
+struct mapfragment {
+    int wid, hei;
+    char *data;
 };
 
 #endif /* SP_LEV_H */

@@ -243,6 +243,8 @@ struct instance_flags {
     boolean defer_plname;  /* X11 hack: askname() might not set g.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
+    boolean in_lua;        /* executing a lua script */
+    boolean lua_testing;   /* doing lua tests */
     int at_midnight;       /* only valid during end of game disclosure */
     int at_night;          /* also only valid during end of game disclosure */
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
@@ -302,6 +304,8 @@ struct instance_flags {
 #endif
 #ifdef WIZARD
     boolean sanity_check;   /* run sanity checks */
+    boolean sanity_no_check; /* skip next sanity check */
+    boolean debug_overwrite_stairs; /* debug: allow overwriting stairs */
     boolean mon_polycontrol;    /* debug: control monster polymorphs */
     boolean in_parse;      /* is a command being parsed? */
 #endif

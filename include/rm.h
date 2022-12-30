@@ -75,6 +75,7 @@ enum levl_typ_types {
     CLOUD,
 
     MAX_TYPE,
+    MATCH_WALL,
     INVALID_TYPE = 127
 };
 
@@ -303,11 +304,6 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define D_SECRET    32 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
- * Some altars are considered as shrines, so we need a flag.
- */
-#define AM_SHRINE   8
-
-/*
  * Thrones should only be looted once.
  */
 #define T_LOOTED    1
@@ -410,7 +406,6 @@ struct rm {
     Bitfield(candig, 1);    /* Exception to Can_dig_down; was a trapdoor */
 };
 
-
 #define SET_TYPLIT(x, y, ttyp, llit)               \
     {                               \
         if ((x) >= 0 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
@@ -422,6 +417,13 @@ struct rm {
             }                               \
         }                             \
     }
+
+/* light states for terrain replacements, for set_levltyp_lit */
+#define SET_LIT_RANDOM -1
+#define SET_LIT_NOCHANGE -2
+
+#define CAN_OVERWRITE_TERRAIN(ttyp) \
+    (iflags.debug_overwrite_stairs || !((ttyp) == LADDER || (ttyp) == STAIRS))
 
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
@@ -561,14 +563,20 @@ struct levelflags {
     Bitfield(graveyard, 1);      /* has_morgue, but remains set */
     Bitfield(sokoban_rules, 1);  /* fill pits and holes w/ boulders */
     Bitfield(is_maze_lev, 1);
-    Bitfield(stormy, 1);     /* thunderous clouds */
-
     Bitfield(is_cavernous_lev, 1);
-    Bitfield(arboreal, 1);      /* Trees replace rock */
-    Bitfield(sky, 1);       /* map has sky instead of ceiling */
+    Bitfield(arboreal, 1);     /* Trees replace rock */
+    Bitfield(sky, 1);          /* map has sky instead of ceiling */
     Bitfield(sheol, 1);
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
                                   rather than ROOM */
+    Bitfield(rndmongen, 1);    /* random monster generation allowed? */
+    Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
+
+    Bitfield(noautosearch, 1); /* automatic searching disabled */
+    Bitfield(fumaroles, 1);    /* lava emits poison gas at random */
+    Bitfield(stormy, 1);       /* clouds create lightning bolts at random */
+
+    schar temperature;         /* +1 == hot, -1 == cold */
 };
 
 struct mon_gen_tuple {

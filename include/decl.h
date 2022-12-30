@@ -412,6 +412,9 @@ E struct c_common_strings {
 /* material strings */
 E const char *materialnm[];
 
+/* empty string that is non-const for parameter use */
+extern char emptystr[];
+
 /* Monster name articles */
 #define ARTICLE_NONE    0
 #define ARTICLE_THE 1
@@ -486,6 +489,13 @@ struct opvar {
         char *str;
         long l;
     } vardata;
+};
+
+struct selectionvar {
+    int wid, hei;
+    boolean bounds_dirty;
+    NhRect bounds; /* use selection_getbounds() */
+    char *map;
 };
 
 #ifdef AUTOPICKUP_EXCEPTIONS
@@ -638,6 +648,80 @@ struct cmd {
 };
 
 extern NEARDATA struct cmd Cmd;
+
+/* some array sizes for 'g' */
+#define LUA_VER_BUFSIZ 20
+#define LUA_COPYRIGHT_BUFSIZ 120
+
+struct instance_globals_c {
+    /* sp_lev.c */
+    struct sp_coder *coder;
+};
+
+struct instance_globals_e {
+    /* new stuff */
+    struct exclusion_zone *exclusion_zones;
+};
+
+struct instance_globals_g {
+    /* dogmove.c */
+    xint16 gtyp;  /* type of dog's current goal */
+    coordxy gx; /* x position of dog's current goal */
+    coordxy gy; /* y position of dog's current goal */
+};
+
+struct instance_globals_i {
+    /* sp_lev.c */
+    boolean in_mk_themerooms;
+};
+
+struct instance_globals_l {
+    /* nhlua.c */
+    genericptr_t luacore; /* lua_State * */
+    char lua_warnbuf[BUFSZ];
+    int loglua;
+    int lua_sid;
+
+    /* trap.c */
+    struct launchplace launchplace;
+
+    /* new stuff */
+    char lua_ver[LUA_VER_BUFSIZ];
+    char lua_copyright[LUA_COPYRIGHT_BUFSIZ];
+};
+
+struct instance_globals_t {
+    /* sp_lev.c */
+    boolean themeroom_failed;
+};
+
+struct instance_globals_x {
+    /* sp_lev.c */
+    coordxy xstart, xsize;
+};
+
+struct instance_globals_y {
+    /* sp_lev.c */
+    coordxy ystart, ysize;
+};
+
+extern struct instance_globals_c gc;
+extern struct instance_globals_e ge;
+extern struct instance_globals_g gg;
+extern struct instance_globals_i gi;
+extern struct instance_globals_l gl;
+extern struct instance_globals_t gt;
+extern struct instance_globals_x gx;
+extern struct instance_globals_y gy;
+
+struct const_globals {
+    const struct obj zeroobj;      /* used to zero out a struct obj */
+    const struct monst zeromonst;  /* used to zero out a struct monst */
+    const anything zeroany;        /* used to zero out union any */
+    const NhRect zeroNhRect;       /* used to zero out NhRect */
+};
+
+extern const struct const_globals cg;
 
 #undef E
 

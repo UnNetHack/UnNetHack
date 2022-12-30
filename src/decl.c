@@ -295,6 +295,8 @@ const char *materialnm[] = {
     "plastic", "glass", "gemstone", "stone"
 };
 
+char emptystr[] = { 0 }; /* non-const */
+
 /* Vision */
 NEARDATA boolean vision_full_recalc = 0;
 NEARDATA char    **viz_array = 0;/* used in cansee() and couldsee() macros */
@@ -365,6 +367,86 @@ void
 decl_init(void)
 {
     return;
+}
+
+struct instance_globals_c gc;
+struct instance_globals_e ge;
+struct instance_globals_g gg;
+struct instance_globals_i gi;
+struct instance_globals_l gl;
+struct instance_globals_t gt;
+struct instance_globals_x gx;
+struct instance_globals_y gy;
+
+const struct const_globals cg = {
+    DUMMY, /* zeroobj */
+    DUMMY, /* zeromonst */
+    DUMMY, /* zeroany */
+    DUMMY, /* zeroNhRect */
+};
+
+const struct instance_globals_c g_init_c = {
+    UNDEFINED_PTR, /* coder */
+};
+
+static const struct instance_globals_e g_init_e = {
+    /* new */
+    NULL, /* exclusion_zones */
+};
+
+const struct instance_globals_g g_init_g = {
+    /* dogmove.c */
+    UNDEFINED_VALUE, /* gtyp */
+    0, /* gx */
+    0, /* gy */
+};
+
+const struct instance_globals_i g_init_i = {
+    /* sp_lev.c */
+    FALSE, /* in_mk_themerooms */
+};
+
+const struct instance_globals_l g_init_l = {
+    /* nhlua.c */
+    UNDEFINED_VALUE, /* luacore */
+    DUMMY, /* lua_warnbuf[] */
+    0, /* loglua */
+    0, /* lua_sid */
+    /* trap.c */
+    { UNDEFINED_PTR, 0, 0 }, /* launchplace */
+    /* new */
+    DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
+    DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
+};
+
+const struct instance_globals_t g_init_t = {
+    /* sp_lev.c */
+    FALSE, /* themeroom_failed */
+};
+
+const struct instance_globals_x g_init_x = {
+    /* sp_lev.c */
+    UNDEFINED_VALUE, /* xstart */
+    UNDEFINED_VALUE, /* xsize */
+};
+
+const struct instance_globals_y g_init_y = {
+    /* sp_lev.c */
+    UNDEFINED_VALUE, /* ystart */
+    UNDEFINED_VALUE, /* ysize */
+};
+
+void
+decl_globals_init(void)
+{
+    gc = g_init_c;
+    ge = g_init_e;
+    gg = g_init_g;
+    gi = g_init_i;
+    gl = g_init_l;
+    gt = g_init_t;
+    gx = g_init_x;
+    gy = g_init_y;
 }
 
 /*decl.c*/

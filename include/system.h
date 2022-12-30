@@ -574,4 +574,6 @@ E int atoi(const char *);
 
 #endif /*  !__cplusplus && !__GO32__ */
 
+#include "nhlua.h"
+
 #endif /* SYSTEM_H */

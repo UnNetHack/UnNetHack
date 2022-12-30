@@ -8,6 +8,14 @@
  */
 #define EXTERN_H    /* comment line for pre-compiled headers */
 #include "config.h"
+#ifndef LUA_INTEGER
+#include "nhlua.h"
+#endif
+
+#define FITSint(x) FITSint_(x, __func__, (int) __LINE__)
+extern int FITSint_(LUA_INTEGER, const char *, int);
+#define FITSuint(x) FITSuint_(x, __func__, (int) __LINE__)
+extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 #if defined(MONITOR_HEAP) || defined(WIZARD)
 char *fmt_ptr(const genericptr);
@@ -40,6 +48,19 @@ alloc(unsigned int lth)
     return ptr;
 }
 
+/* realloc() call that might get substituted by nhrealloc(p,n,file,line) */
+long *
+re_alloc(long *oldptr, unsigned int newlth)
+{
+    long *newptr = (long *) realloc((genericptr_t) oldptr, (size_t) newlth);
+#ifndef MONITOR_HEAP
+    /* "extend to":  assume it won't ever fail if asked to shrink */
+    if (newlth && !newptr) {
+        panic("Memory allocation failure; cannot extend to %u bytes", newlth);
+    }
+#endif
+    return newptr;
+}
 
 #ifdef HAS_PTR_FMT
 #define PTR_FMT "%p"
@@ -148,5 +169,31 @@ dupstr(const char *string)
 {
     return strcpy((char *) alloc(strlen(string) + 1), string);
 }
+
+/* cast to int or panic on overflow; use via macro */
+int
+FITSint_(LUA_INTEGER i, const char *file, int line)
+{
+    int iret = (int) i;
+
+    if (iret != i) {
+        panic("Overflow at %s:%d", file, line);
+    }
+
+    return iret;
+}
+
+unsigned
+FITSuint_(unsigned long long ull, const char *file, int line)
+{
+    unsigned uret = (unsigned) ull;
+
+    if (uret != ull) {
+        panic("Overflow at %s:%d", file, line);
+    }
+
+    return uret;
+}
+
 
 /*alloc.c*/

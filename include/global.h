@@ -113,6 +113,7 @@ typedef unsigned readLenType;
 #define TRUE    ((boolean)1)
 #define FALSE   ((boolean)0)
 #endif
+#define BOOL_RANDOM (-1)
 
 enum optchoice { opt_in, opt_out};
 
@@ -343,6 +344,7 @@ typedef glyph_t nhsym;
 /* primitive memory leak debugging; see alloc.c */
 #ifdef MONITOR_HEAP
 extern long *nhalloc(unsigned int, const char *, int);
+extern long *nhrealloc(long *, unsigned int, const char *, int);
 extern void nhfree(genericptr_t, const char *, int);
 extern char *nhdupstr(const char *, const char *, int);
 # ifndef __FILE__
@@ -352,10 +354,13 @@ extern char *nhdupstr(const char *, const char *, int);
 #  define __LINE__ 0
 # endif
 # define alloc(a) nhalloc(a, __FILE__, (int)__LINE__)
+# define re_alloc(a,n) nhrealloc(a, n, __FILE__, (int) __LINE__)
 # define free(a) nhfree(a, __FILE__, (int)__LINE__)
 # define dupstr(s) nhdupstr(s, __FILE__, (int) __LINE__)
 #else   /* !MONITOR_HEAP */
-extern long *alloc(unsigned int);      /* alloc.c */
+/* declare alloc.c's alloc(); allocations made with it use ordinary free() */
+extern long *alloc(unsigned int); /* alloc.c */
+extern long *re_alloc(long *, unsigned int);
 extern char *dupstr(const char *); /* ditto */
 #endif
 
@@ -435,5 +440,73 @@ struct savefile_info {
 #define LL_DUMP_ALL   0x0800 /* Log dumplog url for all games */
 #define LL_MINORAC    0x1000 /* Log 'minor' achievements - can be spammy */
 #define LL_DEBUG      0x8000 /* For debugging messages and other spam */
+
+/*
+ * Lua sandbox
+ */
+/* Control block for setting up a Lua state with nhl_init(). */
+typedef struct nhl_sandbox_info {
+    uint32_t  flags;       /* see below */
+    uint32_t  memlimit;    /* approximate memory limit */
+    uint32_t  steps;       /* instruction limit for state OR ... */
+    uint32_t  perpcall;    /* ... instruction limit per nhl_pcall */
+} nhl_sandbox_info;
+
+/* For efficiency, we only check every NHL_SB_STEPSIZE instructions. */
+#ifndef NHL_SB_STEPSIZE
+#define NHL_SB_STEPSIZE 1000
+#endif
+
+/* High level groups.  Use these flags. */
+    /* Safe functions. */
+#define NHL_SB_SAFE        0x80000000
+    /* Access to Lua version information. */
+#define NHL_SB_VERSION     0x40000000
+    /* Debugging library - mostly unsafe. */
+#define NHL_SB_DEBUGGING   0x08000000
+    /* Use with memlimit/steps/perpcall to get usage. */
+#define NHL_SB_REPORT      0x04000000
+    /* As above, but do full gc on each nhl_pcall. */
+#define NHL_SB_REPORT2     0x02000000
+
+/* Low level groups.  If you need these, you probably need to define
+ * a new high level group instead. */
+#define NHL_SB_STRING      0x00000001
+#define NHL_SB_TABLE       0x00000002
+#define NHL_SB_COROUTINE   0x00000004
+#define NHL_SB_MATH        0x00000008
+#define NHL_SB_UTF8        0x00000010
+#ifdef notyet
+#define NHL_SB_IO          0x00000020
+#endif
+#define NHL_SB_OS          0x00000040
+
+#define NHL_SB_BASEMASK    0x00000f80
+#define NHL_SB_BASE_BASE   0x00000080
+#define NHL_SB_BASE_ERROR  0x00000100
+#define NHL_SB_BASE_META   0x00000200
+#define NHL_SB_BASE_GC     0x00000400
+#define NHL_SB_BASE_UNSAFE 0x00000800
+
+#define NHL_SB_DBMASK      0x00003000
+#define NHL_SB_DB_DB       0x00001000
+#define NHL_SB_DB_SAFE     0x00002000
+
+#define NHL_SB_OSMASK      0x0000c000
+#define NHL_SB_OS_TIME     0x00004000
+#define NHL_SB_OS_FILES    0x00008000
+
+#define NHL_SB_ALL         0x0000ffff
+
+/* return codes */
+#define NHL_SBRV_DENY 1
+#define NHL_SBRV_ACCEPT 2
+#define NHL_SBRV_FAIL 3
+
+/* NHL_pcall_handle action values */
+typedef enum NHL_pcall_action {
+    NHLpa_panic,
+    NHLpa_impossible
+} NHL_pcall_action;
 
 #endif /* GLOBAL_H */

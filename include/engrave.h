@@ -19,6 +19,13 @@ struct engr {
 #define ENGR_BLOOD 5
 #define HEADSTONE  6
 #define N_ENGRAVE  6
+    Bitfield(guardobjects, 1); /* if engr_txt is "Elbereth", it is effective
+                                * against monsters when an object is present
+                                * even when hero isn't (so behaves similarly
+                                * to how Elbereth did in 3.4.3) */
+    Bitfield(nowipeout, 1);    /* this engraving will not degrade */
+    Bitfield(eread, 1);        /* the engraving text has been read or felt */
+    /* 5 free bits */
 };
 
 #define newengr(lth) (struct engr *)alloc((unsigned)(lth) + sizeof(struct engr))

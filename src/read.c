@@ -1253,6 +1253,31 @@ do_flood(coordxy x, coordxy y, genericptr_t poolcnt)
 
 }
 
+/* Can a stinking cloud physically exist at a certain position?
+ * NOT the same thing as can_center_cloud.
+ */
+boolean
+valid_cloud_pos(coordxy x, coordxy y)
+{
+    if (!isok(x,y)) {
+        return FALSE;
+    }
+    return ACCESSIBLE(levl[x][y].typ) || is_pool(x, y) || is_lava(x, y);
+}
+
+/* Callback for getpos_sethilite, also used in determining whether a scroll
+ * should have its regular effects, or not because it was out of range.
+ */
+static boolean
+can_center_cloud(coordxy x, coordxy y)
+{
+    if (!valid_cloud_pos(x, y)) {
+        return FALSE;
+    }
+    return (cansee(x, y) && distu(x, y) < 32);
+}
+
+
 static boolean
 get_valid_stinking_cloud_pos(coordxy x, coordxy y)
 {

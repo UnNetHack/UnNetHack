@@ -1873,9 +1873,9 @@ warnreveal(void)
 
 /* Pre-map the sokoban levels */
 void
-sokoban_detect(void)
+premap_detect(void)
 {
-    int x, y;
+    coordxy x, y;
     struct trap *ttmp;
     struct obj *obj;
 
@@ -1886,6 +1886,7 @@ sokoban_detect(void)
                 levl[x][y].seenv = SVALL;
             } else if (levl[x][y].typ == SDOOR) {
                 levl[x][y].typ = DOOR;
+                levl[x][y].wall_info = 0; /* see rm.h for explanation */
             } else if (levl[x][y].typ == SCORR) {
                 levl[x][y].typ = CORR;
             }
@@ -1893,10 +1894,8 @@ sokoban_detect(void)
             /* all Sokoban floors only shown lit when dark_room is deactivated */
             levl[x][y].waslit = (levl[x][y].typ != CORR) ? (!iflags.dark_room) : levl[x][y].lit;
             map_background(x, y, 1);
-            for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
-                if (obj->otyp == BOULDER) {
-                    map_object(obj, 1);
-                }
+            if ((obj = sobj_at(BOULDER, x, y)) != 0) {
+                map_object(obj, 1);
             }
         }
     }

@@ -15,6 +15,8 @@
 #include <fcntl.h>
 #endif
 
+#define config_error_add raw_printf
+
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
 # if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
 #  if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
@@ -339,6 +341,7 @@ not_recovered:
 static void
 process_options(int argc, char *argv[])
 {
+    char *origarg;
     int i;
 
     /*
@@ -347,6 +350,7 @@ process_options(int argc, char *argv[])
     while (argc > 1 && argv[1][0] == '-') {
         argv++;
         argc--;
+        origarg = argv[0];
         switch (argv[0][1]) {
             case 'D':
 #ifdef WIZARD
@@ -415,6 +419,17 @@ process_options(int argc, char *argv[])
                     switch_graphics(DEC_GRAPHICS);
                 }
                 break;
+        case 'l':
+#ifdef LIVELOG
+            if (!strncmp(arg, "-loglua", 7)) {
+                gl.loglua = 1;
+            } else {
+                config_error_add("Unknown option: %.60s", origarg);
+            }
+#else
+            config_error_add("Unknown option: %.60s", origarg);
+#endif
+            break;
             case 'p': /* profession (role) */
                 if (argv[0][2]) {
                     if ((i = str2role(&argv[0][2])) >= 0) {

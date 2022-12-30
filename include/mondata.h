@@ -10,6 +10,7 @@
 #define hugemonst(ptr)      ((ptr)->msize >= MZ_HUGE)
 
 #define pm_resistance(ptr, typ)  (((ptr)->mresists & (typ)) != 0)
+#define immune_poisongas(ptr) ((ptr) == &mons[PM_HEZROU] || (ptr) == &mons[PM_VROCK])
 
 #define resists_fire(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_FIRE) != 0)
 #define resists_cold(mon)   ((((mon)->data->mresists | (mon)->mextrinsics) & MR_COLD) != 0)
@@ -310,5 +311,10 @@
                              ((ptr) == &mons[PM_BLACK_MARKETEER] || \
                               (ptr) == &mons[PM_ONE_EYED_SAM]))
 #endif /* BLACKMARKET */
+
+#define PM_ALIGNED_CLERIC PM_ALIGNED_PRIEST
+#define PM_HIGH_CLERIC PM_HIGH_PRIEST
+#define PM_ELVEN_MONARCH PM_ELVENKING
+#define PM_ELF_NOBLE PM_ELF_LORD
 
 #endif /* MONDATA_H */

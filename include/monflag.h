@@ -206,6 +206,9 @@
 #define G_GENO      0x0020      /* can be genocided */
 #define G_NOCORPSE  0x0010      /* no corpse left ever */
 #define G_FREQ      0x0007      /* creation frequency mask */
+/* note: G_IGNORE controls handling of mvitals[].mvflags bits but is
+   passed to mkclass() as if it dealt with mons[].geno bits */
+#define G_IGNORE    0x8000      /* for mkclass(), ignore G_GENOD|G_EXTINCT */
 
 /* for mvitals[].mvflags (variant during game), along with G_NOCORPSE */
 #define G_KNOWN     0x0004      /* have been encountered */
@@ -215,5 +218,8 @@
                                    population control */
 #define MV_KNOWS_EGG    0x0008      /* player recognizes egg of this
                                        monster type */
+
+enum mgender { MALE, FEMALE, NEUTRAL,
+               NUM_MGENDERS };
 
 #endif /* MONFLAG_H */

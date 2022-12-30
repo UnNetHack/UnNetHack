@@ -14,7 +14,6 @@ static schar get_map(int, int, schar);
 static void pass_one(schar, schar);
 static void pass_two(schar, schar);
 static void pass_three(schar, schar);
-static void wallify_map(void);
 static void join_map(schar, schar);
 static void finish_map(schar, schar, coordxy, coordxy);
 static void remove_room(unsigned);
@@ -329,35 +328,6 @@ flood_fill_rm(int sx, int sy, int rmno, boolean lit, boolean anyroom)
     }
 }
 
-/*
- *  If we have drawn a map without walls, this allows us to
- *  auto-magically wallify it.  Taken from lev_main.c.
- */
-static void
-wallify_map(void)
-{
-
-    int x, y, xx, yy;
-
-    for (x = 1; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (levl[x][y].typ == STONE) {
-                for (yy = y - 1; yy <= y+1; yy++) {
-                    for (xx = x - 1; xx <= x+1; xx++) {
-                        if (isok(xx, yy) && levl[xx][yy].typ == ROOM) {
-                            if (yy != y) {
-                                levl[x][y].typ = HWALL;
-                            } else {
-                                levl[x][y].typ = VWALL;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 static void
 join_map_cleanup(void)
 {
@@ -452,7 +422,7 @@ finish_map(schar fg_typ, schar bg_typ, boolean lit, boolean walled)
     int i, j;
 
     if (walled) {
-        wallify_map();
+        wallify_map(1, 0, COLNO-1, ROWNO-1);
     }
 
     if (lit) {
@@ -553,6 +523,16 @@ remove_room(unsigned int roomno)
 #define N_P1_ITER   1   /* tune map generation via this value */
 #define N_P2_ITER   1   /* tune map generation via this value */
 #define N_P3_ITER   2   /* tune map smoothing via this value */
+
+boolean
+litstate_rnd(int litstate)
+{
+    if (litstate < 0) {
+        return (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
+    }
+
+    return (boolean) litstate;
+}
 
 void
 mkmap(lev_init *init_lev)

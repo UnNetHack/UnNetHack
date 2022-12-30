@@ -28,14 +28,13 @@ extern void mkmap(lev_init *);
 
 static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
 static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
-static void create_trap(trap *, struct mkroom *);
 static int noncoalignment(aligntyp);
 static void create_monster(monster *, struct mkroom *);
 static void create_object(object *, struct mkroom *);
 static void create_altar(altar *, struct mkroom *);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
-static void count_features(void);
+static void create_trap(spltrap *, struct mkroom *);
 
 static boolean create_subroom(struct mkroom *, coordxy, coordxy,
                               coordxy, coordxy, xint16, xint16);
@@ -70,13 +69,10 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 char SpLev_Map[COLNO][ROWNO];
 
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
-static coordxy xstart, ystart;
-static char xsize, ysize;
 
 static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
 static int rnddoor(void);
 static int rndtrap(void);
-static void get_location(coordxy *, coordxy *, int, struct mkroom *);
 static void light_region(region *);
 static void maze1xy(coord *, int);
 static boolean sp_level_loader(dlb *, sp_lev *);
@@ -558,24 +554,6 @@ void flip_drawbridge_vertical(struct rm *lev)
     }
 }
 
-static int
-flip_encoded_direction_bits(int flp, int val)
-{
-    /* These depend on xdir[] and ydir[] order */
-    if (flp & 1) {
-        val = swapbits(val, 1, 7);
-        val = swapbits(val, 2, 6);
-        val = swapbits(val, 3, 5);
-    }
-    if (flp & 2) {
-        val = swapbits(val, 1, 3);
-        val = swapbits(val, 0, 4);
-        val = swapbits(val, 7, 5);
-    }
-
-    return val;
-}
-
 #define FlipX(val) (inFlipArea(val, miny) ? ((maxx - (val)) + minx) : val)
 #define FlipY(val) (inFlipArea(minx, val) ? ((maxy - (val)) + miny) : val)
 #define inFlipArea(x,y) \
@@ -591,330 +569,6 @@ flip_encoded_direction_bits(int flp, int val)
             }                                       \
         }                                           \
     } while (0)
-
-extern timer_element *timer_base;
-
-/**
- * Transpose top with bottom or left with right or both; sometimes called
-   for new special levels */
-void
-flip_level(int flp)
-{
-    int x, y, i;
-    int minx, miny, maxx, maxy;
-
-    struct rm trm;
-
-    struct trap *ttmp;
-    struct obj *otmp;
-    struct monst *mtmp;
-    struct engr *etmp;
-    struct mkroom *sroom;
-    timer_element *timer;
-    stairway *stway;
-
-    /* nothing to do unless (flp & 1) or (flp & 2) or both */
-    if ((flp & 3) == 0) {
-        return;
-    }
-
-    get_level_extends(&minx, &miny, &maxx, &maxy);
-    /* get_level_extends() returns -1,-1 to COLNO,ROWNO at max */
-    if (miny < 0) {
-        miny = 0;
-    }
-    if (minx < 1) {
-        minx = 1;
-    }
-    if (maxx >= COLNO) {
-        maxx = (COLNO - 1);
-    }
-    if (maxy >= ROWNO) {
-        maxy = (ROWNO - 1);
-    }
-
-    /* stairs and ladders */
-    for (stway = stairs; stway; stway = stway->next) {
-        if (flp & 1) {
-            stway->sy = FlipY(stway->sy);
-        }
-        if (flp & 2) {
-            stway->sx = FlipX(stway->sx);
-        }
-    }
-
-    /* traps */
-    for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
-        if (!inFlipArea(ttmp->tx, ttmp->ty)) {
-            continue;
-        }
-        if (flp & 1) {
-            ttmp->ty = FlipY(ttmp->ty);
-            if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-                ttmp->launch.y = FlipY(ttmp->launch.y);
-                ttmp->launch2.y = FlipY(ttmp->launch2.y);
-            } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
-                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
-            }
-        }
-        if (flp & 2) {
-            ttmp->tx = FlipX(ttmp->tx);
-            if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-                ttmp->launch.x = FlipX(ttmp->launch.x);
-                ttmp->launch2.x = FlipX(ttmp->launch2.x);
-            } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
-                ttmp->conjoined = flip_encoded_direction_bits(flp, ttmp->conjoined);
-            }
-        }
-    }
-
-    /* objects */
-    for (otmp = fobj; otmp; otmp = otmp->nobj) {
-        if (!inFlipArea(otmp->ox, otmp->oy)) {
-            continue;
-        }
-        if (flp & 1) {
-            otmp->oy = FlipY(otmp->oy);
-        }
-        if (flp & 2) {
-            otmp->ox = FlipX(otmp->ox);
-        }
-    }
-
-    /* buried objects */
-    for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
-        if (!inFlipArea(otmp->ox, otmp->oy)) {
-            continue;
-        }
-        if (flp & 1) {
-            otmp->oy = FlipY(otmp->oy);
-        }
-        if (flp & 2) {
-            otmp->ox = FlipX(otmp->ox);
-        }
-    }
-
-    /* monsters */
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (mtmp->isgd && mtmp->mx == 0) {
-            continue;
-        }
-        /* skip the occasional earth elemental outside the flip area */
-        if (!inFlipArea(mtmp->mx, mtmp->my)) {
-            continue;
-        }
-        if (flp & 1) {
-            mtmp->my = FlipY(mtmp->my);
-        }
-        if (flp & 2) {
-            mtmp->mx = FlipX(mtmp->mx);
-        }
-        if (mtmp->ispriest) {
-            Flip_coord(EPRI(mtmp)->shrpos);
-        } else if (mtmp->isshk) {
-            Flip_coord(ESHK(mtmp)->shk); /* shk's preferred spot */
-            Flip_coord(ESHK(mtmp)->shd); /* shop door */
-        } else if (mtmp->wormno) {
-            if (flp & 1) {
-                flip_worm_segs_vertical(mtmp, miny, maxy);
-            }
-            if (flp & 2) {
-                flip_worm_segs_horizontal(mtmp, minx, maxx);
-            }
-        }
-    }
-
-    /* engravings */
-    for (etmp = head_engr; etmp; etmp = etmp->nxt_engr) {
-        if (flp & 1) {
-            etmp->engr_y = FlipY(etmp->engr_y);
-        }
-        if (flp & 2) {
-            etmp->engr_x = FlipX(etmp->engr_x);
-        }
-    }
-
-    /* level (teleport) regions */
-    for (i = 0; i < num_lregions; i++) {
-        if (flp & 1) {
-            lregions[i].inarea.y1 = FlipY(lregions[i].inarea.y1);
-            lregions[i].inarea.y2 = FlipY(lregions[i].inarea.y2);
-            if (lregions[i].inarea.y1 > lregions[i].inarea.y2) {
-                int tmp = lregions[i].inarea.y1;
-                lregions[i].inarea.y1 = lregions[i].inarea.y2;
-                lregions[i].inarea.y2 = tmp;
-            }
-
-            lregions[i].delarea.y1 = FlipY(lregions[i].delarea.y1);
-            lregions[i].delarea.y2 = FlipY(lregions[i].delarea.y2);
-            if (lregions[i].delarea.y1 > lregions[i].delarea.y2) {
-                int tmp = lregions[i].delarea.y1;
-                lregions[i].delarea.y1 = lregions[i].delarea.y2;
-                lregions[i].delarea.y2 = tmp;
-            }
-        }
-        if (flp & 2) {
-            lregions[i].inarea.x1 = FlipX(lregions[i].inarea.x1);
-            lregions[i].inarea.x2 = FlipX(lregions[i].inarea.x2);
-            if (lregions[i].inarea.x1 > lregions[i].inarea.x2) {
-                int tmp = lregions[i].inarea.x1;
-                lregions[i].inarea.x1 = lregions[i].inarea.x2;
-                lregions[i].inarea.x2 = tmp;
-            }
-
-            lregions[i].delarea.x1 = FlipX(lregions[i].delarea.x1);
-            lregions[i].delarea.x2 = FlipX(lregions[i].delarea.x2);
-            if (lregions[i].delarea.x1 > lregions[i].delarea.x2) {
-                int tmp = lregions[i].delarea.x1;
-                lregions[i].delarea.x1 = lregions[i].delarea.x2;
-                lregions[i].delarea.x2 = tmp;
-            }
-        }
-    }
-
-    /* rooms */
-    for (sroom = &rooms[0]; ; sroom++) {
-        if (sroom->hx < 0) {
-            break;
-        }
-
-        if (flp & 1) {
-            sroom->ly = FlipY(sroom->ly);
-            sroom->hy = FlipY(sroom->hy);
-            if (sroom->ly > sroom->hy) {
-                int tmp = sroom->ly;
-                sroom->ly = sroom->hy;
-                sroom->hy = tmp;
-            }
-        }
-        if (flp & 2) {
-            sroom->lx = FlipX(sroom->lx);
-            sroom->hx = FlipX(sroom->hx);
-            if (sroom->lx > sroom->hx) {
-                int tmp = sroom->lx;
-                sroom->lx = sroom->hx;
-                sroom->hx = tmp;
-            }
-        }
-
-        if (sroom->nsubrooms) {
-            for (i = 0; i < sroom->nsubrooms; i++) {
-                struct mkroom *rroom = sroom->sbrooms[i];
-
-                if (flp & 1) {
-                    rroom->ly = FlipY(rroom->ly);
-                    rroom->hy = FlipY(rroom->hy);
-                    if (rroom->ly > rroom->hy) {
-                        int tmp = rroom->ly;
-                        rroom->ly = rroom->hy;
-                        rroom->hy = tmp;
-                    }
-                }
-                if (flp & 2) {
-                    rroom->lx = FlipX(rroom->lx);
-                    rroom->hx = FlipX(rroom->hx);
-                    if (rroom->lx > rroom->hx) {
-                        int tmp = rroom->lx;
-                        rroom->lx = rroom->hx;
-                        rroom->hx = tmp;
-                    }
-                }
-            }
-        }
-    }
-
-    /* doors */
-    for (i = 0; i < doorindex; i++) {
-        Flip_coord(doors[i]);
-    }
-
-    /* the map */
-    if (flp & 1) {
-        for (x = minx; x <= maxx; x++) {
-            for (y = miny; y < (miny + ((maxy - miny + 1) / 2)); y++) {
-                int ny = FlipY(y);
-
-                flip_drawbridge_vertical(&levl[x][y]);
-                flip_drawbridge_vertical(&levl[x][ny]);
-
-                trm = levl[x][y];
-                levl[x][y] = levl[x][ny];
-                levl[x][ny] = trm;
-
-                otmp = level.objects[x][y];
-                level.objects[x][y] = level.objects[x][ny];
-                level.objects[x][ny] = otmp;
-
-                mtmp = level.monsters[x][y];
-                level.monsters[x][y] = level.monsters[x][ny];
-                level.monsters[x][ny] = mtmp;
-            }
-        }
-    }
-    if (flp & 2) {
-        for (x = minx; x < (minx + ((maxx - minx + 1) / 2)); x++) {
-            for (y = miny; y <= maxy; y++) {
-                int nx = FlipX(x);
-
-                flip_drawbridge_horizontal(&levl[x][y]);
-                flip_drawbridge_horizontal(&levl[nx][y]);
-
-                trm = levl[x][y];
-                levl[x][y] = levl[nx][y];
-                levl[nx][y] = trm;
-
-                otmp = level.objects[x][y];
-                level.objects[x][y] = level.objects[nx][y];
-                level.objects[nx][y] = otmp;
-
-                mtmp = level.monsters[x][y];
-                level.monsters[x][y] = level.monsters[nx][y];
-                level.monsters[nx][y] = mtmp;
-            }
-        }
-    }
-
-    /* timed effects */
-    for (timer = timer_base; timer; timer = timer->next) {
-        if (timer->func_index == MELT_ICE_AWAY) {
-            long ty = timer->arg.a_long & 0xffff;
-            long tx = (timer->arg.a_long >> 16) & 0xffff;
-
-            if (flp & 1) {
-                ty = FlipY(ty);
-            }
-            if (flp & 2) {
-                tx = FlipX(tx);
-            }
-            timer->arg.a_long = ((tx << 16) | ty);
-        }
-    }
-
-    wall_extends(1, 0, COLNO-1, ROWNO-1);
-    vision_reset();
-}
-
-void
-flip_level_rnd(int flp)
-{
-    int c = 0;
-    if ((flp & 1) && rn2(2)) {
-        c |= 1;
-    }
-    if ((flp & 2) && rn2(2)) {
-        c |= 2;
-    }
-
-    /* Workaround for preventing the stairs to Vlad's tower appearing
-     * in the wizard's tower because of a bug in level flipping. */
-    if (On_W_tower_level(&u.uz)) {
-        flp &= 1;
-    }
-
-    if (c) {
-        flip_level(c);
-    }
-}
 
 /*
  * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
@@ -951,27 +605,6 @@ shuffle_alignments(void)
     i = rn2(3);   atmp=ralign[2]; ralign[2]=ralign[i]; ralign[i]=atmp;
     if (rn2(2)) {
         atmp=ralign[1]; ralign[1]=ralign[0]; ralign[0]=atmp;
-    }
-}
-
-/*
- * Count the different features (sinks, fountains) in the level.
- */
-static void
-count_features(void)
-{
-    coordxy x, y;
-
-    level.flags.nfountains = level.flags.nsinks = 0;
-    for (y = 0; y < ROWNO; y++) {
-        for (x = 0; x < COLNO; x++) {
-            int typ = levl[x][y].typ;
-            if (typ == FOUNTAIN) {
-                level.flags.nfountains++;
-            } else if (typ == SINK) {
-                level.flags.nsinks++;
-            }
-        }
     }
 }
 
@@ -1178,10 +811,10 @@ get_location(
         sx = croom->hx - mx + 1;
         sy = croom->hy - my + 1;
     } else {
-        mx = xstart;
-        my = ystart;
-        sx = xsize;
-        sy = ysize;
+        mx = gx.xstart;
+        my = gy.ystart;
+        sx = gx.xsize;
+        sy = gy.ysize;
     }
 
     if (*x >= 0) { /* normal locations */
@@ -1291,25 +924,6 @@ get_unpacked_coord(long int loc, int defhumidity)
     return c;
 }
 
-static void
-get_location_coord(
-    coordxy *x, coordxy *y,
-    int humidity,
-    struct mkroom *croom,
-    long crd)
-{
-    unpacked_coord c;
-
-    c = get_unpacked_coord(crd, humidity);
-    *x = c.x;
-    *y = c.y;
-    get_location(x, y, c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0), croom);
-    if (*x == -1 && *y == -1 && c.is_random) {
-        get_location(x, y, humidity, croom);
-    }
-}
-
-
 /*
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
@@ -1365,280 +979,6 @@ get_free_room_loc(
         }
     }
     *x = try_x,  *y = try_y;
-}
-
-boolean
-check_room(coordxy *lowx, coordxy *ddx, coordxy *lowy, coordxy *ddy, boolean vault)
-{
-    int x, y, hix = *lowx + *ddx, hiy = *lowy + *ddy;
-    struct rm *lev;
-    int xlim, ylim, ymax;
-    coordxy s_lowx, s_ddx, s_lowy, s_ddy;
-
-    s_lowx = *lowx; s_ddx = *ddx;
-    s_lowy = *lowy; s_ddy = *ddy;
-
-    xlim = XLIM + (vault ? 1 : 0);
-    ylim = YLIM + (vault ? 1 : 0);
-
-    if (*lowx < 3) {
-        *lowx = 3;
-    }
-    if (*lowy < 2) {
-        *lowy = 2;
-    }
-    if (hix > COLNO-3) {
-        hix = COLNO-3;
-    }
-    if (hiy > ROWNO-3) {
-        hiy = ROWNO-3;
-    }
-chk:
-    if (hix <= *lowx || hiy <= *lowy) {
-        return FALSE;
-    }
-
-    if (in_mk_rndvault &&
-        (s_lowx != *lowx) && (s_ddx != *ddx)
-        && (s_lowy != *lowy) && (s_ddy != *ddy)) return FALSE;
-
-    /* check area around room (and make room smaller if necessary) */
-    for (x = *lowx - xlim; x<= hix + xlim; x++) {
-        if (x <= 0 || x >= COLNO) {
-            continue;
-        }
-        y = *lowy - ylim;   ymax = hiy + ylim;
-        if (y < 0) {
-            y = 0;
-        }
-        if (ymax >= ROWNO) {
-            ymax = (ROWNO-1);
-        }
-        lev = &levl[x][y];
-        for (; y <= ymax; y++) {
-            if (lev++->typ) {
-#ifdef DEBUG
-                if (!vault) {
-                    debugpline("strange area [%d,%d] in check_room.", x, y);
-                }
-#endif
-                if (!rn2(3)) {
-                    return FALSE;
-                }
-                if (in_mk_rndvault) {
-                    return FALSE;
-                }
-                if (x < *lowx) {
-                    *lowx = x + xlim + 1;
-                } else {
-                    hix = x - xlim - 1;
-                }
-                if (y < *lowy) {
-                    *lowy = y + ylim + 1;
-                } else {
-                    hiy = y - ylim - 1;
-                }
-                goto chk;
-            }
-        }
-    }
-    *ddx = hix - *lowx;
-    *ddy = hiy - *lowy;
-
-    if (in_mk_rndvault &&
-        (s_lowx != *lowx) && (s_ddx != *ddx)
-        && (s_lowy != *lowy) && (s_ddy != *ddy)) return FALSE;
-
-    return TRUE;
-}
-
-/*
- * Create a new room.
- * This is still very incomplete...
- */
-boolean
-create_room(
-    coordxy x, coordxy y,
-    coordxy w, coordxy h,
-    coordxy xal, coordxy yal,
-    xint16 rtype, xint16 rlit)
-{
-    coordxy xabs, yabs;
-    int wtmp, htmp, xaltmp, yaltmp, xtmp, ytmp;
-    NhRect  *r1 = 0, r2;
-    int trycnt = 0;
-    boolean vault = FALSE;
-    int xlim = XLIM, ylim = YLIM;
-
-    if (rtype == -1) { /* Is the type random ? */
-        rtype = OROOM;
-    }
-
-    if (rtype == VAULT) {
-        vault = TRUE;
-        xlim++;
-        ylim++;
-    }
-
-    /* on low levels the room is lit (usually) */
-    /* some other rooms may require lighting */
-
-    /* is light state random ? */
-    if (rlit == -1) {
-        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-    }
-
-    /*
-     * Here we will try to create a room. If some parameters are
-     * random we are willing to make several try before we give
-     * it up.
-     */
-    do {
-        coordxy xborder, yborder;
-        wtmp = w; htmp = h;
-        xtmp = x; ytmp = y;
-        xaltmp = xal; yaltmp = yal;
-
-        /* First case : a totaly random room */
-
-        if ((xtmp < 0 && ytmp <0 && wtmp < 0 && xaltmp < 0 &&
-            yaltmp < 0) || vault) {
-            coordxy hx, hy, lx, ly, dx, dy;
-            r1 = rnd_rect(); /* Get a random rectangle */
-
-            if (!r1) { /* No more free rectangles ! */
-#ifdef DEBUG
-                debugpline("No more rects...");
-#endif
-                return FALSE;
-            }
-            hx = r1->hx;
-            hy = r1->hy;
-            lx = r1->lx;
-            ly = r1->ly;
-            if (vault) {
-                dx = dy = 1;
-            } else {
-                dx = 2 + rn2((hx-lx > 28) ? 12 : 8);
-                dy = 2 + rn2(4);
-                if (dx*dy > 50) {
-                    dy = 50/dx;
-                }
-            }
-            xborder = (lx > 0 && hx < COLNO -1) ? 2*xlim : xlim+1;
-            yborder = (ly > 0 && hy < ROWNO -1) ? 2*ylim : ylim+1;
-            if (hx-lx < dx + 3 + xborder ||
-               hy-ly < dy + 3 + yborder) {
-                r1 = 0;
-                continue;
-            }
-            xabs = lx + (lx > 0 ? xlim : 3)
-                   + rn2(hx - (lx>0 ? lx : 3) - dx - xborder + 1);
-            yabs = ly + (ly > 0 ? ylim : 2)
-                   + rn2(hy - (ly>0 ? ly : 2) - dy - yborder + 1);
-            if (ly == 0 && hy >= (ROWNO-1) &&
-                (!nroom || !rn2(nroom)) && (yabs+dy > ROWNO/2)) {
-                yabs = rn1(3, 2);
-                if (nroom < 4 && dy>1) {
-                    dy--;
-                }
-            }
-            if (!check_room(&xabs, &dx, &yabs, &dy, vault)) {
-                r1 = 0;
-                continue;
-            }
-            wtmp = dx+1;
-            htmp = dy+1;
-            r2.lx = xabs-1; r2.ly = yabs-1;
-            r2.hx = xabs + wtmp;
-            r2.hy = yabs + htmp;
-        } else {    /* Only some parameters are random */
-            int rndpos = 0;
-            coordxy dx, dy;
-            if (xtmp < 0 && ytmp < 0) { /* Position is RANDOM */
-                xtmp = rnd(5);
-                ytmp = rnd(5);
-                rndpos = 1;
-            }
-            if (wtmp < 0 || htmp < 0) { /* Size is RANDOM */
-                wtmp = rn1(15, 3);
-                htmp = rn1(8, 2);
-            }
-            if (xaltmp == -1) { /* Horizontal alignment is RANDOM */
-                xaltmp = rnd(3);
-            }
-            if (yaltmp == -1) { /* Vertical alignment is RANDOM */
-                yaltmp = rnd(3);
-            }
-
-            /* Try to generate real (absolute) coordinates here! */
-
-            xabs = (((xtmp-1) * COLNO) / 5) + 1;
-            yabs = (((ytmp-1) * ROWNO) / 5) + 1;
-            switch (xaltmp) {
-            case LEFT:
-                break;
-            case RIGHT:
-                xabs += (COLNO / 5) - wtmp;
-                break;
-            case CENTER:
-                xabs += ((COLNO / 5) - wtmp) / 2;
-                break;
-            }
-            switch (yaltmp) {
-            case TOP:
-                break;
-            case BOTTOM:
-                yabs += (ROWNO / 5) - htmp;
-                break;
-            case CENTER:
-                yabs += ((ROWNO / 5) - htmp) / 2;
-                break;
-            }
-
-            if (xabs + wtmp - 1 > COLNO - 2) {
-                xabs = COLNO - wtmp - 3;
-            }
-            if (xabs < 2) {
-                xabs = 2;
-            }
-            if (yabs + htmp - 1> ROWNO - 2) {
-                yabs = ROWNO - htmp - 3;
-            }
-            if (yabs < 2) {
-                yabs = 2;
-            }
-
-            /* Try to find a rectangle that fit our room ! */
-
-            r2.lx = xabs-1; r2.ly = yabs-1;
-            r2.hx = xabs + wtmp + rndpos;
-            r2.hy = yabs + htmp + rndpos;
-            r1 = get_rect(&r2);
-
-            dx = wtmp;
-            dy = htmp;
-
-            if (r1 && !check_room(&xabs, &dx, &yabs, &dy, vault)) {
-                r1 = 0;
-            }
-
-        }
-    } while (++trycnt <= 100 && !r1);
-    if (!r1) {  /* creation of room failed ? */
-        return FALSE;
-    }
-    split_rects(r1, &r2);
-
-    if (!vault) {
-        smeq[nroom] = nroom;
-        add_room(xabs, yabs, xabs+wtmp-1, yabs+htmp-1,
-                 rlit, rtype, FALSE);
-    } else {
-        rooms[nroom].lx = xabs;
-        rooms[nroom].ly = yabs;
-    }
-    return TRUE;
 }
 
 /*
@@ -1870,7 +1210,7 @@ create_secret_door(
  * Create a trap in a room.
  */
 static void
-create_trap(trap *t, struct mkroom *croom)
+create_trap(spltrap *t, struct mkroom *croom)
 {
     coordxy x = -1, y = -1;
     coord tm;
@@ -2706,129 +2046,6 @@ search_door(
 }
 
 /*
- * Dig a corridor between two points.
- */
-boolean
-dig_corridor(coord *org, coord *dest, boolean nxcor, schar ftyp, schar btyp)
-{
-    int dx=0, dy=0, dix, diy, cct;
-    struct rm *crm;
-    int tx, ty, xx, yy;
-
-    xx = org->x;  yy = org->y;
-    tx = dest->x; ty = dest->y;
-    if (xx <= 0 || yy <= 0 || tx <= 0 || ty <= 0 ||
-        xx > COLNO-1 || tx > COLNO-1 ||
-        yy > ROWNO-1 || ty > ROWNO-1) {
-#ifdef DEBUG
-        debugpline("dig_corridor: bad coords : (%d,%d) (%d,%d).",
-                   xx, yy, tx, ty);
-#endif
-        return FALSE;
-    }
-    if (tx > xx) {
-        dx = 1;
-    } else if (ty > yy) {
-        dy = 1;
-    } else if (tx < xx) {
-        dx = -1;
-    } else {
-        dy = -1;
-    }
-
-    xx -= dx;
-    yy -= dy;
-    cct = 0;
-    while (xx != tx || yy != ty) {
-        /* loop: dig corridor at [xx,yy] and find new [xx,yy] */
-        if (cct++ > 500 || (nxcor && !rn2(35))) {
-            return FALSE;
-        }
-
-        xx += dx;
-        yy += dy;
-
-        if (xx >= COLNO-1 || xx <= 0 || yy <= 0 || yy >= ROWNO-1) {
-            return FALSE; /* impossible */
-        }
-
-        crm = &levl[xx][yy];
-        if (crm->typ == btyp) {
-            if (ftyp != CORR || rn2(100)) {
-                crm->typ = ftyp;
-                if (nxcor && !rn2(50)) {
-                    (void) mksobj_at(BOULDER, xx, yy, TRUE, FALSE);
-                }
-            } else {
-                crm->typ = CORR; /* formerly secret corridor */
-            }
-        } else {
-        if (crm->typ != ftyp && crm->typ != SCORR) {
-            /* strange ... */
-            return FALSE;
-        }
-        }
-
-        /* find next corridor position */
-        dix = abs(xx-tx);
-        diy = abs(yy-ty);
-
-#if 0
-        /* supposed to add some variance in corridors */
-        /* TODO: check this claim */
-        if ((dix > diy) && diy && !rn2(dix-diy+1)) {
-            dix = 0;
-        } else if ((diy > dix) && dix && !rn2(diy-dix+1)) {
-            diy = 0;
-        }
-#endif
-
-        /* do we have to change direction ? */
-        if (dy && dix > diy) {
-            int ddx = (xx > tx) ? -1 : 1;
-
-            crm = &levl[xx+ddx][yy];
-            if (crm->typ == btyp || crm->typ == ftyp || crm->typ == SCORR) {
-                dx = ddx;
-                dy = 0;
-                continue;
-            }
-        } else if (dx && diy > dix) {
-            int ddy = (yy > ty) ? -1 : 1;
-
-            crm = &levl[xx][yy+ddy];
-            if (crm->typ == btyp || crm->typ == ftyp || crm->typ == SCORR) {
-                dy = ddy;
-                dx = 0;
-                continue;
-            }
-        }
-
-        /* continue straight on? */
-        crm = &levl[xx+dx][yy+dy];
-        if (crm->typ == btyp || crm->typ == ftyp || crm->typ == SCORR) {
-            continue;
-        }
-
-        /* no, what must we do now?? */
-        if (dx) {
-            dx = 0;
-            dy = (ty < yy) ? -1 : 1;
-        } else {
-            dy = 0;
-            dx = (tx < xx) ? -1 : 1;
-        }
-        crm = &levl[xx+dx][yy+dy];
-        if (crm->typ == btyp || crm->typ == ftyp || crm->typ == SCORR) {
-            continue;
-        }
-        dy = -dy;
-        dx = -dx;
-    }
-    return TRUE;
-}
-
-/*
  * Corridors always start from a door. But it can end anywhere...
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
@@ -2969,7 +2186,7 @@ build_room(room *r, struct mkroom *mkr)
 #else
         topologize(aroom);          /* set roomno */
 #endif
-        aroom->needfill = r->filled;
+        aroom->needfill = r->needfill;
         aroom->needjoining = r->joined;
         return aroom;
     }
@@ -3003,37 +2220,6 @@ light_region(region *tmpregion)
                 lev->lit = litstate;
             }
             lev++;
-        }
-    }
-}
-
-void
-wallify_map(int x1, int y1, int x2, int y2)
-{
-    int x, y, xx, yy, lo_xx, lo_yy, hi_xx, hi_yy;
-
-    y1 = max(y1, 0);
-    x1 = max(x1, 1);
-    y2 = min(y2, ROWNO - 1);
-    x2 = min(x2, COLNO - 1);
-    for (y = y1; y <= y2; y++) {
-        lo_yy = (y > 0) ? y - 1 : 0;
-        hi_yy = (y < y2) ? y + 1 : y2;
-        for (x = x1; x <= x2; x++) {
-            if (levl[x][y].typ != STONE) {
-                continue;
-            }
-            lo_xx = (x > 0) ? x - 1 : 0;
-            hi_xx = (x < x2) ? x + 1 : x2;
-            for (yy = lo_yy; yy <= hi_yy; yy++) {
-                for (xx = lo_xx; xx <= hi_xx; xx++) {
-                    if (IS_ROOM(levl[xx][yy].typ) || levl[xx][yy].typ == CROSSWALL) {
-                        levl[x][y].typ = (yy != y) ? HWALL : VWALL;
-                        yy = hi_yy; /* end `yy' loop */
-                        break; /* end `xx' loop */
-                    }
-                }
-            }
         }
     }
 }
@@ -4252,7 +3438,7 @@ spo_room(struct sp_coder *coder)
         tmproom.rtype = OV_i(rtype);
         tmproom.chance = OV_i(chance);
         tmproom.rlit = OV_i(rlit);
-        tmproom.filled = (OV_i(flags) & (1 << 0));
+        tmproom.needfill = (OV_i(flags) & (1 << 0));
         /*tmproom.irregular = (OV_i(flags) & (1 << 1));*/
         tmproom.joined = !(OV_i(flags) & (1 << 2));
 
@@ -4296,15 +3482,15 @@ spo_endroom(struct sp_coder *coder)
         coder->failed_room[coder->n_subroom] = TRUE;
     } else {
         /* no subroom, get out of top-level room */
-        /* Need to ensure xstart/ystart/xsize/ysize have something sensible,
+        /* Need to ensure gxxstart/gy.ystart/gx.xsize/gy.ysize have something sensible,
            in case there's some stuff to be created outside the outermost room,
            and there's no MAP.
          */
-        if (xsize <= 1 && ysize <= 1) {
-            xstart = 1;
-            ystart = 0;
-            xsize = COLNO-1;
-            ysize = ROWNO;
+        if (gx.xsize <= 1 && gy.ysize <= 1) {
+            gx.xstart = 1;
+            gy.ystart = 0;
+            gx.xsize = COLNO-1;
+            gy.ysize = ROWNO;
         }
     }
 }
@@ -4313,20 +3499,21 @@ void
 spo_stair(struct sp_coder *coder)
 {
     coordxy x, y;
-    struct opvar *up, *coord;
+    struct opvar *up, *scoord;
     struct trap *badtrap;
 
-    if (!OV_pop_i(up) ||
-        !OV_pop_c(coord)) return;
+    if (!OV_pop_i(up) || !OV_pop_c(scoord)) {
+        return;
+    }
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(scoord));
     if ((badtrap = t_at(x, y)) != 0) {
         deltrap(badtrap);
     }
-    mkstairs(x, y, (char) OV_i(up), coder->croom);
+    mkstairs(x, y, (char) OV_i(up), coder->croom, !(OV_i(scoord) & SP_COORD_IS_RANDOM));
     SpLev_Map[x][y] = 1;
 
-    opvar_free(coord);
+    opvar_free(scoord);
     opvar_free(up);
 }
 
@@ -4443,10 +3630,12 @@ spo_trap(struct sp_coder *coder)
 {
     struct opvar *type;
     struct opvar *coord;
-    trap tmptrap;
+    spltrap tmptrap;
 
     if (!OV_pop_i(type) ||
-        !OV_pop_c(coord)) return;
+         !OV_pop_c(coord)) {
+        return;
+    }
 
     tmptrap.coord = OV_i(coord);
     tmptrap.type = OV_i(type);
@@ -4754,18 +3943,6 @@ op_selection_do_grow(struct opvar *ov, int dir)
 
 static int (*selection_flood_check_func)(coordxy, coordxy);
 static schar floodfillchk_match_under_typ;
-
-void
-set_selection_floodfillchk(int (*f) (coordxy, coordxy))
-{
-    selection_flood_check_func = f;
-}
-
-static int
-floodfillchk_match_under(coordxy x, coordxy y)
-{
-    return (floodfillchk_match_under_typ == levl[x][y].typ);
-}
 
 static int
 floodfillchk_match_accessible(coordxy x, coordxy y)
@@ -5785,10 +4962,10 @@ spo_wallify(struct sp_coder *coder)
         dy1 = (coordxy)SP_REGION_Y1(OV_i(r));
         dx2 = (coordxy)SP_REGION_X2(OV_i(r));
         dy2 = (coordxy)SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? (xstart - 1) : dx1,
-                    dy1 < 0 ? (ystart - 1) : dy1,
-                    dx2 < 0 ? (xstart + xsize + 1) : dx2,
-                    dy2 < 0 ? (ystart + ysize + 1) : dy2);
+        wallify_map(dx1 < 0 ? (gx.xstart - 1) : dx1,
+                    dy1 < 0 ? (gy.ystart - 1) : dy1,
+                    dx2 < 0 ? (gx.xstart + gx.xsize + 1) : dx2,
+                    dy2 < 0 ? (gy.ystart + gy.ysize + 1) : dy2);
     }
     break;
     case 1:
@@ -5831,82 +5008,82 @@ redo_maploc:
     tmpmazepart.halign = upc.x;
     tmpmazepart.valign = upc.y;
 
-    tmpxsize = xsize; tmpysize = ysize;
-    tmpxstart = xstart; tmpystart = ystart;
+    tmpxsize = gx.xsize; tmpysize = gy.ysize;
+    tmpxstart = gx.xstart; tmpystart = gy.ystart;
 
     halign = tmpmazepart.halign;
     valign = tmpmazepart.valign;
-    xsize = tmpmazepart.xsize;
-    ysize = tmpmazepart.ysize;
+    gx.xsize = tmpmazepart.xsize;
+    gy.ysize = tmpmazepart.ysize;
     switch (tmpmazepart.zaligntyp) {
     default:
     case 0:
         break;
     case 1:
         switch ((int) halign) {
-        case LEFT:    xstart = splev_init_present ? 1 : 3;   break;
-        case H_LEFT:  xstart = 2+((x_maze_max-2-xsize)/4);   break;
-        case CENTER:  xstart = 2+((x_maze_max-2-xsize)/2);   break;
-        case H_RIGHT: xstart = 2+((x_maze_max-2-xsize)*3/4); break;
-        case RIGHT:   xstart = x_maze_max-xsize-1;           break;
+        case LEFT:    gx.xstart = splev_init_present ? 1 : 3;   break;
+        case H_LEFT:  gx.xstart = 2 + ((x_maze_max - 2 - gx.xsize) / 4);     break;
+        case CENTER:  gx.xstart = 2 + ((x_maze_max - 2 - gx.xsize) / 2);     break;
+        case H_RIGHT: gx.xstart = 2 + ((x_maze_max - 2 - gx.xsize) * 3 / 4); break;
+        case RIGHT:   gx.xstart = x_maze_max - gx.xsize - 1;                 break;
         }
         switch ((int) valign) {
-        case TOP:     ystart = 3;                          break;
-        case CENTER:  ystart = 2+((y_maze_max-2-ysize)/2); break;
-        case BOTTOM:  ystart = y_maze_max-ysize-1;         break;
+        case TOP:     gy.ystart = 3;                                     break;
+        case CENTER:  gy.ystart = 2 + ((y_maze_max - 2 - gy.ysize) / 2); break;
+        case BOTTOM:  gy.ystart = y_maze_max - gy.ysize - 1;                break;
         }
-        if (!(xstart % 2)) {
-            xstart++;
+        if (!(gx.xstart % 2)) {
+            gx.xstart++;
         }
-        if (!(ystart % 2)) {
-            ystart++;
+        if (!(gy.ystart % 2)) {
+            gy.ystart++;
         }
         break;
     case 2:
         if (!coder->croom) {
-            xstart = 1;
-            ystart = 0;
-            xsize = COLNO-1-tmpmazepart.xsize;
-            ysize = ROWNO-tmpmazepart.ysize;
+            gx.xstart = 1;
+            gy.ystart = 0;
+            gx.xsize = COLNO-1-tmpmazepart.xsize;
+            gy.ysize = ROWNO-tmpmazepart.ysize;
         }
         get_location_coord(&halign, &valign, ANY_LOC, coder->croom, OV_i(mpa));
-        xsize = tmpmazepart.xsize;
-        ysize = tmpmazepart.ysize;
-        xstart = halign;
-        ystart = valign;
+        gx.xsize = tmpmazepart.xsize;
+        gy.ysize = tmpmazepart.ysize;
+        gx.xstart = halign;
+        gy.ystart = valign;
         break;
     }
-    if ((ystart < 0) || (ystart + ysize > ROWNO)) {
+    if ((gy.ystart < 0) || (gy.ystart + gy.ysize > ROWNO)) {
         if (in_mk_rndvault) {
             coder->exit_script = TRUE;
             goto skipmap;
         }
         /* try to move the start a bit */
-        ystart += (ystart > 0) ? -2 : 2;
-        if (ysize == ROWNO) {
-            ystart = 0;
+        gy.ystart += (gy.ystart > 0) ? -2 : 2;
+        if (gy.ysize == ROWNO) {
+            gy.ystart = 0;
         }
-        if (ystart < 0 || ystart + ysize > ROWNO) {
-            panic("reading special level with ysize too large");
+        if (gy.ystart < 0 || gy.ystart + gy.ysize > ROWNO) {
+            panic("reading special level with gy.ysize too large");
         }
     }
-    if (xsize <= 1 && ysize <= 1) {
-        xstart = 1;
-        ystart = 0;
-        xsize = COLNO-1;
-        ysize = ROWNO;
+    if (gx.xsize <= 1 && gy.ysize <= 1) {
+        gx.xstart = 1;
+        gy.ystart = 0;
+        gx.xsize = COLNO-1;
+        gy.ysize = ROWNO;
     } else {
         coordxy x, y;
         /* random vault should never overwrite anything */
         if (in_mk_rndvault) {
             boolean isokp = TRUE;
-            for (y = ystart - 1; y < ystart+ysize + 1; y++) {
-                for (x = xstart - 1; x < xstart+xsize + 1; x++) {
+            for (y = gy.ystart - 1; y < gy.ystart + gy.ysize + 1; y++) {
+                for (x = gx.xstart - 1; x < gx.xstart + gx.xsize + 1; x++) {
                     coordxy mptyp;
                     if (!isok(x, y)) {
                         isokp = FALSE;
-                    } else if (y < ystart || y >= (ystart+ysize) ||
-                               x < xstart || x >= (xstart+xsize)) {
+                    } else if (y < gy.ystart || y >= (gy.ystart + gy.ysize) ||
+                               x < gx.xstart || x >= (gx.xstart + gx.xsize)) {
                         if (levl[x][y].typ != STONE) {
                             isokp = FALSE;
                         }
@@ -5914,7 +5091,7 @@ redo_maploc:
                             isokp = FALSE;
                         }
                     } else {
-                        mptyp = (mpmap->vardata.str[(y-ystart) * xsize + (x-xstart+1)] - 1);
+                        mptyp = (mpmap->vardata.str[(y - gy.ystart) * gx.xsize + (x - gx.xstart + 1)] - 1);
                         if (mptyp >= MAX_TYPE) {
                             continue;
                         }
@@ -5933,7 +5110,7 @@ redo_maploc:
                         if ((tryct++ < 100) && (tmpmazepart.zaligntyp == 2) &&
                             ((tmpmazepart.halign < 0) || (tmpmazepart.valign < 0)) /* rnd pos */ )
                             goto redo_maploc;
-                        if (!((xsize * ysize) > 20)) { /* !isbig() */
+                        if (!((gx.xsize * gy.ysize) > 20)) { /* !isbig() */
                             rndvault_failed = TRUE;
                         }
                         coder->exit_script = TRUE;
@@ -5943,9 +5120,9 @@ redo_maploc:
             }
         }
         /* Load the map */
-        for (y = ystart; y < ystart+ysize; y++) {
-            for (x = xstart; x < xstart+xsize; x++) {
-                coordxy mptyp = (mpmap->vardata.str[(y-ystart) * xsize + (x-xstart)] - 1);
+        for (y = gy.ystart; y < gy.ystart + gy.ysize; y++) {
+            for (x = gx.xstart; x < gx.xstart + gx.xsize; x++) {
+                coordxy mptyp = (mpmap->vardata.str[(y - gy.ystart) * gx.xsize + (x - gx.xstart)] - 1);
                 if (mptyp >= MAX_TYPE) {
                     continue;
                 }
@@ -5970,7 +5147,7 @@ redo_maploc:
                      *  (secret) door, then it is horizontal.  This does
                      *  not allow (secret) doors to be corners of rooms.
                      */
-                    if (x != xstart && (IS_WALL(levl[x-1][y].typ) ||
+                    if (x != gx.xstart && (IS_WALL(levl[x-1][y].typ) ||
                                         levl[x-1][y].horizontal))
                         levl[x][y].horizontal = 1;
                 } else if (levl[x][y].typ == HWALL ||
@@ -5984,12 +5161,12 @@ redo_maploc:
             }
         }
         if (coder->lvl_is_joined && !in_mk_rndvault) {
-            remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
+            remove_rooms(gx.xstart, gy.ystart, gx.xstart + gx.xsize, gy.ystart + gy.ysize);
         }
     }
     if (!OV_i(mpkeepr)) {
-        xstart = tmpxstart; ystart = tmpystart;
-        xsize = tmpxsize; ysize = tmpysize;
+        gx.xstart = tmpxstart; gy.ystart = tmpystart;
+        gx.xsize = tmpxsize; gy.ysize = tmpysize;
     }
 
 skipmap:
@@ -6297,10 +5474,10 @@ sp_level_coder(sp_lev *lvl)
 
     level.flags.is_maze_lev = 0;
 
-    xstart = 1;
-    ystart = 0;
-    xsize = COLNO-1;
-    ysize = ROWNO;
+    gx.xstart = 1;
+    gy.ystart = 0;
+    gx.xsize = COLNO-1;
+    gy.ysize = ROWNO;
 
     while (coder->frame->n_opcode < lvl->n_opcodes && !coder->exit_script) {
         coder->opcode = lvl->opcodes[coder->frame->n_opcode].opcode;
@@ -6836,8 +6013,8 @@ sp_level_coder(sp_lev *lvl)
                 panic("no selection for rndcoord");
             }
             if (op_selection_rndcoord(pt, &x, &y, FALSE)) {
-                x -= xstart;
-                y -= ystart;
+                x -= gx.xstart;
+                y -= gy.ystart;
             }
             /*get_location(&x, &y, DRY|WET, coder->croom);*/
             splev_stack_push(coder->stack, opvar_new_coord(x, y));
@@ -6932,9 +6109,9 @@ next_opcode:
         wallification(1, 0, COLNO-1, ROWNO-1);
     }
 
-    flip_level_rnd(coder->allow_flips);
+    flip_level_rnd(coder->allow_flips, 0);
 
-    count_features();
+    count_level_features();
 
     if (coder->solidify) {
         solidify_map();
@@ -6945,7 +6122,7 @@ next_opcode:
     fixup_special();
 
     if (coder->premapped) {
-        sokoban_detect();
+        premap_detect();
     }
 
     if (coder->frame) {
@@ -7000,7 +6177,7 @@ sp_lev_savecache(const char *fnam, sp_lev *lvl)
 }
 
 boolean
-load_special(const char *name)
+load_special_des(const char *name)
 {
     dlb *fd;
     sp_lev *lvl = NULL;

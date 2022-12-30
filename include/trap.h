@@ -94,5 +94,13 @@ enum {
 
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
+#define unhideable_trap(ttyp) ((ttyp) == HOLE) /* visible traps */
+#define undestroyable_trap(ttyp) ((ttyp) == MAGIC_PORTAL \
+                                  || (ttyp) == VIBRATING_SQUARE)
+#define is_magical_trap(ttyp) ((ttyp) == TELEP_TRAP     \
+                               || (ttyp) == LEVEL_TELEP \
+                               || (ttyp) == MAGIC_TRAP  \
+                               || (ttyp) == ANTI_MAGIC  \
+                               || (ttyp) == POLY_TRAP)
 
 #endif /* TRAP_H */

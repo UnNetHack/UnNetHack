@@ -791,6 +791,27 @@ makevtele(void)
     makeniche(TELEP_TRAP);
 }
 
+/** Count the tracked features (sinks, fountains) present on the level */
+void
+count_level_features(void)
+{
+    coordxy x, y;
+
+    level.flags.nfountains = level.flags.nsinks = 0;
+    for (y = 0; y < ROWNO; y++) {
+        for (x = 0; x < COLNO; x++) {
+            int typ = levl[x][y].typ;
+
+            if (typ == FOUNTAIN) {
+                level.flags.nfountains++;
+            } else if (typ == SINK) {
+                level.flags.nsinks++;
+            }
+        }
+    }
+}
+
+
 /* clear out various globals that keep information on the current level.
  * some of this is only necessary for some types of levels (maze, normal,
  * special) but it's easier to put it all in one place than make sure
@@ -1107,7 +1128,7 @@ makelevel(void)
             pos.x = somex(croom);
             pos.y = somey(croom);
         }
-        mkstairs(pos.x, pos.y, 0, croom);    /* down */
+        mkstairs(pos.x, pos.y, 0, croom, FALSE); /* down */
     }
     if (nroom > 1) {
         troom = croom;
@@ -1124,7 +1145,7 @@ makelevel(void)
                 pos.y = somey(croom);
             }
         }
-        mkstairs(pos.x, pos.y, 1, croom);   /* up */
+        mkstairs(pos.x, pos.y, 1, croom, FALSE); /* up */
     }
 
     branchp = Is_branchlev(&u.uz);  /* possible dungeon branch */
@@ -1863,13 +1884,33 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
 }
 
 void
-mkstairs(coordxy x, coordxy y, char up, struct mkroom *croom UNUSED)
+mkstairs(
+    coordxy x, coordxy y,
+    char up, /* [why 'char' when usage is boolean?] */
+    struct mkroom *croom UNUSED,
+    boolean force)
 {
+    int ltyp;
     d_level dest;
 
-    if (!x) {
+    if (!x || !isok(x, y)) {
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
+    }
+
+    if (force) {
+        levl[x][y].typ = ROOM;
+    }
+
+    ltyp = levl[x][y].typ; /* somexyspace() allows ice */
+    if (ltyp != ROOM && ltyp != CORR && ltyp != ICE) {
+        int glyph = back_to_glyph(x, y),
+            sidx = glyph_to_cmap(glyph);
+
+        impossible("mkstairs:  placing stairs %s on %s at <%d,%d>",
+                   up ? "up" : "down",
+                   defsyms[sidx].explanation,
+                   x, y);
     }
 
     /*
@@ -2056,7 +2097,7 @@ mkinvokearea(void)
     }
 
     You("are standing at the top of a stairwell leading down!");
-    mkstairs(u.ux, u.uy, 0, (struct mkroom *)0); /* down */
+    mkstairs(u.ux, u.uy, 0, (struct mkroom *)0, FALSE); /* down */
     newsym(u.ux, u.uy);
     vision_full_recalc = 1; /* everything changed */
 

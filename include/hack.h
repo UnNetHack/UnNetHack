@@ -23,6 +23,15 @@
 #define MAX_CARR_CAP    1000    /* so that boulders can be heavier */
 #define DUMMY { 0 }
 
+/* The UNDEFINED macros are used to initialize variables whose
+   initialized value is not relied upon.
+   UNDEFINED_VALUE: used to initialize any scalar type except pointers.
+   UNDEFINED_VALUES: used to initialize any non scalar type without pointers.
+   UNDEFINED_PTR: can be used only on pointer types. */
+#define UNDEFINED_VALUE 0
+#define UNDEFINED_VALUES { 0 }
+#define UNDEFINED_PTR NULL
+
 /* symbolic names for capacity levels */
 #define UNENCUMBERED    0
 #define SLT_ENCUMBER    1   /* Burdened */
@@ -200,7 +209,6 @@ typedef struct strbuf {
 #include "youprop.h"
 #include "wintype.h"
 #include "context.h"
-#include "decl.h"
 #include "timeout.h"
 
 NEARDATA extern coord bhitpos;  /* place where throw or zap hits or stops */
@@ -223,6 +231,11 @@ enum hmon_atkmode_types {
     HMON_KICKED  = 2, /* alternate ranged */
     HMON_APPLIED = 3, /* polearm, treated as ranged */
     HMON_DRAGGED = 4  /* attached iron ball, pulled into mon */
+};
+
+struct launchplace {
+    struct obj *obj;
+    coordxy x, y;
 };
 
 struct restore_info {
@@ -325,14 +338,16 @@ typedef struct {
     struct fieldlevel_content style;
 } NHFILE;
 
-#include "trap.h"
-#include "flag.h"
-#include "rm.h"
-#include "vision.h"
-#include "display.h"
-#include "engrave.h"
 #include "rect.h"
 #include "region.h"
+#include "trap.h"
+#include "flag.h"
+#include "decl.h"
+#include "rm.h"
+#include "selvar.h"
+#include "display.h"
+#include "vision.h"
+#include "engrave.h"
 #include "botl.h"
 
 /* Symbol offsets */
@@ -362,23 +377,26 @@ typedef struct {
 
 #define NO_SPELL    0
 
+typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
+
 /* flags to control makemon() */
 /* goodpos() uses some plus has some of its own */
-#define NO_MM_FLAGS     0x00000 /* use this rather than plain 0 */
-#define NO_MINVENT      0x00001 /* suppress minvent when creating mon */
-#define MM_NOWAIT       0x00002 /* don't set STRAT_WAITMASK flags */
-#define MM_NOCOUNTBIRTH 0x00004 /* don't increment born count (for revival) */
-#define MM_IGNOREWATER  0x00008 /* ignore water when positioning */
-#define MM_ADJACENTOK   0x00010 /* acceptable to use adjacent coordinates */
-#define MM_ANGRY        0x00020 /* monster is created angry */
-#define MM_NONAME       0x00040 /* monster is not christened */
-#define MM_EGD          0x00100 /* add egd structure */
-#define MM_EPRI         0x00200 /* add epri structure */
-#define MM_ESHK         0x00400 /* add eshk structure */
-#define MM_EMIN         0x00800 /* add emin structure */
-#define MM_EDOG         0x01000 /* add edog structure */
-#define MM_ASLEEP       0x02000 /* monsters should be generated asleep */
-#define MM_NOGRP        0x04000 /* suppress creation of monster groups */
+#define NO_MM_FLAGS     0x00000L /* use this rather than plain 0 */
+#define NO_MINVENT      0x00001L /* suppress minvent when creating mon */
+#define MM_NOWAIT       0x00002L /* don't set STRAT_WAITMASK flags */
+#define MM_NOCOUNTBIRTH 0x00004L /* don't increment born count (for revival) */
+#define MM_IGNOREWATER  0x00008L /* ignore water when positioning */
+#define MM_ADJACENTOK   0x00010L /* acceptable to use adjacent coordinates */
+#define MM_ANGRY        0x00020L /* monster is created angry */
+#define MM_NONAME       0x00040L /* monster is not christened */
+#define MM_EGD          0x00080L /* add egd structure */
+#define MM_EPRI         0x00100L /* add epri structure */
+#define MM_ESHK         0x00200L /* add eshk structure */
+#define MM_EMIN         0x00400L /* add emin structure */
+#define MM_EDOG         0x00800L /* add edog structure */
+#define MM_ASLEEP       0x01000L /* monsters should be generated asleep */
+#define MM_NOGRP        0x02000L /* suppress creation of monster groups */
+#define MM_NOTAIL       0x04000L /* if a long worm, don't give it a tail */
 #define MM_NOMSG       0x040000L /* no appear message */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
 #define GP_ALLOW_XY    0x080000L /* [actually used by enexto() to decide
@@ -386,14 +404,28 @@ typedef struct {
 #define GP_ALLOW_U     0x100000L /* don't reject hero's location */
 #define GP_CHECKSCARY  0x200000L /* check monster for onscary() */
 
-/* flags for make_corpse() and mkcorpstat() */
-#define CORPSTAT_NONE   0x00
-#define CORPSTAT_INIT   0x01 /* pass init flag to mkcorpstat */
-#define CORPSTAT_BURIED 0x02 /* bury the corpse or statue */
+/* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
+#define CORPSTAT_NONE     0x00
+#define CORPSTAT_GENDER   0x03 /* 0x01 | 0x02 */
+#define CORPSTAT_HISTORIC 0x04 /* historic statue; not used for corpse */
+#define CORPSTAT_SPE_VAL  0x07 /* 0x03 | 0x04 */
+#define CORPSTAT_INIT     0x08 /* pass init flag to mkcorpstat */
+#define CORPSTAT_BURIED   0x10 /* bury the corpse or statue */
+/* note: gender flags have different values from those used for monsters
+   so that 0 can be unspecified/random instead of male */
+#define CORPSTAT_RANDOM 0
+#define CORPSTAT_FEMALE 1
+#define CORPSTAT_MALE   2
+#define CORPSTAT_NEUTER 3
 
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */
+
+/* m_poisongas_ok() return values */
+#define M_POISONGAS_BAD   0 /* poison gas is bad */
+#define M_POISONGAS_MINOR 1 /* poison gas is ok, maybe causes coughing */
+#define M_POISONGAS_OK    2 /* ignores poison gas completely */
 
 /* flags for deliver_obj_to_mon */
 #define DF_NONE     0x00
@@ -514,6 +546,16 @@ typedef struct {
 #define SUPPRESS_HISTORY 4
 #define URGENT_MESSAGE   8
 
+/* Lua callback functions */
+enum nhcore_calls {
+    NHCORE_START_NEW_GAME = 0,
+    NHCORE_RESTORE_OLD_GAME,
+    NHCORE_MOVELOOP_TURN,
+    NHCORE_GAME_EXIT,
+
+    NUM_NHCORE_CALLS
+};
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0
 #define EYE 1
@@ -567,11 +609,28 @@ typedef struct {
 
 #define MENU_DEFCNT 1
 
+/* flags for mktrap() */
+#define MKTRAP_NOFLAGS       0x0U
+#define MKTRAP_SEEN          0x1U /* trap is seen */
+#define MKTRAP_MAZEFLAG      0x2U /* choose random coords instead of room */
+#define MKTRAP_NOSPIDERONWEB 0x4U /* web will not generate a spider */
+#define MKTRAP_NOVICTIM      0x8U /* no victim corpse or items on it */
+
 /* extended command return values */
 #define ECMD_OK     0x00 /* cmd done successfully */
 #define ECMD_TIME   0x01 /* cmd took time, uses up a turn */
 #define ECMD_CANCEL 0x02 /* cmd canceled by user */
 #define ECMD_FAIL   0x04 /* cmd failed to finish, maybe with a yafm */
+
+/* flags for newcham() */
+#define NO_NC_FLAGS          0U
+#define NC_SHOW_MSG          0x01U
+#define NC_VIA_WAND_OR_SPELL 0x02U
+
+/* pick a random entry from array */
+#define ROLL_FROM(array) array[rn2(SIZE(array))]
+/* array with terminator variation */
+/* #define ROLL_FROMT(array) array[rn2(SIZE(array) - 1)] */
 
 /*
  * option setting restrictions

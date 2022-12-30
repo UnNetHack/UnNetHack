@@ -11,9 +11,9 @@
  * structure eventually.
  */
 
-static NhRegion **regions;
-static int n_regions = 0;
-static int max_regions = 0;
+NhRegion **regions;
+int n_regions = 0;
+int max_regions = 0;
 
 #define NO_CALLBACK (-1)
 
@@ -1172,37 +1172,176 @@ create_cthulhu_death_cloud(coordxy x, coordxy y, int radius, size_t damage, int 
     return cloud;
 }
 
+static boolean
+is_hero_inside_gas_cloud(void)
+{
+    int i;
+
+    for (i = 0; i < n_regions; i++) {
+        if (hero_inside(regions[i]) &&
+             regions[i]->inside_f == INSIDE_GAS_CLOUD) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/* Create a gas cloud which starts at (x,y) and grows outward from it via
+ * breadth-first search.
+ * cloudsize is the number of squares the cloud will attempt to fill.
+ * damage is how much it deals to afflicted creatures. */
+#define MAX_CLOUD_SIZE 150
 NhRegion *
-create_gas_cloud(coordxy x, coordxy y, int radius, size_t damage, int duration)
+create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage, int duration)
 {
     NhRegion *cloud;
-    int i, nrect;
+    int i, j;
     NhRect tmprect;
 
+    /* store visited coords */
+    coordxy xcoords[MAX_CLOUD_SIZE];
+    coordxy ycoords[MAX_CLOUD_SIZE];
+    xcoords[0] = x;
+    ycoords[0] = y;
+    int curridx;
+    int newidx = 1; /* initial spot is already taken */
+    boolean inside_cloud = is_hero_inside_gas_cloud();
+
+    /* a single-point cloud on hero and it deals no damage.
+       probably a natural cause of being polyed. don't message about it */
+    if (!flags.mon_moving && u_at(x, y) && cloudsize == 1 &&
+         (!damage || (damage && m_poisongas_ok(&youmonst) == M_POISONGAS_OK))) {
+        inside_cloud = TRUE;
+    }
+
+    if (cloudsize > MAX_CLOUD_SIZE) {
+        impossible("create_gas_cloud: cloud too large (%d)!", cloudsize);
+        cloudsize = MAX_CLOUD_SIZE;
+    }
+
+    for (curridx = 0; curridx < newidx; curridx++) {
+        if (newidx >= cloudsize) {
+            break;
+        }
+        int xx = xcoords[curridx];
+        int yy = ycoords[curridx];
+        /* Do NOT check for if there is already a gas cloud created at some
+         * other time at this position. They can overlap. */
+
+        /* Primitive Fisher-Yates-Knuth shuffle to randomize the order of
+         * directions chosen. */
+        coord dirs[4] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
+        for (i = 4; i > 0; --i) {
+            coordxy swapidx = rn2(i);
+            coord tmp = dirs[swapidx];
+            dirs[swapidx] = dirs[i-1];
+            dirs[i-1] = tmp;
+        }
+        int nvalid = 0; /* # of valid adjacent spots */
+        for (i = 0; i < 4; ++i) {
+            /* try all 4 directions */
+
+            int dx = dirs[i].x, dy = dirs[i].y;
+            boolean isunpicked = TRUE;
+
+            if (valid_cloud_pos(xx + dx, yy + dy)) {
+                nvalid++;
+                /* don't pick a location we've already picked */
+                for (j = 0; j < newidx; ++j) {
+                    if (xcoords[j] == xx + dx && ycoords[j] == yy + dy) {
+                        isunpicked = FALSE;
+                        break;
+                    }
+                }
+                /* randomly disrupt the natural breadth-first search, so that
+                 * clouds released in open spaces don't always tend towards a
+                 * rhombus shape */
+                if (nvalid == 4 && !rn2(2)) {
+                    continue;
+                }
+
+                if (isunpicked) {
+                    xcoords[newidx] = xx + dx;
+                    ycoords[newidx] = yy + dy;
+                    newidx++;
+                }
+            }
+            if (newidx >= cloudsize) {
+                /* don't try further directions */
+                break;
+            }
+        }
+    }
+    /* We have now either filled up xcoord and ycoord entirely or run out
+       of space.  In either case, newidx is the correct total number of
+       coordinates inserted. */
     cloud = create_region((NhRect *) 0, 0);
-    nrect = radius;
-    tmprect.lx = x;
-    tmprect.hx = x;
-    tmprect.ly = y - (radius - 1);
-    tmprect.hy = y + (radius - 1);
-    for (i = 0; i < nrect; i++) {
+    for (i = 0; i < newidx; ++i) {
+        tmprect.lx = tmprect.hx = xcoords[i];
+        tmprect.ly = tmprect.hy = ycoords[i];
         add_rect_to_reg(cloud, &tmprect);
-        tmprect.lx--;
-        tmprect.hx++;
-        tmprect.ly++;
-        tmprect.hy--;
     }
     cloud->ttl = duration;
+    /* If cloud was constrained in small space, give it more time to live. */
+    cloud->ttl = (cloud->ttl * cloudsize) / newidx;
+
     if (!in_mklev && !flags.mon_moving) {
         set_heros_fault(cloud); /* assume player has created it */
     }
     cloud->inside_f = INSIDE_GAS_CLOUD;
     cloud->expire_f = EXPIRE_GAS_CLOUD;
-    cloud->arg = zeroany;
+    cloud->arg = cg.zeroany;
     cloud->arg.a_int = damage;
     cloud->visible = TRUE;
-    cloud->glyph = cmap_to_glyph(S_cloud);
+    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
     add_region(cloud);
+
+    if (!in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
+        You("are enveloped in a cloud of %s!",
+            damage ? "noxious gas" : "steam");
+    }
+
+    return cloud;
+}
+
+/* create a single gas cloud from selection */
+NhRegion *
+create_gas_cloud_selection(struct selectionvar *sel, int damage)
+{
+    NhRegion *cloud;
+    NhRect tmprect;
+    coordxy x, y;
+    NhRect r = cg.zeroNhRect;
+    boolean inside_cloud = is_hero_inside_gas_cloud();
+
+    selection_getbounds(sel, &r);
+
+    cloud = create_region((NhRect *) 0, 0);
+    for (x = r.lx; x <= r.hx; x++) {
+        for (y = r.ly; y <= r.hy; y++) {
+            if (selection_getpoint(x, y, sel)) {
+                tmprect.lx = tmprect.hx = x;
+                tmprect.ly = tmprect.hy = y;
+                add_rect_to_reg(cloud, &tmprect);
+            }
+        }
+    }
+
+    if (!in_mklev && !flags.mon_moving) {
+        set_heros_fault(cloud); /* assume player has created it */
+    }
+    cloud->inside_f = INSIDE_GAS_CLOUD;
+    cloud->expire_f = EXPIRE_GAS_CLOUD;
+    cloud->arg = cg.zeroany;
+    cloud->arg.a_int = damage;
+    cloud->visible = TRUE;
+    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
+    add_region(cloud);
+
+    if (!in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
+        You("are enveloped in a cloud of %s!",
+            damage ? "noxious gas" : "steam");
+    }
     return cloud;
 }
 

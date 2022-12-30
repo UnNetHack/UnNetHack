@@ -8,7 +8,6 @@
 
 struct selectionvar *l_selection_check(lua_State *, int);
 static struct selectionvar *l_selection_push_new(lua_State *);
-static void l_selection_push_copy(lua_State *, struct selectionvar *);
 
 /* lua_CFunction prototypes */
 static int l_selection_new(lua_State *);
@@ -113,7 +112,7 @@ l_selection_push_new(lua_State *L)
 }
 
 /* push a copy of selectionvar tmp to lua stack */
-static void
+void
 l_selection_push_copy(lua_State *L, struct selectionvar *tmp)
 {
     struct selectionvar
@@ -152,8 +151,6 @@ l_selection_clone(lua_State *L)
     tmp->map = dupstr(sel->map);
     return 1;
 }
-
-DISABLE_WARNING_UNREACHABLE_CODE
 
 /* selection.set(sel, x, y); */
 /* selection.set(sel, x, y, value); */
@@ -260,8 +257,6 @@ l_selection_getpoint(lua_State *L)
     lua_pushnumber(L, val);
     return 1;
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /* local s = selection.negate(sel); */
 /* local s = selection.negate(); */
@@ -446,7 +441,7 @@ l_selection_room(lua_State *L)
     if (argc == 1) {
         int i = luaL_checkinteger(L, -1);
 
-        croom = (i >= 0 && i < gn.nroom) ? &gr.rooms[i] : NULL;
+        croom = (i >= 0 && i < nroom) ? &rooms[i] : NULL;
     }
 
     sel = selection_from_mkroom(croom);
@@ -871,13 +866,10 @@ l_selection_gradient(lua_State *L)
     /* if x2 and y2 aren't set, the gradient has a single center point of x,y;
      * if they are set, the gradient is centered on a (x,y) to (x2,y2) line */
     coordxy x = 0, y = 0, x2 = -1, y2 = -1;
-    /* points will not be added within mindist of the center; the chance for a
+    /* points are always added within mindist of the center; the chance for a
      * point between mindist and maxdist to be added to the selection starts at
-     * 0% at mindist and increases linearly to 100% at maxdist */
+     * 100% at mindist and decreases linearly to 0% at maxdist */
     coordxy mindist = 0, maxdist = 0;
-    /* if limited is true, no points farther than maxdist will be added; if
-     * false, all points farther than maxdist will be added */
-    boolean limited = FALSE;
     long type = 0;
     static const char *const gradtypes[] = {
         "radial", "square", NULL
@@ -893,17 +885,18 @@ l_selection_gradient(lua_State *L)
         y = (coordxy) get_table_int(L, "y");
         x2 = (coordxy) get_table_int_opt(L, "x2", -1);
         y2 = (coordxy) get_table_int_opt(L, "y2", -1);
+        cvt_to_abscoord(&x, &y);
+        cvt_to_abscoord(&x2, &y2);
         /* maxdist is required because there's no obvious default value for it,
-         * whereas mindist has an obvious defalt of 0 */
+         * whereas mindist has an obvious default of 0 */
         maxdist = get_table_int(L, "maxdist");
         mindist = get_table_int_opt(L, "mindist", 0);
-        limited = get_table_boolean_opt(L, "limited", FALSE);
 
         lua_pop(L, 1);
         (void) l_selection_new(L);
         sel = l_selection_check(L, 1);
     } else {
-        nhl_error(L, "wrong parameters");
+        nhl_error(L, "selection.gradient requires table argument");
         /* NOTREACHED */
     }
 
@@ -916,7 +909,7 @@ l_selection_gradient(lua_State *L)
         y2 = y;
     }
 
-    selection_do_gradient(sel, x, y, x2, y2, type, mindist, maxdist, limited);
+    selection_do_gradient(sel, x, y, x2, y2, type, mindist, maxdist);
     lua_settop(L, 1);
     return 1;
 }
@@ -944,8 +937,7 @@ l_selection_iterate(lua_State *L)
                     lua_pushvalue(L, 2);
                     lua_pushinteger(L, tmpx);
                     lua_pushinteger(L, tmpy);
-                    if (nhl_pcall(L, 2, 0)) {
-                        impossible("Lua error: %s", lua_tostring(L, -1));
+                    if (nhl_pcall_handle(L, 2, 0, "l_selection_iterate", NHLpa_impossible)) {
                         /* abort the loops to prevent possible error cascade */
                         goto out;
                     }

@@ -183,6 +183,46 @@ remove_monster(coordxy x, coordxy y)
     level.monsters[x][y] = (struct monst *)0;
 }
 
+/* Would monster be OK with poison gas? */
+/* Does not check for actual poison gas at the location. */
+/* Returns one of M_POISONGAS_foo */
+int
+m_poisongas_ok(struct monst *mtmp)
+{
+    int px, py;
+    boolean is_you = (mtmp == &youmonst);
+
+    /* Non living, non breathing, immune monsters are not concerned */
+    if (nonliving(mtmp->data) ||
+         is_vampshifter(mtmp) ||
+         breathless(mtmp->data) ||
+         immune_poisongas(mtmp->data)) {
+        return M_POISONGAS_OK;
+    }
+    /* not is_swimmer(); assume that non-fish are swimming on
+       the surface and breathing the air above it periodically
+       unless located at water spot on plane of water */
+    px = is_you ? u.ux : mtmp->mx;
+    py = is_you ? u.uy : mtmp->my;
+    if ((mtmp->data->mlet == S_EEL || Is_waterlevel(&u.uz)) && is_pool(px, py)) {
+        return M_POISONGAS_OK;
+    }
+    /* exclude monsters with poison gas breath attack:
+       adult green dragon and Chromatic Dragon (and iron golem,
+       but nonliving() and breathless() tests also catch that) */
+    if (attacktype_fordmg(mtmp->data, AT_BREA, AD_DRST) ||
+         attacktype_fordmg(mtmp->data, AT_BREA, AD_RBRE)) {
+        return M_POISONGAS_OK;
+    }
+    if (is_you && (u.uinvulnerable || Breathless || Underwater)) {
+        return M_POISONGAS_OK;
+    }
+    if (is_you ? Poison_resistance : resists_poison(mtmp)) {
+        return M_POISONGAS_MINOR;
+    }
+    return M_POISONGAS_BAD;
+}
+
 /* return True if mon is capable of converting other monsters into zombies */
 boolean
 zombie_maker(struct monst *mon)

@@ -202,9 +202,10 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/potion.c $(srcdir)/pray.c $(srcdir)/priest.c \
 	$(srcdir)/quest.c $(srcdir)/questpgr.c $(srcdir)/read.c \
 	$(srcdir)/rect.c $(srcdir)/region.c $(srcdir)/restore.c $(srcdir)/rip.c\
-	$(srcdir)/rnd.c $(srcdir)/role.c $(srcdir)/rumors.c $(srcdir)/save.c \
+	$(srcdir)/rnd.c $(srcdir)/role.c $(srcdir)/rumors.c \
+	$(srcdir)/save.c $(srcdir)/selvar.c \
 	$(srcdir)/shk.c $(srcdir)/shknam.c $(srcdir)/sit.c $(srcdir)/sounds.c \
-	$(srcdir)/sp_lev.c $(srcdir)/spell.c $(srcdir)/steal.c \
+	$(srcdir)/sp_lev.c $(srcdir)/spo_lev.c $(srcdir)/spell.c $(srcdir)/steal.c \
 	$(srcdir)/steed.c $(srcdir)/sys.c $(srcdir)/teleport.c $(srcdir)/timeout.c \
 	$(srcdir)/topten.c $(srcdir)/track.c $(srcdir)/trap.c \
 	$(srcdir)/u_init.c $(srcdir)/uhitm.c $(srcdir)/vault.c \
@@ -252,7 +253,7 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
 	global.h autoconf.h hack.h lev.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
-	sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
+	selvar.h sp_lev.h spell.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
 	trap.h unixconf.h vision.h vmsconf.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
@@ -274,7 +275,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
 	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o rnd_isaac.o \
-	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
+	role.o rumors.o save.o selvar.o shk.o shknam.o sit.o sounds.o sp_lev.o spo_lev.o spell.o \
 	steal.o steed.o sys.o teleport.o tile.o timeout.o topten.o track.o trap.o \
 	tutorial.o u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o \
 	wield.o windows.o wizard.o worm.o worn.o write.o zap.o \
@@ -838,11 +839,13 @@ rnd_isaac.o: $(srcdir)/rnd_isaac.c $(HACK_H) ../include/isaac.h
 role.o: $(srcdir)/role.c $(HACK_H)
 rumors.o: $(srcdir)/rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h
 save.o: $(srcdir)/save.c $(HACK_H) ../include/lev.h
+selvar.o: $(srcdir)/selvar.c $(HACK_H) ../include/sp_lev.h
 shk.o: $(srcdir)/shk.c $(HACK_H)
 shknam.o: $(srcdir)/shknam.c $(HACK_H)
 sit.o: $(srcdir)/sit.c $(HACK_H) ../include/artifact.h
 sounds.o: $(srcdir)/sounds.c $(HACK_H)
 sp_lev.o: $(srcdir)/sp_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
+spo_lev.o: $(srcdir)/spo_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
 spell.o: $(srcdir)/spell.c $(HACK_H)
 steal.o: $(srcdir)/steal.c $(HACK_H)
 steed.o: $(srcdir)/steed.c $(HACK_H) ../include/sys.h

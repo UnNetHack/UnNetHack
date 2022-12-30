@@ -229,4 +229,7 @@ struct monst {
 
 #define mon_offmap(mon) ((mon)->mstate != MON_FLOOR)
 
+/* x is a valid index into mons[] array */
+#define ismnum(x) ((x) >= LOW_PM && (x) < NUMMONS)
+
 #endif /* MONST_H */

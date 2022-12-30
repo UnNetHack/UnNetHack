@@ -1330,6 +1330,16 @@ static const char *levltyp[] = {
     ""
 };
 
+const char *
+levltyp_to_name(int typ)
+{
+    if (typ >= 0 && typ < MAX_TYPE) {
+        return levltyp[typ];
+    }
+
+    return NULL;
+}
+
 /* explanation of base-36 output from wiz_map_levltyp() */
 static void
 wiz_levltyp_legend(void)
