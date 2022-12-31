@@ -106,6 +106,9 @@ static const char *random_mesg[] = {
     "...you should arrive at the lab...", "...or somewhere nearby...",
     "Please disable the following security protocols: 2-18, 1-12, 1-0",
     "Our coil is broken, and we don't have a replacement. It's useless. It's so useless.",
+    "Live and drink, friend", /* Caves of Qud */
+    "What I cannot create, I do not understand.", /* Richard Feynman, but also, written into the non-coding region of JCVI syn-1, the first artificial microbe */
+
 };
 
 static const char *blengr(void);
