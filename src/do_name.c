@@ -2286,6 +2286,15 @@ static const char * const bogusmons[] = {
     "techno ant",
     "drum stint reluctance",
     "tackle deice",
+    
+    /* from Caves of Qud */
+    "Argyve the Tinkerer", 
+    "Barathrum the Old",
+    "Oozing bloody gooey acidic lush salty tarry heptasludge",
+    "Saad Amus, the Sky-Bear",
+    
+
+
 };
 
 
