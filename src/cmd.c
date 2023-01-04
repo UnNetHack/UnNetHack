@@ -1523,6 +1523,32 @@ enlightenment(int final, boolean want_disp)
         you_have(buf);
     }
 
+    if (u.lastprayed) {
+        Sprintf(buf, "You last %s %ld turns ago",
+                u.lastprayresult == PRAY_GIFT ? "received a gift" :
+                u.lastprayresult == PRAY_ANGER ? "angered your god" :
+                u.lastprayresult == PRAY_CONV ? "converted to a new god" :
+                "prayed",
+                moves - u.lastprayed);
+        enl_msg(buf, "", "", "");
+        if (u.lastprayresult == PRAY_GOOD) {
+            enl_msg("That prayer was well received", "", "", "");
+        } else if (u.lastprayresult == PRAY_BAD) {
+            enl_msg("That prayer was poorly received", "", "", "");
+        } else if (u.lastprayresult == PRAY_INPROG) {
+            enl_msg("That prayer ", "is ", "was ", "in progress");
+        }
+        if (u.reconciled){
+            if (u.reconciled == REC_REC) {
+                Sprintf(buf, " since reconciled with your god");
+                enl_msg("You ", "have", "had", buf);
+            } else if (u.reconciled == REC_MOL) {
+                Sprintf(buf, " since mollified your god");
+                enl_msg("You ", "have", "had", buf);
+            }
+        }
+    }
+
     /* note: piousness 3 matches MIN_QUEST_ALIGN (quest.h) */
     if (u.ualign.record >= 20) you_are("piously aligned");
     else if (u.ualign.record > 13) you_are("devoutly aligned");

@@ -93,6 +93,7 @@
 	  - Output "You begin awkwardly bashing" for currently unskilled but
 	    skillable weapons
 	  - No paranoid prompt for safe traps when flying or levitating (reported by hackemslashem)
+	  - Show prayer stats in Attributes menu (from dNetHack)
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)
