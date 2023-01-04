@@ -634,6 +634,14 @@ fry_by_god(aligntyp resp_god, boolean via_disintegration)
 }
 
 static void
+update_prayer_stats(int pray_result)
+{
+    u.lastprayed = moves;
+    u.lastprayresult = pray_result;
+    u.reconciled = REC_NONE;
+}
+
+static void
 angrygods(aligntyp resp_god)
 {
     int maxanger;
@@ -643,9 +651,7 @@ angrygods(aligntyp resp_god)
     u.ublessed = 0;
 
     if (u.ualign.type == resp_god) {
-        u.lastprayed = moves;
-        u.lastprayresult = PRAY_ANGER;
-        u.reconciled = REC_NONE;
+        update_prayer_stats(PRAY_ANGER);
     }
 
     /* changed from tmp = u.ugangr + abs (u.uluck) -- rph */
@@ -1606,9 +1612,7 @@ dosacrifice(void)
             adjalign(-1);
             u.ugangr += 3;
             value = -3;
-            u.lastprayed = moves;
-            u.lastprayresult = PRAY_ANGER;
-            u.reconciled = REC_NONE;
+            update_prayer_stats(PRAY_ANGER);
         }
     } /* fake Amulet */
 
@@ -1651,15 +1655,11 @@ dosacrifice(void)
                     change_luck(-3);
                     u.ublesscnt += 300;
 
-                    u.lastprayed = moves;
-                    u.lastprayresult = PRAY_CONV;
-                    u.reconciled = REC_NONE;
+                    update_prayer_stats(PRAY_CONV);
                 } else {
                     u.ugangr += 3;
                     adjalign(-5);
-                    u.lastprayed = moves;
-                    u.lastprayresult = PRAY_ANGER;
-                    u.reconciled = REC_NONE;
+                    update_prayer_stats(PRAY_ANGER);
                     pline("%s rejects your sacrifice!", a_gname());
                     godvoice(altaralign, "Suffer, infidel!");
                     change_luck(-5);
@@ -1774,9 +1774,7 @@ dosacrifice(void)
                     godvoice(u.ualign.type, "Use my gift wisely!");
                     u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
-                    u.lastprayed = moves;
-                    u.lastprayresult = PRAY_GIFT;
-                    u.reconciled = REC_NONE;
+                    update_prayer_stats(PRAY_GIFT);
                     exercise(A_WIS, TRUE);
                     livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                                     "had %s bestowed upon %s by %s",
@@ -1893,9 +1891,7 @@ dopray(void)
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE)) return 0;
 
-    u.lastprayed = moves;
-    u.lastprayresult = PRAY_INPROG;
-    u.reconciled = REC_NONE;
+    update_prayer_stats(PRAY_INPROG);
 
 #ifdef WIZARD
     if (wizard && p_type >= 0) {
