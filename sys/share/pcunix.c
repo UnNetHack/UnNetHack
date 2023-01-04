@@ -81,7 +81,7 @@ eraseoldlocks()
 	 * before starting everything (including the dungeon initialization
 	 * that sets astral_level, needed for maxledgerno()) up
 	 */
-	for(i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
+    for (i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
 		/* try to remove all */
 		set_levelfile_name(lock, i);
 		(void) unlink(fqname(lock, LEVELPREFIX, 0));
@@ -238,8 +238,7 @@ gotlock:
 		error("cannot creat file (%s.)", fq_lock);
 # endif
 	} else {
-		if(write(fd, (char *) &hackpid, sizeof(hackpid))
-		    != sizeof(hackpid)){
+        if (write(fd, (char *) &hackpid, sizeof(hackpid)) != sizeof(hackpid)) {
 # if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(orgdir, 0);
 # endif
@@ -269,17 +268,21 @@ char *s;
 {
 	char *lp;
 
-	for (lp = s; *lp; lp++)
-		if (*lp <= ' ' || *lp == '"' || (*lp >= '*' && *lp <= ',') ||
-		    *lp == '.' || *lp == '/' || (*lp >= ':' && *lp <= '?') ||
+    for (lp = s; *lp; lp++) {
+        if (*lp <= ' ' || *lp == '"' || (*lp >= '*' && *lp <= ',') ||
+            *lp == '.' || *lp == '/' || (*lp >= ':' && *lp <= '?') ||
 # ifdef OS2
-		    *lp == '&' || *lp == '(' || *lp == ')' ||
+            *lp == '&' || *lp == '(' || *lp == ')' ||
 # endif
-		    *lp == '|' || *lp >= 127 || (*lp >= '[' && *lp <= ']'))
-                        *lp = '_';
+            *lp == '|' || *lp >= 127 || (*lp >= '[' && *lp <= ']')) {
+            *lp = '_';
+        }
+    }
 }
 # endif /* WIN32 */
 
 #ifdef __EMX__
-void seteuid(int i){;}
+void seteuid(int i)
+{
+}
 #endif

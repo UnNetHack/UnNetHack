@@ -113,14 +113,16 @@ done1(int sig_unused UNUSED)
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
 #endif
-    if(flags.ignintr) {
+    if (flags.ignintr) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
         clear_nhwindow(WIN_MESSAGE);
         curs_on_u();
         wait_synch();
-        if(multi > 0) nomul(0, 0);
+        if (multi > 0) {
+            nomul(0, 0);
+        }
     } else {
         (void)done2();
     }
@@ -141,15 +143,17 @@ done2(void)
         clear_nhwindow(WIN_MESSAGE);
         curs_on_u();
         wait_synch();
-        if(multi > 0) nomul(0, 0);
-        if(multi == 0) {
+        if (multi > 0) {
+            nomul(0, 0);
+        }
+        if (multi == 0) {
             u.uinvulnerable = FALSE;    /* avoid ctrl-C bug -dlc */
             u.usleep = 0;
         }
         return 0;
     }
 #if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE))
-    if(wizard) {
+    if (wizard) {
         int c;
 # ifdef VMS
         const char *tmp = "Enter debugger?";
@@ -164,7 +168,9 @@ done2(void)
             (void) signal(SIGINT, (SIG_RET_TYPE) done1);
             exit_nhwindows((char *)0);
             NH_abort();
-        } else if (c == 'q') done_stopprint++;
+        } else if (c == 'q') {
+            done_stopprint++;
+        }
     }
 #endif
 #ifndef LINT
@@ -215,8 +221,9 @@ done_in_by(struct monst *mtmp)
     /* "killed by the high priest of Crom" is okay, "killed by the high
        priest" alone isn't */
     if ((mtmp->data->geno & G_UNIQ) != 0 && !(mtmp->data == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
-        if (!type_is_pname(mtmp->data))
+        if (!type_is_pname(mtmp->data)) {
             Strcat(buf, "the ");
+        }
         killer.format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
@@ -224,17 +231,19 @@ done_in_by(struct monst *mtmp)
         Strcat(buf, "the ");
         killer.format = KILLED_BY;
     }
-    if (mtmp->minvis)
+    if (mtmp->minvis) {
         Strcat(buf, "invisible ");
-    if (distorted)
+    }
+    if (distorted) {
         Strcat(buf, "hallucinogen-distorted ");
+    }
 
-    if(mtmp->data == &mons[PM_GHOST]) {
+    if (mtmp->data == &mons[PM_GHOST]) {
         Strcat(buf, "ghost");
         if (has_mgivenname(mtmp)) {
             Sprintf(eos(buf), " of %s", MGIVENNAME(mtmp));
         }
-    } else if(mtmp->isshk) {
+    } else if (mtmp->isshk) {
         Sprintf(eos(buf), "%s %s, the shopkeeper",
                 (mtmp->female ? "Ms." : "Mr."), shkname(mtmp));
         killer.format = KILLED_BY;
@@ -250,32 +259,34 @@ done_in_by(struct monst *mtmp)
     }
 
     if (multi) {
-        if (strlen(multi_txt) > 0)
+        if (strlen(multi_txt) > 0) {
             Sprintf(eos(buf), ", while %s", multi_txt);
-        else
+        } else {
             Strcat(buf, ", while helpless");
+        }
     }
     Strcpy(killer.name, buf);
-    if (mtmp->data ==&mons[PM_NAZGUL])
+    if (mtmp->data ==&mons[PM_NAZGUL]) {
         u.ugrave_arise = PM_BARROW_WIGHT;
-    else if (mtmp->data->mlet == S_WRAITH)
+    } else if (mtmp->data->mlet == S_WRAITH) {
         u.ugrave_arise = PM_WRAITH;
-    else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM)
+    } else if (mtmp->data->mlet == S_MUMMY && urace.mummynum != NON_PM) {
         u.ugrave_arise = urace.mummynum;
-    else if (zombie_maker(mtmp) && zombie_form(youmonst.data) != NON_PM) {
+    } else if (zombie_maker(mtmp) && zombie_form(youmonst.data) != NON_PM) {
         u.ugrave_arise = zombie_form(youmonst.data);
-    }
-    else if (is_vampire(mtmp->data) && Race_if(PM_HUMAN))
+    } else if (is_vampire(mtmp->data) && Race_if(PM_HUMAN)) {
         u.ugrave_arise = PM_VAMPIRE;
-    else if (mtmp->data == &mons[PM_GHOUL])
+    } else if (mtmp->data == &mons[PM_GHOUL]) {
         u.ugrave_arise = PM_GHOUL;
+    }
     if (u.ugrave_arise >= LOW_PM &&
         (mvitals[u.ugrave_arise].mvflags & G_GENOD))
         u.ugrave_arise = NON_PM;
-    if (touch_petrifies(mtmp->data))
+    if (touch_petrifies(mtmp->data)) {
         done(STONING);
-    else
+    } else {
         done(DIED);
+    }
     return;
 }
 
@@ -290,8 +301,9 @@ panic VA_DECL(const char *, str)
     VA_START(str);
     VA_INIT(str, char *);
 
-    if (program_state.panicking++)
+    if (program_state.panicking++) {
         NH_abort(); /* avoid loops - this should never happen*/
+    }
 
     if (iflags.window_inited) {
         raw_print("\r\nOops...");
@@ -314,11 +326,12 @@ panic VA_DECL(const char *, str)
               "Suddenly, the dungeon collapses.");
 #if defined(WIZARD) && !defined(MICRO)
 # if defined(NOTIFY_NETHACK_BUGS)
-    if (!wizard)
+    if (!wizard) {
         raw_printf("Report the following error to \"%s\" or at \"%s\".",
                    DEVTEAM_EMAIL, DEVTEAM_URL);
-    else if (program_state.something_worth_saving)
+    } else if (program_state.something_worth_saving) {
         raw_print("\nError save file being written.\n");
+    }
 # else
     if (!wizard) {
         const char *maybe_rebuild = !program_state.something_worth_saving
@@ -388,10 +401,11 @@ should_query_disclose_option(int category, char *defquery)
             return TRUE;
         }
     }
-    if (defquery)
+    if (defquery) {
         impossible("should_query_disclose_option: bad category %c", category);
-    else
+    } else {
         impossible("should_query_disclose_option: null defquery");
+    }
     return TRUE;
 }
 
@@ -403,11 +417,12 @@ disclose(int how, boolean taken)
     boolean ask;
 
     if (invent) {
-        if(taken)
+        if (taken) {
             Sprintf(qbuf, "Do you want to see what you had when you %s?",
                     (how == QUIT) ? "quit" : "died");
-        else
+        } else {
             Strcpy(qbuf, "Do you want your possessions identified?");
+        }
 
         ask = should_query_disclose_option('i', &defquery);
         if (!done_stopprint) {
@@ -421,14 +436,18 @@ disclose(int how, boolean taken)
             (void) dump_inventory((char *)0, TRUE, want_disp);
             container_contents(invent, TRUE, TRUE, want_disp);
         }
-        if (c == 'q') done_stopprint++;
+        if (c == 'q') {
+            done_stopprint++;
+        }
     }
 
     ask = should_query_disclose_option('a', &defquery);
     if (!done_stopprint) {
         c = ask ? yn_function("Do you want to see your attributes?",
                               ynqchars, defquery) : defquery;
-        if (c == 'q') done_stopprint++;
+        if (c == 'q') {
+            done_stopprint++;
+        }
     }
     enlightenment(how >= PANICKED ? 1 : 2, (c == 'y')); /* final */
 
@@ -438,8 +457,9 @@ disclose(int how, boolean taken)
 #ifdef DUMP_LOG
     do_vanquished(defquery, ask);
 #else
-    if (!done_stopprint)
+    if (!done_stopprint) {
         list_vanquished(defquery, ask);
+    }
 #endif
 
     ask = should_query_disclose_option('g', &defquery);
@@ -451,7 +471,9 @@ disclose(int how, boolean taken)
                               ynqchars, defquery) : defquery;
     }
     show_conduct(how >= PANICKED ? 1 : 2, (c == 'y' && !done_stopprint));
-    if (c == 'q') done_stopprint++;
+    if (c == 'q') {
+        done_stopprint++;
+    }
 
     dump_weapon_skill();
 }
@@ -471,11 +493,19 @@ savelife(int how)
         u.usick_type = 0;
         Sick = 0;
     }
-    if (how == CHOKING) init_uhunger();
+    if (how == CHOKING) {
+        init_uhunger();
+    }
     nomovemsg = "You survived that attempt on your life.";
     flags.move = 0;
-    if(multi > 0) multi = 0; else multi = -1;
-    if(u.utrap && u.utraptype == TT_LAVA) u.utrap = 0;
+    if (multi > 0) {
+        multi = 0;
+    } else {
+        multi = -1;
+    }
+    if (u.utrap && u.utraptype == TT_LAVA) {
+        u.utrap = 0;
+    }
     flags.botl = 1;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
@@ -493,7 +523,7 @@ get_valuables(struct obj *list) /**< inventory or container contents */
     int i;
 
     /* find amulets and gems, ignoring all artifacts */
-    for (obj = list; obj; obj = obj->nobj)
+    for (obj = list; obj; obj = obj->nobj) {
         if (Has_contents(obj)) {
             get_valuables(obj->cobj);
         } else if (obj->oartifact) {
@@ -503,15 +533,19 @@ get_valuables(struct obj *list) /**< inventory or container contents */
             if (!amulets[i].count) {
                 amulets[i].count = obj->quan;
                 amulets[i].typ = obj->otyp;
-            } else amulets[i].count += obj->quan; /* always adds one */
+            } else {
+                amulets[i].count += obj->quan; /* always adds one */
+            }
         } else if (obj->oclass == GEM_CLASS && obj->otyp < LUCKSTONE) {
             i = min(obj->otyp, LAST_GEM + 1) - FIRST_GEM;
             if (!gems[i].count) {
                 gems[i].count = obj->quan;
                 gems[i].typ = obj->otyp;
-            } else gems[i].count += obj->quan;
+            } else {
+                gems[i].count += obj->quan;
+            }
         }
-    return;
+    }
 }
 
 /*
@@ -528,13 +562,17 @@ sort_valuables(
 
     /* move greater quantities to the front of the list */
     for (i = 1; i < size; i++) {
-        if (list[i].count == 0) continue; /* empty slot */
+        if (list[i].count == 0) {
+            continue; /* empty slot */
+        }
         ltmp = list[i]; /* structure copy */
-        for (j = i; j > 0; --j)
-            if (list[j-1].count >= ltmp.count) break;
-            else {
+        for (j = i; j > 0; --j) {
+            if (list[j-1].count >= ltmp.count) {
+                break;
+            } else {
                 list[j] = list[j-1];
             }
+        }
         list[j] = ltmp;
     }
     return;
@@ -572,13 +610,15 @@ artifact_score(struct obj *list, boolean counting, winid endwin)
                         value, currency(value), points);
 #ifdef DUMP_LOG
                 dump_line("", pbuf);
-                if (endwin != WIN_ERR)
+                if (endwin != WIN_ERR) {
 #endif
                 putstr(endwin, 0, pbuf);
+                }
             }
         }
-        if (Has_contents(otmp))
+        if (Has_contents(otmp)) {
             artifact_score(otmp->cobj, counting, endwin);
+        }
     }
 }
 
@@ -650,7 +690,9 @@ done(int how)
                     !killer.name[0] ? deaths[how] : killer.name));
     Strcpy(killer.name, kilbuf);
 
-    if (how < PANICKED) u.umortality++;
+    if (how < PANICKED) {
+        u.umortality++;
+    }
     if (Lifesaved && (how <= MAX_SURVIVABLE_DEATH)) {
         pline("But wait...");
         makeknown(AMULET_OF_LIFE_SAVING);
@@ -663,21 +705,28 @@ done(int how)
             /* It already started to work. Too bad you couldn't hold onto it. */
             useup(uamul);
         } else {
-            if (how == CHOKING) You("vomit ...");
+            if (how == CHOKING) {
+                You("vomit ...");
+            }
 #ifdef WEBB_DISINT
-            if (how == DISINTEGRATED) You("reconstitute!");
-            else
+            if (how == DISINTEGRATED) {
+                You("reconstitute!");
+            } else
 #endif
             You_feel("much better!");
             pline_The("medallion crumbles to dust!");
-            if (uamul) useup(uamul);
+            if (uamul) {
+                useup(uamul);
+            }
 
             (void) adjattrib(A_CON, -1, TRUE);
-            if (u.uhpmax <= 0) u.uhpmax = (heaven_or_hell_mode ? 1 : 10); /* arbitrary */
+            if (u.uhpmax <= 0) {
+                u.uhpmax = (heaven_or_hell_mode ? 1 : 10); /* arbitrary */
+            }
             savelife(how);
-            if ((how == GENOCIDED) && is_playermon_genocided())
+            if ((how == GENOCIDED) && is_playermon_genocided()) {
                 pline("Unfortunately you are still genocided...");
-            else {
+            } else {
                 livelog_printf(LL_LIFESAVE, "averted death (%s)", killer.name);
 
                 killer.name[0] = 0;
@@ -691,7 +740,9 @@ done(int how)
     if (u.ulives > 0 && how < GENOCIDED) {
         pline("But wait...");
         You("suddenly start to feel better!");
-        if(u.uhpmax <= 0) u.uhpmax = 1;
+        if (u.uhpmax <= 0) {
+            u.uhpmax = 1;
+        }
         savelife(how);
         u.ulives--;
         if (!u.ulives) {
@@ -711,10 +762,14 @@ done(int how)
             wizard ||
 #endif
             discover) && (how <= MAX_SURVIVABLE_DEATH)) {
-        if(yn("Die?") == 'y') goto die;
+        if (yn("Die?") == 'y') {
+            goto die;
+        }
         pline("OK, so you don't %s.",
               (how == CHOKING) ? "choke" : (how == DISINTEGRATED) ? "disintegrate" : "die");
-        if(u.uhpmax <= 0) u.uhpmax = u.ulevel * 8;  /* arbitrary */
+        if (u.uhpmax <= 0) {
+            u.uhpmax = u.ulevel * 8; /* arbitrary */
+        }
         savelife(how);
         killer.name[0] = 0;
         killer.format = 0;
@@ -800,7 +855,9 @@ die:
             pline("Do not pass go.  Do not collect 200 %s.", currency(200L));
         }
     }
-    if (have_windows) wait_synch(); /* flush screen output */
+    if (have_windows) {
+        wait_synch(); /* flush screen output */
+    }
 #ifndef NO_SIGNAL
     (void)signal(SIGINT, (SIG_RET_TYPE) done_intr);
 # if defined(UNIX) || defined(VMS) || defined (__EMX__)
@@ -811,16 +868,17 @@ die:
 
     bones_ok = (how < GENOCIDED) && can_make_bones();
 
-    if (how == TURNED_SLIME)
+    if (how == TURNED_SLIME) {
         u.ugrave_arise = PM_GREEN_SLIME;
+    }
 
     if (bones_ok && u.ugrave_arise < LOW_PM) {
         /* corpse gets burnt up too */
-        if (how == BURNING)
+        if (how == BURNING) {
             u.ugrave_arise = (NON_PM - 2); /* leave no corpse */
-        else if (how == STONING)
+        } else if (how == STONING) {
             u.ugrave_arise = (NON_PM - 1); /* statue instead of corpse */
-        else if (u.ugrave_arise == NON_PM &&
+        } else if (u.ugrave_arise == NON_PM &&
                  !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
             int mnum = u.umonnum;
 
@@ -852,9 +910,10 @@ die:
         }
     }
 #ifdef ASTRAL_ESCAPE
-    if (how == ESCAPED || how == DEFIED || how == PANICKED)
+    if (how == ESCAPED || how == DEFIED || how == PANICKED) {
 #endif
     killer.format = NO_KILLER_PREFIX;
+    }
 
     if (how != PANICKED) {
         boolean silently = done_stopprint ? TRUE : FALSE;
@@ -863,20 +922,27 @@ die:
         taken = paybill((how == ESCAPED) ? -1 : (how != QUIT), silently);
         paygd(silently);
         clearpriests();
-    } else taken = FALSE;   /* lint; assert( !bones_ok ); */
+    } else {
+        taken = FALSE; /* lint; assert( !bones_ok ); */
+    }
 
     clearlocks();
 
-    if (have_windows) display_nhwindow(WIN_MESSAGE, FALSE);
+    if (have_windows) {
+        display_nhwindow(WIN_MESSAGE, FALSE);
+    }
 
-    if (how < PANICKED)
+    if (how < PANICKED) {
         check_tutorial_message(QT_T_DEATH);
+    }
 
     if (strcmp(flags.end_disclose, "none") && how != PANICKED) {
         disclose(how, taken);
     }
     /* finish_paybill should be called after disclosure but before bones */
-    if (bones_ok && taken) finish_paybill();
+    if (bones_ok && taken) {
+        finish_paybill();
+    }
 
     /* calculate score, before creating bones [container gold] */
     {
@@ -888,24 +954,30 @@ die:
         umoney += hidden_gold();    /* accumulate gold from containers */
         tmp = umoney - tmp;     /* net gain */
 
-        if (tmp < 0L)
+        if (tmp < 0L) {
             tmp = 0L;
-        if (how < PANICKED)
+        }
+        if (how < PANICKED) {
             tmp -= tmp / 10L;
+        }
         u.urscore += tmp;
         u.urscore += 50L * (long)(deepest - 1);
-        if (deepest > 20)
+        if (deepest > 20) {
             u.urscore += 1000L * (long)((deepest > 30) ? 10 : deepest - 20);
+        }
 #ifdef ASTRAL_ESCAPE
-        if (how == ASCENDED || how == DEFIED) u.urscore *= 2L;
+        if (how == ASCENDED || how == DEFIED) {
+            u.urscore *= 2L;
+        }
 #endif
     }
 
     if (bones_ok) {
 #ifdef WIZARD
-        if (!wizard || paranoid_yn("Save bones?", iflags.paranoid_quit) == 'y')
+        if (!wizard || paranoid_yn("Save bones?", iflags.paranoid_quit) == 'y') {
 #endif /* WIZARD */
         savebones(corpse);
+        }
         /* corpse may be invalid pointer now so
            ensure that it isn't used again */
         corpse = (struct obj *)0;
@@ -946,13 +1018,16 @@ die:
         destroy_nhwindow(WIN_MESSAGE);
         WIN_MESSAGE = WIN_STATUS = WIN_MAP = WIN_ERR;
 
-        if(!done_stopprint || flags.tombstone)
+        if (!done_stopprint || flags.tombstone) {
             endwin = create_nhwindow(NHW_TEXT);
+        }
 
-        if (how < GENOCIDED && flags.tombstone && endwin != WIN_ERR)
+        if (how < GENOCIDED && flags.tombstone && endwin != WIN_ERR) {
             outrip(endwin, how);
-    } else
+        }
+    } else {
         done_stopprint = 1; /* just avoid any more output */
+    }
 
 /* changing kilbuf really changes killer. we do it this way because
    killer is declared a (const char *)
@@ -960,8 +1035,7 @@ die:
     if (u.uhave.amulet) {
         Strcat(kilbuf, " (with the Amulet)");
         killer_flags |= 0x1;
-    }
-    else if (how == ESCAPED) {
+    } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) { /* offered Amulet to wrong deity */
             Strcat(kilbuf, " (in celestial disgrace)");
             killer_flags |= 0x2;
@@ -994,18 +1068,22 @@ die:
         struct val_list *val;
         int i;
 
-        for (val = valuables; val->list; val++)
+        for (val = valuables; val->list; val++) {
             for (i = 0; i < val->size; i++) {
                 val->list[i].count = 0L;
             }
+        }
         get_valuables(invent);
 
         /* add points for collected valuables */
-        for (val = valuables; val->list; val++)
-            for (i = 0; i < val->size; i++)
-                if (val->list[i].count != 0L)
+        for (val = valuables; val->list; val++) {
+            for (i = 0; i < val->size; i++) {
+                if (val->list[i].count != 0L) {
                     u.urscore += val->list[i].count
                                  * (long)objects[val->list[i].typ].oc_cost;
+                }
+            }
+        }
 
         /* count the points for artifacts */
         artifact_score(invent, TRUE, endwin);
@@ -1017,15 +1095,20 @@ die:
         if (mtmp) {
             while (mtmp) {
                 Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
-                if (mtmp->mtame)
+                if (mtmp->mtame) {
                     u.urscore += mtmp->mhp;
+                }
                 mtmp = mtmp->nmon;
             }
-            if (!done_stopprint) putstr(endwin, 0, pbuf);
+            if (!done_stopprint) {
+                putstr(endwin, 0, pbuf);
+            }
             dump_line("", pbuf);
             pbuf[0] = '\0';
         } else {
-            if (!done_stopprint) Strcat(pbuf, " ");
+            if (!done_stopprint) {
+                Strcat(pbuf, " ");
+            }
         }
         Sprintf(eos(pbuf), "%s with %ld point%s,",
                 how==ASCENDED ? "went to your reward" :
@@ -1040,8 +1123,9 @@ die:
             putstr(endwin, 0, pbuf);
         }
 
-        if (!done_stopprint)
+        if (!done_stopprint) {
             artifact_score(invent, FALSE, endwin); /* list artifacts */
+        }
 #ifdef DUMP_LOG
         else
             artifact_score(invent, FALSE, WIN_ERR);
@@ -1053,7 +1137,9 @@ die:
                 int typ = val->list[i].typ;
                 long count = val->list[i].count;
 
-                if (count == 0L) continue;
+                if (count == 0L) {
+                    continue;
+                }
                 if (objects[typ].oc_class != GEM_CLASS || typ <= LAST_GEM) {
                     otmp = mksobj(typ, FALSE, FALSE);
                     makeknown(otmp->otyp);
@@ -1088,22 +1174,29 @@ die:
             /* more conventional demise */
             const char *where = dungeons[u.uz.dnum].dname;
 
-            if (Is_astralevel(&u.uz)) where = "The Astral Plane";
+            if (Is_astralevel(&u.uz)) {
+                where = "The Astral Plane";
+            }
             Sprintf(pbuf, "You %s in %s", ends[how], where);
-            if (!In_endgame(&u.uz) && !Is_knox(&u.uz))
+            if (!In_endgame(&u.uz) && !Is_knox(&u.uz)) {
                 Sprintf(eos(pbuf), " on dungeon level %d",
                         In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
+            }
         }
 
         Sprintf(eos(pbuf), " with %ld point%s,",
                 u.urscore, plur(u.urscore));
-        if (!done_stopprint) putstr(endwin, 0, pbuf);
+        if (!done_stopprint) {
+            putstr(endwin, 0, pbuf);
+        }
         dump_line("", pbuf);
     }
 
     Sprintf(pbuf, "and %ld piece%s of gold, after %ld move%s.",
             umoney, plur(umoney), moves, plur(moves));
-    if (!done_stopprint) putstr(endwin, 0, pbuf);
+    if (!done_stopprint) {
+        putstr(endwin, 0, pbuf);
+    }
     dump_line("", pbuf);
     Sprintf(pbuf, "Killer: %s", killer.name);
     dump_line("", pbuf);
@@ -1117,27 +1210,33 @@ die:
     dump_line("", pbuf);
     dump_blockquote_end();
 
-    if (!done_stopprint)
+    if (!done_stopprint) {
         display_nhwindow(endwin, TRUE);
-    if (endwin != WIN_ERR)
+    }
+    if (endwin != WIN_ERR) {
         destroy_nhwindow(endwin);
+    }
 
     /* "So when I die, the first thing I will see in Heaven is a
      * score list?" */
     if (flags.toptenwin) {
         topten(how);
-        if (have_windows)
+        if (have_windows) {
             exit_nhwindows((char *)0);
+        }
     } else {
-        if (have_windows)
+        if (have_windows) {
             exit_nhwindows((char *)0);
+        }
         topten(how);
     }
 #ifdef DUMP_LOG
     dump_exit();
 #endif
 
-    if(done_stopprint) { raw_print(""); raw_print(""); }
+    if (done_stopprint) {
+        raw_print(""); raw_print("");
+    }
     nh_terminate(EXIT_SUCCESS);
 }
 
@@ -1145,7 +1244,7 @@ static int
 heaven_or_hell_lifesave_end(void)
 {
     u.uinvulnerable = FALSE;
-    return(1);
+    return 1;
 }
 
 
@@ -1177,11 +1276,14 @@ container_contents(struct obj *list, boolean identified, boolean all_containers,
                 continue; /* bag of tricks with charges can't contain anything */
             } else if (box->cobj) {
                 winid tmpwin = WIN_ERR;
-                if (want_disp)
+                if (want_disp) {
                     tmpwin = create_nhwindow(NHW_MENU);
+                }
 #ifdef SORTLOOT
                 /* count the number of items */
-                for (n = 0, obj = box->cobj; obj; obj = obj->nobj) n++;
+                for (n = 0, obj = box->cobj; obj; obj = obj->nobj) {
+                    n++;
+                }
                 /* Make a temporary array to store the objects sorted */
                 oarray = (struct obj **) alloc(n*sizeof(struct obj*));
 
@@ -1210,7 +1312,9 @@ nextclass:
                     }
                 } /* for loop */
                 if (flags.sortpack) {
-                    if (*++invlet) goto nextclass;
+                    if (*++invlet) {
+                        goto nextclass;
+                    }
                 }
 #endif /* SORTLOOT */
                 Sprintf(buf, "Contents of %s:", the(xname(box)));
@@ -1227,8 +1331,9 @@ nextclass:
                 for (obj = box->cobj; obj; obj = obj->nobj) {
 #endif
                     dump_list_item_object(obj);
-                    if (want_disp)
+                    if (want_disp) {
                         putstr(tmpwin, 0, doname(obj));
+                    }
                 }
                 dump_list_end();
                 dump("", "");
@@ -1250,8 +1355,9 @@ nextclass:
             }
         }
         objects[box->otyp].oc_name_known = saveknown;
-        if (!all_containers)
+        if (!all_containers) {
             break;
+        }
     }
 }
 
@@ -1285,9 +1391,13 @@ list_vanquishedonly(void)
     char buf[BUFSZ];
 
     for (i = LOW_PM; i < NUMMONS; i++) {
-        if (mvitals[i].died) ntypes++;
+        if (mvitals[i].died) {
+            ntypes++;
+        }
         total_killed += (long)mvitals[i].died;
-        if (mons[i].mlevel > max_lev) max_lev = mons[i].mlevel;
+        if (mons[i].mlevel > max_lev) {
+            max_lev = mons[i].mlevel;
+        }
     }
 
     /* vanquished creatures list;
@@ -1302,8 +1412,8 @@ list_vanquishedonly(void)
         dump_list_start();
 
         /* countdown by monster "toughness" */
-        for (lev = max_lev; lev >= 0; lev--)
-            for (i = LOW_PM; i < NUMMONS; i++)
+        for (lev = max_lev; lev >= 0; lev--) {
+            for (i = LOW_PM; i < NUMMONS; i++) {
                 if (mons[i].mlevel == lev && (nkilled = mvitals[i].died) > 0) {
                     if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
                         Sprintf(buf, "%s%s",
@@ -1321,18 +1431,22 @@ list_vanquishedonly(void)
                     } else {
                         /* trolls or undead might have come back,
                            but we don't keep track of that */
-                        if (nkilled == 1)
+                        if (nkilled == 1) {
                             Strcpy(buf, an(mons[i].mname));
-                        else
+                        } else {
                             Sprintf(buf, "%d %s",
                                     nkilled, makeplural(mons[i].mname));
+                        }
                     }
                     putstr(klwin, 0, buf);
                     dump_list_item_link(mons[i].mname, buf);
                 }
+            }
+        }
         dump_list_end();
-        if (Hallucination)
+        if (Hallucination) {
             putstr(klwin, 0, "and a partridge in a pear tree");
+        }
         if (ntypes > 1) {
             putstr(klwin, 0, "");
             Sprintf(buf, "%ld creatures vanquished.", total_killed);
@@ -1365,9 +1479,13 @@ do_vanquished(int defquery, boolean ask)
 
     /* get totals first */
     for (i = LOW_PM; i < NUMMONS; i++) {
-        if (mvitals[i].died) ntypes++;
+        if (mvitals[i].died) {
+            ntypes++;
+        }
         total_killed += (long)mvitals[i].died;
-        if (mons[i].mlevel > max_lev) max_lev = mons[i].mlevel;
+        if (mons[i].mlevel > max_lev) {
+            max_lev = mons[i].mlevel;
+        }
     }
 
     /* vanquished creatures list;
@@ -1378,7 +1496,9 @@ do_vanquished(int defquery, boolean ask)
         c = done_stopprint ? 'n' : ask ?
             yn_function("Do you want an account of creatures vanquished?",
                         ynqchars, defquery) : defquery;
-        if (c == 'q') done_stopprint++;
+        if (c == 'q') {
+            done_stopprint++;
+        }
         if (c == 'y') {
             klwin = create_nhwindow(NHW_MENU);
             putstr(klwin, 0, buf);
@@ -1388,8 +1508,8 @@ do_vanquished(int defquery, boolean ask)
         dump_list_start();
 
         /* countdown by monster "toughness" */
-        for (lev = max_lev; lev >= 0; lev--)
-            for (i = LOW_PM; i < NUMMONS; i++)
+        for (lev = max_lev; lev >= 0; lev--) {
+            for (i = LOW_PM; i < NUMMONS; i++) {
                 if (mons[i].mlevel == lev && (nkilled = mvitals[i].died) > 0) {
                     if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
                         Sprintf(buf, "%s%s",
@@ -1407,29 +1527,40 @@ do_vanquished(int defquery, boolean ask)
                     } else {
                         /* trolls or undead might have come back,
                            but we don't keep track of that */
-                        if (nkilled == 1)
+                        if (nkilled == 1) {
                             Strcpy(buf, an(mons[i].mname));
-                        else
+                        } else {
                             Sprintf(buf, "%d %s",
                                     nkilled, makeplural(mons[i].mname));
+                        }
 #ifdef SHOW_BORN
-                        if (iflags.show_born && nkilled != mvitals[i].born)
+                        if (iflags.show_born && nkilled != mvitals[i].born) {
                             Sprintf(buf + strlen(buf), " (%d created)",
                                     (int) mvitals[i].born);
+                        }
 #endif
                     }
-                    if (c == 'y') putstr(klwin, 0, buf);
+                    if (c == 'y') {
+                        putstr(klwin, 0, buf);
+                    }
                     dump_list_item_link(mons[i].mname, buf);
                 }
+            }
+        }
         dump_list_end();
         /*
-         * if (Hallucination)
+         * if (Hallucination) {
          *     putstr(klwin, 0, "and a partridge in a pear tree");
+         }
          */
         if (ntypes > 1) {
-            if (c == 'y') putstr(klwin, 0, "");
+            if (c == 'y') {
+                putstr(klwin, 0, "");
+            }
             Sprintf(buf, "%ld creatures vanquished.", total_killed);
-            if (c == 'y') putstr(klwin, 0, buf);
+            if (c == 'y') {
+                putstr(klwin, 0, buf);
+            }
             dump_line("  ", buf);
         }
         if (c == 'y') {
@@ -1446,8 +1577,11 @@ num_genocides(void)
 {
     int i, n = 0;
 
-    for (i = LOW_PM; i < NUMMONS; ++i)
-        if (mvitals[i].mvflags & G_GENOD) ++n;
+    for (i = LOW_PM; i < NUMMONS; ++i) {
+        if (mvitals[i].mvflags & G_GENOD) {
+            ++n;
+        }
+    }
 
     return n;
 }
@@ -1467,10 +1601,11 @@ list_genocided(int defquery, boolean ask, boolean want_disp UNUSED)
     /* get totals first */
 #ifdef SHOW_EXTINCT
     for (i = LOW_PM; i < NUMMONS; i++) {
-        if (mvitals[i].mvflags & G_GENOD)
+        if (mvitals[i].mvflags & G_GENOD) {
             ngenocided++;
-        else if ( (mvitals[i].mvflags & G_GONE) && !(mons[i].geno & G_UNIQ) )
+        } else if ( (mvitals[i].mvflags & G_GONE) && !(mons[i].geno & G_UNIQ) ) {
             nextincted++;
+        }
     }
     ngenocided = num_genocides();
 #endif
@@ -1482,15 +1617,17 @@ list_genocided(int defquery, boolean ask, boolean want_disp UNUSED)
 #endif
         ) {
 #ifdef SHOW_EXTINCT
-        if (nextincted != 0)
+        if (nextincted != 0) {
             c = ask ?
                 yn_function("Do you want a list of species genocided or extinct?",
                             ynqchars, defquery) : defquery;
-        else
+        } else
 #endif
         c = ask ? yn_function("Do you want a list of species genocided?",
                               ynqchars, defquery) : defquery;
-        if (c == 'q') done_stopprint++;
+        if (c == 'q') {
+            done_stopprint++;
+        }
 #ifdef SHOW_EXTINCT
         Sprintf(buf, "Genocided or extinct species:");
 #else
@@ -1504,25 +1641,30 @@ list_genocided(int defquery, boolean ask, boolean want_disp UNUSED)
         dump_title(buf);
         dump_list_start();
 
-        for (i = LOW_PM; i < NUMMONS; i++)
+        for (i = LOW_PM; i < NUMMONS; i++) {
 #ifdef SHOW_EXTINCT
             if (mvitals[i].mvflags & G_GONE && !(mons[i].geno & G_UNIQ) ) {
 #else
             if (mvitals[i].mvflags & G_GENOD) {
 #endif
-                if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST)
+                if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "" : "the ",
                             mons[i].mname);
-                else
+                } else {
                     Strcpy(buf, makeplural(mons[i].mname));
+                }
 #ifdef SHOW_EXTINCT
-                if( !(mvitals[i].mvflags & G_GENOD) )
+                if ( !(mvitals[i].mvflags & G_GENOD) ) {
                     Strcat(buf, " (extinct)");
+                }
 #endif
-                if (klwin) putstr(klwin, 0, buf);
+                if (klwin) {
+                    putstr(klwin, 0, buf);
+                }
                 dump_list_item(buf);
             }
+        }
 #ifdef SHOW_EXTINCT
         if (nextincted > 0 && aprilfoolsday()) {
             dump_list_item("ammonites (extinct)");
@@ -1531,18 +1673,24 @@ list_genocided(int defquery, boolean ask, boolean want_disp UNUSED)
 #endif
         dump_list_end();
 
-        if (klwin) putstr(klwin, 0, "");
+        if (klwin) {
+            putstr(klwin, 0, "");
+        }
 #ifdef SHOW_EXTINCT
         if (ngenocided>0) {
 #endif
         Sprintf(buf, "%d species genocided.", ngenocided);
-        if (klwin) putstr(klwin, 0, buf);
+        if (klwin) {
+            putstr(klwin, 0, buf);
+        }
         dump_line("  ", buf);
 #ifdef SHOW_EXTINCT
     }
     if (nextincted>0) {
         Sprintf(buf, "%d species extinct.", nextincted);
-        if (klwin) putstr(klwin, 0, buf);
+        if (klwin) {
+            putstr(klwin, 0, buf);
+        }
         dump_line("  ", buf);
     }
 #endif /* SHOW_EXTINCT */

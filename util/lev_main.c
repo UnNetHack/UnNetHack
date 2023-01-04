@@ -135,11 +135,13 @@ long
 method_defined(char *methname, long o, long *ftyp)
 {
     int i;
-    for (i = 0; core_methods[i].methodname; i++)
-	if (core_methods[i].objtyp == o && !strcmp(core_methods[i].methodname, methname)) {
-	    *ftyp = core_methods[i].functype;
-	    return core_methods[i].retval;
-	}
+    for (i = 0; core_methods[i].methodname; i++) {
+        if (core_methods[i].objtyp == o && !strcmp(core_methods[i].methodname, methname)) {
+            *ftyp = core_methods[i].functype;
+            return core_methods[i].retval;
+        }
+    }
+
     return 0;
 }
 
@@ -336,7 +338,7 @@ main(int argc, char **argv)
             errors_encountered = TRUE;
         }
     } else {			/* Otherwise every argument is a filename */
-        for(i=1; i<argc; i++) {
+        for (i = 1; i < argc; i++) {
             fname = argv[i];
             if(!strcmp(fname, "-v")) {
                 be_verbose++;
@@ -468,9 +470,12 @@ int
 is_core_func(char *str)
 {
     int i;
-    for (i = 0; core_vars[i].name; i++)
-	if (!strcmp(core_vars[i].name, str))
-	    return core_vars[i].functype;
+    for (i = 0; core_vars[i].name; i++) {
+        if (!strcmp(core_vars[i].name, str)) {
+            return core_vars[i].functype;
+        }
+    }
+
     return 0;
 }
 
@@ -478,9 +483,11 @@ int
 core_func_idx(char *str)
 {
     int i;
-    for (i = 0; core_vars[i].name; i++)
-	if (!strcmp(core_vars[i].name, str))
-	    return i;
+    for (i = 0; core_vars[i].name; i++) {
+        if (!strcmp(core_vars[i].name, str)) {
+            return i;
+        }
+    }
     return -1;
 }
 
@@ -626,7 +633,7 @@ add_opvars(sp_lev *sp, const char *fmt, ...)
 
     va_start(argp, fmt);
 
-    for(p = fmt; *p != '\0'; p++) {
+    for (p = fmt; *p != '\0'; p++) {
 	switch(*p) {
 	case ' ': break;
 	case 'i':
@@ -981,9 +988,11 @@ void
 splev_add_from(sp_lev *splev, sp_lev *from_splev)
 {
     int i;
-    if (splev && from_splev)
-        for (i = 0; i < from_splev->n_opcodes; i++)
+    if (splev && from_splev) {
+        for (i = 0; i < from_splev->n_opcodes; i++) {
             add_opcode(splev, from_splev->opcodes[i].opcode, opvar_clone(from_splev->opcodes[i].opdat));
+        }
+    }
 }
 
 
@@ -1010,13 +1019,16 @@ get_floor_type(char c)
 int
 get_room_type(char *s)
 {
-	int i;
+    int i;
 
-	SpinCursor(3);
-	for(i=0; room_types[i].name; i++)
-	    if (!strcmp(s, room_types[i].name))
-		return ((int) room_types[i].type);
-	return ERR;
+    SpinCursor(3);
+    for (i = 0; room_types[i].name; i++) {
+        if (!strcmp(s, room_types[i].name)) {
+            return ((int) room_types[i].type);
+        }
+    }
+
+    return ERR;
 }
 
 /*
@@ -1025,13 +1037,15 @@ get_room_type(char *s)
 int
 get_trap_type(char *s)
 {
-	int i;
+    int i;
 
-	SpinCursor(3);
-	for (i=0; trap_types[i].name; i++)
-	    if(!strcmp(s,trap_types[i].name))
-		return trap_types[i].type;
-	return ERR;
+    SpinCursor(3);
+    for (i=0; trap_types[i].name; i++) {
+        if (!strcmp(s,trap_types[i].name)) {
+            return trap_types[i].type;
+        }
+    }
+    return ERR;
 }
 
 /*
@@ -1040,24 +1054,32 @@ get_trap_type(char *s)
 int
 get_monster_id(char *s, char c)
 {
-	int i, class;
+    int i, class;
 
-	SpinCursor(3);
-	class = c ? def_char_to_monclass(c) : 0;
-	if (class == MAXMCLASSES) return ERR;
+    SpinCursor(3);
+    class = c ? def_char_to_monclass(c) : 0;
+    if (class == MAXMCLASSES) return ERR;
 
-	for (i = LOW_PM; i < NUMMONS; i++)
-	    if (!class || class == mons[i].mlet)
-		if (!strcmp(s, mons[i].mname)) return i;
-	/* didn't find it; lets try case insensitive search */
-	for (i = LOW_PM; i < NUMMONS; i++)
-	    if (!class || class == mons[i].mlet)
-		if (!strcasecmp(s, mons[i].mname)) {
-		    if (be_verbose)
-			lc_warning("Monster type \"%s\" matches \"%s\".", s, mons[i].mname);
-		    return i;
-		}
-	return ERR;
+    for (i = LOW_PM; i < NUMMONS; i++) {
+        if (!class || class == mons[i].mlet) {
+            if (!strcmp(s, mons[i].mname)) {
+                return i;
+            }
+        }
+    }
+    /* didn't find it; lets try case insensitive search */
+    for (i = LOW_PM; i < NUMMONS; i++) {
+        if (!class || class == mons[i].mlet) {
+            if (!strcasecmp(s, mons[i].mname)) {
+                if (be_verbose) {
+                    lc_warning("Monster type \"%s\" matches \"%s\".", s, mons[i].mname);
+                }
+                return i;
+            }
+        }
+    }
+
+    return ERR;
 }
 
 /*
@@ -1134,42 +1156,42 @@ check_object_char(char c)
 char
 what_map_char(char c)
 {
-	SpinCursor(3);
-	switch(c) {
-		  case ' '  : return(STONE);
-		  case '#'  : return(CORR);
-		  case '.'  : return(ROOM);
-		  case '-'  : return(HWALL);
-		  case '|'  : return(VWALL);
-		  case '+'  : return(DOOR);
-		  case 'A'  : return(AIR);
-		  case 'B'  : return(CROSSWALL); /* hack: boundary location */
-		  case 'C'  : return(CLOUD);
-		  case 'S'  : return(SDOOR);
-		  case 'H'  : return(SCORR);
-		  case '{'  : return(FOUNTAIN);
-		  case '\\' : return(THRONE);
-		  case 'K'  :
+    SpinCursor(3);
+    switch(c) {
+        case ' '  : return STONE;
+        case '#'  : return CORR;
+        case '.'  : return ROOM;
+        case '-'  : return HWALL;
+        case '|'  : return VWALL;
+        case '+'  : return DOOR;
+        case 'A'  : return AIR;
+        case 'B'  : return CROSSWALL; /* hack: boundary location */
+        case 'C'  : return CLOUD;
+        case 'S'  : return SDOOR;
+        case 'H'  : return SCORR;
+        case '{'  : return FOUNTAIN;
+        case '\\' : return THRONE;
+        case 'K'  :
 #ifdef SINKS
-		      return(SINK);
+                    return SINK;
 #else
-		      lc_warning("Sinks ('K') are not allowed in this version!  Ignoring...");
-		      return(ROOM);
+                    lc_warning("Sinks ('K') are not allowed in this version!  Ignoring...");
+                    return ROOM;
 #endif
-		  case '}'  : return(MOAT);
-		  case 'P'  : return(POOL);
-		  case 'L'  : return(LAVAPOOL);
-		  case 'I'  : return(ICE);
-		  case 'W'  : return(WATER);
-		  case 'T'  : return(TREE);
-		  case 't'  : return(DEADTREE);
-		  case 'F'  : return(IRONBARS);	/* Fe = iron */
-		  case 'M'  : return(BOG);	/* muddy swamp */
-		  case 'x'  : return(MAX_TYPE);	/* 'see-through' */
-		  case 'Y'  : return(CRYSTALICEWALL);
-		  case 'U'  : return(ICEWALL);
-	    }
-	return(INVALID_TYPE);
+        case '}'  : return MOAT;
+        case 'P'  : return POOL;
+        case 'L'  : return LAVAPOOL;
+        case 'I'  : return ICE;
+        case 'W'  : return WATER;
+        case 'T'  : return TREE;
+        case 't'  : return DEADTREE;
+        case 'F'  : return IRONBARS;	/* Fe = iron */
+        case 'M'  : return BOG;	/* muddy swamp */
+        case 'x'  : return MAX_TYPE;	/* 'see-through' */
+        case 'Y'  : return CRYSTALICEWALL;
+        case 'U'  : return ICEWALL;
+    }
+    return INVALID_TYPE;
 }
 
 void
@@ -1203,78 +1225,85 @@ add_opcode(sp_lev *sp, int opc, genericptr_t dat)
 void
 scan_map(char *map, sp_lev *sp)
 {
-	int i, len;
-	char *s1, *s2;
-	long max_len = 0;
-	long max_hig = 0;
-	char *tmpmap[ROWNO];
-	int dx,dy;
-	char *mbuf;
+    int i, len;
+    char *s1, *s2;
+    long max_len = 0;
+    long max_hig = 0;
+    char *tmpmap[ROWNO];
+    int dx,dy;
+    char *mbuf;
 
-	/* First, strip out digits 0-9 (line numbering) */
-	for (s1 = s2 = map; *s1; s1++)
-	    if (*s1 < '0' || *s1 > '9')
-		*s2++ = *s1;
-	*s2 = '\0';
+    /* First, strip out digits 0-9 (line numbering) */
+    for (s1 = s2 = map; *s1; s1++) {
+        if (*s1 < '0' || *s1 > '9') {
+            *s2++ = *s1;
+        }
+    }
+    *s2 = '\0';
 
-	/* Second, find the max width of the map */
-	s1 = map;
-	while (s1 && *s1) {
-		s2 = index(s1, '\n');
-		if (s2) {
-			len = (int) (s2 - s1);
-			s1 = s2 + 1;
-		} else {
-			len = (int) strlen(s1);
-			s1 = (char *) 0;
-		}
-		if (len > max_len) max_len = len;
-	}
+    /* Second, find the max width of the map */
+    s1 = map;
+    while (s1 && *s1) {
+        s2 = index(s1, '\n');
+        if (s2) {
+            len = (int) (s2 - s1);
+            s1 = s2 + 1;
+        } else {
+            len = (int) strlen(s1);
+            s1 = (char *) 0;
+        }
+        if (len > max_len) max_len = len;
+    }
 
-	/* Then parse it now */
-	while (map && *map) {
-		tmpmap[max_hig] = (char *) alloc(max_len);
-		s1 = index(map, '\n');
-		if (s1) {
-			len = (int) (s1 - map);
-			s1++;
-		} else {
-			len = (int) strlen(map);
-			s1 = map + len;
-		}
-		for(i=0; i<len; i++)
-		  if((tmpmap[max_hig][i] = what_map_char(map[i])) == INVALID_TYPE) {
-		      lc_warning("Invalid character '%c' @ (%d, %d) - replacing with stone", map[i], max_hig, i);
-		      tmpmap[max_hig][i] = STONE;
-		    }
-		while(i < max_len)
-		    tmpmap[max_hig][i++] = STONE;
-		map = s1;
-		max_hig++;
-	}
+    /* Then parse it now */
+    while (map && *map) {
+        tmpmap[max_hig] = (char *) alloc(max_len);
+        s1 = index(map, '\n');
+        if (s1) {
+            len = (int) (s1 - map);
+            s1++;
+        } else {
+            len = (int) strlen(map);
+            s1 = map + len;
+        }
+        for (i = 0; i < len; i++) {
+            if((tmpmap[max_hig][i] = what_map_char(map[i])) == INVALID_TYPE) {
+                lc_warning("Invalid character '%c' @ (%d, %d) - replacing with stone", map[i], max_hig, i);
+                tmpmap[max_hig][i] = STONE;
+            }
+        }
+        while (i < max_len) {
+            tmpmap[max_hig][i++] = STONE;
+        }
+        map = s1;
+        max_hig++;
+    }
 
-	/* Memorize boundaries */
+    /* Memorize boundaries */
 
-	max_x_map = max_len - 1;
-	max_y_map = max_hig - 1;
+    max_x_map = max_len - 1;
+    max_y_map = max_hig - 1;
 
 
-	if(max_len > MAP_X_LIM || max_hig > MAP_Y_LIM) {
-	    lc_error("Map too large at (%d x %d), max is (%d x %d)", max_len, max_hig, MAP_X_LIM, MAP_Y_LIM);
-	}
+    if(max_len > MAP_X_LIM || max_hig > MAP_Y_LIM) {
+        lc_error("Map too large at (%d x %d), max is (%d x %d)", max_len, max_hig, MAP_X_LIM, MAP_Y_LIM);
+    }
 
-	mbuf = (char *) alloc(((max_hig-1) * max_len) + (max_len-1) + 2);
-	for (dy = 0; dy < max_hig; dy++)
-	    for (dx = 0; dx < max_len; dx++)
-		mbuf[(dy * max_len) + dx] = (tmpmap[dy][dx] + 1);
+    mbuf = (char *) alloc(((max_hig-1) * max_len) + (max_len-1) + 2);
+    for (dy = 0; dy < max_hig; dy++) {
+        for (dx = 0; dx < max_len; dx++) {
+            mbuf[(dy * max_len) + dx] = (tmpmap[dy][dx] + 1);
+        }
+    }
 
-	mbuf[((max_hig-1) * max_len) + (max_len-1) + 1] = '\0';
+    mbuf[((max_hig-1) * max_len) + (max_len-1) + 1] = '\0';
 
-	add_opvars(sp, "siio", mbuf, max_hig, max_len, SPO_MAP);
+    add_opvars(sp, "siio", mbuf, max_hig, max_len, SPO_MAP);
 
-	for (dy = 0; dy < max_hig; dy++)
-	    Free(tmpmap[dy]);
-	Free(mbuf);
+    for (dy = 0; dy < max_hig; dy++) {
+        Free(tmpmap[dy]);
+    }
+    Free(mbuf);
 }
 
 
@@ -1284,14 +1313,14 @@ scan_map(char *map, sp_lev *sp)
 static boolean
 write_common_data(int fd, sp_lev *lvl UNUSED)
 {
-	static struct version_info version_data = {
-			VERSION_NUMBER, VERSION_FEATURES,
-			VERSION_SANITY1, VERSION_SANITY2
-	};
+    static struct version_info version_data = {
+        VERSION_NUMBER, VERSION_FEATURES,
+        VERSION_SANITY1, VERSION_SANITY2
+    };
 
-	Write(fd, &version_data, sizeof version_data);
-	/*Write(fd, &lvl->init_lev, sizeof(lev_init));*/
-	return TRUE;
+    Write(fd, &version_data, sizeof version_data);
+    /*Write(fd, &lvl->init_lev, sizeof(lev_init));*/
+    return TRUE;
 }
 
 
@@ -1302,253 +1331,265 @@ write_common_data(int fd, sp_lev *lvl UNUSED)
 static boolean
 write_maze(int fd, sp_lev *maze)
 {
-        int i;
+    int i;
 
-        if (!write_common_data(fd, maze))
-            return FALSE;
+    if (!write_common_data(fd, maze)) {
+        return FALSE;
+    }
 
-	Write(fd, &(maze->n_opcodes), sizeof(maze->n_opcodes));
+    Write(fd, &(maze->n_opcodes), sizeof(maze->n_opcodes));
 
-        for (i = 0; i < maze->n_opcodes; i++) {
-	   _opcode tmpo = maze->opcodes[i];
+    for (i = 0; i < maze->n_opcodes; i++) {
+        _opcode tmpo = maze->opcodes[i];
 
-	   Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
+        Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
 
-	   if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES)
-	       panic("write_maze: unknown opcode (%i).", tmpo.opcode);
+        if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES) {
+            panic("write_maze: unknown opcode (%i).", tmpo.opcode);
+        }
 
-	   if (tmpo.opcode == SPO_PUSH) {
-	       genericptr_t opdat = tmpo.opdat;
-	       if (opdat) {
-		   struct opvar *ov = (struct opvar *)opdat;
-		   int size;
-		   Write(fd, &(ov->spovartyp), sizeof(ov->spovartyp));
-		   switch (ov->spovartyp) {
-		   case SPOVAR_NULL: break;
-		   case SPOVAR_COORD:
-		   case SPOVAR_REGION:
-		   case SPOVAR_MAPCHAR:
-		   case SPOVAR_MONST:
-		   case SPOVAR_OBJ:
-		   case SPOVAR_INT:
-		       Write(fd, &(ov->vardata.l), sizeof(ov->vardata.l));
-		       break;
-		   case SPOVAR_VARIABLE:
-		   case SPOVAR_STRING:
-		       if (ov->vardata.str)
-			   size = strlen(ov->vardata.str);
-		       else size = 0;
-		       Write(fd, &size, sizeof(size));
-		       if (size) {
-			   Write(fd, ov->vardata.str, size);
-			   Free(ov->vardata.str);
-		       }
-		       break;
-		   default: panic("write_maze: unknown data type (%i).", ov->spovartyp);
-		   }
-	       } else panic("write_maze: PUSH with no data.");
-	   } else {
-	       /* sanity check */
-	       genericptr_t opdat = tmpo.opdat;
-	       if (opdat)
-		   panic("write_maze: opcode (%i) has data.", tmpo.opcode);
-	   }
+        if (tmpo.opcode == SPO_PUSH) {
+            genericptr_t opdat = tmpo.opdat;
+            if (opdat) {
+                struct opvar *ov = (struct opvar *)opdat;
+                int size;
+                Write(fd, &(ov->spovartyp), sizeof(ov->spovartyp));
+                switch (ov->spovartyp) {
+                    case SPOVAR_NULL: break;
+                    case SPOVAR_COORD:
+                    case SPOVAR_REGION:
+                    case SPOVAR_MAPCHAR:
+                    case SPOVAR_MONST:
+                    case SPOVAR_OBJ:
+                    case SPOVAR_INT:
+                                      Write(fd, &(ov->vardata.l), sizeof(ov->vardata.l));
+                                      break;
+                    case SPOVAR_VARIABLE:
+                    case SPOVAR_STRING:
+                                      if (ov->vardata.str) {
+                                          size = strlen(ov->vardata.str);
+                                      } else {
+                                          size = 0;
+                                      }
+                                      Write(fd, &size, sizeof(size));
+                                      if (size) {
+                                          Write(fd, ov->vardata.str, size);
+                                          Free(ov->vardata.str);
+                                      }
+                                      break;
+                    default: panic("write_maze: unknown data type (%i).", ov->spovartyp);
+                }
+            } else panic("write_maze: PUSH with no data.");
+        } else {
+            /* sanity check */
+            genericptr_t opdat = tmpo.opdat;
+            if (opdat)
+                panic("write_maze: opcode (%i) has data.", tmpo.opcode);
+        }
 
-	   Free(tmpo.opdat);
+        Free(tmpo.opdat);
 
-	}
-        /* clear the struct for next user */
-	Free(maze->opcodes);
-	maze->opcodes = NULL;
-        /*(void) memset((genericptr_t) &maze->init_lev, 0, sizeof maze->init_lev);*/
+    }
+    /* clear the struct for next user */
+    Free(maze->opcodes);
+    maze->opcodes = NULL;
+    /*(void) memset((genericptr_t) &maze->init_lev, 0, sizeof maze->init_lev);*/
 
-	return TRUE;
+    return TRUE;
 }
 
 
 static boolean
 decompile_maze(int fd, sp_lev *maze)
 {
-	long i;
-	char debuf[128];
-	const char *opcodestr[MAX_SP_OPCODES] = {
-	    "null",
-	    "message",
-	    "monster",
-	    "object",
-	    "engraving",
-	    "room",
-	    "subroom",
-	    "door",
-	    "stair",
-	    "ladder",
-	    "altar",
-	    "fountain",
-	    "sink",
-	    "pool",
-	    "trap",
-	    "gold",
-	    "corridor",
-	    "levregion",
-	    "drawbridge",
-	    "mazewalk",
-	    "non_diggable",
-	    "non_passwall",
-	    "wallify",
-	    "map",
-	    "room_door",
-	    "region",
-	    "cmp",
-	    "jmp",
-	    "jl",
-	    "jle",
-	    "jg",
-	    "jge",
-	    "je",
-	    "jne",
-	    "spill",
-	    "terrain",
-	    "replaceterrain",
-	    "exit",
-	    "endroom",
-	    "pop_container",
-	    "push",
-	    "pop",
-	    "rn2",
-	    "dec",
-	    "inc",
-	    "add",
-	    "sub",
-	    "mul",
-	    "div",
-	    "mod",
-	    "sign",
-	    "copy",
-	    "mon_generation",
-	    "end_moninvent",
-	    "grave",
-	    "frame_push",
-	    "frame_pop",
-	    "call",
-	    "return",
-	    "init_map",
-	    "flags",
-	    "sounds",
-	    "wallwalk",
-	    "var_init",
-	    "shuffle_array",
-	    "dice",
-	    "corefunc",
-	    "selection_add",
-	    "selection_point",
-	    "selection_rect",
-	    "selection_fillrect",
-	    "selection_line",
-	    "selection_rndline",
-	    "selection_grow",
-	    "selection_flood",
-	    "selection_rndcoord",
-	    "selection_ellipse",
-	    "selection_filter",
-	    "selection_gradient",
-	    "selection_complement",
-	};
+    long i;
+    char debuf[128];
+    const char *opcodestr[MAX_SP_OPCODES] = {
+        "null",
+        "message",
+        "monster",
+        "object",
+        "engraving",
+        "room",
+        "subroom",
+        "door",
+        "stair",
+        "ladder",
+        "altar",
+        "fountain",
+        "sink",
+        "pool",
+        "trap",
+        "gold",
+        "corridor",
+        "levregion",
+        "drawbridge",
+        "mazewalk",
+        "non_diggable",
+        "non_passwall",
+        "wallify",
+        "map",
+        "room_door",
+        "region",
+        "cmp",
+        "jmp",
+        "jl",
+        "jle",
+        "jg",
+        "jge",
+        "je",
+        "jne",
+        "spill",
+        "terrain",
+        "replaceterrain",
+        "exit",
+        "endroom",
+        "pop_container",
+        "push",
+        "pop",
+        "rn2",
+        "dec",
+        "inc",
+        "add",
+        "sub",
+        "mul",
+        "div",
+        "mod",
+        "sign",
+        "copy",
+        "mon_generation",
+        "end_moninvent",
+        "grave",
+        "frame_push",
+        "frame_pop",
+        "call",
+        "return",
+        "init_map",
+        "flags",
+        "sounds",
+        "wallwalk",
+        "var_init",
+        "shuffle_array",
+        "dice",
+        "corefunc",
+        "selection_add",
+        "selection_point",
+        "selection_rect",
+        "selection_fillrect",
+        "selection_line",
+        "selection_rndline",
+        "selection_grow",
+        "selection_flood",
+        "selection_rndcoord",
+        "selection_ellipse",
+        "selection_filter",
+        "selection_gradient",
+        "selection_complement",
+    };
 
-	/* don't bother with the header stuff */
+    /* don't bother with the header stuff */
 
-        for (i=0;i<maze->n_opcodes;i++) {
-	   _opcode tmpo = maze->opcodes[i];
+    for (i=0;i<maze->n_opcodes;i++) {
+        _opcode tmpo = maze->opcodes[i];
 
-	   if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES)
-	       panic("decompile_maze: unknown opcode (%i).", tmpo.opcode);
+        if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES) {
+            panic("decompile_maze: unknown opcode (%i).", tmpo.opcode);
+        }
 
-	   if (tmpo.opcode == SPO_PUSH) {
-	       genericptr_t opdat = tmpo.opdat;
-	       if (opdat) {
-		   struct opvar *ov = (struct opvar *)opdat;
-		   int size;
-		   switch (ov->spovartyp) {
-		   case SPOVAR_NULL: break;
-		   case SPOVAR_COORD:
-		       snprintf(debuf, 127, "%li:\t%s\tcoord:(%li,%li)\n", i, opcodestr[tmpo.opcode],
-				(ov->vardata.l & 0xff), ((ov->vardata.l >> 16) & 0xff));
-			   Write(fd, debuf, strlen(debuf));
-			   break;
-		   case SPOVAR_REGION:
-		       snprintf(debuf, 127, "%li:\t%s\tregion:(%li,%li,%li,%li)\n", i, opcodestr[tmpo.opcode],
-				(ov->vardata.l & 0xff), ((ov->vardata.l >> 8) & 0xff),
-				((ov->vardata.l >> 16) & 0xff), ((ov->vardata.l >> 24) & 0xff));
-			   Write(fd, debuf, strlen(debuf));
-			   break;
-		   case SPOVAR_OBJ:
-		       snprintf(debuf, 127, "%li:\t%s\tobj:(id=%li,class=\'%c\')\n",
-				i, opcodestr[tmpo.opcode],
-				SP_OBJ_TYP(ov->vardata.l), (char)SP_OBJ_CLASS(ov->vardata.l));
-		       Write(fd, debuf, strlen(debuf));
-		       break;
-		   case SPOVAR_MONST:
-		       snprintf(debuf, 127, "%li:\t%s\tmonster:(pm=%li, class='%c')\n", i, opcodestr[tmpo.opcode],
-				SP_MONST_PM(ov->vardata.l), (char)SP_MONST_CLASS(ov->vardata.l));
-		       Write(fd, debuf, strlen(debuf));
-		       break;
-		   case SPOVAR_MAPCHAR:
-		       snprintf(debuf, 127, "%li:\t%s\tmapchar:(%i,%i)\n", i, opcodestr[tmpo.opcode],
-				(int)SP_MAPCHAR_TYP(ov->vardata.l), (schar)SP_MAPCHAR_LIT(ov->vardata.l));
-		       Write(fd, debuf, strlen(debuf));
-		       break;
-		   case SPOVAR_INT:
-		       if (ov->vardata.l >= ' ' && ov->vardata.l <= '~')
-			   snprintf(debuf, 127, "%li:\t%s\tint:%li\t# '%c'\n", i, opcodestr[tmpo.opcode], ov->vardata.l, (char)ov->vardata.l);
-		       else
-			   snprintf(debuf, 127, "%li:\t%s\tint:%li\n", i, opcodestr[tmpo.opcode], ov->vardata.l);
-		       Write(fd, debuf, strlen(debuf));
-		       break;
-		   case SPOVAR_VARIABLE:
-		   case SPOVAR_STRING:
-		       if (ov->vardata.str)
-			   size = strlen(ov->vardata.str);
-		       else size = 0;
-		       if (size) {
-			   int x;
-			   int ok = (size > 127) ? 0 : 1;
-			   if (ok)
-			       for (x = 0; x < size; x++)
-				   if (ov->vardata.str[x] < ' ' || ov->vardata.str[x] > '~') {
-				       ok = 0;
-				       break;
-				   }
-			   if (ok) {
-			       if (ov->spovartyp == SPOVAR_VARIABLE)
-				   snprintf(debuf, 127, "%li:\t%s\tvar:$%s\n", i, opcodestr[tmpo.opcode], ov->vardata.str);
-			       else
-				   snprintf(debuf, 127, "%li:\t%s\tstr:\"%s\"\n", i, opcodestr[tmpo.opcode], ov->vardata.str);
-			       Write(fd, debuf, strlen(debuf));
-			   } else {
-			       snprintf(debuf, 127, "%li:\t%s\tstr:", i, opcodestr[tmpo.opcode]);
-			       Write(fd, debuf, strlen(debuf));
-			       for (x = 0; x < size; x++) {
-				   snprintf(debuf, 127, "%02x ", ov->vardata.str[x]);
-				   Write(fd, debuf, strlen(debuf));
-			       }
-			       snprintf(debuf, 127, "\n");
-			       Write(fd, debuf, strlen(debuf));
-			   }
-		       }
-		       break;
-		   default: panic("decompile_maze: unknown data type (%i).", ov->spovartyp);
-		   }
-	       } else panic("decompile_maze: PUSH with no data.");
-	   } else {
-	       /* sanity check */
-	       genericptr_t opdat = tmpo.opdat;
-	       if (opdat)
-		   panic("decompile_maze: opcode (%i) has data.", tmpo.opcode);
-	       snprintf(debuf, 127, "%li:\t%s\n", i, opcodestr[tmpo.opcode]);
-	       Write(fd, debuf, strlen(debuf));
-	   }
+        if (tmpo.opcode == SPO_PUSH) {
+            genericptr_t opdat = tmpo.opdat;
+            if (opdat) {
+                struct opvar *ov = (struct opvar *)opdat;
+                int size;
+                switch (ov->spovartyp) {
+                    case SPOVAR_NULL: break;
+                    case SPOVAR_COORD:
+                                      snprintf(debuf, 127, "%li:\t%s\tcoord:(%li,%li)\n", i, opcodestr[tmpo.opcode],
+                                               (ov->vardata.l & 0xff), ((ov->vardata.l >> 16) & 0xff));
+                                      Write(fd, debuf, strlen(debuf));
+                                      break;
+                    case SPOVAR_REGION:
+                                      snprintf(debuf, 127, "%li:\t%s\tregion:(%li,%li,%li,%li)\n", i, opcodestr[tmpo.opcode],
+                                               (ov->vardata.l & 0xff), ((ov->vardata.l >> 8) & 0xff),
+                                               ((ov->vardata.l >> 16) & 0xff), ((ov->vardata.l >> 24) & 0xff));
+                                      Write(fd, debuf, strlen(debuf));
+                                      break;
+                    case SPOVAR_OBJ:
+                                      snprintf(debuf, 127, "%li:\t%s\tobj:(id=%li,class=\'%c\')\n",
+                                               i, opcodestr[tmpo.opcode],
+                                               SP_OBJ_TYP(ov->vardata.l), (char)SP_OBJ_CLASS(ov->vardata.l));
+                                      Write(fd, debuf, strlen(debuf));
+                                      break;
+                    case SPOVAR_MONST:
+                                      snprintf(debuf, 127, "%li:\t%s\tmonster:(pm=%li, class='%c')\n", i, opcodestr[tmpo.opcode],
+                                               SP_MONST_PM(ov->vardata.l), (char)SP_MONST_CLASS(ov->vardata.l));
+                                      Write(fd, debuf, strlen(debuf));
+                                      break;
+                    case SPOVAR_MAPCHAR:
+                                      snprintf(debuf, 127, "%li:\t%s\tmapchar:(%i,%i)\n", i, opcodestr[tmpo.opcode],
+                                               (int)SP_MAPCHAR_TYP(ov->vardata.l), (schar)SP_MAPCHAR_LIT(ov->vardata.l));
+                                      Write(fd, debuf, strlen(debuf));
+                                      break;
+                    case SPOVAR_INT:
+                                      if (ov->vardata.l >= ' ' && ov->vardata.l <= '~') {
+                                          snprintf(debuf, 127, "%li:\t%s\tint:%li\t# '%c'\n", i, opcodestr[tmpo.opcode], ov->vardata.l, (char)ov->vardata.l);
+                                      } else {
+                                          snprintf(debuf, 127, "%li:\t%s\tint:%li\n", i, opcodestr[tmpo.opcode], ov->vardata.l);
+                                      }
+                                      Write(fd, debuf, strlen(debuf));
+                                      break;
+                    case SPOVAR_VARIABLE:
+                    case SPOVAR_STRING:
+                                      if (ov->vardata.str) {
+                                          size = strlen(ov->vardata.str);
+                                      } else {
+                                          size = 0;
+                                      }
+                                      if (size) {
+                                          int x;
+                                          int ok = (size > 127) ? 0 : 1;
+                                          if (ok) {
+                                              for (x = 0; x < size; x++) {
+                                                  if (ov->vardata.str[x] < ' ' || ov->vardata.str[x] > '~') {
+                                                      ok = 0;
+                                                      break;
+                                                  }
+                                              }
+                                          }
+                                          if (ok) {
+                                              if (ov->spovartyp == SPOVAR_VARIABLE) {
+                                                  snprintf(debuf, 127, "%li:\t%s\tvar:$%s\n", i, opcodestr[tmpo.opcode], ov->vardata.str);
+                                              } else {
+                                                  snprintf(debuf, 127, "%li:\t%s\tstr:\"%s\"\n", i, opcodestr[tmpo.opcode], ov->vardata.str);
+                                              }
+                                              Write(fd, debuf, strlen(debuf));
+                                          } else {
+                                              snprintf(debuf, 127, "%li:\t%s\tstr:", i, opcodestr[tmpo.opcode]);
+                                              Write(fd, debuf, strlen(debuf));
+                                              for (x = 0; x < size; x++) {
+                                                  snprintf(debuf, 127, "%02x ", ov->vardata.str[x]);
+                                                  Write(fd, debuf, strlen(debuf));
+                                              }
+                                              snprintf(debuf, 127, "\n");
+                                              Write(fd, debuf, strlen(debuf));
+                                          }
+                                      }
+                                      break;
+                    default: panic("decompile_maze: unknown data type (%i).", ov->spovartyp);
+                }
+            } else panic("decompile_maze: PUSH with no data.");
+        } else {
+            /* sanity check */
+            genericptr_t opdat = tmpo.opdat;
+            if (opdat) {
+                panic("decompile_maze: opcode (%i) has data.", tmpo.opcode);
+            }
+            snprintf(debuf, 127, "%li:\t%s\n", i, opcodestr[tmpo.opcode]);
+            Write(fd, debuf, strlen(debuf));
+        }
 
-	}
-	return TRUE;
+    }
+    return TRUE;
 }
 
 char *
@@ -1558,16 +1599,22 @@ mangle_fname(char *fname)
     char *p = strchr(fname, '%');
 
     if (p) {
-	char buf2[256];
-	p++;
-	while (*p && (*p >= '0') && (*p <= '9')) p++;
-	if (*p != 'i') panic("Illegal counter variable '%%%c' in filename.", *p);
-	if (strchr(p, '%')) panic("Only one counter variable (%%i) in filename allowed.");
-	sprintf(buf2, "%s", fname);
-	sprintf(buf, buf2, fname_counter);
-	fname_counter++;
+        char buf2[256];
+        p++;
+        while (*p && (*p >= '0') && (*p <= '9')) {
+            p++;
+        }
+        if (*p != 'i') {
+            panic("Illegal counter variable '%%%c' in filename.", *p);
+        }
+        if (strchr(p, '%')) {
+            panic("Only one counter variable (%%i) in filename allowed.");
+        }
+        sprintf(buf2, "%s", fname);
+        sprintf(buf, buf2, fname_counter);
+        fname_counter++;
     } else {
-	sprintf(buf, "%s", fname);
+        sprintf(buf, "%s", fname);
     }
     return buf;
 }
@@ -1580,57 +1627,65 @@ mangle_fname(char *fname)
 boolean
 write_level_file(char *filename, sp_lev *lvl)
 {
-	int fout;
-	char lbuf[60];
-	char * mangled = mangle_fname(filename);
+    int fout;
+    char lbuf[60];
+    char * mangled = mangle_fname(filename);
 
-	if (decompile) {
-	    lbuf[0] = '\0';
+    if (decompile) {
+        lbuf[0] = '\0';
 #ifdef PREFIX
-	    Strcat(lbuf, PREFIX);
+        Strcat(lbuf, PREFIX);
 #endif
-	    Strcat(lbuf, mangled);
-	    Strcat(lbuf, "_lev.txt");
-	    fout = open(lbuf, O_TRUNC|O_WRONLY|O_CREAT, OMASK);
-	    if (fout < 0) return FALSE;
-	    decompile_maze(fout, lvl);
-	    (void) close(fout);
-	}
+        Strcat(lbuf, mangled);
+        Strcat(lbuf, "_lev.txt");
+        fout = open(lbuf, O_TRUNC|O_WRONLY|O_CREAT, OMASK);
+        if (fout < 0) {
+            return FALSE;
+        }
+        decompile_maze(fout, lvl);
+        (void) close(fout);
+    }
 
-	lbuf[0] = '\0';
+    lbuf[0] = '\0';
 #ifdef PREFIX
-	Strcat(lbuf, PREFIX);
+    Strcat(lbuf, PREFIX);
 #endif
-	Strcat(lbuf, mangled);
-	Strcat(lbuf, LEV_EXT);
+    Strcat(lbuf, mangled);
+    Strcat(lbuf, LEV_EXT);
 
-	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY, OMASK);
-	if (fout < 0) return FALSE;
+    fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY, OMASK);
+    if (fout < 0) {
+        return FALSE;
+    }
 
-        if (!lvl) panic("write_level_file");
+    if (!lvl) {
+        panic("write_level_file");
+    }
 
-	if (be_verbose)
-	    fprintf(stdout, "File: '%s', opcodes: %li\n", lbuf, lvl->n_opcodes);
+    if (be_verbose) {
+        fprintf(stdout, "File: '%s', opcodes: %li\n", lbuf, lvl->n_opcodes);
+    }
 
-        if (!write_maze(fout, lvl))
-          return FALSE;
+    if (!write_maze(fout, lvl)) {
+        return FALSE;
+    }
 
-	(void) close(fout);
+    (void) close(fout);
 
-	if (is_rnd_vault) {
-	    char debuf[256];
-	    lbuf[0] = '\0';
+    if (is_rnd_vault) {
+        char debuf[256];
+        lbuf[0] = '\0';
 #ifdef PREFIX
-	    Strcat(lbuf, PREFIX);
+        Strcat(lbuf, PREFIX);
 #endif
-	    Strcat(lbuf, "vaults.dat");
-	    fout = open(lbuf, O_WRONLY|O_APPEND|O_CREAT, OMASK);
-	    snprintf(debuf, 255, "%i %s\n", rnd_vault_freq, mangled);
-	    Write(fout, debuf, strlen(debuf));
-	    (void) close(fout);
-	}
+        Strcat(lbuf, "vaults.dat");
+        fout = open(lbuf, O_WRONLY|O_APPEND|O_CREAT, OMASK);
+        snprintf(debuf, 255, "%i %s\n", rnd_vault_freq, mangled);
+        Write(fout, debuf, strlen(debuf));
+        (void) close(fout);
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 #ifdef STRICT_REF_DEF

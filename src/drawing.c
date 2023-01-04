@@ -772,8 +772,11 @@ int
 def_char_to_objclass(char ch)
 {
     int i;
-    for (i = 1; i < MAXOCLASSES; i++)
-        if (ch == def_oc_syms[i]) break;
+    for (i = 1; i < MAXOCLASSES; i++) {
+        if (ch == def_oc_syms[i]) {
+            break;
+        }
+    }
     return i;
 }
 
@@ -785,8 +788,11 @@ int
 def_char_to_monclass(char ch)
 {
     int i;
-    for (i = 1; i < MAXMCLASSES; i++)
-        if (def_monsyms[i] == ch) break;
+    for (i = 1; i < MAXMCLASSES; i++) {
+        if (def_monsyms[i] == ch) {
+            break;
+        }
+    }
     return i;
 }
 
@@ -795,9 +801,10 @@ assign_graphics(glyph_t *graph_chars, int glth, int maxlen, int offset)
 {
     int i;
 
-    for (i = 0; i < maxlen; i++)
+    for (i = 0; i < maxlen; i++) {
         showsyms[i+offset] = (((i < glth) && graph_chars[i]) ?
                               graph_chars[i] : defsyms[i+offset].sym);
+    }
 }
 
 void
@@ -815,7 +822,9 @@ switch_graphics(int gr_set_flag)
     case ASCII_GRAPHICS:
         assign_graphics((glyph_t *)0, 0, MAXPCHARS, 0);
 #ifdef PC9800
-        if (ascgraphics_mode_callback) (*ascgraphics_mode_callback)();
+        if (ascgraphics_mode_callback) {
+            (*ascgraphics_mode_callback)();
+        }
 #endif
         break;
 #ifdef ASCIIGRAPH
@@ -834,7 +843,9 @@ switch_graphics(int gr_set_flag)
 #endif
         assign_graphics(ibm_graphics, SIZE(ibm_graphics), MAXPCHARS, 0);
 #ifdef PC9800
-        if (ibmgraphics_mode_callback) (*ibmgraphics_mode_callback)();
+        if (ibmgraphics_mode_callback) {
+            (*ibmgraphics_mode_callback)();
+        }
 #endif
         break;
 #endif /* ASCIIGRAPH */
@@ -849,7 +860,9 @@ switch_graphics(int gr_set_flag)
         iflags.cursesgraphics = FALSE;
 #endif
         assign_graphics(dec_graphics, SIZE(dec_graphics), MAXPCHARS, 0);
-        if (decgraphics_mode_callback) (*decgraphics_mode_callback)();
+        if (decgraphics_mode_callback) {
+            (*decgraphics_mode_callback)();
+        }
         break;
 #endif /* TERMLIB */
 #ifdef MAC_GRAPHICS_ENV
@@ -997,8 +1010,9 @@ assign_rogue_graphics(boolean is_rlevel)
         save_syms();
 
         /* Use a loop: char != uchar on some machines. */
-        for (i = 0; i < MAXMCLASSES; i++)
+        for (i = 0; i < MAXMCLASSES; i++) {
             monsyms[i] = def_monsyms[i];
+        }
 # if defined(ASCIIGRAPH) && !defined(MSWIN_GRAPHICS)
         if (iflags.IBMgraphics
 #  if defined(USE_TILES) && defined(MSDOS)
@@ -1007,13 +1021,14 @@ assign_rogue_graphics(boolean is_rlevel)
             )
             monsyms[S_HUMAN] = 0x01; /* smiley face */
 # endif
-        for (i = 0; i < MAXPCHARS; i++)
+        for (i = 0; i < MAXPCHARS; i++) {
             showsyms[i] = defsyms[i].sym;
+        }
 
 /*
  * Some day if these rogue showsyms get much more extensive than this,
  * we may want to create r_showsyms, and IBM_r_showsyms arrays to hold
- * all of this info and to simply initialize it via a for() loop like r_oc_syms.
+ * all of this info and to simply initialize it via a for () loop like r_oc_syms.
  */
 
 # ifdef ASCIIGRAPH

@@ -47,20 +47,24 @@ percentage_color_of(int value, int max, const struct percent_color_option *color
     switch (color_options->statclrtype) {
     default:
     case STATCLR_TYPE_PERCENT:
-        if (100 * value <= color_options->percentage * max)
+        if (100 * value <= color_options->percentage * max) {
             return color_options->color_option;
+        }
         break;
     case STATCLR_TYPE_NUMBER_EQ:
-        if (value == color_options->percentage)
+        if (value == color_options->percentage) {
             return color_options->color_option;
+        }
         break;
     case STATCLR_TYPE_NUMBER_LT:
-        if (value < color_options->percentage)
+        if (value < color_options->percentage) {
             return color_options->color_option;
+        }
         break;
     case STATCLR_TYPE_NUMBER_GT:
-        if (value > color_options->percentage)
+        if (value > color_options->percentage) {
             return color_options->color_option;
+        }
         break;
     }
     return percentage_color_of(value, max, color_options->next);
@@ -71,11 +75,14 @@ start_color_option(struct color_option color_option)
 {
 #ifdef TTY_GRAPHICS
     int i;
-    if (color_option.color != NO_COLOR)
+    if (color_option.color != NO_COLOR) {
         term_start_color(color_option.color);
-    for (i = 0; (1 << i) <= color_option.attr_bits; ++i)
-        if (i != ATR_NONE && color_option.attr_bits & (1 << i))
+    }
+    for (i = 0; (1 << i) <= color_option.attr_bits; ++i) {
+        if (i != ATR_NONE && color_option.attr_bits & (1 << i)) {
             term_start_attr(i);
+        }
+    }
 #endif  /* TTY_GRAPHICS */
 }
 
@@ -84,11 +91,14 @@ end_color_option(struct color_option color_option)
 {
 #ifdef TTY_GRAPHICS
     int i;
-    if (color_option.color != NO_COLOR)
+    if (color_option.color != NO_COLOR) {
         term_end_color();
-    for (i = 0; (1 << i) <= color_option.attr_bits; ++i)
-        if (i != ATR_NONE && color_option.attr_bits & (1 << i))
+    }
+    for (i = 0; (1 << i) <= color_option.attr_bits; ++i) {
+        if (i != ATR_NONE && color_option.attr_bits & (1 << i)) {
             term_end_attr(i);
+        }
+    }
 #endif  /* TTY_GRAPHICS */
 }
 
@@ -99,7 +109,9 @@ apply_color_option(
     const char *newbot2,
     int statusline) /**< apply color on this statusline: 1 or 2 */
 {
-    if (!iflags.use_status_colors || !iflags.use_color) return;
+    if (!iflags.use_status_colors || !iflags.use_color) {
+        return;
+    }
     curs(WIN_STATUS, 1, statusline-1);
     start_color_option(color_option);
     putstr(WIN_STATUS, 0, newbot2);
@@ -112,7 +124,9 @@ add_colored_text(const char *text, char *newbot2, int statusline)
     char *nb;
     struct color_option color_option;
 
-    if (*text == '\0') return;
+    if (*text == '\0') {
+        return;
+    }
 
     if ((min(MAXCO, CO)-1) < 0) {
         return;
@@ -120,7 +134,9 @@ add_colored_text(const char *text, char *newbot2, int statusline)
     /* don't add anything if it can't be displayed.
      * Otherwise the color of invisible text may bleed into
      * the statusline. */
-    if (strlen(newbot2) >= (unsigned)min(MAXCO, CO)-1) return;
+    if (strlen(newbot2) >= (unsigned)min(MAXCO, CO)-1) {
+        return;
+    }
 
     if (!iflags.use_status_colors) {
         Sprintf(nb = eos(newbot2), " %s", text);
@@ -176,18 +192,26 @@ rank_of(int lev, short int monnum, boolean female)
             break;
         }
     }
-    if (!role->name.m)
+    if (!role->name.m) {
         role = &urole;
+    }
 
     /* Find the rank */
     for (i = xlev_to_rank((int)lev); i >= 0; i--) {
-        if (female && role->rank[i].f) return (role->rank[i].f);
-        if (role->rank[i].m) return (role->rank[i].m);
+        if (female && role->rank[i].f) {
+            return (role->rank[i].f);
+        }
+        if (role->rank[i].m) {
+            return (role->rank[i].m);
+        }
     }
 
     /* Try the role name, instead */
-    if (female && role->name.f) return (role->name.f);
-    else if (role->name.m) return (role->name.m);
+    if (female && role->name.f) {
+        return (role->name.f);
+    } else if (role->name.m) {
+        return (role->name.m);
+    }
     return ("Player");
 }
 
@@ -195,7 +219,7 @@ rank_of(int lev, short int monnum, boolean female)
 const char *
 rank(void)
 {
-    return(rank_of(u.ulevel, Role_switch, flags.female));
+    return rank_of(u.ulevel, Role_switch, flags.female);
 }
 
 int
@@ -205,22 +229,32 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
 
 
     /* Loop through each of the roles */
-    for (i = 0; roles[i].name.m; i++)
+    for (i = 0; roles[i].name.m; i++) {
         for (j = 0; j < 9; j++) {
             if (roles[i].rank[j].m && !strncmpi(str,
                                                 roles[i].rank[j].m, strlen(roles[i].rank[j].m))) {
-                if (rank_indx) *rank_indx = j;
-                if (title_length) *title_length = strlen(roles[i].rank[j].m);
+                if (rank_indx) {
+                    *rank_indx = j;
+                }
+                if (title_length) {
+                    *title_length = strlen(roles[i].rank[j].m);
+                }
                 return roles[i].malenum;
             }
             if (roles[i].rank[j].f && !strncmpi(str,
                                                 roles[i].rank[j].f, strlen(roles[i].rank[j].f))) {
-                if (rank_indx) *rank_indx = j;
-                if (title_length) *title_length = strlen(roles[i].rank[j].f);
+                if (rank_indx) {
+                    *rank_indx = j;
+                }
+                if (title_length) {
+                    *title_length = strlen(roles[i].rank[j].f);
+                }
                 return ((roles[i].femalenum != NON_PM) ?
                         roles[i].femalenum : roles[i].malenum);
             }
         }
+    }
+
     return NON_PM;
 }
 
@@ -229,8 +263,12 @@ max_rank_sz(void)
 {
     int i, r, maxr = 0;
     for (i = 0; i < 9; i++) {
-        if (urole.rank[i].m && (r = strlen(urole.rank[i].m)) > maxr) maxr = r;
-        if (urole.rank[i].f && (r = strlen(urole.rank[i].f)) > maxr) maxr = r;
+        if (urole.rank[i].m && (r = strlen(urole.rank[i].m)) > maxr) {
+            maxr = r;
+        }
+        if (urole.rank[i].f && (r = strlen(urole.rank[i].f)) > maxr) {
+            maxr = r;
+        }
     }
     mrank_sz = maxr;
     return;
@@ -243,7 +281,9 @@ botl_score(void)
     int deepest = deepest_lev_reached(FALSE);
     long umoney = money_cnt(invent) + hidden_gold();
 
-    if ((umoney -= u.umoney0) < 0L) umoney = 0L;
+    if ((umoney -= u.umoney0) < 0L) {
+        umoney = 0L;
+    }
     return umoney + u.urscore + (long)(50 * (deepest - 1))
            + (long)(deepest > 30 ? 10000 :
                     deepest > 20 ? 1000*(deepest - 20) : 0);
@@ -279,7 +319,9 @@ bot1()
     }
 #endif
     Strcat(newbot1, plname);
-    if('a' <= newbot1[i] && newbot1[i] <= 'z') newbot1[i] += 'A'-'a';
+    if ('a' <= newbot1[i] && newbot1[i] <= 'z') {
+        newbot1[i] += 'A'-'a';
+    }
     newbot1[10] = '\0';
     Sprintf(nb = eos(newbot1), " the ");
 
@@ -288,15 +330,16 @@ bot1()
         int k = 0;
 
         Strcpy(mbot, mons[u.umonnum].mname);
-        while(mbot[k] != 0) {
+        while (mbot[k] != 0) {
             if ((k == 0 || (k > 0 && mbot[k-1] == ' ')) &&
                 'a' <= mbot[k] && mbot[k] <= 'z')
                 mbot[k] += 'A' - 'a';
             k++;
         }
         Sprintf(nb = eos(nb), "%s", mbot);
-    } else
+    } else {
         Sprintf(nb = eos(nb), "%s", rank());
+    }
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     if (flags.hitpointbar) {
@@ -311,7 +354,9 @@ bot1()
         Strcpy(tmp, newbot1);
 
         /* draw hp bar */
-        if (iflags.use_inverse) term_start_attr(ATR_INVERSE);
+        if (iflags.use_inverse) {
+            term_start_attr(ATR_INVERSE);
+        }
         tmp[filledbar] = '\0';
         if (iflags.use_color) {
             /* draw in color mode */
@@ -322,7 +367,9 @@ bot1()
             putstr(WIN_STATUS, 0, tmp);
         }
         term_end_color();
-        if (iflags.use_inverse) term_end_attr(ATR_INVERSE);
+        if (iflags.use_inverse) {
+            term_end_attr(ATR_INVERSE);
+        }
 
         Strcat(newbot1, "]");
     }
@@ -331,25 +378,29 @@ bot1()
     Sprintf(nb = eos(nb), "  ");
     i = mrank_sz + 15;
     j = (nb + 2) - newbot1; /* aka strlen(newbot1) but less computation */
-    if((i - j) > 0)
+    if ((i - j) > 0) {
         Sprintf(nb = eos(nb), "%*s", i-j, " "); /* pad with spaces */
+    }
     if (ACURR(A_STR) > 18) {
-        if (ACURR(A_STR) > STR18(100))
+        if (ACURR(A_STR) > STR18(100)) {
             Sprintf(nb = eos(nb), "St:%2d ", ACURR(A_STR)-100);
-        else if (ACURR(A_STR) < STR18(100))
+        } else if (ACURR(A_STR) < STR18(100)) {
             Sprintf(nb = eos(nb), "St:18/%02d ", ACURR(A_STR)-18);
-        else
+        } else {
             Sprintf(nb = eos(nb), "St:18/** ");
-    } else
+        }
+    } else {
         Sprintf(nb = eos(nb), "St:%-1d ", ACURR(A_STR));
+    }
     Sprintf(nb = eos(nb),
             "Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS), ACURR(A_CHA));
     Sprintf(nb = eos(nb), (u.ualign.type == A_CHAOTIC) ? "  Chaotic" :
             (u.ualign.type == A_NEUTRAL) ? "  Neutral" : "  Lawful");
 #ifdef SCORE_ON_BOTL
-    if (flags.showscore)
+    if (flags.showscore) {
         Sprintf(nb = eos(nb), " S:%ld", botl_score());
+    }
 #endif
 #ifdef DUMP_LOG
 }
@@ -373,23 +424,25 @@ describe_level(char *buf)
     int ret = 1;
 
     /* TODO:    Add in dungeon name */
-    if (Is_knox(&u.uz))
+    if (Is_knox(&u.uz)) {
         Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
-    else if (In_quest(&u.uz))
+    } else if (In_quest(&u.uz)) {
         Sprintf(buf, "Home %d ", dunlev(&u.uz));
-    else if (Is_blackmarket(&u.uz))
+    } else if (Is_blackmarket(&u.uz)) {
         Sprintf(buf, "Blackmarket ");
-    else if (Is_town_level(&u.uz))
+    } else if (Is_town_level(&u.uz)) {
         Sprintf(buf, "Town ");
-    else if (Is_minetown_level(&u.uz))
+    } else if (Is_minetown_level(&u.uz)) {
         Sprintf(buf, "Mine Town:%-2d ", depth(&u.uz));
-    else if (In_endgame(&u.uz)) {
+    } else if (In_endgame(&u.uz)) {
         /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
         (void) endgame_level_name(buf, depth(&u.uz));
         Strcat(buf, " ");
     } else {
         char *dgn_name = dungeons[u.uz.dnum].dname;
-        if (!strncmpi(dgn_name, "The ", 4)) { dgn_name += 4; }
+        if (!strncmpi(dgn_name, "The ", 4)) {
+            dgn_name += 4;
+        }
         /* ports with more room may expand this one */
         Sprintf(buf, "%s:%-2d ",
                 iflags.show_dgn_name ? dgn_name : "Dlvl",
@@ -477,7 +530,9 @@ void bot2str(char *newbot2)
     hp = Upolyd ? u.mh : u.uhp;
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
 
-    if(hp < 0) hp = 0;
+    if (hp < 0) {
+        hp = 0;
+    }
     (void) describe_level(newbot2);
     Sprintf(nb = eos(newbot2), "%c:%-2ld", oc_syms[COIN_CLASS],
             money_cnt(invent)
@@ -513,24 +568,28 @@ void bot2str(char *newbot2)
     Sprintf(nb = eos(nb), " Pw:%d(%d)", u.uen, u.uenmax);
 #endif
     Sprintf(nb = eos(nb), " AC:%-2d", u.uac);
-    if (Upolyd)
+    if (Upolyd) {
         Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
+    }
 #ifdef EXP_ON_BOTL
-    else if(flags.showexp)
+    else if (flags.showexp) {
         Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel, u.uexp);
+    }
 #endif
     else
         Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 
 #ifdef SHOW_WEIGHT
-    if (flags.showweight)
+    if (flags.showweight) {
         Sprintf(nb = eos(nb), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
+    }
 #endif
 
 
-    if(flags.time)
+    if (flags.time) {
         Sprintf(nb = eos(nb), " T:%ld", moves);
+    }
 
 #ifdef REALTIME_ON_BOTL
     if (iflags.showrealtime) {

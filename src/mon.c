@@ -352,7 +352,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     unsigned corpstatflags = corpseflags;
     boolean burythem = ((corpstatflags & CORPSTAT_BURIED) != 0);
 
-    switch(mndx) {
+    switch (mndx) {
     case PM_GRAY_DRAGON:
     case PM_SILVER_DRAGON:
 #if 0   /* DEFERRED */
@@ -470,15 +470,16 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         break;
     case PM_WOOD_GOLEM:
         num = d(2, 4);
-        while(num--) {
+        while (num--) {
             obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
         }
         free_mgivenname(mtmp);
         break;
     case PM_LEATHER_GOLEM:
         num = d(2, 4);
-        while(num--)
+        while (num--) {
             obj = mksobj_at(LEATHER_ARMOR, x, y, TRUE, FALSE);
+        }
         free_mgivenname(mtmp);
         break;
     case PM_WAX_GOLEM:
@@ -571,7 +572,7 @@ minliquid(struct monst *mtmp)
        are blocked so this (Flying || Levitation) test fails there
        and steed will be subject to water effects, as intended) */
     if (mtmp == u.usteed && (Flying || Levitation))
-        return (0);
+        return 0;
 
     /* Gremlin multiplying won't go on forever since the hit points
      * keep going down, and when it gets to 1 hit point the clone
@@ -583,7 +584,7 @@ minliquid(struct monst *mtmp)
         if (inpool) {
             water_damage_chain(mtmp->minvent, FALSE);
         }
-        return (0);
+        return 0;
     } else if (mtmp->data == &mons[PM_IRON_GOLEM] && (inpool || inswamp) && !rn2(5)) {
         int dam = d(2, 6);
         if (cansee(mtmp->mx, mtmp->my))
@@ -597,7 +598,7 @@ minliquid(struct monst *mtmp)
             }
         }
         water_damage_chain(mtmp->minvent, FALSE);
-        return (0);
+        return 0;
     }
 
     if (inlava) {
@@ -649,7 +650,7 @@ minliquid(struct monst *mtmp)
                 (void) rloc(mtmp, FALSE);
                 return 0;
             }
-            return (1);
+            return 1;
         }
     } else if (inpool) {
         /* Most monsters drown in pools.  flooreffects() will take care of
@@ -686,13 +687,13 @@ minliquid(struct monst *mtmp)
                 }
                 return 0;
             }
-            return (1);
+            return 1;
         }
     } else if (inswamp) {
         if (!is_clinger(mtmp->data)
             && !is_swimmer(mtmp->data) && !amphibious(mtmp->data)) {
             water_damage_chain(mtmp->minvent, FALSE);
-            return (0);
+            return 0;
         }
     } else {
         /* but eels have a difficult time outside */
@@ -704,7 +705,7 @@ minliquid(struct monst *mtmp)
             monflee(mtmp, 2, FALSE, FALSE);
         }
     }
-    return (0);
+    return 0;
 }
 
 int
@@ -803,7 +804,7 @@ movemon(void)
        teleport another, this scheme would have problems.
      */
 
-    for(mtmp = fmon; mtmp; mtmp = nmtmp) {
+    for (mtmp = fmon; mtmp; mtmp = nmtmp) {
         /* end monster movement early if hero is flagged to leave the level */
         if (u.utotype
 #ifdef SAFERHANGUP
@@ -1555,7 +1556,9 @@ nexttry:    /* eels prefer the water, but if there is no water nearby,
                     info[cnt] |= ALLOW_ROCK;
                 }
                 if (monseeu && onlineu(nx, ny)) {
-                    if(flag & NOTONL) continue;
+                    if (flag & NOTONL) {
+                        continue;
+                    }
                     info[cnt] |= NOTONL;
                 }
                 /* check for diagonal tight squeeze */
@@ -1616,7 +1619,7 @@ nexttry:    /* eels prefer the water, but if there is no water nearby,
         wantpool = FALSE;
         goto nexttry;
     }
-    return(cnt);
+    return cnt;
 }
 
 /* Part of mm_aggression that represents two-way aggression.  To avoid
@@ -1753,7 +1756,7 @@ monnear(struct monst *mon, coordxy x, coordxy y)
     if (distance == 2 && NODIAG(mon->data - mons)) {
         return 0;
     }
-    return((boolean)(distance < 3));
+    return (boolean)(distance < 3);
 }
 
 /* really free dead monsters */
@@ -2263,7 +2266,7 @@ mondead_helper(struct monst *mtmp, uchar adtyp)
 #ifdef KOPS
     if (mtmp->data->mlet == S_KOP) {
         /* Dead Kops may come back. */
-        switch(rnd(5)) {
+        switch (rnd(5)) {
         case 1: /* returns near the stairs */
             (void) makemon(mtmp->data, xdnstair, ydnstair, NO_MM_FLAGS);
             break;
@@ -3383,11 +3386,12 @@ m_respond(struct monst *mtmp)
     if (mtmp->data == &mons[PM_MEDUSA]) {
         int i;
 
-        for (i = 0; i < NATTK; i++)
+        for (i = 0; i < NATTK; i++) {
             if (mtmp->data->mattk[i].aatyp == AT_GAZE) {
                 (void) gazemu(mtmp, &mtmp->data->mattk[i]);
                 break;
             }
+        }
     }
 }
 
@@ -3441,11 +3445,12 @@ setmangry(struct monst *mtmp, boolean via_attack UNUSED)
         int got_mad = 0;
 
         /* guardians will sense this attack even if they can't see it */
-        for (mon = fmon; mon; mon = mon->nmon)
+        for (mon = fmon; mon; mon = mon->nmon) {
             if (!DEADMONSTER(mon) && mon->data == q_guardian && mon->mpeaceful) {
                 mon->mpeaceful = 0;
                 if (canseemon(mon)) ++got_mad;
             }
+        }
         if (got_mad && !Hallucination)
             pline_The("%s appear%s to be angry too...",
                       got_mad == 1 ? q_guardian->mname :
@@ -3541,7 +3546,7 @@ rescham(void)
     struct monst *mtmp;
     int mcham;
 
-    for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
 
         mcham = (int) mtmp->cham;
@@ -3613,18 +3618,18 @@ restrap(struct monst *mtmp)
         /* can't hide while trapped except in pits */
         (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) && !is_pit(t->ttyp)) ||
         (sensemon(mtmp) && distu(mtmp->mx, mtmp->my) <= 2)) {
-        return(FALSE);
+        return FALSE;
     }
 
     if (mtmp->data->mlet == S_MIMIC) {
         set_mimic_sym(mtmp);
-        return(TRUE);
+        return TRUE;
     } else if (levl[mtmp->mx][mtmp->my].typ == ROOM) {
         mtmp->mundetected = 1;
-        return(TRUE);
+        return TRUE;
     }
 
-    return(FALSE);
+    return FALSE;
 }
 
 /* monster/hero tries to hide under something at the current location */
@@ -3700,8 +3705,9 @@ mon_animal_list(boolean construct)
 
         /* if (animal_list) impossible("animal_list already exists"); */
 
-        for (n = 0, i = LOW_PM; i < SPECIAL_PM; i++)
+        for (n = 0, i = LOW_PM; i < SPECIAL_PM; i++) {
             if (is_animal(&mons[i])) animal_temp[n++] = i;
+        }
         /* if (n == 0) animal_temp[n++] = NON_PM; */
 
         animal_list = (short *)alloc(n * sizeof *animal_list);
@@ -4340,7 +4346,7 @@ newcham(
         }
     }
 
-    return(1);
+    return 1;
 }
 
 /* sometimes an egg will be special */
@@ -4411,7 +4417,7 @@ kill_eggs(struct obj *obj_list)
 {
     struct obj *otmp;
 
-    for (otmp = obj_list; otmp; otmp = otmp->nobj)
+    for (otmp = obj_list; otmp; otmp = otmp->nobj) {
         if (otmp->otyp == EGG) {
             if (dead_species(otmp->corpsenm, TRUE)) {
                 /*
@@ -4433,6 +4439,7 @@ kill_eggs(struct obj *obj_list)
         } else if (Has_contents(otmp)) {
             kill_eggs(otmp->cobj);
         }
+    }
 }
 
 /** kill all members of genocided species */
@@ -4565,9 +4572,9 @@ angry_guards(boolean silent)
                 You_hear("the shrill sound of a guard's whistle.");
             }
         }
-        return(TRUE);
+        return TRUE;
     }
-    return(FALSE);
+    return FALSE;
 }
 
 void

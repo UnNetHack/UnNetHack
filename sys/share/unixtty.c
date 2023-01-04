@@ -214,22 +214,22 @@ settty(const char *s)
 void
 setftty(void)
 {
-int ef = 0;			/* desired value of flags & ECHO */
+    int ef = 0; /* desired value of flags & ECHO */
 #ifdef LINT	/* cf = CBRKON(CBRKMASK); const expr to initialize is ok */
-int cf = 0;
+    int cf = 0;
 #else
-int cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
+    int cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
 #endif
-int change = 0;
-	iflags.cbreak = ON;
-	iflags.echo = OFF;
-	/* Should use (ECHO|CRMOD) here instead of ECHO */
-	if((curttyb.echoflgs & ECHO) != ef){
-		curttyb.echoflgs &= ~ECHO;
-/*		curttyb.echoflgs |= ef;					*/
-		change++;
-	}
-	if((curttyb.cbrkflgs & CBRKMASK) != cf){
+    int change = 0;
+    iflags.cbreak = ON;
+    iflags.echo = OFF;
+    /* Should use (ECHO|CRMOD) here instead of ECHO */
+    if ((curttyb.echoflgs & ECHO) != ef) {
+        curttyb.echoflgs &= ~ECHO;
+        /* curttyb.echoflgs |= ef; */
+        change++;
+    }
+    if ((curttyb.cbrkflgs & CBRKMASK) != cf) {
 		curttyb.cbrkflgs &= ~CBRKMASK;
 		curttyb.cbrkflgs |= cf;
 #ifdef USG
@@ -362,15 +362,16 @@ void
 init_sco_cons(void)
 {
 # ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
-		atexit(sco_mapon);
-		sco_mapoff();
-		switch_graphics(IBM_GRAPHICS);
+    if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
+        atexit(sco_mapon);
+        sco_mapoff();
+        switch_graphics(IBM_GRAPHICS);
 #  ifdef TEXTCOLOR
-		if (has_colors())
-			iflags.use_color = TRUE;
+        if (has_colors()) {
+            iflags.use_color = TRUE;
+        }
 #  endif
-	}
+    }
 # endif
 }
 #endif	/* _M_UNIX */
@@ -421,14 +422,15 @@ void
 init_linux_cons(void)
 {
 # ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
-		atexit(linux_mapon);
-		linux_mapoff();
+    if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+        atexit(linux_mapon);
+        linux_mapoff();
 #  ifdef TEXTCOLOR
-		if (has_colors())
-			iflags.use_color = TRUE;
+        if (has_colors()) {
+            iflags.use_color = TRUE;
+        }
 #  endif
-	}
+    }
 # endif
 }
 #endif	/* __linux__ */

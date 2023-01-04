@@ -6,8 +6,9 @@
 void
 were_change(struct monst *mon)
 {
-    if (!is_were(mon->data))
+    if (!is_were(mon->data)) {
         return;
+    }
 
     if (is_human(mon->data)) {
         if (!Protection_from_shape_changers &&
@@ -22,8 +23,9 @@ were_change(struct monst *mon)
                 case PM_WEREJACKAL: howler = "jackal";  break;
                 default:        howler = (char *)0; break;
                 }
-                if (howler)
+                if (howler) {
                     You_hear("a %s howling at the moon.", howler);
+                }
             }
         }
     } else if (!rn2(30) || Protection_from_shape_changers) {
@@ -36,13 +38,13 @@ were_change(struct monst *mon)
 int
 counter_were(int pm)
 {
-    switch(pm) {
-    case PM_WEREWOLF:         return(PM_HUMAN_WEREWOLF);
-    case PM_HUMAN_WEREWOLF:   return(PM_WEREWOLF);
-    case PM_WEREJACKAL:       return(PM_HUMAN_WEREJACKAL);
-    case PM_HUMAN_WEREJACKAL: return(PM_WEREJACKAL);
-    case PM_WERERAT:          return(PM_HUMAN_WERERAT);
-    case PM_HUMAN_WERERAT:    return(PM_WERERAT);
+    switch (pm) {
+    case PM_WEREWOLF:         return PM_HUMAN_WEREWOLF;
+    case PM_HUMAN_WEREWOLF:   return PM_WEREWOLF;
+    case PM_WEREJACKAL:       return PM_HUMAN_WEREJACKAL;
+    case PM_HUMAN_WEREJACKAL: return PM_WEREJACKAL;
+    case PM_WERERAT:          return PM_HUMAN_WERERAT;
+    case PM_HUMAN_WERERAT:    return PM_WERERAT;
     default:
         return NON_PM;
     }
@@ -108,34 +110,41 @@ new_were(struct monst *mon)
 /* were-creature (even you) summons a horde */
 int
 were_summon(struct permonst *ptr, boolean yours, int *visible, char *genbuf)
-                     
-              
+
+
               /* number of visible helpers created */
-             
+
 {
     int i, typ, pm = monsndx(ptr);
     struct monst *mtmp;
     int total = 0;
 
     *visible = 0;
-    if (Protection_from_shape_changers && !yours)
+    if (Protection_from_shape_changers && !yours) {
         return 0;
+    }
     for (i = rnd(5); i > 0; i--) {
         switch (pm) {
         case PM_WERERAT:
         case PM_HUMAN_WERERAT:
             typ = rn2(3) ? PM_SEWER_RAT : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT;
-            if (genbuf) Strcpy(genbuf, "rat");
+            if (genbuf) {
+                Strcpy(genbuf, "rat");
+            }
             break;
         case PM_WEREJACKAL:
         case PM_HUMAN_WEREJACKAL:
             typ = rn2(7) ? PM_JACKAL : rn2(3) ? PM_COYOTE : PM_FOX;
-            if (genbuf) Strcpy(genbuf, "jackal");
+            if (genbuf) {
+                Strcpy(genbuf, "jackal");
+            }
             break;
         case PM_WEREWOLF:
         case PM_HUMAN_WEREWOLF:
             typ = rn2(5) ? PM_WOLF : rn2(2) ? PM_WARG : PM_WINTER_WOLF;
-            if (genbuf) Strcpy(genbuf, "wolf");
+            if (genbuf) {
+                Strcpy(genbuf, "wolf");
+            }
             break;
         default:
             continue;
@@ -160,12 +169,16 @@ you_were(void)
     char qbuf[QBUFSZ];
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
-    if (Unchanging || (u.umonnum == u.ulycn)) return;
+    if (Unchanging || (u.umonnum == u.ulycn)) {
+        return;
+    }
     if (controllable_poly) {
         /* `+4' => skip "were" prefix to get name of beast */
         Sprintf(qbuf, "Do you want to change into %s?",
                 an(mons[u.ulycn].mname+4));
-        if(yn(qbuf) == 'n') return;
+        if (yn(qbuf) == 'n') {
+            return;
+        }
     }
     (void) polymon(u.ulycn);
 }

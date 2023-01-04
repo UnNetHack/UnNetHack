@@ -223,8 +223,9 @@ static int
 timed_occupation(void)
 {
     (*timed_occ_fn)();
-    if (multi > 0)
+    if (multi > 0) {
         multi--;
+    }
     return multi > 0;
 }
 
@@ -259,8 +260,9 @@ set_occupation(int (*fn) (void), const char *txt, int xtime)
     if (xtime) {
         occupation = timed_occupation;
         timed_occ_fn = fn;
-    } else
+    } else {
         occupation = fn;
+    }
     occtxt = txt;
     occtime = 0;
     return;
@@ -287,9 +289,14 @@ popch(void) {
      * ABORT character (as checked in pcmain.c), that character will be
      * pushed back on the pushq.
      */
-    if (occupation) return '\0';
-    if (in_doagain) return (char)((shead != stail) ? saveq[stail++] : '\0');
-    else return (char)((phead != ptail) ? pushq[ptail++] : '\0');
+    if (occupation) {
+        return '\0';
+    }
+    if (in_doagain) {
+        return (char)((shead != stail) ? saveq[stail++] : '\0');
+    } else {
+        return (char)((phead != ptail) ? pushq[ptail++] : '\0');
+    }
 }
 
 char
@@ -299,19 +306,22 @@ pgetchar(void) {        /* curtesy of aeb@cwi.nl */
     if (iflags.debug_fuzzer) {
         return randomkey();
     }
-    if(!(ch = popch()))
+    if (!(ch = popch())) {
         ch = nhgetch();
-    return((char)ch);
+    }
+    return (char)ch;
 }
 
 /* A ch == 0 resets the pushq */
 void
 pushch(char ch)
 {
-    if (!ch)
+    if (!ch) {
         phead = ptail = 0;
-    if (phead < BSIZE)
+    }
+    if (phead < BSIZE) {
         pushq[phead++] = ch;
+    }
     return;
 }
 
@@ -322,10 +332,11 @@ void
 savech(char ch)
 {
     if (!in_doagain) {
-        if (!ch)
+        if (!ch) {
             phead = ptail = shead = stail = 0;
-        else if (shead < BSIZE)
+        } else if (shead < BSIZE) {
             saveq[shead++] = ch;
+        }
     }
     return;
 }
@@ -703,44 +714,58 @@ extcmd_via_menu(void)
 static int
 domonability(void)
 {
-    if (can_breathe(youmonst.data)) return dobreathe();
-    else if (attacktype(youmonst.data, AT_SPIT)) return dospit();
-    else if (youmonst.data->mlet == S_NYMPH) return doremove();
-    else if (attacktype(youmonst.data, AT_GAZE)) return dogaze();
-    else if (is_were(youmonst.data)) return dosummon();
-    else if (webmaker(youmonst.data)) return dospinweb();
-    else if (is_hider(youmonst.data)) return dohide();
-    else if (is_mind_flayer(youmonst.data)) return domindblast();
-    else if (u.umonnum == PM_GREMLIN) {
-        if(IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
-            if (split_mon(&youmonst, (struct monst *)0))
+    if (can_breathe(youmonst.data)) {
+        return dobreathe();
+    } else if (attacktype(youmonst.data, AT_SPIT)) {
+        return dospit();
+    } else if (youmonst.data->mlet == S_NYMPH) {
+        return doremove();
+    } else if (attacktype(youmonst.data, AT_GAZE)) {
+        return dogaze();
+    } else if (is_were(youmonst.data)) {
+        return dosummon();
+    } else if (webmaker(youmonst.data)) {
+        return dospinweb();
+    } else if (is_hider(youmonst.data)) {
+        return dohide();
+    } else if (is_mind_flayer(youmonst.data)) {
+        return domindblast();
+    } else if (u.umonnum == PM_GREMLIN) {
+        if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+            if (split_mon(&youmonst, (struct monst *)0)) {
                 dryup(u.ux, u.uy, TRUE);
-        } else There("is no fountain here.");
+            }
+        } else {
+            There("is no fountain here.");
+        }
     } else if (is_unicorn(youmonst.data)) {
         fix_attributes_and_properties((struct obj *)0, 0);
         return 1;
     } else if (youmonst.data->msound == MS_SHRIEK) {
         You("shriek.");
-        if(u.uburied)
+        if (u.uburied) {
             pline("Unfortunately sound does not carry well through rock.");
-        else aggravate();
-    } else if (Upolyd)
+        } else {
+            aggravate();
+        }
+    } else if (Upolyd) {
         pline("Any special ability you may have is purely reflexive.");
-    else You("don't have a special ability in your normal form!");
+    } else {
+        You("don't have a special ability in your normal form!");
+    }
     return 0;
 }
 
 static int
 enter_explore_mode(void)
 {
-    if(!discover && !wizard) {
+    if (!discover && !wizard) {
         pline("Beware!  From explore mode there will be no return to normal game.");
         if (paranoid_yn("Do you want to enter explore mode?", iflags.paranoid_quit) == 'y') {
             clear_nhwindow(WIN_MESSAGE);
             You("are now in non-scoring explore mode.");
             discover = TRUE;
-        }
-        else {
+        } else {
             clear_nhwindow(WIN_MESSAGE);
             pline("Resuming normal game.");
         }
@@ -760,8 +785,9 @@ dooverview_or_wiz_where(void)
 {
 /*
  #ifdef WIZARD
-    if (wizard) return wiz_where();
-    else
+    if (wizard) {
+        return wiz_where();
+    } else
  #endif
  */
     dooverview();
@@ -781,13 +807,13 @@ wiz_show_rooms(void)
     for (y = 0; y < ROWNO; y++) {
         for (x = 0; x < COLNO; x++) {
             int rno = levl[x][y].roomno;
-            if (rno == NO_ROOM)
+            if (rno == NO_ROOM) {
                 row[x] = '.';
-            else if (rno == SHARED)
+            } else if (rno == SHARED) {
                 row[x] = '+';
-            else if (rno == SHARED_PLUS)
+            } else if (rno == SHARED_PLUS) {
                 row[x] = '*';
-            else {
+            } else {
                 int i = (rno - ROOMOFFSET) % 52;
                 row[x] = (i < 26) ? ('a'+i) : ('A'+i-26);
             }
@@ -811,8 +837,9 @@ wiz_wish(void) /* Unlimited wishes for debug mode by Paul Polderman */
         makewish(TRUE);
         flags.verbose = save_verbose;
         (void) encumber_msg();
-    } else
+    } else {
         pline("Unavailable command '^W'.");
+    }
     return 0;
 }
 
@@ -845,8 +872,9 @@ wiz_map(void)
         do_mapping();
         HConfusion = save_Hconf;
         HHallucination = save_Hhallu;
-    } else
+    } else {
         pline("Unavailable command '^F'.");
+    }
     return 0;
 }
 
@@ -854,8 +882,11 @@ wiz_map(void)
 static int
 wiz_genesis(void)
 {
-    if (wizard) (void) create_particular();
-    else pline("Unavailable command '^G'.");
+    if (wizard) {
+        (void) create_particular();
+    } else {
+        pline("Unavailable command '^G'.");
+    }
     return 0;
 }
 
@@ -887,9 +918,11 @@ wiz_detect(void)
 static int
 wiz_level_tele(void)
 {
-    if (wizard) level_tele();
-    else if(flags.tutorial)
+    if (wizard) {
+        level_tele();
+    } else if (flags.tutorial) {
         tutorial_redisplay();
+    }
     return 0;
 }
 
@@ -913,8 +946,11 @@ wiz_level_change(void)
 
     getlin("To what experience level do you want to be set?", buf);
     (void)mungspaces(buf);
-    if (buf[0] == '\033' || buf[0] == '\0') ret = 0;
-    else ret = sscanf(buf, "%d", &newlevel);
+    if (buf[0] == '\033' || buf[0] == '\0') {
+        ret = 0;
+    } else {
+        ret = sscanf(buf, "%d", &newlevel);
+    }
 
     if (ret != 1) {
         pline("%s", Never_mind);
@@ -927,7 +963,9 @@ wiz_level_change(void)
             You("are already as inexperienced as you can get.");
             return 0;
         }
-        if (newlevel < 1) newlevel = 1;
+        if (newlevel < 1) {
+            newlevel = 1;
+        }
         while (u.ulevel > newlevel)
             losexp("#levelchange");
     } else {
@@ -935,7 +973,9 @@ wiz_level_change(void)
             You("are already as experienced as you can get.");
             return 0;
         }
-        if (newlevel > MAXULEV) newlevel = MAXULEV;
+        if (newlevel > MAXULEV) {
+            newlevel = MAXULEV;
+        }
         while (u.ulevel < newlevel)
             pluslvl(FALSE);
     }
@@ -953,8 +993,9 @@ wiz_panic(void)
         return 0;
     }
 
-    if (yn("Do you want to call panic() and end your game?") == 'y')
+    if (yn("Do you want to call panic() and end your game?") == 'y') {
         panic("crash test.");
+    }
     return 0;
 }
 
@@ -982,7 +1023,9 @@ wiz_show_seenv(void)
     startx = max(1, u.ux-(COLNO/4));
     stopx = min(startx+(COLNO/2), COLNO);
     /* can't have a line exactly 80 chars long */
-    if (stopx - startx == COLNO/2) startx++;
+    if (stopx - startx == COLNO/2) {
+        startx++;
+    }
 
     for (y = 0; y < ROWNO; y++) {
         for (x = startx, curx = 0; x < stopx; x++, curx += 2) {
@@ -990,15 +1033,19 @@ wiz_show_seenv(void)
                 row[curx] = row[curx+1] = '@';
             } else {
                 v = levl[x][y].seenv & 0xff;
-                if (v == 0)
+                if (v == 0) {
                     row[curx] = row[curx+1] = ' ';
-                else
+                } else {
                     Sprintf(&row[curx], "%02x", v);
+                }
             }
         }
         /* remove trailing spaces */
-        for (x = curx-1; x >= 0; x--)
-            if (row[x] != ' ') break;
+        for (x = curx-1; x >= 0; x--) {
+            if (row[x] != ' ') {
+                break;
+            }
+        }
         row[x+1] = '\0';
 
         putstr(win, 0, row);
@@ -1023,19 +1070,23 @@ wiz_show_vision(void)
     putstr(win, 0, "");
     for (y = 0; y < ROWNO; y++) {
         for (x = 1; x < COLNO; x++) {
-            if (x == u.ux && y == u.uy)
+            if (x == u.ux && y == u.uy) {
                 row[x] = '@';
-            else {
+            } else {
                 v = viz_array[y][x]; /* data access should be hidden */
-                if (v == 0)
+                if (v == 0) {
                     row[x] = ' ';
-                else
+                } else {
                     row[x] = '0' + viz_array[y][x];
+                }
             }
         }
         /* remove trailing spaces */
-        for (x = COLNO-1; x >= 1; x--)
-            if (row[x] != ' ') break;
+        for (x = COLNO-1; x >= 1; x--) {
+            if (row[x] != ' ') {
+                break;
+            }
+        }
         row[x+1] = '\0';
 
         putstr(win, 0, &row[1]);
@@ -1058,16 +1109,17 @@ wiz_show_wmodes(void)
     for (y = 0; y < ROWNO; y++) {
         for (x = 0; x < COLNO; x++) {
             lev = &levl[x][y];
-            if (x == u.ux && y == u.uy)
+            if (x == u.ux && y == u.uy) {
                 row[x] = '@';
-            else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
+            } else if (IS_WALL(lev->typ) || lev->typ == SDOOR) {
                 row[x] = '0' + (lev->wall_info & WM_MASK);
-            else if (lev->typ == CORR)
+            } else if (lev->typ == CORR) {
                 row[x] = '#';
-            else if (IS_ROOM(lev->typ) || IS_DOOR(lev->typ))
+            } else if (IS_ROOM(lev->typ) || IS_DOOR(lev->typ)) {
                 row[x] = '.';
-            else
+            } else {
                 row[x] = 'x';
+            }
         }
         row[COLNO] = '\0';
         putstr(win, 0, row);
@@ -1549,7 +1601,9 @@ do_naming(int typ)
 int
 do_naming_mname(void)
 {
-    if (iflags.vanilla_ui_behavior) return do_naming(1);
+    if (iflags.vanilla_ui_behavior) {
+        return do_naming(1);
+    }
     return do_naming(0);
 }
 
@@ -1906,16 +1960,21 @@ size_obj(struct obj *otmp)
 
     if (otmp->oextra) {
         sz += (int) sizeof (struct oextra);
-        if (ONAME(otmp))
+        if (ONAME(otmp)) {
             sz += (int) strlen(ONAME(otmp)) + 1;
-        if (OMONST(otmp))
+        }
+        if (OMONST(otmp)) {
             sz += size_monst(OMONST(otmp), FALSE);
-        if (OMID(otmp))
+        }
+        if (OMID(otmp)) {
             sz += (int) sizeof (unsigned);
-        if (OLONG(otmp))
+        }
+        if (OLONG(otmp)) {
             sz += (int) sizeof (long);
-        if (OMAILCMD(otmp))
+        }
+        if (OMAILCMD(otmp)) {
             sz += (int) strlen(OMAILCMD(otmp)) + 1;
+        }
     }
     return sz;
 }
@@ -1962,8 +2021,9 @@ mon_invent_chain(winid win, const char *src, struct monst *chain, long int *tota
     long count = 0, size = 0;
     struct monst *mon;
 
-    for (mon = chain; mon; mon = mon->nmon)
+    for (mon = chain; mon; mon = mon->nmon) {
         count_obj(mon->minvent, &count, &size, TRUE, FALSE);
+    }
     *total_count += count;
     *total_size += size;
     Sprintf(buf, template, src, count, size);
@@ -1983,10 +2043,12 @@ contained_stats(winid win, const char *src, long int *total_count, long int *tot
     count_obj(migrating_objs, &count, &size, FALSE, TRUE);
     /* DEADMONSTER check not required in this loop since they have no
      * inventory */
-    for (mon = fmon; mon; mon = mon->nmon)
+    for (mon = fmon; mon; mon = mon->nmon) {
         count_obj(mon->minvent, &count, &size, FALSE, TRUE);
-    for (mon = migrating_mons; mon; mon = mon->nmon)
+    }
+    for (mon = migrating_mons; mon; mon = mon->nmon) {
         count_obj(mon->minvent, &count, &size, FALSE, TRUE);
+    }
 
     if (count || size) {
         *total_count += count;
@@ -2001,24 +2063,30 @@ size_monst(struct monst *mtmp, boolean incl_wsegs)
 {
     int sz = (int) sizeof (struct monst);
 
-    if (mtmp->wormno && incl_wsegs)
+    if (mtmp->wormno && incl_wsegs) {
         sz += size_wseg(mtmp);
+    }
 
     if (mtmp->mextra) {
         sz += (int) sizeof (struct mextra);
         if (MGIVENNAME(mtmp)) {
             sz += (int) strlen(MGIVENNAME(mtmp)) + 1;
         }
-        if (EGD(mtmp))
+        if (EGD(mtmp)) {
             sz += (int) sizeof (struct egd);
-        if (EPRI(mtmp))
+        }
+        if (EPRI(mtmp)) {
             sz += (int) sizeof (struct epri);
-        if (ESHK(mtmp))
+        }
+        if (ESHK(mtmp)) {
             sz += (int) sizeof (struct eshk);
-        if (EMIN(mtmp))
+        }
+        if (EMIN(mtmp)) {
             sz += (int) sizeof (struct emin);
-        if (EDOG(mtmp))
+        }
+        if (EDOG(mtmp)) {
             sz += (int) sizeof (struct edog);
+        }
         /* mextra->mcorpsenm doesn't point to more memory */
     }
     return sz;
@@ -2150,11 +2218,12 @@ misc_stats(winid win, long int *total_count, long int *total_size)
 #endif
 
     count = size = 0L;
-    for (idx = 0; idx < NUM_OBJECTS; ++idx)
+    for (idx = 0; idx < NUM_OBJECTS; ++idx) {
         if (objects[idx].oc_uname) {
             ++count;
             size += (long) (strlen(objects[idx].oc_uname) + 1);
         }
+    }
     if (count || size) {
         *total_count += count;
         *total_size += size;
@@ -2174,10 +2243,12 @@ wiz_mazewalkmap(void)
     win = create_nhwindow(NHW_TEXT);
 
     for (y = 0; y < ROWNO; y++) {
-        for (x = 0; x < COLNO; x++)
+        for (x = 0; x < COLNO; x++) {
             row[x] = SpLev_Map[x][y] ? '1' : '.';
-        if (y == u.uy)
+        }
+        if (y == u.uy) {
             row[u.ux] = '@';
+        }
         row[x] = '\0';
         putstr(win, 0, row);
     }
@@ -2232,9 +2303,10 @@ wiz_show_stats(void)
               &total_mon_count, &total_mon_size);
     /* 'mydogs' is only valid during level change or end of game disclosure,
        but conceivably we've been called from within debugger at such time */
-    if (mydogs) /* monsters accompanying hero */
+    if (mydogs) { /* monsters accompanying hero */
         mon_chain(win, "mydogs", mydogs, FALSE,
                   &total_mon_count, &total_mon_size);
+    }
     putstr(win, 0, stats_sep);
     Sprintf(buf, template, "  Mon total", total_mon_count, total_mon_size);
     putstr(win, 0, buf);
@@ -2306,19 +2378,24 @@ wiz_migrate_mons()
     struct monst *mtmp;
     d_level tolevel;
     getlin("How many random monsters to migrate? [0]", inbuf);
-    if (*inbuf == '\033') return 0;
-    mcount = atoi(inbuf);
-    if (mcount < 0 || mcount > (COLNO * ROWNO) || Is_botlevel(&u.uz))
+    if (*inbuf == '\033') {
         return 0;
+    }
+    mcount = atoi(inbuf);
+    if (mcount < 0 || mcount > (COLNO * ROWNO) || Is_botlevel(&u.uz)) {
+        return 0;
+    }
     while (mcount > 0) {
-        if (Is_stronghold(&u.uz))
+        if (Is_stronghold(&u.uz)) {
             assign_level(&tolevel, &valley_level);
-        else
+        } else {
             get_level(&tolevel, depth(&u.uz) + 1);
+        }
         ptr = rndmonst();
         mtmp = makemon(ptr, 0, 0, NO_MM_FLAGS);
         if (mtmp) migrate_to_level(mtmp, ledger_no(&tolevel),
                                    MIGR_RANDOM, (coord *)0);
+        }
         mcount--;
     }
     return 0;
@@ -2706,8 +2783,9 @@ randomkey(void)
     case 11:
     case 12:
         c = (iflags.num_pad ? ndir[rn2(8)] : sdir[rn2(8)]);
-        if (!rn2(7))
+        if (!rn2(7)) {
             c = !iflags.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
+        }
         break;
     case 13:
         c = (char) rn1('9'-'0'+1, '0');
@@ -2735,14 +2813,16 @@ random_response(char *buf, int sz)
 
     for (;;) {
         c = randomkey();
-        if (c == '\n')
+        if (c == '\n') {
             break;
+        }
         if (c == '\033') {
             count = 0;
             break;
         }
-        if (count < sz - 1)
+        if (count < sz - 1) {
             buf[count++] = c;
+        }
     }
     buf[count] = '\0';
 }
@@ -2798,11 +2878,10 @@ rhack(char *cmd)
         return;
     }
     /* Special case of *cmd == ' ' handled better below */
-    if(!*cmd || *cmd == (char)0377)
+    if (!*cmd || *cmd == (char)0377) {
 #else
-    if(!*cmd || *cmd == (char)0377 || (!iflags.rest_on_space && *cmd == ' '))
+    if (!*cmd || *cmd == (char)0377 || (!iflags.rest_on_space && *cmd == ' ')) {
 #endif
-    {
         nhbell();
         flags.move = FALSE;
         return;     /* probably we just had an interrupt */
@@ -2937,14 +3016,18 @@ rhack(char *cmd)
     }
 
     if (do_walk) {
-        if (multi) flags.mv = TRUE;
+        if (multi) {
+            flags.mv = TRUE;
+        }
         check_tutorial_command('m');
         domove();
         flags.forcefight = 0;
         return;
     } else if (do_rush) {
         if (firsttime) {
-            if (!multi) multi = max(COLNO, ROWNO);
+            if (!multi) {
+                multi = max(COLNO, ROWNO);
+            }
             u.last_str_turn = 0;
         }
         flags.mv = TRUE;
@@ -2977,8 +3060,9 @@ rhack(char *cmd)
                 /* we discard 'const' because some compilers seem to have
                    trouble with the pointer passed to set_occupation() */
                 func = ((struct ext_func_tab *) tlist)->ef_funct;
-                if (tlist->f_text && !occupation && multi)
+                if (tlist->f_text && !occupation && multi) {
                     set_occupation(func, tlist->f_text, multi);
+                }
                 /* remember pressed character */
                 last_cmd_char = *cmd;
                 res = (*func)();    /* perform the command */
@@ -3026,8 +3110,11 @@ xytod(schar x, schar y)
 {
     int dd;
 
-    for(dd = 0; dd < 8; dd++)
-        if(x == xdir[dd] && y == ydir[dd]) return dd;
+    for (dd = 0; dd < 8; dd++) {
+        if (x == xdir[dd] && y == ydir[dd]) {
+            return dd;
+        }
+    }
 
     return -1;
 }
@@ -3048,7 +3135,11 @@ movecmd(char sym)
     // TODO
     const char *dp;
     const char *sdp;
-    if (iflags.num_pad) sdp = ndir; else sdp = sdir; /* DICE workaround */
+    if (iflags.num_pad) {
+        sdp = ndir;
+    } else {
+        sdp = sdir; /* DICE workaround */
+    }
 
     u.dz = 0;
     dp = index(sdp, sym);
@@ -3069,8 +3160,9 @@ movecmd(char sym)
 int
 dxdy_moveok(void)
 {
-    if (u.dx && u.dy && NODIAG(u.umonnum))
+    if (u.dx && u.dy && NODIAG(u.umonnum)) {
         u.dx = u.dy = 0;
+    }
     return u.dx || u.dy;
 }
 
@@ -3118,7 +3210,9 @@ get_adjacent_loc(const char *prompt, const char *emsg, coordxy x, coordxy y, coo
         cc->x = new_x;
         cc->y = new_y;
     } else {
-        if (emsg) pline("%s", emsg);
+        if (emsg) {
+            pline("%s", emsg);
+        }
         return 0;
     }
     return 1;
@@ -3134,9 +3228,9 @@ getdir(const char *s)
 
  retry:
 #ifdef REDO
-    if(in_doagain || *readchar_queue)
+    if (in_doagain || *readchar_queue) {
         dirsym = readchar();
-    else
+    } else
 #endif
     dirsym = yn_function ((s && *s != '^') ? s : "In what direction?",
                           (char *)0, '\0');
@@ -3172,7 +3266,9 @@ getdir(const char *s)
                     goto retry;
                 }
             }
-            if (!did_help) pline("What a strange direction!");
+            if (!did_help) {
+                pline("What a strange direction!");
+            }
         }
         return 0;
     } else if (is_mov && !dxdy_moveok()) {
@@ -3735,16 +3831,17 @@ click_to_cmd(coordxy x, coordxy y, int mod)
         }
     } else {
         /* convert without using floating point, allowing sloppy clicking */
-        if(x > 2*abs(y))
+        if (x > 2*abs(y)) {
             x = 1, y = 0;
-        else if(y > 2*abs(x))
+        } else if (y > 2*abs(x)) {
             x = 0, y = 1;
-        else if(x < -2*abs(y))
+        } else if (x < -2*abs(y)) {
             x = -1, y = 0;
-        else if(y < -2*abs(x))
+        } else if (y < -2*abs(x)) {
             x = 0, y = -1;
-        else
+        } else {
             x = sgn(x), y = sgn(y);
+        }
 
         if (x == 0 && y == 0) {
             /* map click on player to "rest" command */
@@ -3787,8 +3884,9 @@ get_count(
         if (inkey) {
             key = inkey;
             inkey = '\0';
-        } else
+        } else {
             key = readchar();
+        }
 
         if (digit(key)) {
             cnt = 10 * cnt + (long) (key - '0');
@@ -3923,7 +4021,7 @@ parse(void)
     clear_nhwindow(WIN_MESSAGE);
 
     iflags.in_parse = FALSE;
-    return(in_line);
+    return in_line;
 }
 
 #ifdef UNIX
@@ -3969,11 +4067,12 @@ readchar(void)
         return randomkey();
     }
 
-    if ( *readchar_queue )
+    if ( *readchar_queue ) {
         sym = *readchar_queue++;
-    else
+    } else {
 #ifdef REDO
         sym = in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
+    }
 #else
         sym = pgetchar();
 #endif
@@ -4013,7 +4112,7 @@ readchar(void)
         readchar_queue = click_to_cmd(x, y, mod);
         sym = *readchar_queue++;
     }
-    return((char) sym);
+    return (char) sym;
 }
 
 /** Returns the number of known up- or downstairs. */
@@ -4104,7 +4203,9 @@ dotravel(void)
        even if it is typed by accident, aborting when picking a target
        destination is trivial.  Travel via mouse predates travel via '_',
        and this use of OPTION=!travel is probably just a mistake....] */
-    if (!iflags.travelcmd) return 0;
+    if (!iflags.travelcmd) {
+        return 0;
+    }
 
     cmd[1]=0;
     cc.x = iflags.travelcc.x;
@@ -4168,10 +4269,14 @@ doautofight(void)
     /* check surrounding squares for monster to attack */
     for (i = -1; i <= 1; i++) {
         for (j = -1; j <= 1; j++) {
-            if (!isok(u.ux+i, u.uy+j)) continue;
+            if (!isok(u.ux+i, u.uy+j)) {
+                continue;
+            }
             mtmp = m_at(u.ux+i, u.uy+j);
             if (mtmp && canspotmon(mtmp) && !is_safemon(mtmp)) {
-                if (attack(mtmp)) return 1;
+                if (attack(mtmp)) {
+                    return 1;
+                }
                 break;
             }
         }
@@ -4224,8 +4329,9 @@ wiz_port_debug()
             /* execute the function */
             (*menu_selections[n].fn)();
         }
-    } else
+    } else {
         pline("No port-specific debug capability defined.");
+    }
     return 0;
 }
 # endif /*PORT_DEBUG*/

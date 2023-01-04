@@ -137,7 +137,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	/* get command line parameters */
 	p = _get_cmd_arg(GetCommandLine());
 	p = _get_cmd_arg(NULL); /* skip first paramter - command name */
-	for( argc = 1; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
+    for (argc = 1; p && argc<MAX_CMDLINE_PARAM; argc++ ) {
 		len = _tcslen(p);
 		if( len>0 ) {
 			argv[argc] = _strdup( NH_W2A(p, buf, BUFSZ) );
@@ -193,11 +193,13 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
         if( !pArgs ) pArgs = pCmdLine;
 
         /* skip whitespace */
-        for(pRetArg = pArgs; *pRetArg && _istspace(*pRetArg); pRetArg = CharNext(pRetArg));
-		if( !*pRetArg ) {
-			pArgs = NULL;
-			return NULL;
-		}
+        for (pRetArg = pArgs; *pRetArg && _istspace(*pRetArg); pRetArg = CharNext(pRetArg)) {
+            ;
+        }
+        if (!*pRetArg) {
+            pArgs = NULL;
+            return NULL;
+        }
 
         /* check for quote */
         if( *pRetArg==TEXT('"') ) {
@@ -206,7 +208,9 @@ TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
 				pArgs = _tcschr(pRetArg, TEXT('"'));
 	    } else {
 			/* skip to whitespace */
-			for(pArgs = pRetArg; *pArgs && !_istspace(*pArgs); pArgs = CharNext(pArgs));
+            for (pArgs = pRetArg; *pArgs && !_istspace(*pArgs); pArgs = CharNext(pArgs)) {
+                ;
+            }
 		}
 
 		if( pArgs && *pArgs ) {

@@ -456,12 +456,13 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	case MSNH_MSG_CLEAR_WINDOW:
 	{
-		int i, j;
-		for(i=0; i<COLNO; i++)
-			for(j=0; j<ROWNO; j++) {
-			data->map[i][j] = -1;
-		}
-		InvalidateRect(hWnd, NULL, TRUE);
+        int i, j;
+        for (i=0; i<COLNO; i++) {
+            for (j=0; j<ROWNO; j++) {
+                data->map[i][j] = -1;
+            }
+        }
+        InvalidateRect(hWnd, NULL, TRUE);
 	} break;
 
 	case MSNH_MSG_CURSOR:
@@ -505,11 +506,12 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data = (PNHMapWindow)malloc(sizeof(NHMapWindow));
 	if( !data ) panic("out of memory");
 
-	ZeroMemory(data, sizeof(NHMapWindow));
-	for(i=0; i<COLNO; i++)
-		for(j=0; j<ROWNO; j++) {
-		data->map[i][j] = -1;
-	}
+    ZeroMemory(data, sizeof(NHMapWindow));
+    for (i = 0; i < COLNO; i++) {
+        for (j = 0; j < ROWNO; j++) {
+            data->map[i][j] = -1;
+        }
+    }
 
 	data->bAsciiMode = FALSE;
 
@@ -555,8 +557,8 @@ void onPaint(HWND hWnd)
 			SetBkMode(hDC, TRANSPARENT);
 
 			/* draw the map */
-			for(i=paint_rt.left; i<paint_rt.right; i++)
-			for(j=paint_rt.top; j<paint_rt.bottom; j++)
+            for (i = paint_rt.left; i < paint_rt.right; i++) {
+                for (j = paint_rt.top; j < paint_rt.bottom; j++) {
 			if(data->map[i][j]>=0) {
 				char ch;
 				TCHAR wch;
@@ -603,6 +605,8 @@ void onPaint(HWND hWnd)
 						 );
 				SetTextColor (hDC, OldFg);
 			}
+                }
+            }
 			SelectObject(hDC, oldFont);
 		} else {
 			/* prepare tiles DC for mapping */
@@ -610,8 +614,8 @@ void onPaint(HWND hWnd)
 			saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
 
 			/* draw the map */
-			for(i=paint_rt.left; i<paint_rt.right; i++)
-			for(j=paint_rt.top; j<paint_rt.bottom; j++)
+            for (i = paint_rt.left; i < paint_rt.right; i++) {
+                for (j = paint_rt.top; j < paint_rt.bottom; j++) {
 				if(data->map[i][j]>=0) {
 					short ntile;
 					int t_x, t_y;
@@ -663,6 +667,8 @@ void onPaint(HWND hWnd)
 						DeleteDC(hdcPetMark);
 					}
 				}
+                }
+            }
 			SelectObject(tileDC, saveBmp);
 			DeleteDC(tileDC);
 		}

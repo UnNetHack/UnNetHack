@@ -336,7 +336,7 @@ const char *type;
             Fprintf(stderr, "no colormap set yet\n");
             return FALSE;
         }
-        return(write_text_colormap(tile_file));
+        return write_text_colormap(tile_file);
     } else {
         Fprintf(stderr, "bad mode (%s) for fopen_text_file\n", type);
         return FALSE;
@@ -347,7 +347,7 @@ boolean
 read_text_tile(pixels)
 pixel (*pixels)[TILE_X];
 {
-    return(read_txttile(tile_file, pixels));
+    return read_txttile(tile_file, pixels);
 }
 
 boolean

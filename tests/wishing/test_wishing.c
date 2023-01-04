@@ -47,8 +47,9 @@ int main(int argc, char *argv[]) {
 
     /* initialize object descriptions */
     int i;
-    for (i = 0; i < NUM_OBJECTS; i++)
+    for (i = 0; i < NUM_OBJECTS; i++) {
         objects[i].oc_name_idx = objects[i].oc_descr_idx = i;
+    }
 
     Suite *s = test_suite();
     SRunner *sr = srunner_create(s);

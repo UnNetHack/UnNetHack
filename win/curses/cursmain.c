@@ -316,8 +316,9 @@ curses_display_nhwindow(winid wid, boolean block)
     }
 
     if ((wid == MESSAGE_WIN) && block) {
-        if (u.uhp != -1 && program_state.gameover != 1)
+        if (u.uhp != -1 && program_state.gameover != 1) {
             (void) curses_block(TRUE);
+        }
         /* don't bug player with TAB prompt on "Saving..." or endgame */
         else
             (void) curses_more();
@@ -421,8 +422,9 @@ curses_display_file(const char *filename,boolean must_exist)
 void
 curses_start_menu(winid wid)
 {
-    if (inv_update)
+    if (inv_update) {
         return;
+    }
 
     curses_create_nhmenu(wid);
 }
@@ -489,8 +491,9 @@ end_menu(window, prompt)
 void
 curses_end_menu(winid wid, const char *prompt)
 {
-    if (inv_update)
+    if (inv_update) {
         return;
+    }
 
     curses_finalize_nhmenu(wid, prompt);
 }
@@ -523,8 +526,9 @@ int select_menu(winid window, int how, menu_item **selected)
 int
 curses_select_menu(winid wid, int how, MENU_ITEM_P ** selected)
 {
-    if (inv_update)
+    if (inv_update) {
         return 0;
+    }
 
     return curses_display_nhmenu(wid, how, selected);
 }

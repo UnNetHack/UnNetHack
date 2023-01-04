@@ -428,17 +428,20 @@ int
 getchain(s)
 	char	*s;
 {
-	int i;
+    int i;
 
-	if(strlen(s)) {
+    if (strlen(s)) {
+        for (i = n_levs - tmpdungeon[n_dgns].levels + 1; i <= n_levs; i++) {
+            if (!strcmp(tmplevel[i].name, s)) {
+                return i;
+            }
+        }
 
-	    for(i = n_levs - tmpdungeon[n_dgns].levels + 1; i <= n_levs; i++)
-		if(!strcmp(tmplevel[i].name, s)) return i;
+        yyerror("Can't locate the specified chain level.");
+        return -2;
+    }
 
-	    yyerror("Can't locate the specified chain level.");
-	    return(-2);
-	}
-	return(-1);
+    return -1;
 }
 
 /*
@@ -455,14 +458,15 @@ check_dungeon()
 {
 	int i;
 
-	for(i = 0; i < n_dgns; i++)
+    for (i = 0; i < n_dgns; i++) {
 	    if(!strcmp(tmpdungeon[i].name, tmpdungeon[n_dgns].name)) {
 		yyerror("Duplicate dungeon name.");
 		return(0);
 	    }
+    }
 
 	if(n_dgns)
-	  for(i = 0; i < n_brs - tmpdungeon[n_dgns].branches; i++) {
+        for (i = 0; i < n_brs - tmpdungeon[n_dgns].branches; i++) {
 	    if(!strcmp(tmpbranch[i].name, tmpdungeon[n_dgns].name)) break;
 
 	    if(i >= n_brs - tmpdungeon[n_dgns].branches) {
@@ -497,11 +501,12 @@ check_level()
 		return(0);
 	}
 
-	for(i = 0; i < n_levs; i++)
-	    if(!strcmp(tmplevel[i].name, tmplevel[n_levs].name)) {
-		yyerror("Duplicate level name.");
-		return(0);
-	    }
+    for (i = 0; i < n_levs; i++) {
+        if (!strcmp(tmplevel[i].name, tmplevel[n_levs].name)) {
+            yyerror("Duplicate level name.");
+            return(0);
+        }
+    }
 
 	if(tmplevel[i].chain == -2) {
 		yyerror("Invaild level chain reference.");
@@ -539,12 +544,12 @@ check_branch()
 		return(0);
 	}
 
-	for(i = 0; i < n_dgns; i++)
-	    if(!strcmp(tmpdungeon[i].name, tmpbranch[n_brs].name)) {
-
+    for (i = 0; i < n_dgns; i++) {
+        if(!strcmp(tmpdungeon[i].name, tmpbranch[n_brs].name)) {
 		yyerror("Reverse branching not allowed.");
 		return(0);
 	    }
+    }
 
 	if(tmpbranch[i].chain == -2) {
 
@@ -602,14 +607,16 @@ output_dgn()
 							1, yyout);
 
 	    nl += tmpdungeon[nd].levels;
-	    for(; cl < nl; cl++)
+	    for (; cl < nl; cl++) {
 		(void) fwrite((char *)&tmplevel[cl], sizeof(struct tmplevel),
 							1, yyout);
+        }
 
 	    nb += tmpdungeon[nd].branches;
-	    for(; cb < nb; cb++)
+	    for (; cb < nb; cb++) {
 		(void) fwrite((char *)&tmpbranch[cb], sizeof(struct tmpbranch),
 							1, yyout);
+        }
 	}
 	/* apparently necessary for Think C 5.x, otherwise harmless */
 	(void) fflush(yyout);

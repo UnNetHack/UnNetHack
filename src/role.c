@@ -620,21 +620,25 @@ str2role(const char *str)
     int i, len;
 
     /* Is str valid? */
-    if (!str || !str[0])
+    if (!str || !str[0]) {
         return ROLE_NONE;
+    }
 
     /* Match as much of str as is provided */
     len = strlen(str);
     for (i = 0; roles[i].name.m; i++) {
         /* Does it match the male name? */
-        if (!strncmpi(str, roles[i].name.m, len))
+        if (!strncmpi(str, roles[i].name.m, len)) {
             return i;
+        }
         /* Or the female name? */
-        if (roles[i].name.f && !strncmpi(str, roles[i].name.f, len))
+        if (roles[i].name.f && !strncmpi(str, roles[i].name.f, len)) {
             return i;
+        }
         /* Or the filecode? */
-        if (!strcmpi(str, roles[i].filecode))
+        if (!strcmpi(str, roles[i].filecode)) {
             return i;
+        }
     }
 
     if ((len == 1 && (*str == '*' || *str == '@')) ||
@@ -659,20 +663,28 @@ randrace(int rolenum)
     int i, n = 0;
 
     /* Count the number of valid races */
-    for (i = 0; races[i].noun; i++)
+    for (i = 0; races[i].noun; i++) {
 /*      if (roles[rolenum].allow & races[i].allow & ROLE_RACEMASK)*/
-        if (validrace(rolenum, i))
+        if (validrace(rolenum, i)) {
             n++;
+        }
+    }
 
     /* Pick a random race */
     /* Use a factor of 100 in case of bad random number generators */
-    if (n) n = rn2(n*100)/100;
-    for (i = 0; races[i].noun; i++)
+    if (n) {
+        n = rn2(n*100)/100;
+    }
+    for (i = 0; races[i].noun; i++) {
 /*      if (roles[rolenum].allow & races[i].allow & ROLE_RACEMASK) {*/
         if (validrace(rolenum, i)) {
-            if (n) n--;
-            else return (i);
+            if (n) {
+                n--;
+            } else {
+                return i;
+            }
         }
+    }
 
     /* This role has no permitted races? */
     return (rn2(SIZE(races)-1));
@@ -685,18 +697,21 @@ str2race(const char *str)
     int i, len;
 
     /* Is str valid? */
-    if (!str || !str[0])
+    if (!str || !str[0]) {
         return ROLE_NONE;
+    }
 
     /* Match as much of str as is provided */
     len = strlen(str);
     for (i = 0; races[i].noun; i++) {
         /* Does it match the noun? */
-        if (!strncmpi(str, races[i].noun, len))
+        if (!strncmpi(str, races[i].noun, len)) {
             return i;
+        }
         /* Or the filecode? */
-        if (!strcmpi(str, races[i].filecode))
+        if (!strcmpi(str, races[i].filecode)) {
             return i;
+        }
     }
 
     if ((len == 1 && (*str == '*' || *str == '@')) ||
@@ -722,21 +737,29 @@ randgend(int rolenum, int racenum)
     int i, n = 0;
 
     /* Count the number of valid genders */
-    for (i = 0; i < ROLE_GENDERS; i++)
+    for (i = 0; i < ROLE_GENDERS; i++) {
 /*      if (roles[rolenum].allow & races[racenum].allow &
                 genders[i].allow & ROLE_GENDMASK) */
-        if (validgend(rolenum, racenum, i))
+        if (validgend(rolenum, racenum, i)) {
             n++;
+        }
+    }
 
     /* Pick a random gender */
-    if (n) n = rn2(n);
-    for (i = 0; i < ROLE_GENDERS; i++)
+    if (n) {
+        n = rn2(n);
+    }
+    for (i = 0; i < ROLE_GENDERS; i++) {
 /*      if (roles[rolenum].allow & races[racenum].allow &
                 genders[i].allow & ROLE_GENDMASK) {*/
         if (validgend(rolenum, racenum, i)) {
-            if (n) n--;
-            else return (i);
+            if (n) {
+                n--;
+            } else {
+                return (i);
+            }
         }
+    }
 
     /* This role/race has no permitted genders? */
     return (rn2(ROLE_GENDERS));
@@ -749,18 +772,21 @@ str2gend(const char *str)
     int i, len;
 
     /* Is str valid? */
-    if (!str || !str[0])
+    if (!str || !str[0]) {
         return ROLE_NONE;
+    }
 
     /* Match as much of str as is provided */
     len = strlen(str);
     for (i = 0; i < ROLE_GENDERS; i++) {
         /* Does it match the adjective? */
-        if (!strncmpi(str, genders[i].adj, len))
+        if (!strncmpi(str, genders[i].adj, len)) {
             return i;
+        }
         /* Or the filecode? */
-        if (!strcmpi(str, genders[i].filecode))
+        if (!strcmpi(str, genders[i].filecode)) {
             return i;
+        }
     }
     if ((len == 1 && (*str == '*' || *str == '@')) ||
         !strncmpi(str, randomstr, len))
@@ -785,22 +811,28 @@ randalign(int rolenum, int racenum)
     int i, n = 0;
 
     /* Count the number of valid alignments */
-    for (i = 0; i < ROLE_ALIGNS; i++)
-        if (roles[rolenum].allow & races[racenum].allow &
-            aligns[i].allow & ROLE_ALIGNMASK)
+    for (i = 0; i < ROLE_ALIGNS; i++) {
+        if (roles[rolenum].allow & races[racenum].allow & aligns[i].allow & ROLE_ALIGNMASK) {
             n++;
+        }
+    }
 
     /* Pick a random alignment */
-    if (n) n = rn2(n);
-    for (i = 0; i < ROLE_ALIGNS; i++)
-        if (roles[rolenum].allow & races[racenum].allow &
-            aligns[i].allow & ROLE_ALIGNMASK) {
-            if (n) n--;
-            else return (i);
+    if (n) {
+        n = rn2(n);
+    }
+    for (i = 0; i < ROLE_ALIGNS; i++) {
+        if (roles[rolenum].allow & races[racenum].allow & aligns[i].allow & ROLE_ALIGNMASK) {
+            if (n) {
+                n--;
+            } else {
+                return i;
+            }
         }
+    }
 
     /* This role/race has no permitted alignments? */
-    return (rn2(ROLE_ALIGNS));
+    return rn2(ROLE_ALIGNS);
 }
 
 
@@ -810,18 +842,21 @@ str2align(const char *str)
     int i, len;
 
     /* Is str valid? */
-    if (!str || !str[0])
+    if (!str || !str[0]) {
         return ROLE_NONE;
+    }
 
     /* Match as much of str as is provided */
     len = strlen(str);
     for (i = 0; i < ROLE_ALIGNS; i++) {
         /* Does it match the adjective? */
-        if (!strncmpi(str, aligns[i].adj, len))
+        if (!strncmpi(str, aligns[i].adj, len)) {
             return i;
+        }
         /* Or the filecode? */
-        if (!strcmpi(str, aligns[i].filecode))
+        if (!strcmpi(str, aligns[i].filecode)) {
             return i;
+        }
     }
     if ((len == 1 && (*str == '*' || *str == '@')) ||
         !strncmpi(str, randomstr, len))
@@ -964,11 +999,13 @@ pick_race(int rolenum, int gendnum, int alignnum, int pickhow)
     int races_ok = 0;
 
     for (i = 0; i < SIZE(races)-1; i++) {
-        if (ok_race(rolenum, i, gendnum, alignnum))
+        if (ok_race(rolenum, i, gendnum, alignnum)) {
             races_ok++;
+        }
     }
-    if (races_ok == 0 || (races_ok > 1 && pickhow == PICK_RIGID))
+    if (races_ok == 0 || (races_ok > 1 && pickhow == PICK_RIGID)) {
         return ROLE_NONE;
+    }
     races_ok = rn2(races_ok);
     for (i = 0; i < SIZE(races)-1; i++) {
         if (ok_race(rolenum, i, gendnum, alignnum)) {
@@ -1110,18 +1147,21 @@ pick_align(int rolenum, int racenum, int gendnum, int pickhow)
     int aligns_ok = 0;
 
     for (i = 0; i < ROLE_ALIGNS; i++) {
-        if (ok_align(rolenum, racenum, gendnum, i))
+        if (ok_align(rolenum, racenum, gendnum, i)) {
             aligns_ok++;
+        }
     }
-    if (aligns_ok == 0 || (aligns_ok > 1 && pickhow == PICK_RIGID))
+    if (aligns_ok == 0 || (aligns_ok > 1 && pickhow == PICK_RIGID)) {
         return ROLE_NONE;
+    }
     aligns_ok = rn2(aligns_ok);
     for (i = 0; i < ROLE_ALIGNS; i++) {
         if (ok_align(rolenum, racenum, gendnum, i)) {
-            if (aligns_ok == 0)
+            if (aligns_ok == 0) {
                 return i;
-            else
+            } else {
                 aligns_ok--;
+            }
         }
     }
     return ROLE_NONE;
@@ -1147,8 +1187,9 @@ rigid_role_checks(void)
          */
         flags.initrole = pick_role(flags.initrace, flags.initgend,
                                    flags.initalign, PICK_RANDOM);
-        if (flags.initrole < 0)
+        if (flags.initrole < 0) {
             flags.initrole = randrole_filtered();
+        }
     }
     if (flags.initrace == ROLE_RANDOM &&
          (tmp = pick_race(flags.initrole, flags.initgend,
@@ -1247,7 +1288,9 @@ promptsep(char *buf, int num_post_attribs)
         Strcat(buf, ",");
     Strcat(buf, " ");
     --post_attribs;
-    if (!post_attribs && num_post_attribs > 1) Strcat(buf, conj);
+    if (!post_attribs && num_post_attribs > 1) {
+        Strcat(buf, conj);
+    }
     return buf;
 }
 
@@ -1256,9 +1299,15 @@ role_gendercount(int rolenum)
 {
     int gendcount = 0;
     if (validrole(rolenum)) {
-        if (roles[rolenum].allow & ROLE_MALE) ++gendcount;
-        if (roles[rolenum].allow & ROLE_FEMALE) ++gendcount;
-        if (roles[rolenum].allow & ROLE_NEUTER) ++gendcount;
+        if (roles[rolenum].allow & ROLE_MALE) {
+            ++gendcount;
+        }
+        if (roles[rolenum].allow & ROLE_FEMALE) {
+            ++gendcount;
+        }
+        if (roles[rolenum].allow & ROLE_NEUTER) {
+            ++gendcount;
+        }
     }
     return gendcount;
 }
@@ -1268,9 +1317,15 @@ race_alignmentcount(int racenum)
 {
     int aligncount = 0;
     if (racenum != ROLE_NONE && racenum != ROLE_RANDOM) {
-        if (races[racenum].allow & ROLE_CHAOTIC) ++aligncount;
-        if (races[racenum].allow & ROLE_LAWFUL) ++aligncount;
-        if (races[racenum].allow & ROLE_NEUTRAL) ++aligncount;
+        if (races[racenum].allow & ROLE_CHAOTIC) {
+            ++aligncount;
+        }
+        if (races[racenum].allow & ROLE_LAWFUL) {
+            ++aligncount;
+        }
+        if (races[racenum].allow & ROLE_NEUTRAL) {
+            ++aligncount;
+        }
     }
     return aligncount;
 }
@@ -1283,29 +1338,37 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
     static char err_ret[] = " character's";
     boolean donefirst = FALSE;
 
-    if (!suppliedbuf || buflen < 1) return err_ret;
+    if (!suppliedbuf || buflen < 1) {
+        return err_ret;
+    }
 
     /* initialize these static variables each time this is called */
     post_attribs = 0;
-    for (k=0; k < NUM_BP; ++k)
+    for (k=0; k < NUM_BP; ++k) {
         pa[k] = 0;
+    }
     buf[0] = '\0';
     *suppliedbuf = '\0';
 
     /* How many alignments are allowed for the desired race? */
-    if (racenum != ROLE_NONE && racenum != ROLE_RANDOM)
+    if (racenum != ROLE_NONE && racenum != ROLE_RANDOM) {
         aligncount = race_alignmentcount(racenum);
+    }
 
     if (alignnum != ROLE_NONE &&
          alignnum != ROLE_RANDOM &&
          ok_align(rolenum, racenum, gendnum, alignnum)) {
         /* if race specified, and multiple choice of alignments for it */
         if ((racenum >= 0) && (aligncount > 1)) {
-            if (donefirst) Strcat(buf, " ");
+            if (donefirst) {
+                Strcat(buf, " ");
+            }
             Strcat(buf, aligns[alignnum].adj);
             donefirst = TRUE;
         } else {
-            if (donefirst) Strcat(buf, " ");
+            if (donefirst) {
+                Strcat(buf, " ");
+            }
             Strcat(buf, aligns[alignnum].adj);
             donefirst = TRUE;
         }
@@ -1328,8 +1391,9 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
     /* <your lawful> */
 
     /* How many genders are allowed for the desired role? */
-    if (validrole(rolenum))
+    if (validrole(rolenum)) {
         gendercount = role_gendercount(rolenum);
+    }
 
     if (gendnum != ROLE_NONE && gendnum != ROLE_RANDOM) {
         if (validrole(rolenum)) {
@@ -1337,12 +1401,16 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
                and name of role itself does not distinguish gender */
             if ((rolenum != ROLE_NONE) && (gendercount > 1)
                 && !roles[rolenum].name.f) {
-                if (donefirst) Strcat(buf, " ");
+                if (donefirst) {
+                    Strcat(buf, " ");
+                }
                 Strcat(buf, genders[gendnum].adj);
                 donefirst = TRUE;
             }
         } else {
-            if (donefirst) Strcat(buf, " ");
+            if (donefirst) {
+                Strcat(buf, " ");
+            }
             Strcat(buf, genders[gendnum].adj);
             donefirst = TRUE;
         }
@@ -1359,13 +1427,17 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
 
     if (racenum != ROLE_NONE && racenum != ROLE_RANDOM) {
         if (validrole(rolenum) && ok_race(rolenum, racenum, gendnum, alignnum)) {
-            if (donefirst) Strcat(buf, " ");
+            if (donefirst) {
+                Strcat(buf, " ");
+            }
             Strcat(buf, (rolenum == ROLE_NONE) ?
                    races[racenum].noun :
                    races[racenum].adj);
             donefirst = TRUE;
         } else if (!validrole(rolenum)) {
-            if (donefirst) Strcat(buf, " ");
+            if (donefirst) {
+                Strcat(buf, " ");
+            }
             Strcat(buf, races[racenum].noun);
             donefirst = TRUE;
         } else {
@@ -1379,19 +1451,23 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
     /* <your lawful female gnomish> || <your lawful female gnome> */
 
     if (validrole(rolenum)) {
-        if (donefirst) Strcat(buf, " ");
+        if (donefirst) {
+            Strcat(buf, " ");
+        }
         if (gendnum != ROLE_NONE) {
-            if (gendnum == 1  && roles[rolenum].name.f)
+            if (gendnum == 1  && roles[rolenum].name.f) {
                 Strcat(buf, roles[rolenum].name.f);
-            else
+            } else {
                 Strcat(buf, roles[rolenum].name.m);
+            }
         } else {
             if (roles[rolenum].name.f) {
                 Strcat(buf, roles[rolenum].name.m);
                 Strcat(buf, "/");
                 Strcat(buf, roles[rolenum].name.f);
-            } else
+            } else {
                 Strcat(buf, roles[rolenum].name.m);
+            }
         }
         donefirst = TRUE;
     } else if (rolenum == ROLE_NONE) {
@@ -1400,7 +1476,9 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
     }
 
     if ((racenum == ROLE_NONE || racenum == ROLE_RANDOM) && !validrole(rolenum)) {
-        if (donefirst) Strcat(buf, " ");
+        if (donefirst) {
+            Strcat(buf, " ");
+        }
         Strcat(buf, "character");
         donefirst = TRUE;
     }
@@ -1410,8 +1488,9 @@ root_plselection_prompt(char *suppliedbuf, int buflen, int rolenum, int racenum,
     if (buflen > (int) (strlen(buf) + 1)) {
         Strcpy(suppliedbuf, buf);
         return suppliedbuf;
-    } else
+    } else {
         return err_ret;
+    }
 }
 
 char *
@@ -1421,13 +1500,14 @@ build_plselection_prompt(char *buf, int buflen, int rolenum, int racenum, int ge
     int num_post_attribs = 0;
     char tmpbuf[BUFSZ], *p;
 
-    if (buflen < QBUFSZ)
+    if (buflen < QBUFSZ) {
         return (char *)defprompt;
+    }
 
     Strcpy(tmpbuf, "Shall I pick ");
-    if (racenum != ROLE_NONE || validrole(rolenum))
+    if (racenum != ROLE_NONE || validrole(rolenum)) {
         Strcat(tmpbuf, "your ");
-    else {
+    } else {
         Strcat(tmpbuf, "a ");
     }
     /* <your> */
@@ -1496,32 +1576,37 @@ plnamesuffix(void)
     int i;
 
     /* Look for tokens delimited by '-' */
-    if ((eptr = index(plname, '-')) != (char *) 0)
+    if ((eptr = index(plname, '-')) != (char *) 0) {
         *eptr++ = '\0';
+    }
     while (eptr) {
         /* Isolate the next token */
         sptr = eptr;
-        if ((eptr = index(sptr, '-')) != (char *)0)
+        if ((eptr = index(sptr, '-')) != (char *)0) {
             *eptr++ = '\0';
+        }
 
         /* Try to match it to something */
-        if ((i = str2role(sptr)) != ROLE_NONE)
+        if ((i = str2role(sptr)) != ROLE_NONE) {
             flags.initrole = i;
-        else if ((i = str2race(sptr)) != ROLE_NONE)
+        } else if ((i = str2race(sptr)) != ROLE_NONE) {
             flags.initrace = i;
-        else if ((i = str2gend(sptr)) != ROLE_NONE)
+        } else if ((i = str2gend(sptr)) != ROLE_NONE) {
             flags.initgend = i;
-        else if ((i = str2align(sptr)) != ROLE_NONE)
+        } else if ((i = str2align(sptr)) != ROLE_NONE) {
             flags.initalign = i;
+        }
     }
-    if(!plname[0]) {
+    if (!plname[0]) {
         askname();
         plnamesuffix();
     }
 
     /* commas in the plname confuse the record file, convert to spaces */
     for (sptr = plname; *sptr; sptr++) {
-        if (*sptr == ',') *sptr = ' ';
+        if (*sptr == ',') {
+            *sptr = ' ';
+        }
     }
 }
 
@@ -1898,13 +1983,15 @@ role_init(void)
          * ignore this.
          */
         mons[urole.malenum].mflags3 |= M3_INFRAVISION;
-        if (urole.femalenum != NON_PM)
+        if (urole.femalenum != NON_PM) {
             mons[urole.femalenum].mflags3 |= M3_INFRAVISION;
+        }
     }
 
     /* Fix up initial roleplay flags */
-    if (Role_if(PM_MONK))
+    if (Role_if(PM_MONK)) {
         flags.vegetarian = TRUE;
+    }
     flags.vegan |= flags.ascet;
     flags.vegetarian |= flags.vegan;
 
@@ -1961,7 +2048,7 @@ Goodbye(void)
 void
 violated(int cdt)
 {
-    switch(cdt) {
+    switch (cdt) {
     case CONDUCT_PACIFISM:
         u.uconduct.killer++;
         if (u.roleplay.pacifist) {
@@ -1971,7 +2058,9 @@ violated(int cdt)
                 Strcpy(killer.name, "quit after an act of violence");
                 done(QUIT);
             }
-            if (u.uconduct.killer >= 10) u.roleplay.pacifist = FALSE;
+            if (u.uconduct.killer >= 10) {
+                u.roleplay.pacifist = FALSE;
+            }
         }
         break;
 
@@ -1997,32 +2086,48 @@ violated(int cdt)
         break;
 
     case CONDUCT_VEGETARIAN:    /* replaces violated_vegetarian() */
-        if (u.roleplay.vegetarian)
+        if (u.roleplay.vegetarian) {
             You_feel("guilty.");
-        if (Role_if(PM_MONK))
+        }
+        if (Role_if(PM_MONK)) {
             adjalign(-1);
+        }
         u.uconduct.unvegetarian++;
         u.uconduct.unvegan++;
         u.uconduct.food++;
-        if (u.uconduct.unvegetarian >= 30) u.roleplay.vegetarian = FALSE;
-        if (u.uconduct.unvegan >= 20) u.roleplay.vegan = FALSE;
-        if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+        if (u.uconduct.unvegetarian >= 30) {
+            u.roleplay.vegetarian = FALSE;
+        }
+        if (u.uconduct.unvegan >= 20) {
+            u.roleplay.vegan = FALSE;
+        }
+        if (u.uconduct.food >= 10) {
+            u.roleplay.ascet = FALSE;
+        }
         break;
 
     case CONDUCT_VEGAN:
-        if (u.roleplay.vegan)
+        if (u.roleplay.vegan) {
             You_feel("a bit guilty.");
+        }
         u.uconduct.unvegan++;
         u.uconduct.food++;
-        if (u.uconduct.unvegan >= 20) u.roleplay.vegan = FALSE;
-        if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+        if (u.uconduct.unvegan >= 20) {
+            u.roleplay.vegan = FALSE;
+        }
+        if (u.uconduct.food >= 10) {
+            u.roleplay.ascet = FALSE;
+        }
         break;
 
     case CONDUCT_FOODLESS:
-        if (u.roleplay.ascet)
+        if (u.roleplay.ascet) {
             You_feel("a little bit guilty.");
+        }
         u.uconduct.food++;
-        if (u.uconduct.food >= 10) u.roleplay.ascet = FALSE;
+        if (u.uconduct.food >= 10) {
+            u.roleplay.ascet = FALSE;
+        }
         break;
 
     case CONDUCT_ILLITERACY:
@@ -2036,8 +2141,9 @@ violated(int cdt)
 
     case CONDUCT_THIEVERY:
         u.uconduct.robbed++;
-        if (Role_if(PM_ROGUE))
+        if (Role_if(PM_ROGUE)) {
             You_feel("like an ordinary robber.");
+        }
         break;
 
     default:
@@ -2059,14 +2165,30 @@ successful_cdt(int cdt)
     if ((cdt == CONDUCT_SADISM) && !u.uconduct.killer &&
         (num_genocides() || (u.uconduct.weaphit>100)))
         return TRUE;
-    if ((cdt == CONDUCT_ATHEISM) && !u.uconduct.gnostic) return TRUE;
-    if ((cdt == CONDUCT_NUDISM) && !u.uconduct.armoruses) return TRUE;
-    if ((cdt == CONDUCT_BLINDFOLDED) && !u.uconduct.unblinded) return TRUE;
-    if ((cdt == CONDUCT_VEGETARIAN) && !u.uconduct.unvegetarian) return TRUE;
-    if ((cdt == CONDUCT_VEGAN) && !u.uconduct.unvegan) return TRUE;
-    if ((cdt == CONDUCT_FOODLESS) && !u.uconduct.food) return TRUE;
-    if ((cdt == CONDUCT_ILLITERACY) && !u.uconduct.literate) return TRUE;
-    if ((cdt == CONDUCT_THIEVERY) && !u.uconduct.robbed) return TRUE;
+    if ((cdt == CONDUCT_ATHEISM) && !u.uconduct.gnostic) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_NUDISM) && !u.uconduct.armoruses) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_BLINDFOLDED) && !u.uconduct.unblinded) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_VEGETARIAN) && !u.uconduct.unvegetarian) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_VEGAN) && !u.uconduct.unvegan) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_FOODLESS) && !u.uconduct.food) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_ILLITERACY) && !u.uconduct.literate) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_THIEVERY) && !u.uconduct.robbed) {
+        return TRUE;
+    }
 
     return FALSE;
 }
@@ -2076,14 +2198,30 @@ successful_cdt(int cdt)
 boolean
 intended_cdt(int cdt)
 {
-    if ((cdt == CONDUCT_PACIFISM) && flags.pacifist) return TRUE;
-    if ((cdt == CONDUCT_ATHEISM) && flags.atheist) return TRUE;
-    if ((cdt == CONDUCT_NUDISM) && flags.nudist) return TRUE;
-    if ((cdt == CONDUCT_BLINDFOLDED) && flags.blindfolded) return TRUE;
-    if ((cdt == CONDUCT_FOODLESS) && flags.ascet) return TRUE;
-    if ((cdt == CONDUCT_VEGAN) && flags.vegan) return TRUE;
-    if ((cdt == CONDUCT_VEGETARIAN) && flags.vegetarian) return TRUE;
-    if ((cdt == CONDUCT_ILLITERACY) && flags.illiterate) return TRUE;
+    if ((cdt == CONDUCT_PACIFISM) && flags.pacifist) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_ATHEISM) && flags.atheist) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_NUDISM) && flags.nudist) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_BLINDFOLDED) && flags.blindfolded) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_FOODLESS) && flags.ascet) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_VEGAN) && flags.vegan) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_VEGETARIAN) && flags.vegetarian) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_ILLITERACY) && flags.illiterate) {
+        return TRUE;
+    }
 
     return FALSE;
 }
@@ -2092,9 +2230,15 @@ intended_cdt(int cdt)
 boolean
 superfluous_cdt(int cdt)
 {
-    if ((cdt == CONDUCT_VEGAN) && successful_cdt(CONDUCT_FOODLESS)) return TRUE;
-    if ((cdt == CONDUCT_VEGETARIAN) && successful_cdt(CONDUCT_VEGAN)) return TRUE;
-    if ((cdt == CONDUCT_THIEVERY) && !u.uevent.invoked) return TRUE;
+    if ((cdt == CONDUCT_VEGAN) && successful_cdt(CONDUCT_FOODLESS)) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_VEGETARIAN) && successful_cdt(CONDUCT_VEGAN)) {
+        return TRUE;
+    }
+    if ((cdt == CONDUCT_THIEVERY) && !u.uevent.invoked) {
+        return TRUE;
+    }
 
     return FALSE;
 }

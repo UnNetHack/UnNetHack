@@ -45,8 +45,9 @@ curses_update_inv(void)
 
     display_inventory(NULL, FALSE);
 
-    if (border)
+    if (border) {
         box(win, 0, 0);
+    }
 
     wnoutrefresh(win);
 }

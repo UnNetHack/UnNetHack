@@ -242,10 +242,10 @@ main( int argc, char *argv[])
 	}
 
 #ifdef FILE_PREFIX
-	if(argc >=2 && argv[1][0]!='-'){
-	    file_prefix=argv[1];
-	    argc--;argv++;
-	}
+    if (argc >=2 && argv[1][0]!='-') {
+        file_prefix=argv[1];
+        argc--;argv++;
+    }
 #endif
 	do_makedefs(&argv[1][1]);
 	exit(EXIT_SUCCESS);
@@ -1218,19 +1218,23 @@ check_control(char *s)
 {
 	int	i;
 
-	if(s[0] != '%') return(-1);
+    if (s[0] != '%') {
+        return -1;
+    }
 
-	for(i = 0; deflist[i].defname; i++)
-	    if(!strncmp(deflist[i].defname, s+1, strlen(deflist[i].defname)))
-		return(i);
+    for (i = 0; deflist[i].defname; i++) {
+        if (!strncmp(deflist[i].defname, s+1, strlen(deflist[i].defname))) {
+            return i;
+        }
+    }
 
-	return(-1);
+    return -1;
 }
 
 static char *
 without_control(char *s)
 {
-	return(s + 1 + strlen(deflist[check_control(in_line)].defname));
+    return (s + 1 + strlen(deflist[check_control(in_line)].defname));
 }
 
 void
@@ -1286,15 +1290,16 @@ recheck:
 static boolean
 ranged_attk(struct permonst *ptr)
 {
-	int	i, j;
-	int atk_mask = (1<<AT_BREA) | (1<<AT_SPIT) | (1<<AT_GAZE);
+    int	i, j;
+    int atk_mask = (1<<AT_BREA) | (1<<AT_SPIT) | (1<<AT_GAZE);
 
-	for(i = 0; i < NATTK; i++) {
-	    if((j=ptr->mattk[i].aatyp) >= AT_WEAP || (atk_mask & (1<<j)))
-		return TRUE;
-	}
+    for (i = 0; i < NATTK; i++) {
+        if ((j=ptr->mattk[i].aatyp) >= AT_WEAP || (atk_mask & (1<<j))) {
+            return TRUE;
+        }
+    }
 
-	return(FALSE);
+    return FALSE;
 }
 
 /* This routine is designed to return an integer value which represents
@@ -1323,36 +1328,40 @@ mstrength(struct permonst *ptr)
 /*	For very fast monsters */
 	n += (ptr->mmove >= 18);
 
-/*	For each attack and "special" attack */
-	for(i = 0; i < NATTK; i++) {
+    /* For each attack and "special" attack */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].aatyp;
+        n += (tmp2 > 0);
+        n += (tmp2 == AT_MAGC);
+        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+    }
 
-	    tmp2 = ptr->mattk[i].aatyp;
-	    n += (tmp2 > 0);
-	    n += (tmp2 == AT_MAGC);
-	    n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
-	}
-
-/*	For each "special" damage type */
-	for(i = 0; i < NATTK; i++) {
-
-	    tmp2 = ptr->mattk[i].adtyp;
-	    if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
-		|| (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
-			n += 2;
-	    else if (strcmp(ptr->mname, "grid bug")) n += (tmp2 != AD_PHYS);
-	    n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
-	}
+    /* For each "special" damage type */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].adtyp;
+        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
+                || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE)) {
+            n += 2;
+        } else if (strcmp(ptr->mname, "grid bug")) {
+            n += (tmp2 != AD_PHYS);
+        }
+        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
+    }
 
 /*	Leprechauns are special cases.  They have many hit dice so they
 	can hit and are hard to kill, but they don't really do much damage. */
 	if (!strcmp(ptr->mname, "leprechaun")) n -= 2;
 
-/*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
-	if(n == 0) tmp--;
-	else if(n >= 6) tmp += ( n / 2 );
-	else tmp += ( n / 3 + 1);
+    /* inally, adjust the monster level  0 <= n <= 24 (approx.) */
+    if (n == 0) {
+        tmp--;
+    } else if (n >= 6) {
+        tmp += (n / 2);
+    } else {
+        tmp += (n / 3 + 1);
+    }
 
-	return((tmp >= 0) ? tmp : 0);
+    return (tmp >= 0) ? tmp : 0;
 }
 
 void
@@ -1454,50 +1463,58 @@ static boolean	in_msg;
 static boolean
 qt_comment(char *s)
 {
-	if(s[0] == '#') return(TRUE);
-	return((boolean)(!in_msg  && strlen(s) == NO_MSG));
+    if (s[0] == '#') {
+        return TRUE;
+    }
+    return (boolean)(!in_msg  && strlen(s) == NO_MSG);
 }
 
 static boolean
 qt_control(char *s)
 {
-	return((boolean)(s[0] == '%' && (s[1] == 'C' || s[1] == 'E')));
+    return (boolean)(s[0] == '%' && (s[1] == 'C' || s[1] == 'E'));
 }
 
 static int
 get_hdr(char *code)
 {
-	int	i;
+    int	i;
 
-	for(i = 0; i < qt_hdr.n_hdr; i++)
-	    if(!strncmp(code, qt_hdr.id[i], LEN_HDR)) return (++i);
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
+        if (!strncmp(code, qt_hdr.id[i], LEN_HDR)) {
+            return (++i);
+        }
+    }
 
-	return(0);
+    return 0;
 }
 
 static boolean
 new_id(char *code)
 {
-	if(qt_hdr.n_hdr >= N_HDR) {
-	    Fprintf(stderr, OUT_OF_HEADERS, qt_line);
-	    return(FALSE);
-	}
+    if (qt_hdr.n_hdr >= N_HDR) {
+        Fprintf(stderr, OUT_OF_HEADERS, qt_line);
+        return FALSE;
+    }
 
-	strncpy(&qt_hdr.id[qt_hdr.n_hdr][0], code, LEN_HDR);
-	msg_hdr[qt_hdr.n_hdr].n_msg = 0;
-	qt_hdr.offset[qt_hdr.n_hdr++] = 0L;
-	return(TRUE);
+    strncpy(&qt_hdr.id[qt_hdr.n_hdr][0], code, LEN_HDR);
+    msg_hdr[qt_hdr.n_hdr].n_msg = 0;
+    qt_hdr.offset[qt_hdr.n_hdr++] = 0L;
+    return TRUE;
 }
 
 static boolean
 known_msg(int num, int id)
 {
-	int i;
+    int i;
 
-	for(i = 0; i < msg_hdr[num].n_msg; i++)
-	    if(msg_hdr[num].qt_msg[i].msgnum == id) return(TRUE);
+    for (i = 0; i < msg_hdr[num].n_msg; i++) {
+        if (msg_hdr[num].qt_msg[i].msgnum == id) {
+            return TRUE;
+        }
+    }
 
-	return(FALSE);
+    return FALSE;
 }
 
 
@@ -1569,22 +1586,22 @@ do_qt_text(char *s)
 static void
 adjust_qt_hdrs(void)
 {
-	int	i, j;
-	long count = 0L, hdr_offset = sizeof(int) +
-			(sizeof(char)*LEN_HDR + sizeof(long)) * qt_hdr.n_hdr;
+    int	i, j;
+    long count = 0L, hdr_offset = sizeof(int) +
+        (sizeof(char)*LEN_HDR + sizeof(long)) * qt_hdr.n_hdr;
 
-	for(i = 0; i < qt_hdr.n_hdr; i++) {
-	    qt_hdr.offset[i] = hdr_offset;
-	    hdr_offset += sizeof(int) + sizeof(struct qtmsg) * msg_hdr[i].n_msg;
-	}
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
+        qt_hdr.offset[i] = hdr_offset;
+        hdr_offset += sizeof(int) + sizeof(struct qtmsg) * msg_hdr[i].n_msg;
+    }
 
-	for(i = 0; i < qt_hdr.n_hdr; i++)
-	    for(j = 0; j < msg_hdr[i].n_msg; j++) {
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
+        for (j = 0; j < msg_hdr[i].n_msg; j++) {
 
-		msg_hdr[i].qt_msg[j].offset = hdr_offset + count;
-		count += msg_hdr[i].qt_msg[j].size;
-	    }
-	return;
+            msg_hdr[i].qt_msg[j].offset = hdr_offset + count;
+            count += msg_hdr[i].qt_msg[j].size;
+        }
+    }
 }
 
 static void
@@ -1604,17 +1621,17 @@ put_qt_hdrs(void)
 	(void) fwrite((genericptr_t)&(qt_hdr.offset[0]), sizeof(long),
 							qt_hdr.n_hdr, ofp);
 #ifdef DEBUG
-	for(i = 0; i < qt_hdr.n_hdr; i++)
-		Fprintf(stderr, "%c @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
+        Fprintf(stderr, "%c @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
+    }
 
 	Fprintf(stderr, "\n");
 #endif
 
-	/*
-	 *	The individual class headers.
-	 */
-	for(i = 0; i < qt_hdr.n_hdr; i++) {
-
+    /*
+     *	The individual class headers.
+     */
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
 #ifdef DEBUG
 	    Fprintf(stderr, "%ld: %c header info.\n", ftell(ofp),
 		    qt_hdr.id[i]);
@@ -1625,11 +1642,12 @@ put_qt_hdrs(void)
 			    sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
 #ifdef DEBUG
 	    { int j;
-	      for(j = 0; j < msg_hdr[i].n_msg; j++)
-		Fprintf(stderr, "msg %d @ %ld (%ld)\n",
-			msg_hdr[i].qt_msg[j].msgnum,
-			msg_hdr[i].qt_msg[j].offset,
-			msg_hdr[i].qt_msg[j].size);
+            for (j = 0; j < msg_hdr[i].n_msg; j++) {
+                Fprintf(stderr, "msg %d @ %ld (%ld)\n",
+                        msg_hdr[i].qt_msg[j].msgnum,
+                        msg_hdr[i].qt_msg[j].offset,
+                        msg_hdr[i].qt_msg[j].size);
+            }
 	    }
 #endif
 	}
@@ -1723,7 +1741,7 @@ do_objs(void)
 	Fprintf(ofp, "%s", Dont_Edit_Code);
 	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 
-	for(i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
+    for (i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
 		SpinCursor(3);
 
 		objects[i].oc_name_idx = objects[i].oc_descr_idx = i;	/* init */

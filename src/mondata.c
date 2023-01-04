@@ -28,8 +28,9 @@ set_mon_data(struct monst *mon, struct permonst *ptr)
              * so add a redundant test to suppress that.
              */
             mon->movement *= new_speed;
-            if (old_speed > 0) /* old > new and new >= 0, so always True */
+            if (old_speed > 0) { /* old > new and new >= 0, so always True */
                 mon->movement /= old_speed;
+            }
         }
     }
     return;
@@ -41,9 +42,11 @@ attacktype_fordmg(struct permonst *ptr, int atyp, int dtyp)
 {
     struct attack *a;
 
-    for (a = &ptr->mattk[0]; a < &ptr->mattk[NATTK]; a++)
-        if (a->aatyp == atyp && (dtyp == AD_ANY || a->adtyp == dtyp))
+    for (a = &ptr->mattk[0]; a < &ptr->mattk[NATTK]; a++) {
+        if (a->aatyp == atyp && (dtyp == AD_ANY || a->adtyp == dtyp)) {
             return a;
+        }
+    }
 
     return (struct attack *)0;
 }
@@ -116,8 +119,9 @@ resists_magm(struct monst *mon)
         return TRUE;
     /* check for magic resistance granted by wielded weapon */
     o = is_you ? uwep : MON_WEP(mon);
-    if (o && o->oartifact && defends(AD_MAGM, o))
+    if (o && o->oartifact && defends(AD_MAGM, o)) {
         return TRUE;
+    }
     /* check for magic resistance granted by worn or carried items */
     o = (mon == &youmonst) ? invent : mon->minvent;
     long slotmask = W_ARMOR | W_ACCESSORY;
@@ -157,8 +161,9 @@ resists_blnd(struct monst *mon)
         dmgtype_fromattack(ptr, AD_BLND, AT_GAZE))
         return TRUE;
     o = is_you ? uwep : MON_WEP(mon);
-    if (o && o->oartifact && defends(AD_BLND, o))
+    if (o && o->oartifact && defends(AD_BLND, o)) {
         return TRUE;
+    }
     o = is_you ? invent : mon->minvent;
     long slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */ ||
@@ -192,33 +197,39 @@ can_blnd(
     const char *s;
 
     /* no eyes protect against all attacks for now */
-    if (!haseyes(mdef->data))
+    if (!haseyes(mdef->data)) {
         return FALSE;
+    }
 
-    switch(aatyp) {
+    switch (aatyp) {
     case AT_EXPL: case AT_BOOM: case AT_GAZE: case AT_MAGC:
     case AT_BREA: /* assumed to be lightning */
         /* light-based attacks may be cancelled or resisted */
-        if (magr && magr->mcan)
+        if (magr && magr->mcan) {
             return FALSE;
+        }
         return !resists_blnd(mdef);
 
     case AT_WEAP: case AT_SPIT: case AT_NONE:
         /* an object is used (thrown/spit/other) */
         if (obj && (obj->otyp == CREAM_PIE)) {
-            if (is_you && Blindfolded)
+            if (is_you && Blindfolded) {
                 return FALSE;
+            }
         } else if (obj && (obj->otyp == BLINDING_VENOM)) {
             /* all ublindf, including LENSES, protect, cream-pies too */
-            if (is_you && (ublindf || u.ucreamed))
+            if (is_you && (ublindf || u.ucreamed)) {
                 return FALSE;
+            }
             check_visor = TRUE;
         } else if (obj && (obj->otyp == POT_BLINDNESS)) {
             return TRUE; /* no defense */
-        } else
+        } else {
             return FALSE; /* other objects cannot cause blindness yet */
-        if ((magr == &youmonst) && u.uswallow)
+        }
+        if ((magr == &youmonst) && u.uswallow) {
             return FALSE; /* can't affect eyes while inside monster */
+        }
         break;
 
     case AT_ENGL:
@@ -232,17 +243,20 @@ can_blnd(
 
     case AT_CLAW:
         /* e.g. raven: all ublindf, including LENSES, protect */
-        if (is_you && ublindf)
+        if (is_you && ublindf) {
             return FALSE;
-        if ((magr == &youmonst) && u.uswallow)
+        }
+        if ((magr == &youmonst) && u.uswallow) {
             return FALSE; /* can't affect eyes while inside monster */
+        }
         check_visor = TRUE;
         break;
 
     case AT_TUCH: case AT_STNG:
         /* some physical, blind-inducing attacks can be cancelled */
-        if (magr && magr->mcan)
+        if (magr && magr->mcan) {
             return FALSE;
+        }
         break;
 
     default:
@@ -252,11 +266,13 @@ can_blnd(
     /* check if wearing a visor (only checked if visor might help) */
     if (check_visor) {
         o = (mdef == &youmonst) ? invent : mdef->minvent;
-        for ( ; o; o = o->nobj)
+        for ( ; o; o = o->nobj) {
             if ((o->owornmask & W_ARMH) &&
-                (s = OBJ_DESCR(objects[o->otyp])) != (char *)0 &&
-                !strcmp(s, "visored helmet"))
+                 (s = OBJ_DESCR(objects[o->otyp])) != (char *)0 &&
+                 !strcmp(s, "visored helmet")) {
                 return FALSE;
+            }
+        }
     }
 
     return TRUE;
@@ -276,9 +292,13 @@ ranged_attk(struct permonst *ptr)
      */
     for (i = 0; i < NATTK; i++) {
         atyp = ptr->mattk[i].aatyp;
-        if (atyp >= AT_WEAP) return TRUE;
+        if (atyp >= AT_WEAP) {
+            return TRUE;
+        }
         /* assert(atyp < 32); */
-        if ((atk_mask & (1L << atyp)) != 0L) return TRUE;
+        if ((atk_mask & (1L << atyp)) != 0L) {
+            return TRUE;
+        }
     }
 
     return FALSE;
@@ -386,10 +406,11 @@ can_be_strangled(struct monst *mon)
 boolean
 can_track(struct permonst *ptr)
 {
-    if (uwep && uwep->oartifact == ART_EXCALIBUR)
+    if (uwep && uwep->oartifact == ART_EXCALIBUR) {
         return TRUE;
-    else
-        return((boolean)haseyes(ptr));
+    } else {
+        return (boolean)haseyes(ptr);
+    }
 }
 
 /** creature will slide out of armor */
@@ -463,9 +484,11 @@ dmgtype_fromattack(struct permonst *ptr, int dtyp, int atyp)
 {
     struct attack *a;
 
-    for (a = &ptr->mattk[0]; a < &ptr->mattk[NATTK]; a++)
-        if (a->adtyp == dtyp && (atyp == AT_ANY || a->aatyp == atyp))
+    for (a = &ptr->mattk[0]; a < &ptr->mattk[NATTK]; a++) {
+        if (a->adtyp == dtyp && (atyp == AT_ANY || a->aatyp == atyp)) {
             return a;
+        }
+    }
 
     return (struct attack *)0;
 }
@@ -506,7 +529,7 @@ max_passive_dmg(struct monst *mdef, struct monst *magr)
     }
 
     for (i = 0; i < NATTK; i++) {
-        if(mdef->data->mattk[i].aatyp == AT_NONE ||
+        if (mdef->data->mattk[i].aatyp == AT_NONE ||
            mdef->data->mattk[i].aatyp == AT_BOOM) {
             adtyp = mdef->data->mattk[i].adtyp;
             if ((adtyp == AD_ACID && !resists_acid(magr)) ||
@@ -515,9 +538,13 @@ max_passive_dmg(struct monst *mdef, struct monst *magr)
                 (adtyp == AD_ELEC && !resists_elec(magr)) ||
                 adtyp == AD_PHYS) {
                 dmg = mdef->data->mattk[i].damn;
-                if(!dmg) dmg = mdef->data->mlevel+1;
+                if (!dmg) {
+                    dmg = mdef->data->mlevel+1;
+                }
                 dmg *= mdef->data->mattk[i].damd;
-            } else dmg = 0;
+            } else {
+                dmg = 0;
+            }
 
             return dmg * multi2;
         }
@@ -531,72 +558,100 @@ same_race(struct permonst *pm1, struct permonst *pm2)
 {
     char let1 = pm1->mlet, let2 = pm2->mlet;
 
-    if (pm1 == pm2)
+    if (pm1 == pm2) {
         return TRUE; /* exact match */
+    }
     /* player races have their own predicates */
-    if (is_human(pm1))
+    if (is_human(pm1)) {
         return is_human(pm2);
-    if (is_elf(pm1))
+    }
+    if (is_elf(pm1)) {
         return is_elf(pm2);
-    if (is_dwarf(pm1))
+    }
+    if (is_dwarf(pm1)) {
         return is_dwarf(pm2);
-    if (is_gnome(pm1))
+    }
+    if (is_gnome(pm1)) {
         return is_gnome(pm2);
-    if (is_orc(pm1))
+    }
+    if (is_orc(pm1)) {
         return is_orc(pm2);
+    }
     /* other creatures are less precise */
-    if (is_giant(pm1))
+    if (is_giant(pm1)) {
         return is_giant(pm2); /* open to quibbling here */
-    if (is_golem(pm1))
+    }
+    if (is_golem(pm1)) {
         return is_golem(pm2); /* even moreso... */
-    if (is_mind_flayer(pm1))
+    }
+    if (is_mind_flayer(pm1)) {
         return is_mind_flayer(pm2);
+    }
     if (let1 == S_KOBOLD || pm1 == &mons[PM_KOBOLD_ZOMBIE]
         || pm1 == &mons[PM_KOBOLD_MUMMY])
         return (let2 == S_KOBOLD || pm2 == &mons[PM_KOBOLD_ZOMBIE]
                 || pm2 == &mons[PM_KOBOLD_MUMMY]);
-    if (let1 == S_OGRE)
+    if (let1 == S_OGRE) {
         return (let2 == S_OGRE);
-    if (let1 == S_NYMPH)
+    }
+    if (let1 == S_NYMPH) {
         return (let2 == S_NYMPH);
-    if (let1 == S_CENTAUR)
+    }
+    if (let1 == S_CENTAUR) {
         return (let2 == S_CENTAUR);
-    if (is_unicorn(pm1))
+    }
+    if (is_unicorn(pm1)) {
         return is_unicorn(pm2);
-    if (let1 == S_DRAGON)
+    }
+    if (let1 == S_DRAGON) {
         return (let2 == S_DRAGON);
-    if (let1 == S_NAGA)
+    }
+    if (let1 == S_NAGA) {
         return (let2 == S_NAGA);
+    }
     /* other critters get steadily messier */
-    if (is_rider(pm1))
+    if (is_rider(pm1)) {
         return is_rider(pm2); /* debatable */
-    if (is_minion(pm1))
+    }
+    if (is_minion(pm1)) {
         return is_minion(pm2); /* [needs work?] */
+    }
     /* tengu don't match imps (first test handled case of both being tengu) */
-    if (pm1 == &mons[PM_TENGU] || pm2 == &mons[PM_TENGU])
+    if (pm1 == &mons[PM_TENGU] || pm2 == &mons[PM_TENGU]) {
         return FALSE;
-    if (let1 == S_IMP)
+    }
+    if (let1 == S_IMP) {
         return (let2 == S_IMP);
+    }
     /* and minor demons (imps) don't match major demons */
-    else if (let2 == S_IMP)
+    else if (let2 == S_IMP) {
         return FALSE;
-    if (is_demon(pm1))
+    }
+    if (is_demon(pm1)) {
         return is_demon(pm2);
+    }
     if (is_undead(pm1)) {
-        if (let1 == S_ZOMBIE)
+        if (let1 == S_ZOMBIE) {
             return (let2 == S_ZOMBIE);
-        if (let1 == S_MUMMY)
+        }
+        if (let1 == S_MUMMY) {
             return (let2 == S_MUMMY);
-        if (let1 == S_VAMPIRE)
+        }
+        if (let1 == S_VAMPIRE) {
             return (let2 == S_VAMPIRE);
-        if (let1 == S_LICH)
+        }
+        if (let1 == S_LICH) {
             return (let2 == S_LICH);
-        if (let1 == S_WRAITH)
+        }
+        if (let1 == S_WRAITH) {
             return (let2 == S_WRAITH);
-        if (let1 == S_GHOST)
+        }
+        if (let1 == S_GHOST) {
             return (let2 == S_GHOST);
-    } else if (is_undead(pm2))
+        }
+    } else if (is_undead(pm2)) {
         return FALSE;
+    }
 
     /* check for monsters which grow into more mature forms */
     if (let1 == let2) {
@@ -605,24 +660,29 @@ same_race(struct permonst *pm1, struct permonst *pm2)
         /* we know m1 != m2 (very first check above); test all smaller
            forms of m1 against m2, then all larger ones; don't need to
            make the corresponding tests for variants of m2 against m1 */
-        for (prv = m1, nxt = big_to_little(m1); nxt != prv;
-             prv = nxt, nxt = big_to_little(nxt))
-            if (nxt == m2)
+        for (prv = m1, nxt = big_to_little(m1); nxt != prv; prv = nxt, nxt = big_to_little(nxt)) {
+            if (nxt == m2) {
                 return TRUE;
-        for (prv = m1, nxt = little_to_big(m1); nxt != prv;
-             prv = nxt, nxt = little_to_big(nxt))
-            if (nxt == m2)
+            }
+        }
+        for (prv = m1, nxt = little_to_big(m1); nxt != prv; prv = nxt, nxt = little_to_big(nxt)) {
+            if (nxt == m2) {
                 return TRUE;
+            }
+        }
     }
     /* not caught by little/big handling */
-    if (pm1 == &mons[PM_GARGOYLE] || pm1 == &mons[PM_WINGED_GARGOYLE])
+    if (pm1 == &mons[PM_GARGOYLE] || pm1 == &mons[PM_WINGED_GARGOYLE]) {
         return (pm2 == &mons[PM_GARGOYLE]
                 || pm2 == &mons[PM_WINGED_GARGOYLE]);
-    if (pm1 == &mons[PM_KILLER_BEE] || pm1 == &mons[PM_QUEEN_BEE])
+    }
+    if (pm1 == &mons[PM_KILLER_BEE] || pm1 == &mons[PM_QUEEN_BEE]) {
         return (pm2 == &mons[PM_KILLER_BEE] || pm2 == &mons[PM_QUEEN_BEE]);
+    }
 
-    if (is_longworm(pm1))
+    if (is_longworm(pm1)) {
         return is_longworm(pm2); /* handles tail */
+    }
     /* [currently there's no reason to bother matching up
         assorted bugs and blobs with their closest variants] */
     /* didn't match */
@@ -635,7 +695,9 @@ monsndx(struct permonst *ptr)
 {
     int i;
 
-    if (ptr == &upermonst) return PM_PLAYERMON;
+    if (ptr == &upermonst) {
+        return PM_PLAYERMON;
+    }
 
     i = (int)(ptr - &mons[0]);
     if (i < LOW_PM || i >= NUMMONS) {
@@ -645,7 +707,7 @@ monsndx(struct permonst *ptr)
         return NON_PM;      /* will not get here */
     }
 
-    return(i);
+    return i;
 }
 
 /* for handling alternate spellings */
@@ -689,23 +751,26 @@ name_to_mon(const char *in_str)
     slen = strlen(str);
     term = str + slen;
 
-    if ((s = strstri(str, "vortices")) != 0)
+    if ((s = strstri(str, "vortices")) != 0) {
         Strcpy(s+4, "ex");
+    }
     /* be careful with "ies"; "priest", "zombies" */
     else if (slen > 3 && !strcmpi(term-3, "ies") &&
              (slen < 7 || strcmpi(term-7, "zombies")))
         Strcpy(term-3, "y");
     /* luckily no monster names end in fe or ve with ves plurals */
-    else if (slen > 3 && !strcmpi(term-3, "ves"))
+    else if (slen > 3 && !strcmpi(term-3, "ves")) {
         Strcpy(term-3, "f");
+    }
 
     slen = strlen(str); /* length possibly needs recomputing */
 
     /* change grey dragon to gray dragon, otherwise
        you'd get the (possibly) shuffled dragon with magic
        resistance */
-    if (!strncmpi(str, "grey dragon", 11))
+    if (!strncmpi(str, "grey dragon", 11)) {
         *(str + 2) = 'a';
+    }
 
     {
         static const struct alt_spl names[] = {
@@ -767,9 +832,11 @@ name_to_mon(const char *in_str)
         };
         const struct alt_spl *namep;
 
-        for (namep = names; namep->name; namep++)
-            if (!strncmpi(str, namep->name, (int)strlen(namep->name)))
+        for (namep = names; namep->name; namep++) {
+            if (!strncmpi(str, namep->name, (int)strlen(namep->name))) {
                 return namep->pm_val;
+            }
+        }
     }
 
     for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
@@ -793,7 +860,11 @@ name_to_mon(const char *in_str)
             }
         }
     }
-    if (mntmp == NON_PM) mntmp = title_to_mon(str, (int *)0, (int *)0);
+
+    if (mntmp == NON_PM) {
+        mntmp = title_to_mon(str, (int *)0, (int *)0);
+    }
+
     return mntmp;
 }
 
@@ -851,8 +922,9 @@ name_to_monclass(const char *in_str, int *mndx_p)
                 *mndx_p = PM_LONG_WORM;
             }
 #ifdef NEXT_VERSION
-        } else if (i == MAXMCLASSES) /* maybe 'I' */
+        } else if (i == MAXMCLASSES) { /* maybe 'I' */
             i = (*in_str == DEF_INVISIBLE) ? S_invisible : 0;
+        }
 #else
         }
 #endif
@@ -911,7 +983,9 @@ name_to_monclass(const char *in_str, int *mndx_p)
 int
 gender(struct monst *mtmp)
 {
-    if (is_neuter(mtmp->data)) return 2;
+    if (is_neuter(mtmp->data)) {
+        return 2;
+    }
     return mtmp->female;
 }
 
@@ -946,7 +1020,9 @@ levl_follower(struct monst *mtmp)
     }
 
     /* some monsters will follow even while intending to flee from you */
-    if (mtmp->mtame || mtmp->iswiz || is_fshk(mtmp)) return TRUE;
+    if (mtmp->mtame || mtmp->iswiz || is_fshk(mtmp)) {
+        return TRUE;
+    }
 
     /* stalking types follow, but won't when fleeing unless you hold
        the Amulet */
@@ -1031,8 +1107,12 @@ little_to_big(int montype)
 {
     int i;
 
-    for (i = 0; grownups[i][0] >= LOW_PM; i++)
-        if(montype == grownups[i][0]) return grownups[i][1];
+    for (i = 0; grownups[i][0] >= LOW_PM; i++) {
+        if (montype == grownups[i][0]) {
+            return grownups[i][1];
+        }
+    }
+
     return montype;
 }
 
@@ -1041,8 +1121,11 @@ big_to_little(int montype)
 {
     int i;
 
-    for (i = 0; grownups[i][0] >= LOW_PM; i++)
-        if(montype == grownups[i][1]) return grownups[i][0];
+    for (i = 0; grownups[i][0] >= LOW_PM; i++) {
+        if (montype == grownups[i][1]) {
+            return grownups[i][0];
+        }
+    }
     return montype;
 }
 
@@ -1085,8 +1168,11 @@ big_little_match(int montyp1, int montyp2)
 const struct permonst *
 raceptr(struct monst *mtmp)
 {
-    if (mtmp == &youmonst && !Upolyd) return(&mons[urace.malenum]);
-    else return(mtmp->data);
+    if (mtmp == &youmonst && !Upolyd) {
+        return &mons[urace.malenum];
+    } else {
+        return mtmp->data;
+    }
 }
 
 static const char *levitate[4]  = { "float", "Float", "wobble", "Wobble" };

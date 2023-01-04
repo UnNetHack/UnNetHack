@@ -93,7 +93,7 @@ get_wormno(void)
         new_wormno++;
     }
 
-    return(0);  /* level infested with worms */
+    return 0;  /* level infested with worms */
 }
 
 /*
@@ -176,7 +176,9 @@ shrink_worm(int wnum) /**< worm number */
 {
     struct wseg *seg;
 
-    if (wtails[wnum] == wheads[wnum]) return;   /* no tail */
+    if (wtails[wnum] == wheads[wnum]) {
+        return; /* no tail */
+    }
 
     seg = wtails[wnum];
     wtails[wnum] = seg->nseg;
@@ -393,12 +395,15 @@ wormhitu(struct monst *worm)
 void
 cutoff(struct monst *worm, struct wseg *tail)
 {
-    if (flags.mon_moving)
+    if (flags.mon_moving) {
         pline("Part of the tail of %s is cut off.", mon_nam(worm));
-    else
+    } else {
         You("cut part of the tail off of %s.", mon_nam(worm));
+    }
     toss_wsegs(tail, TRUE);
-    if (worm->mhp > 1) worm->mhp /= 2;
+    if (worm->mhp > 1) {
+        worm->mhp /= 2;
+    }
 }
 
 /*  cutworm()
@@ -418,9 +423,13 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     int wnum = worm->wormno;
     int cut_chance, new_wnum;
 
-    if (!wnum) return; /* no worm */
+    if (!wnum) {
+        return; /* no worm */
+    }
 
-    if (x == worm->mx && y == worm->my) return;     /* hit on head */
+    if (x == worm->mx && y == worm->my) {
+        return; /* hit on head */
+    }
 
     /* cutting goes best with a cuttier weapon */
     cut_chance = rnd(20); /* Normally     1-16 does not cut, 17-20 does, */
@@ -503,10 +512,11 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     /* Place the new monster at all the segment locations. */
     place_wsegs(new_worm, worm);
 
-    if (flags.mon_moving)
+    if (flags.mon_moving) {
         pline("%s is cut in half.", Monnam(worm));
-    else
+    } else {
         You("cut %s in half.", mon_nam(worm));
+    }
 }
 
 /*
@@ -573,7 +583,9 @@ save_worm(int fd, int mode)
 
     if (perform_bwrite(mode)) {
         for (i = 1; i < MAX_NUM_WORMS; i++) {
-            for (count = 0, curr = wtails[i]; curr; curr = curr->nseg) count++;
+            for (count = 0, curr = wtails[i]; curr; curr = curr->nseg) {
+                count++;
+            }
             /* Save number of segments */
             bwrite(fd, (genericptr_t) &count, sizeof(count));
             /* Save segment locations of the monster. */
@@ -591,7 +603,9 @@ save_worm(int fd, int mode)
         /* Free the segments only.  savemonchn() will take care of the
          * monsters. */
         for (i = 1; i < MAX_NUM_WORMS; i++) {
-            if (!(curr = wtails[i])) continue;
+            if (!(curr = wtails[i])) {
+                continue;
+            }
 
             while (curr) {
                 temp = curr->nseg;
@@ -618,7 +632,9 @@ rest_worm(int fd)
 
     for (i = 1; i < MAX_NUM_WORMS; i++) {
         mread(fd, (genericptr_t) &count, sizeof(count));
-        if (!count) continue; /* none */
+        if (!count) {
+            continue; /* none */
+        }
 
         /* Get the segments. */
         for (curr = (struct wseg *) 0, j = 0; j < count; j++) {
@@ -626,10 +642,11 @@ rest_worm(int fd)
             temp->nseg = (struct wseg *) 0;
             mread(fd, (genericptr_t) &(temp->wx), sizeof(coordxy));
             mread(fd, (genericptr_t) &(temp->wy), sizeof(coordxy));
-            if (curr)
+            if (curr) {
                 curr->nseg = temp;
-            else
+            } else {
                 wtails[i] = temp;
+            }
             curr = temp;
         }
         wheads[i] = curr;
@@ -928,7 +945,9 @@ create_worm_tail(int num_segs)
     int i=0;
     struct wseg *new_tail, *curr;
 
-    if (!num_segs) return (struct wseg *)0;
+    if (!num_segs) {
+        return (struct wseg *)0;
+    }
 
     new_tail = curr = newseg();
     curr->nseg = (struct wseg *)0;
@@ -959,7 +978,9 @@ worm_known(struct monst *worm)
     struct wseg *curr = wtails[worm->wormno];
 
     while (curr) {
-        if(cansee(curr->wx, curr->wy)) return TRUE;
+        if (cansee(curr->wx, curr->wy)) {
+            return TRUE;
+        }
         curr = curr->nseg;
     }
     return FALSE;

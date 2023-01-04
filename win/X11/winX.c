@@ -285,17 +285,18 @@ XColor   *color;	/* the X color structure; changed only if successful */
     }
 
     if (!table) {
-	table = (XColor *) XtCalloc(ncells, sizeof(XColor));
-	for(i=0; i<ncells; i++)
-	    table[i].pixel = i;
-	XQueryColors(DisplayOfScreen(screen), colormap, table, ncells);
+        table = (XColor *) XtCalloc(ncells, sizeof(XColor));
+        for (i=0; i<ncells; i++) {
+            table[i].pixel = i;
+        }
+        XQueryColors(DisplayOfScreen(screen), colormap, table, ncells);
     }
 
     /* go thru cells and look for the one with smallest diff */
     /* diff is calculated abs(reddiff)+abs(greendiff)+abs(bluediff) */
     /* a more knowledgeable color person might improve this -dlc */
 try_again:
-    for(i=0; i<ncells; i++) {
+    for (i=0; i<ncells; i++) {
 	if(table[i].flags == tmp.flags) {
 	    j = (int)table[i].red - (int)tmp.red;
 	    if(j < 0) j = -j;

@@ -79,7 +79,7 @@ roguecorr(coordxy x, coordxy y, int dir)
             levl[fromx][fromy].doormask = D_NODOOR;
             fromy++;
         }
-        if(y >= 2) {
+        if (y >= 2) {
             impossible("down door from %d,%d going nowhere?", x, y);
             return;
         }
@@ -123,7 +123,7 @@ roguecorr(coordxy x, coordxy y, int dir)
             levl[fromx][fromy].doormask = D_NODOOR;
             fromx++;
         }
-        if(x >= 2) {
+        if (x >= 2) {
             impossible("right door from %d,%d going nowhere?", x, y);
             return;
         }
@@ -148,7 +148,9 @@ roguecorr(coordxy x, coordxy y, int dir)
         }
         roguejoin(fromx, fromy, tox, toy, TRUE);
         return;
-    } else impossible("corridor in direction %d?", dir);
+    } else {
+        impossible("corridor in direction %d?", dir);
+    }
 }
 
 /* Modified walkfrom() from mkmaze.c */
@@ -158,7 +160,7 @@ miniwalk(coordxy x, coordxy y)
     int q, dir;
     int dirs[4];
 
-    while(1) {
+    while (1) {
         q = 0;
 #define doorhere (r[x][y].doortable)
         if (x>0 && (!(doorhere & LEFT)) &&
@@ -176,9 +178,11 @@ miniwalk(coordxy x, coordxy y)
         /* Rogue levels aren't just 3 by 3 mazes; they have some extra
          * connections, thus that 1/10 chance
          */
-        if (!q) return;
+        if (!q) {
+            return;
+        }
         dir = dirs[rn2(q)];
-        switch(dir) { /* Move in direction */
+        switch (dir) { /* Move in direction */
         case 0: doorhere |= LEFT;
             x--;
             doorhere |= RIGHT;
@@ -222,8 +226,8 @@ makeroguerooms(void) {
 #define here r[x][y]
 
     nroom = 0;
-    for(y=0; y<3; y++) {
-        for(x=0; x<3; x++) {
+    for (y=0; y<3; y++) {
+        for (x=0; x<3; x++) {
             /* Note: we want to insure at least 1 room.  So, if the
              * first 8 are all dummies, force the last to be a room.
              */
@@ -249,8 +253,8 @@ makeroguerooms(void) {
     }
     miniwalk(rn2(3), rn2(3));
     nroom = 0;
-    for(y=0; y<3; y++) {
-        for(x=0; x<3; x++) {
+    for (y=0; y<3; y++) {
+        for (x=0; x<3; x++) {
             if (here.real) { /* Make a room */
                 int lowx, lowy, hix, hiy;
 
@@ -272,16 +276,22 @@ makeroguerooms(void) {
     }
 
     /* Now, add connecting corridors. */
-    for(y=0; y<3; y++) for(x=0; x<3; x++) {
-            if (here.doortable & DOWN)
+    for (y=0; y<3; y++) {
+        for (x=0; x<3; x++) {
+            if (here.doortable & DOWN) {
                 roguecorr(x, y, DOWN);
-            if (here.doortable & RIGHT)
+            }
+            if (here.doortable & RIGHT) {
                 roguecorr(x, y, RIGHT);
-            if (here.doortable & LEFT)
+            }
+            if (here.doortable & LEFT) {
                 impossible ("left end of %d, %d never connected?", x, y);
-            if (here.doortable & UP)
+            }
+            if (here.doortable & UP) {
                 impossible ("up end of %d, %d never connected?", x, y);
+            }
         }
+    }
 }
 
 void
@@ -298,11 +308,14 @@ makerogueghost(void)
     struct mkroom *croom;
     int x, y;
 
-    if (!nroom) return; /* Should never happen */
+    if (!nroom) {
+        return; /* Should never happen */
+    }
     croom = &rooms[rn2(nroom)];
     x = somex(croom); y = somey(croom);
-    if (!(ghost = makemon(&mons[PM_GHOST], x, y, NO_MM_FLAGS)))
+    if (!(ghost = makemon(&mons[PM_GHOST], x, y, NO_MM_FLAGS))) {
         return;
+    }
     ghost->msleeping = 1;
     ghost = christen_monst(ghost, roguename());
 
@@ -314,32 +327,48 @@ makerogueghost(void)
     if (rn2(2)) {
         ghostobj = mksobj_at(MACE, x, y, FALSE, FALSE);
         ghostobj->spe = rnd(3);
-        if (rn2(4)) curse(ghostobj);
+        if (rn2(4)) {
+            curse(ghostobj);
+        }
     } else {
         ghostobj = mksobj_at(TWO_HANDED_SWORD, x, y, FALSE, FALSE);
         ghostobj->spe = rnd(5) - 2;
-        if (rn2(4)) curse(ghostobj);
+        if (rn2(4)) {
+            curse(ghostobj);
+        }
     }
     ghostobj = mksobj_at(BOW, x, y, FALSE, FALSE);
     ghostobj->spe = 1;
-    if (rn2(4)) curse(ghostobj);
+    if (rn2(4)) {
+        curse(ghostobj);
+    }
 
     ghostobj = mksobj_at(ARROW, x, y, FALSE, FALSE);
     ghostobj->spe = 0;
     ghostobj->quan = (long) rn1(10, 25);
     ghostobj->owt = weight(ghostobj);
-    if (rn2(4)) curse(ghostobj);
+    if (rn2(4)) {
+        curse(ghostobj);
+    }
 
     if (rn2(2)) {
         ghostobj = mksobj_at(RING_MAIL, x, y, FALSE, FALSE);
         ghostobj->spe = rn2(3);
-        if (!rn2(3)) ghostobj->oerodeproof = TRUE;
-        if (rn2(4)) curse(ghostobj);
+        if (!rn2(3)) {
+            ghostobj->oerodeproof = TRUE;
+        }
+        if (rn2(4)) {
+            curse(ghostobj);
+        }
     } else {
         ghostobj = mksobj_at(PLATE_MAIL, x, y, FALSE, FALSE);
         ghostobj->spe = rnd(5) - 2;
-        if (!rn2(3)) ghostobj->oerodeproof = TRUE;
-        if (rn2(4)) curse(ghostobj);
+        if (!rn2(3)) {
+            ghostobj->oerodeproof = TRUE;
+        }
+        if (rn2(4)) {
+            curse(ghostobj);
+        }
     }
     if (rn2(2)) {
         ghostobj = mksobj_at(FAKE_AMULET_OF_YENDOR, x, y, TRUE, FALSE);

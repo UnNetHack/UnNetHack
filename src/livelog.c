@@ -39,18 +39,42 @@ encodeachieve(void)
 
     r = 0;
 
-    if(achieve.get_bell) r |= 1L << 0;
-    if(achieve.enter_gehennom) r |= 1L << 1;
-    if(achieve.get_candelabrum) r |= 1L << 2;
-    if(achieve.get_book) r |= 1L << 3;
-    if(achieve.perform_invocation) r |= 1L << 4;
-    if(achieve.get_amulet) r |= 1L << 5;
-    if(In_endgame(&u.uz)) r |= 1L << 6;
-    if(Is_astralevel(&u.uz)) r |= 1L << 7;
-    if(achieve.ascended) r |= 1L << 8;
-    if(achieve.get_luckstone) r |= 1L << 9;
-    if(achieve.finish_sokoban) r |= 1L << 10;
-    if(achieve.killed_medusa) r |= 1L << 11;
+    if (achieve.get_bell) {
+        r |= 1L << 0;
+    }
+    if (achieve.enter_gehennom) {
+        r |= 1L << 1;
+    }
+    if (achieve.get_candelabrum) {
+        r |= 1L << 2;
+    }
+    if (achieve.get_book) {
+        r |= 1L << 3;
+    }
+    if (achieve.perform_invocation) {
+        r |= 1L << 4;
+    }
+    if (achieve.get_amulet) {
+        r |= 1L << 5;
+    }
+    if (In_endgame(&u.uz)) {
+        r |= 1L << 6;
+    }
+    if (Is_astralevel(&u.uz)) {
+        r |= 1L << 7;
+    }
+    if (achieve.ascended) {
+        r |= 1L << 8;
+    }
+    if (achieve.get_luckstone) {
+        r |= 1L << 9;
+    }
+    if (achieve.finish_sokoban) {
+        r |= 1L << 10;
+    }
+    if (achieve.killed_medusa) {
+        r |= 1L << 11;
+    }
 
     return r;
 }
@@ -79,7 +103,7 @@ void livelog_write_string(char* buffer) {
 #else
     if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
 #endif
-        if(!(livelogfile = fopen_datafile_area(LOGAREA, LIVELOGFILE, "a", SCOREPREFIX))) {
+        if (!(livelogfile = fopen_datafile_area(LOGAREA, LIVELOGFILE, "a", SCOREPREFIX))) {
             pline("Cannot open live log file!");
         } else {
             fprintf(livelogfile, "%s", buffer);
@@ -152,7 +176,7 @@ void livelog_achieve_update(void) {
 
     /* livelog_achieve_update is sometimes called when there's
      * no actual change. */
-    if(achieve_diff == 0) {
+    if (achieve_diff == 0) {
         return;
     }
 

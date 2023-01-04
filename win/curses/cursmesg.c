@@ -305,8 +305,9 @@ curses_last_messages(void)
     int i;
     for (i = (num_messages - 1); i > 0; i--) {
         mesg = get_msg_line(TRUE, i);
-        if (mesg && mesg->str && strcmp(mesg->str, ""))
+        if (mesg && mesg->str && strcmp(mesg->str, "")) {
             curses_message_win_puts(mesg->str, TRUE);
+        }
     }
     curses_message_win_puts(toplines, TRUE);
 }
@@ -454,8 +455,12 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (border) {
         border_space = 1;
-        if (mx < 1) mx = 1;
-        if (my < 1) my = 1;
+        if (mx < 1) {
+            mx = 1;
+        }
+        if (my < 1) {
+            my = 1;
+        }
     }
     maxy = height - 1 + border_space;
     maxx = width - 1 + border_space;
@@ -471,8 +476,11 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     linestarts[0] = tmpbuf;
 
     if (mx > border_space) { /* newline */
-        if (my >= maxy) scroll_window(MESSAGE_WIN);
-        else my++;
+        if (my >= maxy) {
+            scroll_window(MESSAGE_WIN);
+        } else {
+            my++;
+        }
         mx = border_space;
     }
 
@@ -481,7 +489,9 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     for (i = 0; i < nlines-1; i++) {
         tmpstr = curses_break_str(linestarts[i],width-1,1);
         linestarts[i+1] = linestarts[i] + strlen(tmpstr);
-        if (*linestarts[i+1] == ' ') linestarts[i+1]++;
+        if (*linestarts[i+1] == ' ') {
+            linestarts[i+1]++;
+        }
         mvwaddstr(win,my,mx,tmpstr);
         free(tmpstr);
         if (++my >= maxy) {
@@ -493,7 +503,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     mx = promptx = strlen(linestarts[nlines-1]) + border_space;
     promptline = nlines - 1;
 
-    while(1) {
+    while (1) {
         mx = strlen(linestarts[nlines - 1]) + border_space;
         if (mx > maxx) {
             if (nlines < maxlines) {
@@ -506,7 +516,9 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
                 }
                 mx = border_space;
                 linestarts[nlines] = linestarts[nlines - 1] + strlen(tmpstr);
-                if (*linestarts[nlines] == ' ') linestarts[nlines]++;
+                if (*linestarts[nlines] == ' ') {
+                    linestarts[nlines]++;
+                }
                 mvwaddstr(win, my, mx, linestarts[nlines]);
                 mx = strlen(linestarts[nlines]) + border_space;
                 nlines++;
@@ -521,10 +533,10 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         wrefresh(win);
         ch = getch();
         curs_set(0);
-        switch(ch) {
+        switch (ch) {
         case '\033': /* DOESCAPE */
             /* blank the input but don't exit */
-            while(nlines  - 1 > promptline) {
+            while (nlines  - 1 > promptline) {
                 if (nlines-- > height) {
                     unscroll_window(MESSAGE_WIN);
                     tmpstr = curses_break_str(linestarts[nlines - height], width - 1, 1);
@@ -590,8 +602,11 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             break;
         default:
             p_answer[len++] = ch;
-            if (len >= buffer) len = buffer-1;
-            else mvwaddch(win, my, mx, ch);
+            if (len >= buffer) {
+                len = buffer-1;
+            } else {
+                mvwaddch(win, my, mx, ch);
+            }
             p_answer[len] = '\0';
         }
     }
@@ -641,10 +656,11 @@ directional_scroll(winid wid, int nlines)
     wscrl(win, nlines);
     scrollok(win, FALSE);
     if (wid == MESSAGE_WIN) {
-        if (border)
+        if (border) {
             mx = 1;
-        else
+        } else {
             mx = 0;
+        }
     }
     if (border) {
         box(win, 0, 0);

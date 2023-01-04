@@ -183,7 +183,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 
 		data->menu.gacc[0] = '\0';
 		ap = data->menu.gacc;
-		for( i=0; i<data->menu.size;  i++) {
+        for (i=0; i<data->menu.size; i++) {
 			if( data->menu.items[i].accelerator!=0 ) {
 				next_char = (char)(data->menu.items[i].accelerator+1);
 			} else if( NHMENU_IS_SELECTABLE(data->menu.items[i]) ) {
@@ -202,7 +202,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		}
 
 		/* collect group accelerators */
-		for( i=0; i<data->menu.size;  i++) {
+        for (i=0; i<data->menu.size; i++) {
 			if( data->how != PICK_NONE ) {
 				if( data->menu.items[i].group_accel &&
 					!strchr(data->menu.gacc, data->menu.items[i].group_accel) ) {
@@ -225,12 +225,12 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 		} else if(how==PICK_ONE || how==PICK_ANY) {
 			/* count selected items */
 			ret_val = 0;
-			for(i=0; i<data->menu.size; i++ ) {
-				if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
-					NHMENU_IS_SELECTED(data->menu.items[i]) ) {
-					ret_val++;
-				}
-			}
+            for (i = 0; i < data->menu.size; i++) {
+                if (NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
+                        NHMENU_IS_SELECTED(data->menu.items[i])) {
+                    ret_val++;
+                }
+            }
 			if( ret_val > 0 ) {
 				int sel_ind;
 
@@ -238,7 +238,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected)
 				if( !selected ) panic("out of memory");
 
 				sel_ind = 0;
-				for(i=0; i<data->menu.size; i++ ) {
+                for (i = 0; i < data->menu.size; i++) {
 					if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
 						NHMENU_IS_SELECTED(data->menu.items[i]) ) {
 						selected[sel_ind].item = data->menu.items[i].identifier;
@@ -751,7 +751,7 @@ void SetMenuListType(HWND hWnd, int how)
 	ListView_InsertColumn(control, 0, &lvcol);
 
 	/* add items to the list view */
-	for(i=0; i<data->menu.size; i++ ) {
+    for (i = 0; i < data->menu.size; i++) {
 		LVITEM lvitem;
 		ZeroMemory( &lvitem, sizeof(lvitem) );
 		sprintf(buf, "%c - %s", max(data->menu.items[i].accelerator, ' '), data->menu.items[i].str );
@@ -1048,9 +1048,9 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	case MENU_SELECT_ALL:
 		if( data->how == PICK_ANY ) {
 			reset_menu_count(hwndList, data);
-			for(i=0; i<data->menu.size; i++ ) {
-				SelectMenuItem(hwndList, data, i, -1);
-			}
+            for (i=0; i<data->menu.size; i++ ) {
+                SelectMenuItem(hwndList, data, i, -1);
+            }
 			return -2;
 		}
 	break;
@@ -1058,7 +1058,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	case MENU_UNSELECT_ALL:
 		if( data->how == PICK_ANY ) {
 			reset_menu_count(hwndList, data);
-			for(i=0; i<data->menu.size; i++ ) {
+            for (i=0; i<data->menu.size; i++) {
 				SelectMenuItem(hwndList, data, i, 0);
 			}
 			return -2;
@@ -1068,7 +1068,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	case MENU_INVERT_ALL:
 		if( data->how == PICK_ANY ) {
 			reset_menu_count(hwndList, data);
-			for(i=0; i<data->menu.size; i++ ) {
+            for (i=0; i<data->menu.size; i++ ) {
 				SelectMenuItem(
 					hwndList,
 					data,
@@ -1088,7 +1088,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			pageSize = ListView_GetCountPerPage( hwndList );
 			from = max(0, topIndex);
 			to = min(data->menu.size, from+pageSize);
-			for(i=from; i<to; i++ ) {
+            for (i=from; i<to; i++ ) {
 				SelectMenuItem(hwndList, data, i, -1);
 			}
 			return -2;
@@ -1103,7 +1103,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			pageSize = ListView_GetCountPerPage( hwndList );
 			from = max(0, topIndex);
 			to = min(data->menu.size, from+pageSize);
-			for(i=from; i<to; i++ ) {
+            for (i=from; i<to; i++) {
 				SelectMenuItem(hwndList, data, i, 0);
 			}
 			return -2;
@@ -1118,7 +1118,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			pageSize = ListView_GetCountPerPage( hwndList );
 			from = max(0, topIndex);
 			to = min(data->menu.size, from+pageSize);
-			for(i=from; i<to; i++ ) {
+            for (i=from; i<to; i++ ) {
 				SelectMenuItem(
 					hwndList,
 					data,
@@ -1140,7 +1140,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			}
 			SetFocus(hwndList);	// set focus back to the list control
 			if (!*buf || *buf == '\033') return -2;
-			for(i=0; i<data->menu.size; i++ ) {
+            for (i = 0; i < data->menu.size; i++) {
 				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
 					&& strstr(data->menu.items[i].str, buf) ) {
 					if (data->how == PICK_ANY) {
@@ -1224,7 +1224,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 			/* matched a group accelerator */
 			if (data->how == PICK_ANY || data->how == PICK_ONE) {
 				reset_menu_count(hwndList, data);
-				for(i=0; i<data->menu.size; i++ ) {
+                for (i = 0; i < data->menu.size; i++ ) {
 					if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
 						data->menu.items[i].group_accel == ch ) {
 						if( data->how == PICK_ANY ) {
@@ -1272,7 +1272,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 		}
 
 		is_accelerator = FALSE;
-		for(i=0; i<data->menu.size; i++) {
+		for (i = 0; i < data->menu.size; i++) {
 			if( data->menu.items[i].accelerator == ch ) {
 				is_accelerator = TRUE;
 				break;
@@ -1282,7 +1282,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 		if( (ch>='a' && ch<='z') ||
 			(ch>='A' && ch<='Z') || is_accelerator) {
 			if (data->how == PICK_ANY || data->how == PICK_ONE) {
-				for(i=0; i<data->menu.size; i++ ) {
+				for (i = 0; i < data->menu.size; i++) {
 					if( data->menu.items[i].accelerator == ch ) {
 						if( data->how == PICK_ANY ) {
 							SelectMenuItem(
@@ -1343,7 +1343,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 			/* Calculate the width of the list box. */
 			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
 			GetTextMetrics(hdc, &tm);
-			for(i=0; i<data->menu.size; i++ ) {
+            for (i = 0; i < data->menu.size; i++) {
 				LONG menuitemwidth = 0;
 				int column;
 				char *p, *p1;
@@ -1399,21 +1399,24 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 /*-----------------------------------------------------------------------------*/
 void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 {
-	int i;
+    int i;
 
-	if( item<0 || item>=data->menu.size ) return;
+    if (item<0 || item>=data->menu.size ) {
+        return;
+    }
 
-	if( data->how==PICK_ONE && count!=0 ) {
-		for(i=0; i<data->menu.size; i++)
-			if( item!=i && data->menu.items[i].count!=0 ) {
-				data->menu.items[i].count = 0;
-				ListView_RedrawItems( hwndList, i, i );
-			};
-	}
+    if (data->how == PICK_ONE && count != 0) {
+        for (i=0; i<data->menu.size; i++) {
+            if (item != i && data->menu.items[i].count != 0) {
+                data->menu.items[i].count = 0;
+                ListView_RedrawItems( hwndList, i, i );
+            }
+        }
+    }
 
-	data->menu.items[item].count = count;
-	ListView_RedrawItems( hwndList, item, item );
-	reset_menu_count(hwndList, data);
+    data->menu.items[item].count = count;
+    ListView_RedrawItems( hwndList, item, item );
+    reset_menu_count(hwndList, data);
 }
 /*-----------------------------------------------------------------------------*/
 void reset_menu_count(HWND hwndList, PNHMenuWindow data)

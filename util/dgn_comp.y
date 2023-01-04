@@ -487,17 +487,19 @@ init_branch(void)
 int
 getchain(char *s)
 {
-	int i;
+    int i;
 
-	if(strlen(s)) {
+    if (strlen(s)) {
+        for (i = n_levs - tmpdungeon[n_dgns].levels + 1; i <= n_levs; i++) {
+            if (!strcmp(tmplevel[i].name, s)) {
+                return i;
+            }
+        }
 
-	    for(i = n_levs - tmpdungeon[n_dgns].levels + 1; i <= n_levs; i++)
-		if(!strcmp(tmplevel[i].name, s)) return i;
-
-	    yyerror("Can't locate the specified chain level.");
-	    return(-2);
-	}
-	return(-1);
+        yyerror("Can't locate the specified chain level.");
+        return(-2);
+    }
+    return -1;
 }
 
 /*
@@ -514,14 +516,15 @@ check_dungeon(void)
 {
 	int i;
 
-	for(i = 0; i < n_dgns; i++)
+    for (i = 0; i < n_dgns; i++) {
 	    if(!strcmp(tmpdungeon[i].name, tmpdungeon[n_dgns].name)) {
 		yyerror("Duplicate dungeon name.");
 		return(0);
 	    }
+    }
 
 	if(n_dgns)
-	  for(i = 0; i < n_brs - tmpdungeon[n_dgns].branches; i++) {
+	  for (i = 0; i < n_brs - tmpdungeon[n_dgns].branches; i++) {
 	    if(!strcmp(tmpbranch[i].name, tmpdungeon[n_dgns].name)) break;
 
 	    if(i >= n_brs - tmpdungeon[n_dgns].branches) {
@@ -556,11 +559,12 @@ check_level(void)
 		return(0);
 	}
 
-	for(i = 0; i < n_levs; i++)
+    for (i = 0; i < n_levs; i++) {
 	    if(!strcmp(tmplevel[i].name, tmplevel[n_levs].name)) {
 		yyerror("Duplicate level name.");
 		return(0);
 	    }
+    }
 
 	if(tmplevel[i].chain == -2) {
 		yyerror("Invaild level chain reference.");

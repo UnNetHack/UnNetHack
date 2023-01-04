@@ -27,8 +27,12 @@ static boolean
 is_swallow_sym(int c)
 {
     int i;
-    for (i = S_sw_tl; i <= S_sw_br; i++)
-        if ((int)showsyms[i] == c) return TRUE;
+    for (i = S_sw_tl; i <= S_sw_br; i++) {
+        if ((int)showsyms[i] == c) {
+            return TRUE;
+        }
+    }
+
     return FALSE;
 }
 
@@ -42,7 +46,9 @@ append_str(char *buf, const char *new_str)
 {
     int space_left; /* space remaining in buf */
 
-    if (strstri(buf, new_str)) return 0;
+    if (strstri(buf, new_str)) {
+        return 0;
+    }
 
     space_left = BUFSZ - strlen(buf) - 1;
     if (space_left < 1) {
@@ -308,8 +314,9 @@ look_at_monster(char *buf, char *monbuf, struct monst *mtmp, coordxy x, coordxy 
 
     /* we know the hero sees a monster at this location, but if it's shown
        due to persistant monster detection he might remember something else */
-    if (mtmp->mundetected || M_AP_TYPE(mtmp))
+    if (mtmp->mundetected || M_AP_TYPE(mtmp)) {
         mhidden_description(mtmp, FALSE, eos(buf));
+    }
 
     if (monbuf) {
         unsigned how_seen = how_mon_is_seen(mtmp);
@@ -406,8 +413,9 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         /* file lookup can't distinguish between "gnomish wizard" monster
            and correspondingly named player character, always picking the
            former; force it to find the general "wizard" entry instead */
-        if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
+        if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd) {
             pm = &mons[PM_WIZARD];
+        }
 
         /* When you see yourself normally, no explanation is appended
            (even if you could also see yourself via other means).
@@ -416,11 +424,17 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         if ((Invisible || u.uundetected) && !Blind && !(u.uswallow || iflags.save_uswallow)) {
             unsigned how = 0;
 
-            if (Infravision) how |= 1;
-            if (Unblind_telepat) how |= 2;
-            if (Detect_monsters) how |= 4;
+            if (Infravision) {
+                how |= 1;
+            }
+            if (Unblind_telepat) {
+                how |= 2;
+            }
+            if (Detect_monsters) {
+                how |= 4;
+            }
 
-            if (how)
+            if (how) {
                 Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
                         (how & 1) ? "infravision" : "",
                         /* add comma if telep and infrav */
@@ -429,6 +443,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
                         /* add comma if detect and (infrav or telep or both) */
                         ((how & 7) > 4) ? ", " : "",
                         (how & 4) ? "monster detection" : "");
+            }
         }
     } else if (u.uswallow) {
         /* when swallowed, we're only called for spots adjacent to hero,
@@ -466,22 +481,26 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         int warnindx = glyph_to_warning(glyph);
 
         Strcpy(buf, def_warnsyms[warnindx].explanation);
-    } else if(!glyph_is_cmap(glyph)) {
+    } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
-    } else switch(glyph_to_cmap(glyph)) {
+    } else {
+        switch (glyph_to_cmap(glyph)) {
         case S_altar:
-            if(!In_endgame(&u.uz))
+            if (!In_endgame(&u.uz)) {
                 Sprintf(buf, "%s altar",
                         align_str(Amask2align(levl[x][y].altarmask & ~AM_SHRINE)));
-            else Sprintf(buf, "aligned altar");
+            } else {
+                Sprintf(buf, "aligned altar");
+            }
             break;
         case S_ndoor:
-            if (is_drawbridge_wall(x, y) >= 0)
+            if (is_drawbridge_wall(x, y) >= 0) {
                 Strcpy(buf, "open drawbridge portcullis");
-            else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
+            } else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN) {
                 Strcpy(buf, "broken door");
-            else
+            } else {
                 Strcpy(buf, "doorway");
+            }
             break;
         case S_cloud:
             Strcpy(buf, Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
@@ -508,6 +527,7 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
         }
+    }
 
     return ((pm && !Hallucination) ? pm : (struct permonst *) 0);
 }
@@ -956,10 +976,18 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
                 damage_info.damage_large, damage_info.bonus_large);
         OBJPUTSTR(buf);
 
-        if (damage_info.blessed_damage) { OBJPUTSTR(damage_info.blessed_damage); }
-        if (damage_info.axe_damage)     { OBJPUTSTR(damage_info.axe_damage); }
-        if (damage_info.silver_damage)  { OBJPUTSTR(damage_info.silver_damage); }
-        if (damage_info.light_damage)   { OBJPUTSTR(damage_info.light_damage); }
+        if (damage_info.blessed_damage) {
+            OBJPUTSTR(damage_info.blessed_damage);
+        }
+        if (damage_info.axe_damage)     {
+            OBJPUTSTR(damage_info.axe_damage);
+        }
+        if (damage_info.silver_damage)  {
+            OBJPUTSTR(damage_info.silver_damage);
+        }
+        if (damage_info.light_damage)   {
+            OBJPUTSTR(damage_info.light_damage);
+        }
 
         Sprintf(buf, "Has a %s%d %s to hit.",
                 (oc.oc_hitbon >= 0 ? "+" : ""),
@@ -1386,9 +1414,11 @@ checkfile(struct obj *obj, char *inp, struct permonst *pm, boolean user_typed_na
      * for Angel and angel, make the lookup string the same for both
      * user_typed_name and picked name.
      */
-    if (pm != (struct permonst *) 0 && !user_typed_name)
+    if (pm != (struct permonst *) 0 && !user_typed_name) {
         dbase_str = strcpy(newstr, pm->mname);
-    else dbase_str = strcpy(newstr, inp);
+    } else {
+        dbase_str = strcpy(newstr, inp);
+    }
     (void) lcase(dbase_str);
 
     if (!strncmp(dbase_str, "interior of ", 12)) {
@@ -1506,17 +1536,21 @@ char *supplemental_name)
     /* adjust the input to remove "named " and "called " */
     if ((ep = strstri(dbase_str, " named ")) != 0) {
         alt = ep + 7;
-        if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep)
+        if ((ap = strstri(dbase_str, " called ")) != 0 && ap < ep) {
             ep = ap; /* "named" is alt but truncate at "called" */
+        }
     } else if ((ep = strstri(dbase_str, " called ")) != 0) {
         copynchars(givenname, ep + 8, BUFSZ - 1);
         alt = givenname;
-        if (supplemental_name && (sp = strstri(inp, " called ")) != 0)
+        if (supplemental_name && (sp = strstri(inp, " called ")) != 0) {
             copynchars(supplemental_name, sp + 8, BUFSZ - 1);
-    } else
+        }
+    } else {
         ep = strstri(dbase_str, ", ");
-    if (ep && ep > dbase_str)
+    }
+    if (ep && ep > dbase_str) {
         *ep = '\0';
+    }
     /* remove article from 'alt' name ("a pair of lenses named
         The Eyes of the Overworld" simplified above to "lenses named
         The Eyes of the Overworld", now reduced to "The Eyes of the
@@ -1526,10 +1560,12 @@ char *supplemental_name)
                 || !strncmpi(alt, "the ", 4)))
         alt = index(alt, ' ') + 1;
     /* remove charges or "(lit)" or wizmode "(N aum)" */
-    if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str)
+    if ((ep = strstri(dbase_str, " (")) != 0 && ep > dbase_str) {
         *ep = '\0';
-    if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt)
+    }
+    if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt) {
         *ap = '\0';
+    }
 
     /*
         * If the object is named, then the name is the alternate description;
@@ -1538,8 +1574,9 @@ char *supplemental_name)
         * user will usually be found under their name, rather than under
         * their object type, so looking for a singular form is pointless.
         */
-    if (!alt)
+    if (!alt) {
         alt = makesingular(dbase_str);
+    }
 
     pass1found_in_file = FALSE;
     for (pass = !strcmp(alt, dbase_str) ? 0 : 1; pass >= 0; --pass) {
@@ -1559,8 +1596,9 @@ char *supplemental_name)
 
         /* look for the appropriate entry */
         while (dlb_fgets(buf, BUFSZ, fp)) {
-            if (*buf == '.')
+            if (*buf == '.') {
                 break; /* we passed last entry without success */
+            }
 
             if (digit(*buf)) {
                 /* a number indicates the end of current entry */
@@ -1580,8 +1618,9 @@ char *supplemental_name)
                         continue;
                     } else {
                         found_in_file = TRUE;
-                        if (pass == 1)
+                        if (pass == 1) {
                             pass1found_in_file = TRUE;
+                        }
                         break;
                     }
                 }
@@ -1604,10 +1643,11 @@ char *supplemental_name)
                 return FALSE;
             }
             fseekoffset = (long) txt_offset + entry_offset;
-            if (pass == 1)
+            if (pass == 1) {
                 pass1offset = fseekoffset;
-            else if (fseekoffset == pass1offset)
+            } else if (fseekoffset == pass1offset) {
                 goto checkfile_done;
+            }
         }
 
         boolean lookat_mon = (pm != (struct permonst *) 0);
@@ -2260,11 +2300,12 @@ do_look(int mode, coord *click_cc)
         if (from_screen) {
             int glyph; /* glyph at selected position */
 
-            if (flags.verbose)
+            if (flags.verbose) {
                 pline("Please move the cursor to %s.",
                       what_is_an_unknown_object);
-            else
+            } else {
                 pline("Pick an object.");
+            }
 
             ans = getpos(&cc, quick, what_is_an_unknown_object);
             if (ans < 0 || cc.x < 0) {
@@ -2288,8 +2329,9 @@ do_look(int mode, coord *click_cc)
                 sym = showsyms[trap_to_defsym(glyph_to_trap(glyph))];
             } else if (glyph_is_object(glyph)) {
                 sym = oc_syms[(int)objects[glyph_to_obj(glyph)].oc_class];
-                if (sym == '`' && iflags.bouldersym && (int)glyph_to_obj(glyph) == BOULDER)
+                if (sym == '`' && iflags.bouldersym && (int)glyph_to_obj(glyph) == BOULDER) {
                     sym = iflags.bouldersym;
+                }
             } else if (glyph_is_monster(glyph)) {
                 /* takes care of pets, detected, ridden, and regular mons */
                 sym = monsyms[(int)mons[glyph_to_mon(glyph)].mlet];
@@ -2406,11 +2448,14 @@ do_look(int mode, coord *click_cc)
                     found += append_str(out_str,
                                         article == 2 ? the(x_str) :
                                         article == 1 ? an(x_str) : x_str);
-                    if (is_cmap_trap(i)) hit_trap = TRUE;
+                    if (is_cmap_trap(i)) {
+                        hit_trap = TRUE;
+                    }
                 }
 
-                if (i == S_altar || is_cmap_trap(i))
+                if (i == S_altar || is_cmap_trap(i)) {
                     need_to_look = TRUE;
+                }
             }
         }
 
@@ -2428,8 +2473,9 @@ do_look(int mode, coord *click_cc)
                 }
                 /* Kludge: warning trumps boulders on the display.
                    Reveal the boulder too or player can get confused */
-                if (from_screen && sobj_at(BOULDER, cc.x, cc.y))
+                if (from_screen && sobj_at(BOULDER, cc.x, cc.y)) {
                     Strcat(out_str, " co-located with a boulder");
+                }
                 break; /* out of for loop*/
             }
         }
@@ -2503,7 +2549,9 @@ do_look(int mode, coord *click_cc)
             pline("I've never heard of such things.");
         }
 
-        if (quick) check_tutorial_farlook(cc.x, cc.y);
+        if (quick) {
+            check_tutorial_farlook(cc.x, cc.y);
+        }
 
     } while (from_screen && !quick && ans != LOOK_ONCE);
 
@@ -2659,8 +2707,9 @@ do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
                 copynchars(eos(question), entrytext,
                     (int) (sizeof question - 1 - (strlen(question) + 2)));
                 Strcat(question, "\"?");
-                if (yn(question) == 'y')
+                if (yn(question) == 'y') {
                 yes_to_moreinfo = TRUE;
+                }
             }
             if (yes_to_moreinfo) {
                 int i, subs = 0;
@@ -2705,10 +2754,11 @@ dowhatis(void)
 int
 doquickwhatis(void)
 {
-    if(iflags.num_pad)
+    if (iflags.num_pad) {
         check_tutorial_message(QT_T_CURSOR_NUMPAD);
-    else
+    } else {
         check_tutorial_message(QT_T_CURSOR_VIKEYS);
+    }
 
     return do_look(1, (coord *) 0);
 }
@@ -2719,12 +2769,16 @@ doidtrap(void)
     struct trap *trap;
     int x, y, tt;
 
-    if (!getdir("^")) return 0;
+    if (!getdir("^")) {
+        return 0;
+    }
     x = u.ux + u.dx;
     y = u.uy + u.dy;
-    for (trap = ftrap; trap; trap = trap->ntrap)
+    for (trap = ftrap; trap; trap = trap->ntrap) {
         if (trap->tx == x && trap->ty == y) {
-            if (!trap->tseen) break;
+            if (!trap->tseen) {
+                break;
+            }
             tt = trap->ttyp;
             if (u.dz) {
                 if (u.dz < 0 ? (tt == TRAPDOOR || tt == HOLE) :
@@ -2741,6 +2795,7 @@ doidtrap(void)
                   !trap->madeby_u ? "" : " by you");
             return 0;
         }
+    }
     pline("I can't see a trap there.");
     return 0;
 }
@@ -2760,12 +2815,14 @@ dowhatdoes_core(char q, char *cbuf)
 
     ctrl = ((q <= '\033') ? (q - 1 + 'A') : 0);
     meta = ((0x80 & q) ? (0x7f & q) : 0);
-    while(dlb_fgets(buf, BUFSZ-6, fp)) {
+    while (dlb_fgets(buf, BUFSZ-6, fp)) {
         if ((ctrl && *buf=='^' && *(buf+1)==ctrl) ||
             (meta && *buf=='M' && *(buf+1)=='-' && *(buf+2)==meta) ||
             *buf==q) {
             ep = index(buf, '\n');
-            if(ep) *ep = 0;
+            if (ep) {
+                *ep = 0;
+            }
             if (ctrl && buf[2] == '\t') {
                 buf = bufr + 1;
                 (void) strncpy(buf, "^?      ", 8);
@@ -2774,7 +2831,7 @@ dowhatdoes_core(char q, char *cbuf)
                 buf = bufr + 2;
                 (void) strncpy(buf, "M-?     ", 8);
                 buf[2] = meta;
-            } else if(buf[1] == '\t') {
+            } else if (buf[1] == '\t') {
                 buf = bufr;
                 buf[0] = q;
                 (void) strncpy(buf+1, "       ", 7);
@@ -2802,10 +2859,11 @@ dowhatdoes(void)
     intron();
 #endif
     reslt = dowhatdoes_core(q, bufr);
-    if (reslt)
+    if (reslt) {
         pline("%s", reslt);
-    else
+    } else {
         pline("I've never heard of such commands.");
+    }
     return 0;
 }
 
@@ -2850,10 +2908,12 @@ help_menu(int *sel)
     any.a_void = 0;     /* zero all bits */
     start_menu(tmpwin);
 #ifdef WIZARD
-    if (!wizard) help_menu_items[WIZHLP_SLOT] = "",
+    if (!wizard) {
+        help_menu_items[WIZHLP_SLOT] = "";
         help_menu_items[WIZHLP_SLOT+1] = (char *)0;
+    }
 #endif
-    for (i = 0; help_menu_items[i]; i++)
+    for (i = 0; help_menu_items[i]; i++) {
 #ifdef PORT_HELP
         /* port-specific line has a %s in it for the PORT_ID */
         if (help_menu_items[i][0] == '%') {
@@ -2861,13 +2921,16 @@ help_menu(int *sel)
             any.a_int = PORT_HELP_ID + 1;
             add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_NONE,
                      helpbuf, MENU_UNSELECTED);
-        } else
+        } else {
 #endif
-    {
-        any.a_int = (*help_menu_items[i]) ? i+1 : 0;
-        if (flags.tutorial || i != TUTHLP_SLOT)
-            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0,
-                     ATR_NONE, help_menu_items[i], MENU_UNSELECTED);
+            any.a_int = (*help_menu_items[i]) ? i+1 : 0;
+            if (flags.tutorial || i != TUTHLP_SLOT) {
+                add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0,
+                        ATR_NONE, help_menu_items[i], MENU_UNSELECTED);
+            }
+#ifdef PORT_HELP
+        }
+#endif
     }
     end_menu(tmpwin, "Select one item:");
     n = select_menu(tmpwin, PICK_ONE, &selected);

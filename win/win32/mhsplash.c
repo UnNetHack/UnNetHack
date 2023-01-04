@@ -87,7 +87,7 @@ void mswin_display_splash_window (BOOL show_ver)
 	Sprintf(buf, "%s\r\n%s\r\n%s\r\n\r\n", COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
 	    COPYRIGHT_BANNER_C);
 	strsize = strlen(buf);
-	
+
 	if (show_ver) {
 	    /* Show complete version information */
 	    dlb *f;
@@ -100,7 +100,7 @@ void mswin_display_splash_window (BOOL show_ver)
 	    f = dlb_fopen(OPTIONS_USED, RDTMODE);
 	    if (f) {
 		char line[LLEN + 1];
-		
+
 		while (dlb_fgets(line, LLEN, f)) {
 		    size_t len;
 		    len = strlen(line);
@@ -124,14 +124,14 @@ void mswin_display_splash_window (BOOL show_ver)
 	    }
 	} else {
 	    /* Show news, if any */
-	    if (iflags.news) {	    
+	    if (iflags.news) {
 		FILE *nf;
-		
+
 		iflags.news = 0; /* prevent newgame() from re-displaying news */
 		nf = fopen(NEWS, "r");
 		if (nf != NULL) {
 		    char line[LLEN + 1];
-		    
+
 		    while (fgets(line, LLEN, nf)) {
 			size_t len;
 			len = strlen(line);
@@ -152,7 +152,7 @@ void mswin_display_splash_window (BOOL show_ver)
 			strsize += len;
 		    }
 		    (void) fclose(nf);
-		} 
+		}
 		else
 		{
 		    strcat(buf, "No news.");
@@ -162,15 +162,15 @@ void mswin_display_splash_window (BOOL show_ver)
 	SetWindowText(GetDlgItem(hWnd, IDC_EXTRAINFO), buf);
 	free(buf);
 	ShowWindow(hWnd, SW_SHOW);
-	
-	while( IsWindow(hWnd) &&
+
+    while (IsWindow(hWnd) &&
 	    GetMessage(&msg, NULL, 0, 0)!=0 ) {
 	    if( !IsDialogMessage(hWnd, &msg) ) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	    }
 	}
-	
+
 	GetNHApp()->hPopupWnd = NULL;
 	mswin_destroy_splashfonts();
 }
@@ -206,8 +206,8 @@ BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 		SetBkMode (hdc, OPAQUE);
 		OldBitmap = SelectObject(hdcBitmap, GetNHApp()->bmpSplash);
 		nhapply_image_transparent(hdc, SPLASH_OFFSET_X, SPLASH_OFFSET_Y,
-		    SPLASH_WIDTH, SPLASH_HEIGHT, 
-		    hdcBitmap, 0, 0, SPLASH_WIDTH, SPLASH_HEIGHT, 
+		    SPLASH_WIDTH, SPLASH_HEIGHT,
+		    hdcBitmap, 0, 0, SPLASH_WIDTH, SPLASH_HEIGHT,
 		    TILE_BK_COLOR);
 
 		SelectObject (hdcBitmap, OldBitmap);

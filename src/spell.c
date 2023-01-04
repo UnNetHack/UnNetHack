@@ -76,9 +76,13 @@ spell_let_to_idx(char ilet)
     int indx;
 
     indx = ilet - 'a';
-    if (indx >= 0 && indx < 26) return indx;
+    if (indx >= 0 && indx < 26) {
+        return indx;
+    }
     indx = ilet - 'A';
-    if (indx >= 0 && indx < 26) return indx + 26;
+    if (indx >= 0 && indx < 26) {
+        return indx + 26;
+    }
     return -1;
 }
 
@@ -88,7 +92,7 @@ cursed_book(struct obj *bp)
 {
     int lev = objects[bp->otyp].oc_level;
 
-    switch(rn2(lev)) {
+    switch (rn2(lev)) {
     case 0:
         You_feel("a wrenching sensation.");
         tele();     /* teleport him */
@@ -122,9 +126,10 @@ cursed_book(struct obj *bp)
                          " further" : "");
                     uarmg->oeroded2++;
                 }
-            } else
+            } else {
                 Your("gloves %s completely corroded.",
                      Blind ? "feel" : "look");
+            }
             break;
         }
         /* temp disable in_use; death should not destroy the book */
@@ -135,7 +140,7 @@ cursed_book(struct obj *bp)
         bp->in_use = TRUE;
         break;
     case 6:
-        if(Antimagic) {
+        if (Antimagic) {
             shieldeff(u.ux, u.uy);
             pline_The("book %s, but you are unharmed!", explodes);
         } else {
@@ -186,40 +191,50 @@ deadbook(struct obj *book2)
     makeknown(SPE_BOOK_OF_THE_DEAD);
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
     book2->known = 1;
-    if(invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
+    if (invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
         struct obj *otmp;
         boolean arti1_primed = FALSE, arti2_primed = FALSE,
                          arti_cursed = FALSE;
 
-        if(book2->cursed) {
+        if (book2->cursed) {
             pline_The("runes appear scrambled.  You can't read them!");
             return;
         }
 
-        if(!u.uhave.bell || !u.uhave.menorah) {
+        if (!u.uhave.bell || !u.uhave.menorah) {
             pline("A chill runs down your %s.", body_part(SPINE));
-            if(!u.uhave.bell) You_hear("a faint chime...");
-            if(!u.uhave.menorah) pline("Vlad's doppelganger is amused.");
+            if (!u.uhave.bell) {
+                You_hear("a faint chime...");
+            }
+            if (!u.uhave.menorah) {
+                pline("Vlad's doppelganger is amused.");
+            }
             return;
         }
 
-        for(otmp = invent; otmp; otmp = otmp->nobj) {
-            if(otmp->otyp == CANDELABRUM_OF_INVOCATION &&
-               otmp->spe == 7 && otmp->lamplit) {
-                if(!otmp->cursed) arti1_primed = TRUE;
-                else arti_cursed = TRUE;
+        for (otmp = invent; otmp; otmp = otmp->nobj) {
+            if (otmp->otyp == CANDELABRUM_OF_INVOCATION &&
+                 otmp->spe == 7 && otmp->lamplit) {
+                if (!otmp->cursed) {
+                    arti1_primed = TRUE;
+                } else {
+                    arti_cursed = TRUE;
+                }
             }
-            if(otmp->otyp == BELL_OF_OPENING &&
+            if (otmp->otyp == BELL_OF_OPENING &&
                (moves - otmp->age) < 5L) { /* you rang it recently */
-                if(!otmp->cursed) arti2_primed = TRUE;
-                else arti_cursed = TRUE;
+                if (!otmp->cursed) {
+                    arti2_primed = TRUE;
+                } else {
+                    arti_cursed = TRUE;
+                }
             }
         }
 
-        if(arti_cursed) {
+        if (arti_cursed) {
             pline_The("invocation fails!");
             pline("At least one of your artifacts is cursed...");
-        } else if(arti1_primed && arti2_primed) {
+        } else if (arti1_primed && arti2_primed) {
             unsigned soon = (unsigned) d(2, 6); /* time til next intervene() */
 
             /* successful invocation */
@@ -228,7 +243,9 @@ deadbook(struct obj *book2)
             /* in case you haven't killed the Wizard yet, behave as if
                you just did */
             u.uevent.udemigod = 1; /* wizdead() */
-            if (!u.udg_cnt || u.udg_cnt > soon) u.udg_cnt = soon;
+            if (!u.udg_cnt || u.udg_cnt > soon) {
+                u.udg_cnt = soon;
+            }
         } else { /* at least one artifact not prepared properly */
             You("have a feeling that %s is amiss...", something);
             goto raise_dead;
@@ -255,25 +272,29 @@ raise_dead:
         mm.x = u.ux;
         mm.y = u.uy;
         mkundead(&mm, TRUE, NO_MINVENT);
-    } else if(book2->blessed) {
-        for(mtmp = fmon; mtmp; mtmp = mtmp2) {
+    } else if (book2->blessed) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp2) {
             mtmp2 = mtmp->nmon; /* tamedog() changes chain */
-            if (DEADMONSTER(mtmp)) continue;
+            if (DEADMONSTER(mtmp)) {
+                continue;
+            }
 
             if (is_undead(mtmp->data) && cansee(mtmp->mx, mtmp->my)) {
                 mtmp->mpeaceful = TRUE;
-                if(sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
+                if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
                    && distu(mtmp->mx, mtmp->my) < 4)
                     if (mtmp->mtame) {
-                        if (mtmp->mtame < 20)
+                        if (mtmp->mtame < 20) {
                             mtmp->mtame++;
-                    } else
-                        (void) tamedog(mtmp, (struct obj *)0);
+                        }
+                    } else {
+                        (void) tamedog(mtmp, (struct obj *) 0);
+                    }
                 else monflee(mtmp, 0, FALSE, TRUE);
             }
         }
     } else {
-        switch(rn2(3)) {
+        switch (rn2(3)) {
         case 0:
             Your("ancestors are annoyed with you!");
             break;
@@ -312,23 +333,25 @@ learn(void)
     boolean costly = TRUE;
 
     /* JDS: lenses give 50% faster reading; 33% smaller read time */
-    if (delay && ublindf && ublindf->otyp == LENSES && rn2(2)) delay++;
+    if (delay && ublindf && ublindf->otyp == LENSES && rn2(2)) {
+        delay++;
+    }
     if (Confusion) {        /* became confused while learning */
         (void) confused_book(book);
         book = 0;           /* no longer studying */
         nomul(delay, "reading a book");     /* remaining delay is uninterrupted */
         delay = 0;
-        return(0);
+        return 0;
     }
     if (delay) {    /* not if (delay++), so at end delay == 0 */
         delay++;
-        return(1); /* still busy */
+        return 1; /* still busy */
     }
     exercise(A_WIS, TRUE);      /* you're studying. */
     booktype = book->otyp;
-    if(booktype == SPE_BOOK_OF_THE_DEAD) {
+    if (booktype == SPE_BOOK_OF_THE_DEAD) {
         deadbook(book);
-        return(0);
+        return 0;
     }
 
     Sprintf(splname, objects[booktype].oc_name_known ?
@@ -369,7 +392,9 @@ learn(void)
             break;
         }
     }
-    if (i == MAXSPELL) warning("Too many spells memorized!");
+    if (i == MAXSPELL) {
+        warning("Too many spells memorized!");
+    }
 
     if (book->cursed) { /* maybe a demon cursed it */
         if (cursed_book(book)) {
@@ -378,9 +403,11 @@ learn(void)
             return 0;
         }
     }
-    if (costly) check_unpaid(book);
+    if (costly) {
+        check_unpaid(book);
+    }
     book = 0;
-    return(0);
+    return 0;
 }
 
 int
@@ -400,7 +427,7 @@ study_book(struct obj *spellbook)
         if (booktype == SPE_BLANK_PAPER) {
             pline("This spellbook is all blank.");
             makeknown(booktype);
-            return(1);
+            return 1;
         }
         switch (objects[booktype].oc_level) {
         case 1:
@@ -446,7 +473,7 @@ study_book(struct obj *spellbook)
                             (read_ability < 12 ? "very " : ""));
                     if (yn(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
-                        return(1);
+                        return 1;
                     }
                 }
                 /* its up to random luck now */
@@ -461,22 +488,25 @@ study_book(struct obj *spellbook)
 
             nomul(delay, "reading a book");         /* study time */
             delay = 0;
-            if(gone || !rn2(3)) {
-                if (!gone) pline_The("spellbook crumbles to dust!");
+            if (gone || !rn2(3)) {
+                if (!gone) {
+                    pline_The("spellbook crumbles to dust!");
+                }
                 if (!objects[spellbook->otyp].oc_name_known &&
                     !objects[spellbook->otyp].oc_uname)
                     docall(spellbook);
                 useup(spellbook);
-            } else
+            } else {
                 spellbook->in_use = FALSE;
-            return(1);
+            }
+            return 1;
         } else if (confused) {
             if (!confused_book(spellbook)) {
                 spellbook->in_use = FALSE;
             }
             nomul(delay, "reading a book");
             delay = 0;
-            return(1);
+            return 1;
         }
         spellbook->in_use = FALSE;
 
@@ -487,7 +517,7 @@ study_book(struct obj *spellbook)
 
     book = spellbook;
     set_occupation(learn, "studying", 0);
-    return(1);
+    return 1;
 }
 
 /* a spellbook has been destroyed or the character has changed levels;
@@ -495,7 +525,9 @@ study_book(struct obj *spellbook)
 void
 book_disappears(struct obj *obj)
 {
-    if (obj == book) book = (struct obj *)0;
+    if (obj == book) {
+        book = (struct obj *) 0;
+    }
 }
 
 /* renaming an object usually results in it having a different address;
@@ -504,7 +536,9 @@ book_disappears(struct obj *obj)
 void
 book_substitution(struct obj *old_obj, struct obj *new_obj)
 {
-    if (old_obj == book) book = new_obj;
+    if (old_obj == book) {
+        book = new_obj;
+    }
 }
 
 /* called from moveloop() */
@@ -518,10 +552,11 @@ age_spells(void)
      * The hero's speed, rest status, conscious status etc.
      * does not alter the loss of memory.
      */
-    for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++)
-        if (spellknow(i))
+    for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
+        if (spellknow(i)) {
             decrnknow(i);
-    return;
+        }
+    }
 }
 
 /*
@@ -540,29 +575,37 @@ getspell(int *spell_no)
     }
     if (flags.menu_style == MENU_TRADITIONAL) {
         /* we know there is at least 1 known spell */
-        for (nspells = 1; nspells < MAXSPELL
-             && spellid(nspells) != NO_SPELL; nspells++)
+        for (nspells = 1; nspells < MAXSPELL && spellid(nspells) != NO_SPELL; nspells++) {
             continue;
+        }
 
-        if (nspells == 1) Strcpy(lets, "a");
-        else if (nspells < 27) Sprintf(lets, "a-%c", 'a' + nspells - 1);
-        else if (nspells == 27) Sprintf(lets, "a-zA");
-        else Sprintf(lets, "a-zA-%c", 'A' + nspells - 27);
+        if (nspells == 1) {
+            Strcpy(lets, "a");
+        } else if (nspells < 27) {
+            Sprintf(lets, "a-%c", 'a' + nspells - 1);
+        } else if (nspells == 27) {
+            Sprintf(lets, "a-zA");
+        } else {
+            Sprintf(lets, "a-zA-%c", 'A' + nspells - 27);
+        }
 
-        for(;;)  {
+        for (;;)  {
             Sprintf(qbuf, "Cast which spell? [%s ?]", lets);
-            if ((ilet = yn_function(qbuf, (char *)0, '\0')) == '?')
+            if ((ilet = yn_function(qbuf, (char *)0, '\0')) == '?') {
                 break;
+            }
 
-            if (index(quitchars, ilet))
+            if (index(quitchars, ilet)) {
                 return FALSE;
+            }
 
             idx = spell_let_to_idx(ilet);
             if (idx >= 0 && idx < nspells) {
                 *spell_no = idx;
                 return TRUE;
-            } else
+            } else {
                 You("don't know that spell.");
+            }
         }
     }
     return dospellmenu("Choose which spell to cast",
@@ -575,8 +618,9 @@ docast(void)
 {
     int spell_no;
 
-    if (getspell(&spell_no))
+    if (getspell(&spell_no)) {
         return spelleffects(spell_no, FALSE);
+    }
     return 0;
 }
 
@@ -651,21 +695,23 @@ cast_protection(void)
         if (!Blind) {
             const char *hgolden = hcolor(NH_GOLDEN);
 
-            if (u.uspellprot)
+            if (u.uspellprot) {
                 pline_The("%s haze around you becomes more dense.",
                           hgolden);
-            else
+            } else {
                 pline_The("%s around you begins to shimmer with %s haze.",
                           (Underwater || Is_waterlevel(&u.uz)) ? "water" :
                           u.uswallow ? mbodypart(u.ustuck, STOMACH) :
                           IS_STWALL(levl[u.ux][u.uy].typ) ? "stone" : "air",
                           an(hgolden));
+            }
         }
         u.uspellprot += gain;
         u.uspmtime =
             P_SKILL(spell_skilltype(SPE_PROTECTION)) == P_EXPERT ? 20 : 10;
-        if (!u.usptime)
+        if (!u.usptime) {
             u.usptime = u.uspmtime;
+        }
         find_ac();
     } else {
         Your("skin feels warm for a moment.");
@@ -738,25 +784,25 @@ spelleffects(int spell, boolean atme)
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
         You("are too hungry to cast that spell.");
-        return(0);
+        return 0;
     } else if (ACURR(A_STR) < 4)  {
         You("lack the strength to cast spells.");
-        return(0);
-    } else if(check_capacity(
+        return 0;
+    } else if (check_capacity(
                   "Your concentration falters while carrying so much stuff.")) {
-        return (1);
+        return 1;
     } else if (!freehand()) {
         Your("arms are not free to cast!");
-        return (0);
+        return 0;
     }
 
     if (u.uhave.amulet) {
         You_feel("the amulet draining your energy away.");
         energy += rnd(2*energy);
     }
-    if(energy > u.uen)  {
+    if (energy > u.uen)  {
         You("don't have enough energy to cast that spell.");
-        return(0);
+        return 0;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
             int hungr = energy * 2;
@@ -775,7 +821,9 @@ spelleffects(int spell, boolean atme)
              * understand quite well how to cast spells.
              */
             intell = acurr(A_INT);
-            if (!Role_if(PM_WIZARD)) intell = 10;
+            if (!Role_if(PM_WIZARD)) {
+                intell = 10;
+            }
             switch (intell) {
             case 25: case 24: case 23: case 22:
             case 21: case 20: case 19: case 18:
@@ -789,8 +837,9 @@ spelleffects(int spell, boolean atme)
              * this is low enough that they must eat before
              * casting anything else except detect food
              */
-            if (hungr > u.uhunger-3)
+            if (hungr > u.uhunger-3) {
                 hungr = u.uhunger-3;
+            }
             morehungry(hungr);
         }
     }
@@ -800,7 +849,7 @@ spelleffects(int spell, boolean atme)
         You("fail to cast the spell correctly.");
         u.uen -= energy / 2;
         flags.botl = 1;
-        return(1);
+        return 1;
     }
 
     u.uen -= energy;
@@ -817,7 +866,7 @@ spelleffects(int spell, boolean atme)
     skill = spell_skilltype(pseudo->otyp);
     role_skill = P_SKILL(skill);
 
-    switch(pseudo->otyp)  {
+    switch (pseudo->otyp)  {
     /*
      * At first spells act as expected.  As the hero increases in skill
      * with the appropriate spell type, some spells increase in their
@@ -831,8 +880,8 @@ spelleffects(int spell, boolean atme)
                 if (throwspell()) {
                     cc.x=u.dx; cc.y=u.dy;
                     n=rnd(8)+1;
-                    while(n--) {
-                        if(!u.dx && !u.dy && !u.dz) {
+                    while (n--) {
+                        if (!u.dx && !u.dy && !u.dz) {
                             if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                                 char buf[BUFSZ];
                                 Sprintf(buf, "zapped %sself with a spell", uhim());
@@ -883,19 +932,24 @@ spelleffects(int spell, boolean atme)
     case SPE_DRAIN_LIFE:
     case SPE_STONE_TO_FLESH:
         if (!(objects[pseudo->otyp].oc_dir == NODIR)) {
-            if (atme) u.dx = u.dy = u.dz = 0;
-            else if (!getdir((char *)0)) {
+            if (atme) {
+                u.dx = u.dy = u.dz = 0;
+            } else if (!getdir((char *)0)) {
                 /* getdir cancelled, re-use previous direction */
                 pline_The("magical energy is released!");
             }
-            if(!u.dx && !u.dy && !u.dz) {
+            if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                     char buf[BUFSZ];
                     Sprintf(buf, "zapped %sself with a spell", uhim());
                     losehp(damage, buf, NO_KILLER_PREFIX);
                 }
-            } else weffects(pseudo);
-        } else weffects(pseudo);
+            } else {
+                weffects(pseudo);
+            }
+        } else {
+            weffects(pseudo);
+        }
         update_inventory(); /* spell may modify inventory */
         break;
 
@@ -905,7 +959,9 @@ spelleffects(int spell, boolean atme)
     case SPE_DETECT_FOOD:
     case SPE_CAUSE_FEAR:
         /* high skill yields effect equivalent to blessed scroll */
-        if (role_skill >= P_SKILLED) pseudo->blessed = 1;
+        if (role_skill >= P_SKILLED) {
+            pseudo->blessed = 1;
+        }
     /* fall through */
     case SPE_CHARM_MONSTER:
     case SPE_MAGIC_MAPPING:
@@ -921,7 +977,9 @@ spelleffects(int spell, boolean atme)
     case SPE_LEVITATION:
     case SPE_RESTORE_ABILITY:
         /* high skill yields effect equivalent to blessed potion */
-        if (role_skill >= P_SKILLED) pseudo->blessed = 1;
+        if (role_skill >= P_SKILLED) {
+            pseudo->blessed = 1;
+        }
     /* fall through */
     case SPE_INVISIBILITY:
         (void) peffects(pseudo);
@@ -931,7 +989,9 @@ spelleffects(int spell, boolean atme)
         healup(0, 0, FALSE, TRUE);
         break;
     case SPE_CURE_SICKNESS:
-        if (Sick) You("are no longer ill.");
+        if (Sick) {
+            You("are no longer ill.");
+        }
         if (Slimed) {
             pline_The("slime disappears!");
             Slimed = 0;
@@ -940,11 +1000,12 @@ spelleffects(int spell, boolean atme)
         healup(0, 0, TRUE, FALSE);
         break;
     case SPE_CREATE_FAMILIAR:
-        (void) make_familiar((struct obj *)0, u.ux, u.uy, FALSE);
+        (void) make_familiar((struct obj *) 0, u.ux, u.uy, FALSE);
         break;
     case SPE_CLAIRVOYANCE:
-        if (!BClairvoyant)
+        if (!BClairvoyant) {
             do_vicinity_map();
+        }
         /* at present, only two things block clairvoyance */
         else if (uarmh && (uarmh->otyp == CORNUTHAUM
                            || uarmh->otyp == TINFOIL_HAT))
@@ -955,13 +1016,14 @@ spelleffects(int spell, boolean atme)
         cast_protection();
         break;
     case SPE_JUMPING:
-        if (!jump(max(role_skill, 1)))
+        if (!jump(max(role_skill, 1))) {
             pline("%s", nothing_happens);
+        }
         break;
     default:
         warning("Unknown spell %d attempted.", spell);
-        obfree(pseudo, (struct obj *)0);
-        return(0);
+        obfree(pseudo, (struct obj *) 0);
+        return 0;
     }
 
     /* Skill gain for spells is faster than skill gain for weapons;
@@ -970,8 +1032,8 @@ spelleffects(int spell, boolean atme)
        even faster by not advancing to skilled as soon as possible. */
     use_skill(skill, (spellev(spell) * (role_skill <= P_BASIC ? 4 : 2)));
 
-    obfree(pseudo, (struct obj *)0);    /* now, get rid of it */
-    return(1);
+    obfree(pseudo, (struct obj *) 0);    /* now, get rid of it */
+    return 1;
 }
 
 /* Choose location where spell takes effect. */
@@ -989,8 +1051,9 @@ throwspell(void)
     pline("Where do you want to cast the spell?");
     cc.x = u.ux;
     cc.y = u.uy;
-    if (getpos(&cc, TRUE, "the desired position") < 0)
+    if (getpos(&cc, TRUE, "the desired position") < 0) {
         return 0;   /* user pressed ESC */
+    }
     /* The number of moves from hero to where the spell drops.*/
     if (distmin(u.ux, u.uy, cc.x, cc.y) > 10) {
         pline_The("spell dissipates over the distance!");
@@ -1081,11 +1144,14 @@ losespells(void)
     int n, nzap, i;
 
     book = 0;
-    for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; n++)
+    for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; n++) {
         continue;
+    }
     if (n) {
         nzap = rnd(n) + confused ? 1 : 0;
-        if (nzap > n) nzap = n;
+        if (nzap > n) {
+            nzap = n;
+        }
         for (i = n - nzap; i < n; i++) {
             spellid(i) = NO_SPELL;
             exercise(A_WIS, FALSE); /* ouch! */
@@ -1127,14 +1193,16 @@ dovspell(void)
     int splnum, othnum;
     struct spell spl_tmp;
 
-    if (spellid(0) == NO_SPELL)
+    if (spellid(0) == NO_SPELL) {
         You("don't know any spells right now.");
-    else {
+    } else {
         while (dospellmenu("Currently known spells",
                            SPELLMENU_VIEW, &splnum)) {
             Sprintf(qbuf, "Reordering spells; swap '%c' with",
                     spellet(splnum));
-            if (!dospellmenu(qbuf, splnum, &othnum)) break;
+            if (!dospellmenu(qbuf, splnum, &othnum)) {
+                break;
+            }
 
             spl_tmp = spl_book[splnum];
             spl_book[splnum] = spl_book[othnum];
@@ -1146,9 +1214,9 @@ dovspell(void)
 
 static boolean
 dospellmenu(const char *prompt, int splaction, int *spell_no)
-                   
+
                 /* SPELLMENU_CAST, SPELLMENU_VIEW, or spl_book[] index */
-              
+
 {
     winid tmpwin;
     int i, n, how;
@@ -1169,11 +1237,12 @@ dospellmenu(const char *prompt, int splaction, int *spell_no)
      * To do it right would require that we implement columns
      * in the window-ports (say via a tab character).
      */
-    if (!iflags.menu_tab_sep)
+    if (!iflags.menu_tab_sep) {
         Sprintf(buf, "%-20s     Level  %-12s Fail  Memory",
                 "    Name", "Category");
-    else
+    } else {
         Sprintf(buf, "Name\tLevel\tCategory\tFail");
+    }
     add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, 0, 0, ATR_BOLD, buf, MENU_UNSELECTED);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
         Sprintf(buf, iflags.menu_tab_sep ?
@@ -1193,20 +1262,24 @@ dospellmenu(const char *prompt, int splaction, int *spell_no)
     end_menu(tmpwin, prompt);
 
     how = PICK_ONE;
-    if (splaction == SPELLMENU_VIEW && spellid(1) == NO_SPELL)
+    if (splaction == SPELLMENU_VIEW && spellid(1) == NO_SPELL) {
         how = PICK_NONE;    /* only one spell => nothing to swap with */
+    }
     n = select_menu(tmpwin, how, &selected);
     destroy_nhwindow(tmpwin);
     if (n > 0) {
         *spell_no = selected[0].item.a_int - 1;
         /* menu selection for `PICK_ONE' does not
            de-select any preselected entry */
-        if (n > 1 && *spell_no == splaction)
+        if (n > 1 && *spell_no == splaction) {
             *spell_no = selected[1].item.a_int - 1;
+        }
         free((genericptr_t)selected);
         /* default selection of preselected spell means that
            user chose not to swap it with anything */
-        if (*spell_no == splaction) return FALSE;
+        if (*spell_no == splaction) {
+            return FALSE;
+        }
         return TRUE;
     } else if (splaction >= 0) {
         /* explicit de-selection of preselected spell means that
@@ -1275,20 +1348,29 @@ percent_success(int spell)
     special = urole.spelheal;
     statused = ACURR(urole.spelstat);
 
-    if (uarm && is_metallic(uarm))
+    if (uarm && is_metallic(uarm)) {
         splcaster += (uarmc && uarmc->otyp == ROBE) ?
                      urole.spelarmr/2 : urole.spelarmr;
-    else if (uarmc && uarmc->otyp == ROBE)
+    } else if (uarmc && uarmc->otyp == ROBE) {
         splcaster -= urole.spelarmr;
+    }
     /* archeologists are not penalized for their quest artifact */
-    if (uarms && !is_quest_artifact(uarms)) splcaster += urole.spelshld;
+    if (uarms && !is_quest_artifact(uarms)) {
+        splcaster += urole.spelshld;
+    }
 
-    if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE)
+    if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE) {
         splcaster += uarmhbon;
-    if (uarmh && uarmh->otyp == TINFOIL_HAT)
+    }
+    if (uarmh && uarmh->otyp == TINFOIL_HAT) {
         splcaster += uarmhbon;
-    if (uarmg && is_metallic(uarmg)) splcaster += uarmgbon;
-    if (uarmf && is_metallic(uarmf)) splcaster += uarmfbon;
+    }
+    if (uarmg && is_metallic(uarmg)) {
+        splcaster += uarmgbon;
+    }
+    if (uarmf && is_metallic(uarmf)) {
+        splcaster += uarmfbon;
+    }
 
     /* `healing spell' bonus */
     if (spellid(spell) == SPE_HEALING ||
@@ -1298,7 +1380,9 @@ percent_success(int spell)
         spellid(spell) == SPE_RESTORE_ABILITY ||
         spellid(spell) == SPE_REMOVE_CURSE) splcaster += special;
 
-    if (splcaster > 20) splcaster = 20;
+    if (splcaster > 20) {
+        splcaster = 20;
+    }
 
     /* Calculate learned ability */
 
@@ -1334,8 +1418,12 @@ percent_success(int spell)
      * specter of overflowing 16-bit ints (and permit wearing a
      * shield to raise the chances :-).
      */
-    if (chance < 0) chance = 0;
-    if (chance > 120) chance = 120;
+    if (chance < 0) {
+        chance = 0;
+    }
+    if (chance > 120) {
+        chance = 120;
+    }
 
     /* Wearing anything but a light shield makes it very awkward to
      * cast a spell (unless an archeologist wearing quest artifact).
@@ -1354,8 +1442,12 @@ percent_success(int spell)
     chance = chance * (20-splcaster) / 15 - splcaster;
 
     /* Clamp to percentile */
-    if (chance > 100) chance = 100;
-    if (chance < 0) chance = 0;
+    if (chance > 100) {
+        chance = 100;
+    }
+    if (chance < 0) {
+        chance = 0;
+    }
 
     return chance;
 }

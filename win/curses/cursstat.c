@@ -104,17 +104,20 @@ get_trouble_color(const char *stat)
         if (stat && !strcmp(clr->txt, stat)) {
 #ifdef STATUS_COLORS
             /* Check if we have a color enabled with statuscolors */
-            if (!iflags.use_status_colors)
+            if (!iflags.use_status_colors) {
                 return curses_color_attr(CLR_GRAY, 0); /* no color configured */
+            }
 
             struct color_option stat_color;
 
             stat_color = text_color_of(clr->txt, text_colors);
-            if (stat_color.color == NO_COLOR && !stat_color.attr_bits)
+            if (stat_color.color == NO_COLOR && !stat_color.attr_bits) {
                 return curses_color_attr(CLR_GRAY, 0);
+            }
 
-            if (stat_color.color != NO_COLOR)
+            if (stat_color.color != NO_COLOR) {
                 res = curses_color_attr(stat_color.color, 0);
+            }
 
             res = curses_color_attr(stat_color.color, 0);
             int count;
@@ -143,15 +146,16 @@ get_playerrank(char *rank)
         int k = 0;
 
         Strcpy(buf, mons[u.umonnum].mname);
-        while(buf[k] != 0) {
+        while (buf[k] != 0) {
             if ((k == 0 || (k > 0 && buf[k-1] == ' ')) &&
                 'a' <= buf[k] && buf[k] <= 'z')
                 buf[k] += 'A' - 'a';
             k++;
         }
         Strcpy(rank, buf);
-    } else
+    } else {
         Strcpy(rank, rank_of(u.ulevel, Role_switch, flags.female));
+    }
 }
 
 /* Handles numerical stat changes of various kinds.
@@ -170,29 +174,34 @@ print_statdiff(const char *append, nhstat *stat, int new, int type)
         if ((type == STAT_AC && new < stat->value) ||
             (type != STAT_AC && new > stat->value)) {
             color = STAT_UP_COLOR;
-            if (type == STAT_GOLD)
+            if (type == STAT_GOLD) {
                 color = HI_GOLD;
-        } else
+            }
+        } else {
             color = STAT_DOWN_COLOR;
+        }
 
         stat->value = new;
         stat->highlight_color = color;
         stat->highlight_turns = 5;
-    } else if (stat->highlight_turns)
+    } else if (stat->highlight_turns) {
         color = stat->highlight_color;
+    }
 
     attr_t attr = curses_color_attr(color, 0);
     wattron(win, attr);
     wprintw(win, "%s", append);
     if (type == STAT_STR && new > 18) {
-        if (new > 118)
+        if (new > 118) {
             wprintw(win, "%d", new - 100);
-        else if (new == 118)
+        } else if (new == 118) {
             wprintw(win, "18/**");
-        else
+        } else {
             wprintw(win, "18/%02d", new - 18);
-    } else
+        }
+    } else {
         wprintw(win, "%d", new);
+    }
 
     wattroff(win, attr);
 }
@@ -263,19 +272,22 @@ curses_color_attr(int nh_color, int bg_color)
            49-56: Cyan
            57-64: Gray/White */
 
-        if (bg_color == nh_color)
+        if (bg_color == nh_color) {
             color = 1; /* Make foreground black if fg==bg */
+        }
 
         if (bg_color == CLR_RED || bg_color == CLR_BLUE) {
             /* already defined before extension */
             color *= 2;
             color += 16;
-            if (bg_color == CLR_RED)
+            if (bg_color == CLR_RED) {
                 color--;
+            }
         } else {
             boolean hicolor = FALSE;
-            if (COLORS >= 16)
+            if (COLORS >= 16) {
                 hicolor = TRUE;
+            }
 
             switch (bg_color) {
             case CLR_GREEN:
@@ -311,17 +323,20 @@ hpen_color_attr(boolean is_hp, int cur, int max)
     struct color_option stat_color;
     int count;
     attr_t attr = 0;
-    if (!iflags.use_status_colors)
+    if (!iflags.use_status_colors) {
         return curses_color_attr(CLR_GRAY, 0);
+    }
 
     stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
 
-    if (stat_color.color != NO_COLOR)
+    if (stat_color.color != NO_COLOR) {
         attr |= curses_color_attr(stat_color.color, 0);
+    }
 
     for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
-        if (count != ATR_NONE && (stat_color.attr_bits & (1 << count)))
+        if (count != ATR_NONE && (stat_color.attr_bits & (1 << count))) {
             attr |= curses_convert_attr(count);
+        }
     }
 
     return attr;
@@ -341,25 +356,28 @@ hpen_color(boolean is_hp, int cur, int max)
         struct color_option stat_color;
         stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
 
-        if (stat_color.color == NO_COLOR)
+        if (stat_color.color == NO_COLOR) {
             return CLR_GRAY;
-        else
+        } else {
             return stat_color.color;
-    } else
+        }
+    } else {
         return CLR_GRAY;
+    }
 #endif
 
     int color = CLR_GRAY;
-    if (cur == max)
+    if (cur == max) {
         color = CLR_GRAY;
-    else if (cur * 3 > max * 2) /* >2/3 */
+    } else if (cur * 3 > max * 2) { /* >2/3 */
         color = is_hp ? CLR_GREEN : CLR_CYAN;
-    else if (cur * 3 > max) /* >1/3 */
+    } else if (cur * 3 > max) { /* >1/3 */
         color = is_hp ? CLR_YELLOW : CLR_BLUE;
-    else if (cur * 7 > max) /* >1/7 */
+    } else if (cur * 7 > max) { /* >1/7 */
         color = is_hp ? CLR_RED : CLR_MAGENTA;
-    else
+    } else {
         color = is_hp ? CLR_ORANGE : CLR_BRIGHT_MAGENTA;
+    }
 
     return color;
 }
@@ -382,9 +400,9 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
 #endif
 
     char buf[BUFSZ];
-    if (title)
+    if (title) {
         Strcpy(buf, title);
-    else {
+    } else {
         int len = 5;
         sprintf(buf, "%*d / %-*d", len, cur, len, max);
     }
@@ -400,10 +418,12 @@ draw_bar(boolean is_hp, int cur, int max, const char *title)
     /* Figure out how much of the bar to fill */
     int fill = 0;
     int len = strlen(buf);
-    if (cur > 0 && max > 0)
+    if (cur > 0 && max > 0) {
         fill = len * cur / max;
-    if (fill > len)
+    }
+    if (fill > len) {
         fill = len;
+    }
 
     waddch(win, '[');
     wattron(win, fillattr);
@@ -429,8 +449,9 @@ curses_update_stats(void)
     int orient = curses_get_window_orientation(STATUS_WIN);
 
     boolean horiz = FALSE;
-    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT))
+    if ((orient != ALIGN_RIGHT) && (orient != ALIGN_LEFT)) {
         horiz = TRUE;
+    }
 
     boolean border = curses_window_has_border(STATUS_WIN);
 
@@ -443,8 +464,9 @@ curses_update_stats(void)
         int ax = 0;
         int ay = 0;
         getmaxyx(win, ay, ax);
-        if (border)
+        if (border) {
             ay -= 2;
+        }
 
         nhUse(ax); /* getmaxyx macro isn't sufficient */
 
@@ -479,13 +501,15 @@ curses_update_stats(void)
         hpmax = u.mhmax;
     }
 
-    if (orient != ALIGN_RIGHT && orient != ALIGN_LEFT)
+    if (orient != ALIGN_RIGHT && orient != ALIGN_LEFT) {
         draw_horizontal(x, y, hp, hpmax);
-    else
+    } else {
         draw_vertical(x, y, hp, hpmax);
+    }
 
-    if (border)
+    if (border) {
         box(win, 0, 0);
+    }
 
     wnoutrefresh(win);
 
@@ -530,8 +554,9 @@ draw_horizontal(int x, int y, int hp, int hpmax)
                   u.ualign.type == A_NEUTRAL ? " Neutral" : " Lawful"));
 
 #ifdef SCORE_ON_BOTL
-    if (flags.showscore)
+    if (flags.showscore) {
         print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER);
+    }
 #endif /* SCORE_ON_BOTL */
 
 
@@ -569,8 +594,9 @@ draw_horizontal(int x, int y, int hp, int hpmax)
 
     print_statdiff(" AC:", &prevac, u.uac, STAT_AC);
 
-    if (Upolyd)
+    if (Upolyd) {
         print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+    }
 #ifdef EXP_ON_BOTL
     else if (flags.showexp) {
         print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER);
@@ -582,8 +608,9 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     else
         print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
 
-    if (flags.time)
+    if (flags.time) {
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+    }
 
     if (iflags.showrealtime) {
         wprintw(win, " %s", botl_realtime());
@@ -618,17 +645,19 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wprintw(win, "HP:");
     draw_bar(TRUE, hp, hpmax, NULL);
     print_statdiff(" AC:", &prevac, u.uac, STAT_AC);
-    if (Upolyd)
+    if (Upolyd) {
         print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+    }
 #ifdef EXP_ON_BOTL
     else if (flags.showexp) {
         /* Ensure that Xp have proper highlight on level change. */
         int levelchange = 0;
         if (prevlevel.value != u.ulevel) {
-            if (prevlevel.value < u.ulevel)
+            if (prevlevel.value < u.ulevel) {
                 levelchange = 1;
-            else
+            } else {
                 levelchange = 2;
+            }
         }
         print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER);
         /* use waddch, we don't want to highlight the '/' */
@@ -636,13 +665,15 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 
         /* Figure out amount of Xp needed to next level */
         int xp_left = 0;
-        if (u.ulevel < 30)
+        if (u.ulevel < 30) {
             xp_left = (newuexp(u.ulevel) - u.uexp);
+        }
 
         if (levelchange) {
             prevexp.value = (xp_left + 1);
-            if (levelchange == 2)
+            if (levelchange == 2) {
                 prevexp.value = (xp_left - 1);
+            }
         }
         print_statdiff("", &prevexp, xp_left, STAT_AC);
         waddch(win, ')');
@@ -665,12 +696,14 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     print_statdiff(" $", &prevau, money_cnt(invent), STAT_GOLD);
 
 #ifdef SCORE_ON_BOTL
-    if (flags.showscore)
+    if (flags.showscore) {
         print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER);
+    }
 #endif /* SCORE_ON_BOTL */
 
-    if (flags.time)
+    if (flags.time) {
         print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+    }
 
     if (iflags.showrealtime) {
         wprintw(win, " %s", botl_realtime());
@@ -681,8 +714,9 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     /* Right-aligned attributes */
     int stat_length = 6; /* " Dx:xx" */
     int str_length = 6;
-    if (ACURR(A_STR) > 18 && ACURR(A_STR) < 119)
+    if (ACURR(A_STR) > 18 && ACURR(A_STR) < 119) {
         str_length = 9;
+    }
 
     getmaxyx(win, y, x);
 
@@ -734,8 +768,9 @@ draw_vertical(int x, int y, int hp, int hpmax)
     int namelen = strlen(plname);
     int maxlen = 19;
 #ifdef STATUS_COLORS
-    if (iflags.vanilla_ui_behavior) /* no hp bar */
+    if (iflags.vanilla_ui_behavior) { /* no hp bar */
         maxlen += 2; /* With no hitpointbar, we can fit more since there's no "[]" */
+    }
 #endif
 
     if ((ranklen + namelen) > maxlen) {
@@ -776,10 +811,11 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wprintw(win,   "Dungeon Level: ");
 
     /* Astral Plane doesn't fit */
-    if (In_endgame(&u.uz))
+    if (In_endgame(&u.uz)) {
         wprintw(win, "%s", Is_astralevel(&u.uz) ? "Astral" : "End Game");
-    else
+    } else {
         wprintw(win, "%d", depth(&u.uz));
+    }
     wmove(win, y++, x);
 
     print_statdiff("Gold:          ", &prevau, money_cnt(invent), STAT_GOLD);
@@ -813,8 +849,9 @@ draw_vertical(int x, int y, int hp, int hpmax)
     print_statdiff("Armor Class:   ", &prevac, u.uac, STAT_AC);
     wmove(win, y++, x);
 
-    if (Upolyd)
+    if (Upolyd) {
         print_statdiff("Hit Dice:      ", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+    }
 #ifdef EXP_ON_BOTL
     else if (flags.showexp) {
         print_statdiff("Experience:    ", &prevlevel, u.ulevel, STAT_OTHER);
@@ -853,8 +890,9 @@ curses_add_statuses(WINDOW *win, boolean align_right,
         int mx = *x;
         int my = *y;
         getmaxyx(win, my, mx);
-        if (!curses_window_has_border(STATUS_WIN))
+        if (!curses_window_has_border(STATUS_WIN)) {
             mx++;
+        }
 
         nhUse(my);
 
@@ -892,20 +930,25 @@ curses_add_status(WINDOW *win, boolean align_right, boolean vertical,
 {
     /* If vertical is TRUE here with no x/y, that's an error. But handle
        it gracefully since NH3 doesn't recover well in crashes. */
-    if (!x || !y)
+    if (!x || !y) {
         vertical = FALSE;
+    }
 
-    if (!trouble)
+    if (!trouble) {
         return;
+    }
 
-    if (!vertical && !align_right)
+    if (!vertical && !align_right) {
         waddch(win, ' ');
+    }
 
     /* For whatever reason, hunger states have trailing spaces. Get rid of them. */
     char buf[BUFSZ];
     Strcpy(buf, str);
     int i;
-    for (i = 0; (buf[i] != ' ' && buf[i] != '\0'); i++) ;
+    for (i = 0; (buf[i] != ' ' && buf[i] != '\0'); i++) {
+        ;
+    }
 
     buf[i] = '\0';
     if (align_right) {
@@ -933,8 +976,9 @@ decrement_highlight(nhstat *stat, boolean zero)
         }
 
         stat->highlight_turns--;
-        if (stat->highlight_turns == 0)
+        if (stat->highlight_turns == 0) {
             return 1;
+        }
     }
     return 0;
 }
@@ -964,6 +1008,7 @@ curses_decrement_highlights(boolean zero)
     unhighlight |= decrement_highlight(&prevscore, zero);
 #endif
 
-    if (unhighlight)
+    if (unhighlight) {
         curses_update_stats();
+    }
 }

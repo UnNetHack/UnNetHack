@@ -164,16 +164,20 @@ does_block(coordxy x, coordxy y, struct rm *lev)
         return 1;
 
     /* Ice walls block */
-    if (lev->typ == ICEWALL)
+    if (lev->typ == ICEWALL) {
         return 1;
+    }
 
     if (lev->typ == CLOUD || lev->typ == WATER ||
         (lev->typ == MOAT && Underwater))
         return 1;
 
     /* Boulders block light. */
-    for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
-        if (obj->otyp == BOULDER) return 1;
+    for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
+        if (obj->otyp == BOULDER) {
+            return 1;
+        }
+    }
 
     /* Mimics mimicing a door or boulder or ... block light. */
     if ((mon = m_at(x, y)) && (!mon->minvis || See_invisible) &&
@@ -212,7 +216,7 @@ vision_reset(void)
         dig_left = 0;
         block = TRUE; /* location (0,y) is always stone; it's !isok() */
         lev = &levl[1][y];
-        for (x = 1; x < COLNO; x++, lev += ROWNO)
+        for (x = 1; x < COLNO; x++, lev += ROWNO) {
             if (block != (IS_ROCK(lev->typ) || does_block(x, y, lev))) {
                 if (block) {
                     for (i=dig_left; i<x; i++) {
@@ -221,7 +225,9 @@ vision_reset(void)
                     }
                 } else {
                     i = dig_left;
-                    if(dig_left) dig_left--; /* point at first blocked point */
+                    if (dig_left) {
+                        dig_left--; /* point at first blocked point */
+                    }
                     for (; i<x; i++) {
                         left_ptrs [y][i] = dig_left;
                         right_ptrs[y][i] = x;
@@ -231,9 +237,12 @@ vision_reset(void)
                 dig_left = x;
                 block = !block;
             }
+        }
         /* handle right boundary; almost identical for blocked/unblocked */
         i = dig_left;
-        if(!block && dig_left) dig_left--; /* point at first blocked point */
+        if (!block && dig_left) {
+            dig_left--; /* point at first blocked point */
+        }
         for (; i<COLNO; i++) {
             left_ptrs [y][i] = dig_left;
             right_ptrs[y][i] = (COLNO-1);
@@ -311,8 +320,9 @@ rogue_vision(char **next, coordxy *rmin, coordxy *rmax) /* could_see array point
                 if (rooms[rnum].rlit) {
                     next[zy][zx] = COULD_SEE | IN_SIGHT;
                     levl[zx][zy].seenv = SVALL; /* see the walls */
-                } else
+                } else {
                     next[zy][zx] = COULD_SEE;
+                }
             }
         }
     }
@@ -325,8 +335,12 @@ rogue_vision(char **next, coordxy *rmin, coordxy *rmax) /* could_see array point
     xlo = max(u.ux - 1, 1);
     xhi = min(u.ux + 1, COLNO - 1);
     for (zy = ylo; zy <= yhi; zy++) {
-        if (xlo < rmin[zy]) rmin[zy] = xlo;
-        if (xhi > rmax[zy]) rmax[zy] = xhi;
+        if (xlo < rmin[zy]) {
+            rmin[zy] = xlo;
+        }
+        if (xhi > rmax[zy]) {
+            rmax[zy] = xhi;
+        }
 
         for (zx = xlo; zx <= xhi; zx++) {
             next[zy][zx] = COULD_SEE | IN_SIGHT;
@@ -338,7 +352,9 @@ rogue_vision(char **next, coordxy *rmin, coordxy *rmax) /* could_see array point
              * positions are not updated because they were already in sight.
              * So, we have to do it here.
              */
-            if (in_door && (zx == u.ux || zy == u.uy)) newsym(zx, zy);
+            if (in_door && (zx == u.ux || zy == u.uy)) {
+                newsym(zx, zy);
+            }
         }
     }
 }
@@ -406,20 +422,36 @@ int row, col;
     if (lev->typ >= CROSSWALL && lev->typ <= TRWALL) {
         switch (res) {
         case SV0:
-            if (col > 0   && viz_clear[row][col-1]) res |= SV7;
-            if (row > 0   && viz_clear[row-1][col]) res |= SV1;
+            if (col > 0   && viz_clear[row][col-1]) {
+                res |= SV7;
+            }
+            if (row > 0   && viz_clear[row-1][col]) {
+                res |= SV1;
+            }
             break;
         case SV2:
-            if (row > 0   && viz_clear[row-1][col]) res |= SV1;
-            if (col < COLNO-1 && viz_clear[row][col+1]) res |= SV3;
+            if (row > 0   && viz_clear[row-1][col]) {
+                res |= SV1;
+            }
+            if (col < COLNO-1 && viz_clear[row][col+1]) {
+                res |= SV3;
+            }
             break;
         case SV4:
-            if (col < COLNO-1 && viz_clear[row][col+1]) res |= SV3;
-            if (row < ROWNO-1 && viz_clear[row+1][col]) res |= SV5;
+            if (col < COLNO-1 && viz_clear[row][col+1]) {
+                res |= SV3;
+            }
+            if (row < ROWNO-1 && viz_clear[row+1][col]) {
+                res |= SV5;
+            }
             break;
         case SV6:
-            if (row < ROWNO-1 && viz_clear[row+1][col]) res |= SV5;
-            if (col > 0   && viz_clear[row][col-1]) res |= SV7;
+            if (row < ROWNO-1 && viz_clear[row+1][col]) {
+                res |= SV5;
+            }
+            if (col > 0   && viz_clear[row][col-1]) {
+                res |= SV7;
+            }
             break;
         }
     }
@@ -504,7 +536,9 @@ vision_recalc(int control)
     int oldseenv;                            /* previous seenv value */
 
     vision_full_recalc = 0; /* reset flag */
-    if (in_mklev || !iflags.vision_inited) return;
+    if (in_mklev || !iflags.vision_inited) {
+        return;
+    }
 
     /*
      * Either the light sources have been taken care of, or we must
@@ -547,8 +581,11 @@ vision_recalc(int control)
             start = min(viz_rmin[row], next_rmin[row]);
             stop  = max(viz_rmax[row], next_rmax[row]);
 
-            for (col = start; col <= stop; col++)
-                if (old_row[col] & IN_SIGHT) newsym(col, row);
+            for (col = start; col <= stop; col++) {
+                if (old_row[col] & IN_SIGHT) {
+                    newsym(col, row);
+                }
+            }
         }
 
         /* skip the normal update loop */
@@ -570,14 +607,17 @@ vision_recalc(int control)
              */
             has_night_vision = 0;
 
-            for (row = u.uy-1; row <= u.uy+1; row++)
+            for (row = u.uy-1; row <= u.uy+1; row++) {
                 for (col = u.ux-1; col <= u.ux+1; col++) {
-                    if (!isok(col, row) || !is_pool(col, row)) continue;
+                    if (!isok(col, row) || !is_pool(col, row)) {
+                        continue;
+                    }
 
                     next_rmin[row] = min(next_rmin[row], col);
                     next_rmax[row] = max(next_rmax[row], col);
                     next_array[row][col] = IN_SIGHT | COULD_SEE;
                 }
+            }
         }
 
         /* if in a pit, just update for immediate locations */
@@ -594,12 +634,14 @@ vision_recalc(int control)
                 next_rmax[row] = min(COLNO-1, u.ux + 1);
                 next_row = next_array[row];
 
-                for(col=next_rmin[row]; col <= next_rmax[row]; col++)
+                for (col=next_rmin[row]; col <= next_rmax[row]; col++) {
                     next_row[col] = IN_SIGHT | COULD_SEE;
+                }
             }
-        } else
+        } else {
             view_from(u.uy, u.ux, next_array, next_rmin, next_rmax,
                       0, (void (*)(coordxy, coordxy, genericptr_t)) 0, (genericptr_t)0);
+        }
 
         /*
          * Set the IN_SIGHT bit for xray and night vision.
@@ -626,8 +668,9 @@ vision_recalc(int control)
                         oldseenv = levl[col][row].seenv;
                         levl[col][row].seenv = SVALL; /* see all! */
                         /* Update if previously not in sight or new angle. */
-                        if (!(old_row_val & IN_SIGHT) || oldseenv != SVALL)
+                        if (!(old_row_val & IN_SIGHT) || oldseenv != SVALL) {
                             newsym(col, row);
+                        }
                     }
 
                     next_rmin[row] = min(start, next_rmin[row]);
@@ -663,8 +706,11 @@ vision_recalc(int control)
                     start = max(      0, u.ux - ranges[dy]);
                     stop  = min(COLNO-1, u.ux + ranges[dy]);
 
-                    for (col = start; col <= stop; col++)
-                        if (next_row[col]) next_row[col] |= IN_SIGHT;
+                    for (col = start; col <= stop; col++) {
+                        if (next_row[col]) {
+                            next_row[col] |= IN_SIGHT;
+                        }
+                    }
 
                     next_rmin[row] = min(start, next_rmin[row]);
                     next_rmax[row] = max(stop, next_rmax[row]);
@@ -721,8 +767,9 @@ vision_recalc(int control)
                 lev->seenv |= new_angle(lev, sv, row, col); /* update seen angle */
 
                 /* Update pos if previously not in sight or new angle. */
-                if ( !(old_row[col] & IN_SIGHT) || oldseenv != lev->seenv)
+                if ( !(old_row[col] & IN_SIGHT) || oldseenv != lev->seenv) {
                     newsym(col, row);
+                }
             }
 
             else if ((next_row[col] & COULD_SEE)
@@ -747,10 +794,12 @@ vision_recalc(int control)
                         lev->seenv |= new_angle(lev, sv, row, col);
 
                         /* Update pos if previously not in sight or new angle.*/
-                        if (!(old_row[col] & IN_SIGHT) || oldseenv!=lev->seenv)
+                        if (!(old_row[col] & IN_SIGHT) || oldseenv!=lev->seenv) {
                             newsym(col, row);
-                    } else
+                        }
+                    } else {
                         goto not_in_sight; /* we don't see it */
+                    }
 
                 } else {
                     next_row[col] |= IN_SIGHT; /* we see it */
@@ -759,8 +808,9 @@ vision_recalc(int control)
                     lev->seenv |= new_angle(lev, sv, row, col);
 
                     /* Update pos if previously not in sight or new angle. */
-                    if ( !(old_row[col] & IN_SIGHT) || oldseenv != lev->seenv)
+                    if ( !(old_row[col] & IN_SIGHT) || oldseenv != lev->seenv) {
                         newsym(col, row);
+                    }
                 }
             } else if ((next_row[col] & COULD_SEE) && lev->waslit) {
                 /*
@@ -804,8 +854,9 @@ skip:
      * vision_recalc(2) -> newsym() -> crash!  u.ux and u.uy are 0 and
      * program_state.panicking == 1 under those circumstances
      */
-    if (!program_state.panicking)
+    if (!program_state.panicking) {
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
+    }
 
     /* Set the new min and max pointers. */
     viz_rmin = next_rmin;
@@ -834,7 +885,9 @@ block_point(coordxy x, coordxy y)
      * was out of night-vision range of the hero.  Suddenly the hero should
      * see the lit room.
      */
-    if (isok(x, y) && (viz_array[y][x])) vision_full_recalc = 1;
+    if (isok(x, y) && (viz_array[y][x])) {
+        vision_full_recalc = 1;
+    }
 }
 
 /*
@@ -849,7 +902,9 @@ unblock_point(coordxy x, coordxy y)
 
     /* recalc light sources here? */
 
-    if (isok(x, y) && (viz_array[y][x])) vision_full_recalc = 1;
+    if (isok(x, y) && (viz_array[y][x])) {
+        vision_full_recalc = 1;
+    }
 }
 
 
@@ -906,7 +961,9 @@ dig_point(int row, int col)
 {
     int i;
 
-    if (viz_clear[row][col]) return;        /* already done */
+    if (viz_clear[row][col]) {
+        return; /* already done */
+    }
 
     viz_clear[row][col] = 1;
 
@@ -918,8 +975,9 @@ dig_point(int row, int col)
             right_ptrs[row][0] = right_ptrs[row][1];
         } else {
             right_ptrs[row][0] = 1;
-            for (i = 1; i <= right_ptrs[row][1]; i++)
+            for (i = 1; i <= right_ptrs[row][1]; i++) {
                 left_ptrs[row][i] = 1;
+            }
         }
     } else if (col == (COLNO-1)) {      /* right edge */
 
@@ -927,8 +985,9 @@ dig_point(int row, int col)
             left_ptrs[row][COLNO-1] = left_ptrs[row][COLNO-2];
         } else {
             left_ptrs[row][COLNO-1] = COLNO-2;
-            for (i = left_ptrs[row][COLNO-2]; i < COLNO-1; i++)
+            for (i = left_ptrs[row][COLNO-2]; i < COLNO-1; i++) {
                 right_ptrs[row][i] = COLNO-2;
+            }
         }
     }
 
@@ -938,43 +997,55 @@ dig_point(int row, int col)
     else if (viz_clear[row][col-1] && viz_clear[row][col+1]) {
         /* Both sides clear */
         for (i = left_ptrs[row][col-1]; i <= col; i++) {
-            if (!viz_clear[row][i]) continue; /* catch non-end case */
+            if (!viz_clear[row][i]) {
+                continue; /* catch non-end case */
+            }
             right_ptrs[row][i] = right_ptrs[row][col+1];
         }
         for (i = col; i <= right_ptrs[row][col+1]; i++) {
-            if (!viz_clear[row][i]) continue; /* catch non-end case */
+            if (!viz_clear[row][i]) {
+                continue; /* catch non-end case */
+            }
             left_ptrs[row][i] = left_ptrs[row][col-1];
         }
 
     } else if (viz_clear[row][col-1]) {
         /* Left side clear, right side blocked. */
-        for (i = col+1; i <= right_ptrs[row][col+1]; i++)
+        for (i = col+1; i <= right_ptrs[row][col+1]; i++) {
             left_ptrs[row][i] = col+1;
+        }
 
         for (i = left_ptrs[row][col-1]; i <= col; i++) {
-            if (!viz_clear[row][i]) continue; /* catch non-end case */
+            if (!viz_clear[row][i]) {
+                continue; /* catch non-end case */
+            }
             right_ptrs[row][i] = col+1;
         }
         left_ptrs[row][col] = left_ptrs[row][col-1];
 
     } else if (viz_clear[row][col+1]) {
         /* Right side clear, left side blocked. */
-        for (i = left_ptrs[row][col-1]; i < col; i++)
+        for (i = left_ptrs[row][col-1]; i < col; i++) {
             right_ptrs[row][i] = col-1;
+        }
 
         for (i = col; i <= right_ptrs[row][col+1]; i++) {
-            if (!viz_clear[row][i]) continue; /* catch non-end case */
+            if (!viz_clear[row][i]) {
+                continue; /* catch non-end case */
+            }
             left_ptrs[row][i] = col-1;
         }
         right_ptrs[row][col] = right_ptrs[row][col+1];
 
     } else {
         /* Both sides blocked */
-        for (i = left_ptrs[row][col-1]; i < col; i++)
+        for (i = left_ptrs[row][col-1]; i < col; i++) {
             right_ptrs[row][i] = col-1;
+        }
 
-        for (i = col+1; i <= right_ptrs[row][col+1]; i++)
+        for (i = col+1; i <= right_ptrs[row][col+1]; i++) {
             left_ptrs[row][i] = col+1;
+        }
 
         left_ptrs[row][col]  = col-1;
         right_ptrs[row][col] = col+1;
@@ -986,7 +1057,9 @@ fill_point(int row, int col)
 {
     int i;
 
-    if (!viz_clear[row][col]) return;
+    if (!viz_clear[row][col]) {
+        return;
+    }
 
     viz_clear[row][col] = 0;
 
@@ -995,16 +1068,18 @@ fill_point(int row, int col)
             right_ptrs[row][0] = 0;
         } else {
             right_ptrs[row][0] = right_ptrs[row][1];
-            for (i = 1; i <= right_ptrs[row][1]; i++)
+            for (i = 1; i <= right_ptrs[row][1]; i++) {
                 left_ptrs[row][i] = 0;
+            }
         }
     } else if (col == COLNO-1) {
         if (viz_clear[row][COLNO-2]) {  /* adjacent is clear */
             left_ptrs[row][COLNO-1] = COLNO-1;
         } else {
             left_ptrs[row][COLNO-1] = left_ptrs[row][COLNO-2];
-            for (i = left_ptrs[row][COLNO-2]; i < COLNO-1; i++)
+            for (i = left_ptrs[row][COLNO-2]; i < COLNO-1; i++) {
                 right_ptrs[row][i] = COLNO-1;
+            }
         }
     }
 
@@ -1013,51 +1088,63 @@ fill_point(int row, int col)
      */
     else if (viz_clear[row][col-1] && viz_clear[row][col+1]) {
         /* Both sides clear */
-        for (i = left_ptrs[row][col-1]+1; i <= col; i++)
+        for (i = left_ptrs[row][col-1]+1; i <= col; i++) {
             right_ptrs[row][i] = col;
+        }
 
-        if (!left_ptrs[row][col-1]) /* catch the end case */
+        if (!left_ptrs[row][col-1]) { /* catch the end case */
             right_ptrs[row][0] = col;
+        }
 
-        for (i = col; i < right_ptrs[row][col+1]; i++)
+        for (i = col; i < right_ptrs[row][col+1]; i++) {
             left_ptrs[row][i] = col;
+        }
 
-        if (right_ptrs[row][col+1] == COLNO-1) /* catch the end case */
+        if (right_ptrs[row][col+1] == COLNO-1) { /* catch the end case */
             left_ptrs[row][COLNO-1] = col;
+        }
 
     } else if (viz_clear[row][col-1]) {
         /* Left side clear, right side blocked. */
-        for (i = col; i <= right_ptrs[row][col+1]; i++)
+        for (i = col; i <= right_ptrs[row][col+1]; i++) {
             left_ptrs[row][i] = col;
+        }
 
-        for (i = left_ptrs[row][col-1]+1; i < col; i++)
+        for (i = left_ptrs[row][col-1]+1; i < col; i++) {
             right_ptrs[row][i] = col;
+        }
 
-        if (!left_ptrs[row][col-1]) /* catch the end case */
+        if (!left_ptrs[row][col-1]) { /* catch the end case */
             right_ptrs[row][i] = col;
+        }
 
         right_ptrs[row][col] = right_ptrs[row][col+1];
 
     } else if (viz_clear[row][col+1]) {
         /* Right side clear, left side blocked. */
-        for (i = left_ptrs[row][col-1]; i <= col; i++)
+        for (i = left_ptrs[row][col-1]; i <= col; i++) {
             right_ptrs[row][i] = col;
+        }
 
-        for (i = col+1; i < right_ptrs[row][col+1]; i++)
+        for (i = col+1; i < right_ptrs[row][col+1]; i++) {
             left_ptrs[row][i] = col;
+        }
 
-        if (right_ptrs[row][col+1] == COLNO-1) /* catch the end case */
+        if (right_ptrs[row][col+1] == COLNO-1) { /* catch the end case */
             left_ptrs[row][i] = col;
+        }
 
         left_ptrs[row][col] = left_ptrs[row][col-1];
 
     } else {
         /* Both sides blocked */
-        for (i = left_ptrs[row][col-1]; i <= col; i++)
+        for (i = left_ptrs[row][col-1]; i <= col; i++) {
             right_ptrs[row][i] = right_ptrs[row][col+1];
+        }
 
-        for (i = col; i <= right_ptrs[row][col+1]; i++)
+        for (i = col; i <= right_ptrs[row][col+1]; i++) {
             left_ptrs[row][i] = left_ptrs[row][col-1];
+        }
     }
 }
 
@@ -1128,179 +1215,195 @@ static genericptr_t varg;
 /*
  *  Quadrant I (step < 0).
  */
-#define q1_path(srow, scol, y2, x2, label)          \
-    {                           \
-        int dx, dy;                     \
-        int k, err, x, y, dxs, dys;        \
-                            \
-        x  = (scol);    y  = (srow);            \
-        dx = (x2) - x;  dy = y - (y2);          \
-                            \
+#define q1_path(srow, scol, y2, x2, label)           \
+    {                                                \
+        int dx, dy;                                  \
+        int k, err, x, y, dxs, dys;                  \
+                                                     \
+        x  = (scol);    y  = (srow);                 \
+        dx = (x2) - x;  dy = y - (y2);               \
+                                                     \
         result = 0;  /* default to a blocked path */ \
-                            \
+                                                     \
         dxs = dx << 1; /* save the shifted values */ \
-        dys = dy << 1;                  \
-        if (dy > dx) {                  \
-            err = dxs - dy;                 \
-                            \
-            for (k = dy-1; k; k--) {            \
-                if (err >= 0) {             \
-                    x++;                    \
-                    err -= dys;             \
-                }                       \
-                y--;                    \
-                err += dxs;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-        } else {                        \
-            err = dys - dx;                 \
-                            \
-            for (k = dx-1; k; k--) {            \
-                if (err >= 0) {             \
-                    y--;                    \
-                    err -= dxs;             \
-                }                       \
-                x++;                    \
-                err += dys;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-        }                           \
-                            \
-        result = 1;                     \
+        dys = dy << 1;                               \
+        if (dy > dx) {                               \
+            err = dxs - dy;                          \
+                                                     \
+            for (k = dy-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    x++;                             \
+                    err -= dys;                      \
+                }                                    \
+                y--;                                 \
+                err += dxs;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label; /* blocked */        \
+                }                                    \
+            }                                        \
+        } else {                                     \
+            err = dys - dx;                          \
+                                                     \
+            for (k = dx-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    y--;                             \
+                    err -= dxs;                      \
+                }                                    \
+                x++;                                 \
+                err += dys;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label; /* blocked */        \
+                }                                    \
+            }                                        \
+        }                                            \
+                                                     \
+        result = 1;                                  \
     }
 
 /*
  * Quadrant IV (step > 0).
  */
-#define q4_path(srow, scol, y2, x2, label)          \
-    {                           \
-        int dx, dy;                     \
-        int k, err, x, y, dxs, dys;        \
-                            \
-        x  = (scol);    y  = (srow);            \
-        dx = (x2) - x;  dy = (y2) - y;          \
-                            \
+#define q4_path(srow, scol, y2, x2, label)           \
+    {                                                \
+        int dx, dy;                                  \
+        int k, err, x, y, dxs, dys;                  \
+                                                     \
+        x  = (scol);    y  = (srow);                 \
+        dx = (x2) - x;  dy = (y2) - y;               \
+                                                     \
         result = 0;  /* default to a blocked path */ \
-                            \
+                                                     \
         dxs = dx << 1; /* save the shifted values */ \
-        dys = dy << 1;                  \
-        if (dy > dx) {                  \
-            err = dxs - dy;                 \
-                            \
-            for (k = dy-1; k; k--) {            \
-                if (err >= 0) {             \
-                    x++;                    \
-                    err -= dys;             \
-                }                       \
-                y++;                    \
-                err += dxs;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-                            \
-        } else {                        \
-            err = dys - dx;                 \
-                            \
-            for (k = dx-1; k; k--) {            \
-                if (err >= 0) {             \
-                    y++;                    \
-                    err -= dxs;             \
-                }                       \
-                x++;                    \
-                err += dys;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-        }                           \
-                            \
-        result = 1;                     \
+        dys = dy << 1;                               \
+        if (dy > dx) {                               \
+            err = dxs - dy;                          \
+                                                     \
+            for (k = dy-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    x++;                             \
+                    err -= dys;                      \
+                }                                    \
+                y++;                                 \
+                err += dxs;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label;/* blocked */         \
+                }                                    \
+            }                                        \
+                                                     \
+        } else {                                     \
+            err = dys - dx;                          \
+                                                     \
+            for (k = dx-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    y++;                             \
+                    err -= dxs;                      \
+                }                                    \
+                x++;                                 \
+                err += dys;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label;/* blocked */         \
+                }                                    \
+            }                                        \
+        }                                            \
+                                                     \
+        result = 1;                                  \
     }
 
 /*
  * Quadrant II (step < 0).
  */
-#define q2_path(srow, scol, y2, x2, label)          \
-    {                           \
-        int dx, dy;                     \
-        int k, err, x, y, dxs, dys;        \
-                            \
-        x  = (scol);    y  = (srow);            \
-        dx = x - (x2);  dy = y - (y2);          \
-                            \
+#define q2_path(srow, scol, y2, x2, label)           \
+    {                                                \
+        int dx, dy;                                  \
+        int k, err, x, y, dxs, dys;                  \
+                                                     \
+        x  = (scol);    y  = (srow);                 \
+        dx = x - (x2);  dy = y - (y2);               \
+                                                     \
         result = 0;  /* default to a blocked path */ \
-                            \
+                                                     \
         dxs = dx << 1; /* save the shifted values */ \
-        dys = dy << 1;                  \
-        if (dy > dx) {                  \
-            err = dxs - dy;                 \
-                            \
-            for (k = dy-1; k; k--) {            \
-                if (err >= 0) {             \
-                    x--;                    \
-                    err -= dys;             \
-                }                       \
-                y--;                    \
-                err += dxs;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-        } else {                        \
-            err = dys - dx;                 \
-                            \
-            for (k = dx-1; k; k--) {            \
-                if (err >= 0) {             \
-                    y--;                    \
-                    err -= dxs;             \
-                }                       \
-                x--;                    \
-                err += dys;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-        }                           \
-                            \
-        result = 1;                     \
+        dys = dy << 1;                               \
+        if (dy > dx) {                               \
+            err = dxs - dy;                          \
+                                                     \
+            for (k = dy-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    x--;                             \
+                    err -= dys;                      \
+                }                                    \
+                y--;                                 \
+                err += dxs;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label;/* blocked */         \
+                }                                    \
+            }                                        \
+        } else {                                     \
+            err = dys - dx;                          \
+                                                     \
+            for (k = dx-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    y--;                             \
+                    err -= dxs;                      \
+                }                                    \
+                x--;                                 \
+                err += dys;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label;/* blocked */         \
+                }                                    \
+            }                                        \
+        }                                            \
+                                                     \
+        result = 1;                                  \
     }
 
 /*
  * Quadrant III (step > 0).
  */
-#define q3_path(srow, scol, y2, x2, label)          \
-    {                           \
-        int dx, dy;                     \
-        int k, err, x, y, dxs, dys;        \
-                            \
-        x  = (scol);    y  = (srow);            \
-        dx = x - (x2);  dy = (y2) - y;          \
-                            \
+#define q3_path(srow, scol, y2, x2, label)           \
+    {                                                \
+        int dx, dy;                                  \
+        int k, err, x, y, dxs, dys;                  \
+                                                     \
+        x  = (scol);    y  = (srow);                 \
+        dx = x - (x2);  dy = (y2) - y;               \
+                                                     \
         result = 0;  /* default to a blocked path */ \
-                            \
+                                                     \
         dxs = dx << 1; /* save the shifted values */ \
-        dys = dy << 1;                  \
-        if (dy > dx) {                  \
-            err = dxs - dy;                 \
-                            \
-            for (k = dy-1; k; k--) {            \
-                if (err >= 0) {             \
-                    x--;                    \
-                    err -= dys;             \
-                }                       \
-                y++;                    \
-                err += dxs;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-                            \
-        } else {                        \
-            err = dys - dx;                 \
-                            \
-            for (k = dx-1; k; k--) {            \
-                if (err >= 0) {             \
-                    y++;                    \
-                    err -= dxs;             \
-                }                       \
-                x--;                    \
-                err += dys;                 \
-                if (!is_clear(y, x)) goto label;/* blocked */ \
-            }                       \
-        }                           \
-                            \
-        result = 1;                     \
+        dys = dy << 1;                               \
+        if (dy > dx) {                               \
+            err = dxs - dy;                          \
+                                                     \
+            for (k = dy-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    x--;                             \
+                    err -= dys;                      \
+                }                                    \
+                y++;                                 \
+                err += dxs;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label;/* blocked */         \
+                }                                    \
+            }                                        \
+                                                     \
+        } else {                                     \
+            err = dys - dx;                          \
+                                                     \
+            for (k = dx-1; k; k--) {                 \
+                if (err >= 0) {                      \
+                    y++;                             \
+                    err -= dxs;                      \
+                }                                    \
+                x--;                                 \
+                err += dys;                          \
+                if (!is_clear(y, x)) {               \
+                    goto label;/* blocked */         \
+                }                                    \
+            }                                        \
+        }                                            \
+                                                     \
+        result = 1;                                  \
     }
 
 #else   /* quadrants are really functions */
@@ -1340,7 +1443,9 @@ int scol, srow, y2, x2;
             }
             y--;
             err += dxs;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     } else {
         err = dys - dx;
@@ -1352,7 +1457,9 @@ int scol, srow, y2, x2;
             }
             x++;
             err += dys;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     }
 
@@ -1384,7 +1491,9 @@ int scol, srow, y2, x2;
             }
             y++;
             err += dxs;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     } else {
         err = dys - dx;
@@ -1396,7 +1505,9 @@ int scol, srow, y2, x2;
             }
             x++;
             err += dys;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     }
 
@@ -1428,7 +1539,9 @@ int scol, srow, y2, x2;
             }
             y--;
             err += dxs;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     } else {
         err = dys - dx;
@@ -1440,7 +1553,9 @@ int scol, srow, y2, x2;
             }
             x--;
             err += dys;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     }
 
@@ -1472,7 +1587,9 @@ int scol, srow, y2, x2;
             }
             y++;
             err += dxs;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     } else {
         err = dys - dx;
@@ -1484,7 +1601,9 @@ int scol, srow, y2, x2;
             }
             x--;
             err += dys;
-            if (!is_clear(y, x)) return 0; /* blocked */
+            if (!is_clear(y, x)) {
+                return 0; /* blocked */
+            }
         }
     }
 
@@ -1505,16 +1624,16 @@ clear_path(int col1, int row1, int col2, int row2)
 {
     int result;
 
-    if(col1 < col2) {
-        if(row1 > row2) {
+    if (col1 < col2) {
+        if (row1 > row2) {
             q1_path(row1, col1, row2, col2, cleardone);
         } else {
             q4_path(row1, col1, row2, col2, cleardone);
         }
     } else {
-        if(row1 > row2) {
+        if (row1 > row2) {
             q2_path(row1, col1, row2, col2, cleardone);
-        } else if(row1 == row2 && col1 == col2) {
+        } else if (row1 == row2 && col1 == col2) {
             result = 1;
         } else {
             q3_path(row1, col1, row2, col2, cleardone);
@@ -1523,7 +1642,7 @@ clear_path(int col1, int row1, int col2, int row2)
 #ifdef MACRO_CPATH
 cleardone:
 #endif
-    return((boolean)result);
+    return (boolean)result;
 }
 
 #ifdef VISION_TABLES
@@ -1564,11 +1683,13 @@ view_init()
 {
     int i;
 
-    for (i = 0; i < CLOSE_MAX_BC_DY; i++)
+    for (i = 0; i < CLOSE_MAX_BC_DY; i++) {
         close_dy[i] = &close_table[i];
+    }
 
-    for (i = 0; i < FAR_MAX_BC_DY; i++)
+    for (i = 0; i < FAR_MAX_BC_DY; i++) {
         far_dy[i] = &far_table[i];
+    }
 }
 
 
@@ -1588,12 +1709,21 @@ int side, this_row, block_row, block_col;
     /*
      * If on the same column (block_row = -1), then we can see it.
      */
-    if (block_row < 0) return block_col;
+    if (block_row < 0) {
+        return block_col;
+    }
 
     /* Take explicit absolute values.  Adjust. */
-    if ((sdy = (start_row-block_row)) < 0) sdy = -sdy; --sdy;   /* src   dy */
-    if ((sdx = (start_col-block_col)) < 0) sdx = -sdx;      /* src   dx */
-    if ((pdy = (block_row-this_row))  < 0) pdy = -pdy;      /* point dy */
+    if ((sdy = (start_row - block_row)) < 0) {
+        sdy = -sdy;
+    }
+    --sdy; /* src   dy */
+    if ((sdx = (start_col - block_col)) < 0) {
+        sdx = -sdx; /* src   dx */
+    }
+    if ((pdy = (block_row - this_row)) < 0) {
+        pdy = -pdy; /* point dy */
+    }
 
     if (sdy < 0 || sdy >= CLOSE_MAX_SB_DY || sdx >= CLOSE_MAX_SB_DX ||
         pdy >= CLOSE_MAX_BC_DY) {
@@ -1601,8 +1731,9 @@ int side, this_row, block_row, block_col;
         return block_col;
     }
     offset = close_dy[sdy]->close[sdx][pdy];
-    if (side == FROM_RIGHT)
+    if (side == FROM_RIGHT) {
         return block_col + offset;
+    }
 
     return block_col - offset;
 }
@@ -1623,21 +1754,34 @@ int side, this_row, block_row, block_col;
      * Could easily have the column be -1, but then wouldn't know if it was
      * the left or right border.
      */
-    if (block_row < 0) return block_col;
+    if (block_row < 0) {
+        return block_col;
+    }
 
     /* Take explicit absolute values.  Adjust. */
-    if ((sdy = (start_row-block_row)) < 0) sdy = -sdy;      /* src   dy */
-    if ((sdx = (start_col-block_col)) < 0) sdx = -sdx; --sdx;   /* src   dx */
-    if ((pdy = (block_row-this_row))  < 0) pdy = -pdy; --pdy;   /* point dy */
+    if ((sdy = (start_row - block_row)) < 0) {
+        sdy = -sdy; /* src   dy */
+    }
+    if ((sdx = (start_col - block_col)) < 0) {
+        sdx = -sdx;
+    }
+    --sdx; /* src   dx */
+    if ((pdy = (block_row - this_row)) < 0) {
+        pdy = -pdy;
+    }
+    --pdy; /* point dy */
 
     if (sdy >= FAR_MAX_SB_DY || sdx < 0 || sdx >= FAR_MAX_SB_DX ||
         pdy < 0 || pdy >= FAR_MAX_BC_DY) {
         impossible("far_shadow:  bad value");
         return block_col;
     }
-    if ((offset = far_dy[sdy]->far_q[sdx][pdy]) == OFF_TABLE) offset = -1;
-    if (side == FROM_RIGHT)
+    if ((offset = far_dy[sdy]->far_q[sdx][pdy]) == OFF_TABLE) {
+        offset = -1;
+    }
+    if (side == FROM_RIGHT) {
         return block_col + offset;
+    }
 
     return block_col - offset;
 }
@@ -1676,11 +1820,16 @@ right_side(
     }
     if (limits) {
         lim_max = start_col + *limits;
-        if(lim_max > COLNO-1) lim_max = COLNO-1;
-        if(right_mark > lim_max) right_mark = lim_max;
+        if (lim_max > COLNO-1) {
+            lim_max = COLNO-1;
+        }
+        if (right_mark > lim_max) {
+            right_mark = lim_max;
+        }
         limits++; /* prepare for next row */
-    } else
+    } else {
         lim_max = COLNO-1;
+    }
 
     /*
      * Get the left shadow from the close block.  This value could be
@@ -1699,7 +1848,9 @@ right_side(
      */
     while (left <= right_mark) {
         loc_right = right_ptrs[row][left];
-        if(loc_right > lim_max) loc_right = lim_max;
+        if (loc_right > lim_max) {
+            loc_right = lim_max;
+        }
         if (viz_clear_rows[row][left]) {
             if (loc_right >= left_shadow) {
                 left = left_shadow; /* opening ends beyond shadow */
@@ -1707,25 +1858,40 @@ right_side(
             }
             left = loc_right;
             loc_right = right_ptrs[row][left];
-            if(loc_right > lim_max) loc_right = lim_max;
-            if (left == loc_right) return; /* boundary */
+            if (loc_right > lim_max) {
+                loc_right = lim_max;
+            }
+            if (left == loc_right) {
+                return; /* boundary */
+            }
 
             /* Shadow covers opening, beyond right mark */
-            if (left == right_mark && left_shadow > right_mark) return;
+            if (left == right_mark && left_shadow > right_mark) {
+                return;
+            }
         }
 
-        if (loc_right > right_mark) /* can't see stone beyond the mark */
+        if (loc_right > right_mark) { /* can't see stone beyond the mark */
             loc_right = right_mark;
+        }
 
-        if(vis_func) {
-            for (i = left; i <= loc_right; i++) (*vis_func)(i, row, varg);
+        if (vis_func) {
+            for (i = left; i <= loc_right; i++) {
+                (*vis_func)(i, row, varg);
+            }
         } else {
-            for (i = left; i <= loc_right; i++) set_cs(rowp, i);
+            for (i = left; i <= loc_right; i++) {
+                set_cs(rowp, i);
+            }
             set_min(left);  set_max(loc_right);
         }
 
-        if (loc_right == right_mark) return; /* all stone */
-        if (loc_right >= left_shadow) hit_stone = 1;
+        if (loc_right == right_mark) {
+            return; /* all stone */
+        }
+        if (loc_right >= left_shadow) {
+            hit_stone = 1;
+        }
         left = loc_right + 1;
     }
 
@@ -1738,8 +1904,9 @@ right_side(
     /*
      * Get the right shadow.  Make sure that it is a legal value.
      */
-    if ((right_shadow = far_shadow(FROM_RIGHT, row, fb_row, fb_col)) >= COLNO)
+    if ((right_shadow = far_shadow(FROM_RIGHT, row, fb_row, fb_col)) >= COLNO) {
         right_shadow = COLNO-1;
+    }
     /*
      * Make vertical walls work the way we want them.  In this case, we
      * note when the close block blocks the column just above/beneath
@@ -1747,9 +1914,12 @@ right_side(
      * the location is filled, then we want to see it, so we put the
      * right shadow back (same as fb_col).
      */
-    if (right_shadow < fb_col && !viz_clear_rows[row][fb_col])
+    if (right_shadow < fb_col && !viz_clear_rows[row][fb_col]) {
         right_shadow = fb_col;
-    if(right_shadow > lim_max) right_shadow = lim_max;
+    }
+    if (right_shadow > lim_max) {
+        right_shadow = lim_max;
+    }
 
     /*
      * Main loop.  Within the range of sight of the previous row, mark all
@@ -1758,7 +1928,9 @@ right_side(
     while (left <= right_mark) {
         /* Get the far right of the opening or wall */
         loc_right = right_ptrs[row][left];
-        if(loc_right > lim_max) loc_right = lim_max;
+        if (loc_right > lim_max) {
+            loc_right = lim_max;
+        }
 
         if (!viz_clear_rows[row][left]) {
             hit_stone = 1; /* use stone on this row as close block */
@@ -1768,19 +1940,29 @@ right_side(
              *
              * Can't see stone beyond the right mark.
              */
-            if (loc_right > right_mark) loc_right = right_mark;
+            if (loc_right > right_mark) {
+                loc_right = right_mark;
+            }
 
-            if(vis_func) {
-                for (i = left; i <= loc_right; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = left; i <= loc_right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = left; i <= loc_right; i++) set_cs(rowp, i);
+                for (i = left; i <= loc_right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left);  set_max(loc_right);
             }
 
-            if (loc_right == right_mark) return; /* hit the end */
+            if (loc_right == right_mark) {
+                return; /* hit the end */
+            }
             left = loc_right + 1;
             loc_right = right_ptrs[row][left];
-            if(loc_right > lim_max) loc_right = lim_max;
+            if (loc_right > lim_max) {
+                loc_right = lim_max;
+            }
             /* fall through... we know at least one position is visible */
         }
 
@@ -1794,7 +1976,9 @@ right_side(
         if (hit_stone) {
             lblock_col = left-1; /* local block column */
             left = close_shadow(FROM_RIGHT, row, row, lblock_col);
-            if (left > lim_max) break;  /* off the end */
+            if (left > lim_max) {
+                break; /* off the end */
+            }
         }
 
         /*
@@ -1806,8 +1990,9 @@ right_side(
         if (left >= loc_right) {
             if (loc_right == lim_max) { /* boundary */
                 if (left == lim_max) {
-                    if(vis_func) (*vis_func)(lim_max, row, varg);
-                    else {
+                    if (vis_func) {
+                        (*vis_func)(lim_max, row, varg);
+                    } else {
                         set_cs(rowp, lim_max); /* last pos */
                         set_max(lim_max);
                     }
@@ -1837,20 +2022,25 @@ right_side(
          */
         if ((loc_right < right_shadow) ||
             (fb_row >= 0 && loc_right == right_shadow)) {
-            if(vis_func) {
-                for (i = left; i <= loc_right; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = left; i <= loc_right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = left; i <= loc_right; i++) set_cs(rowp, i);
+                for (i = left; i <= loc_right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left);  set_max(loc_right);
             }
 
             if (deeper) {
-                if (hit_stone)
+                if (hit_stone) {
                     right_side(nrow, row, lblock_col, row, loc_right,
                                left, loc_right, limits);
-                else
+                } else {
                     right_side(nrow, cb_row, cb_col, row, loc_right,
                                left, loc_right, limits);
+                }
             }
 
             /*
@@ -1872,20 +2062,25 @@ right_side(
          * the next far block is the current far block.
          */
         else {
-            if(vis_func) {
-                for (i=left; i <= right_shadow; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = left; i <= right_shadow; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = left; i <= right_shadow; i++) set_cs(rowp, i);
+                for (i = left; i <= right_shadow; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left);  set_max(right_shadow);
             }
 
             if (deeper) {
-                if (hit_stone)
+                if (hit_stone) {
                     right_side(nrow,   row, lblock_col, fb_row, fb_col,
                                left, right_shadow, limits);
-                else
+                } else {
                     right_side(nrow, cb_row,    cb_col, fb_row, fb_col,
                                left, right_shadow, limits);
+                }
             }
 
             return; /* we're outta here */
@@ -1921,25 +2116,32 @@ left_side(
 
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
-    if(!vis_func) {
+    if (!vis_func) {
         rowp    = cs_rows[row];
         row_min = &cs_left[row];
         row_max = &cs_right[row];
     }
-    if(limits) {
+    if (limits) {
         lim_min = start_col - *limits;
-        if(lim_min < 0) lim_min = 0;
-        if(left_mark < lim_min) left_mark = lim_min;
+        if (lim_min < 0) {
+            lim_min = 0;
+        }
+        if (left_mark < lim_min) {
+            left_mark = lim_min;
+        }
         limits++; /* prepare for next row */
-    } else
+    } else {
         lim_min = 0;
+    }
 
     /* This value could be illegal. */
     right_shadow = close_shadow(FROM_LEFT, row, cb_row, cb_col);
 
     while ( right >= left_mark ) {
         loc_left = left_ptrs[row][right];
-        if(loc_left < lim_min) loc_left = lim_min;
+        if (loc_left < lim_min) {
+            loc_left = lim_min;
+        }
         if (viz_clear_rows[row][right]) {
             if (loc_left <= right_shadow) {
                 right = right_shadow; /* opening ends beyond shadow */
@@ -1947,34 +2149,51 @@ left_side(
             }
             right = loc_left;
             loc_left = left_ptrs[row][right];
-            if(loc_left < lim_min) loc_left = lim_min;
-            if (right == loc_left) return; /* boundary */
+            if (loc_left < lim_min) {
+                loc_left = lim_min;
+            }
+            if (right == loc_left) {
+                return; /* boundary */
+            }
         }
 
-        if (loc_left < left_mark) /* can't see beyond the left mark */
+        if (loc_left < left_mark) { /* can't see beyond the left mark */
             loc_left = left_mark;
+        }
 
-        if(vis_func) {
-            for (i = loc_left; i <= right; i++) (*vis_func)(i, row, varg);
+        if (vis_func) {
+            for (i = loc_left; i <= right; i++) {
+                (*vis_func)(i, row, varg);
+            }
         } else {
-            for (i = loc_left; i <= right; i++) set_cs(rowp, i);
+            for (i = loc_left; i <= right; i++) {
+                set_cs(rowp, i);
+            }
             set_min(loc_left);  set_max(right);
         }
 
-        if (loc_left == left_mark) return; /* all stone */
-        if (loc_left <= right_shadow) hit_stone = 1;
+        if (loc_left == left_mark) {
+            return; /* all stone */
+        }
+        if (loc_left <= right_shadow) {
+            hit_stone = 1;
+        }
         right = loc_left - 1;
     }
 
     /* At first visible clear spot on or beyond the right shadow. */
 
-    if ((left_shadow = far_shadow(FROM_LEFT, row, fb_row, fb_col)) < 0)
+    if ((left_shadow = far_shadow(FROM_LEFT, row, fb_row, fb_col)) < 0) {
         left_shadow = 0;
+    }
 
     /* Do vertical walls as we want. */
-    if (left_shadow > fb_col && !viz_clear_rows[row][fb_col])
+    if (left_shadow > fb_col && !viz_clear_rows[row][fb_col]) {
         left_shadow = fb_col;
-    if(left_shadow < lim_min) left_shadow = lim_min;
+    }
+    if (left_shadow < lim_min) {
+        left_shadow = lim_min;
+    }
 
     while (right >= left_mark) {
         loc_left = left_ptrs[row][right];
@@ -1983,19 +2202,29 @@ left_side(
             hit_stone = 1; /* use stone on this row as close block */
 
             /* We can only see walls until the left mark */
-            if (loc_left < left_mark) loc_left = left_mark;
+            if (loc_left < left_mark) {
+                loc_left = left_mark;
+            }
 
-            if(vis_func) {
-                for (i = loc_left; i <= right; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = loc_left; i <= right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = loc_left; i <= right; i++) set_cs(rowp, i);
+                for (i = loc_left; i <= right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(loc_left);  set_max(right);
             }
 
-            if (loc_left == left_mark) return; /* hit end */
+            if (loc_left == left_mark) {
+                return; /* hit end */
+            }
             right = loc_left - 1;
             loc_left = left_ptrs[row][right];
-            if (loc_left < lim_min) loc_left = lim_min;
+            if (loc_left < lim_min) {
+                loc_left = lim_min;
+            }
             /* fall through...*/
         }
 
@@ -2003,7 +2232,9 @@ left_side(
         if (hit_stone) {
             lblock_col = right+1; /* stone block (local) */
             right = close_shadow(FROM_LEFT, row, row, lblock_col);
-            if (right < lim_min) return; /* off the end */
+            if (right < lim_min) {
+                return; /* off the end */
+            }
         }
 
         /*  Check if the shadow covers the opening. */
@@ -2011,8 +2242,9 @@ left_side(
             /*  Make a boundary condition work. */
             if (loc_left == lim_min) { /* at boundary */
                 if (right == lim_min) {
-                    if(vis_func) (*vis_func)(lim_min, row, varg);
-                    else {
+                    if (vis_func) {
+                        (*vis_func)(lim_min, row, varg);
+                    } else {
                         set_cs(rowp, lim_min); /* caught the last pos */
                         set_min(lim_min);
                     }
@@ -2027,20 +2259,26 @@ left_side(
         /* If the far wall of the opening is closer than the shadow limit. */
         if ((loc_left > left_shadow) ||
             (fb_row >= 0 && loc_left == left_shadow)) {
-            if(vis_func) {
-                for (i = loc_left; i <= right; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = loc_left; i <= right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
+
             } else {
-                for (i = loc_left; i <= right; i++) set_cs(rowp, i);
+                for (i = loc_left; i <= right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(loc_left);  set_max(right);
             }
 
             if (deeper) {
-                if (hit_stone)
+                if (hit_stone) {
                     left_side(nrow, row, lblock_col, row, loc_left,
                               loc_left, right, limits);
-                else
+                } else {
                     left_side(nrow, cb_row, cb_col, row, loc_left,
                               loc_left, right, limits);
+                }
             }
 
             hit_stone = 1; /* needed for walls of width 1 */
@@ -2048,20 +2286,25 @@ left_side(
         }
         /*  The opening extends beyond the left mark. */
         else {
-            if(vis_func) {
-                for (i=left_shadow; i <= right; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = left_shadow; i <= right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = left_shadow; i <= right; i++) set_cs(rowp, i);
+                for (i = left_shadow; i <= right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left_shadow);   set_max(right);
             }
 
             if (deeper) {
-                if (hit_stone)
+                if (hit_stone) {
                     left_side(nrow, row, lblock_col, fb_row, fb_col,
                               left_shadow, right, limits);
-                else
+                } else {
                     left_side(nrow, cb_row, cb_col, fb_row, fb_col,
                               left_shadow, right, limits);
+                }
             }
 
             return; /* we're outta here */
@@ -2112,23 +2355,33 @@ view_from(
                 (viz_clear_rows[srow][scol+1] ? right_ptrs[srow][scol+1] : scol+1);
     }
 
-    if(range) {
-        if(range > MAX_RADIUS || range < 1)
+    if (range) {
+        if (range > MAX_RADIUS || range < 1) {
             panic("view_from called with range %d", range);
+        }
         limits = circle_ptr(range) + 1; /* start at next row */
-        if(left < scol - range) left = scol - range;
-        if(right > scol + range) right = scol + range;
-    } else
+        if (left < scol - range) {
+            left = scol - range;
+        }
+        if (right > scol + range) {
+            right = scol + range;
+        }
+    } else {
         limits = (char*) 0;
+    }
 
-    if(func) {
-        for (i = left; i <= right; i++) (*func)(i, srow, arg);
+    if (func) {
+        for (i = left; i <= right; i++) {
+            (*func)(i, srow, arg);
+        }
     } else {
         /* Row optimization */
         rowp = cs_rows[srow];
 
         /* We know that we can see our row. */
-        for (i = left; i <= right; i++) set_cs(rowp, i);
+        for (i = left; i <= right; i++) {
+            set_cs(rowp, i);
+        }
         cs_left[srow]  = left;
         cs_right[srow] = right;
     }
@@ -2142,18 +2395,22 @@ view_from(
      */
     if ( (nrow = srow+1) < ROWNO ) {
         step =  1;/* move down */
-        if (scol<COLNO-1)
+        if (scol < COLNO-1) {
             right_side(nrow, -1, scol, right_row, right, scol, right, limits);
-        if (scol)
+        }
+        if (scol) {
             left_side(nrow, -1, scol, left_row, left, left, scol, limits);
+        }
     }
 
     if ( (nrow = srow-1) >= 0 ) {
         step = -1; /* move up */
-        if (scol<COLNO-1)
+        if (scol < COLNO-1) {
             right_side(nrow, -1, scol, right_row, right, scol, right, limits);
-        if (scol)
+        }
+        if (scol) {
             left_side(nrow, -1, scol, left_row, left, left, scol, limits);
+        }
     }
 }
 
@@ -2208,22 +2465,29 @@ right_side(
      * on the structure of circle_data[]).
      */
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
-    if(!vis_func) {
+    if (!vis_func) {
         rowp    = cs_rows[row];/* optimization */
         row_min = &cs_left[row];
         row_max = &cs_right[row];
     }
-    if(limits) {
+    if (limits) {
         lim_max = start_col + *limits;
-        if(lim_max > COLNO-1) lim_max = COLNO-1;
-        if(right_mark > lim_max) right_mark = lim_max;
+        if (lim_max > COLNO-1) {
+            lim_max = COLNO-1;
+        }
+        if (right_mark > lim_max) {
+            right_mark = lim_max;
+        }
         limits++; /* prepare for next row */
-    } else
+    } else {
         lim_max = COLNO-1;
+    }
 
     while (left <= right_mark) {
         right_edge = right_ptrs[row][left];
-        if(right_edge > lim_max) right_edge = lim_max;
+        if (right_edge > lim_max) {
+            right_edge = lim_max;
+        }
 
         if (!is_clear(row, left)) {
             /*
@@ -2244,10 +2508,14 @@ right_side(
                 right_edge = is_clear(row-step, right_mark) ?
                              right_mark+1 : right_mark;
             }
-            if(vis_func) {
-                for (i = left; i <= right_edge; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = left; i <= right_edge; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = left; i <= right_edge; i++) set_cs(rowp, i);
+                for (i = left; i <= right_edge; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left);      set_max(right_edge);
             }
             left = right_edge + 1; /* no limit check necessary */
@@ -2267,7 +2535,9 @@ right_side(
                     q4_path(start_row, start_col, row, left, rside1);
                 }
 rside1:         /* used if q?_path() is a macro */
-                if (result) break;
+                if (result) {
+                    break;
+                }
             }
 
             /*
@@ -2277,10 +2547,13 @@ rside1:         /* used if q?_path() is a macro */
              *      left == right_edge == right_mark == lim_max.
              *
              */
-            if (left > lim_max) return; /* check (1) */
+            if (left > lim_max) {
+                return; /* check (1) */
+            }
             if (left == lim_max) { /* check (2) */
-                if(vis_func) (*vis_func)(lim_max, row, varg);
-                else {
+                if (vis_func) {
+                    (*vis_func)(lim_max, row, varg);
+                } else {
                     set_cs(rowp, lim_max);
                     set_max(lim_max);
                 }
@@ -2318,12 +2591,14 @@ rside1:         /* used if q?_path() is a macro */
                     q4_path(start_row, start_col, row, right, rside2);
                 }
 rside2:         /* used if q?_path() is a macro */
-                if (!result) break;
+                if (!result) {
+                    break;
+                }
             }
             --right; /* get rid of the last increment */
-        }
-        else
+        } else {
             right = right_edge;
+        }
 
         /*
          * We have the range that we want.  Set the bits.  Note that
@@ -2340,17 +2615,26 @@ rside2:         /* used if q?_path() is a macro */
                 start_col < (COLNO-1) && !is_clear(row, start_col+1))
                 right = start_col+1;
 
-            if(right > lim_max) right = lim_max;
+            if (right > lim_max) {
+                right = lim_max;
+            }
             /* set the bits */
-            if(vis_func)
-                for (i = left; i <= right; i++) (*vis_func)(i, row, varg);
-            else {
-                for (i = left; i <= right; i++) set_cs(rowp, i);
-                set_min(left);      set_max(right);
+            if (vis_func) {
+                for (i = left; i <= right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
+            } else {
+                for (i = left; i <= right; i++) {
+                    set_cs(rowp, i);
+                }
+                set_min(left);
+                set_max(right);
             }
 
             /* recursive call for next finger of light */
-            if (deeper) right_side(nrow, left, right, limits);
+            if (deeper) {
+                right_side(nrow, left, right, limits);
+            }
             left = right + 1; /* no limit check necessary */
         }
     }
@@ -2373,22 +2657,29 @@ left_side(int row, int left_mark, int right, coordxy *limits)
 
     nrow    = row+step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
-    if(!vis_func) {
+    if (!vis_func) {
         rowp    = cs_rows[row];
         row_min = &cs_left[row];
         row_max = &cs_right[row];
     }
-    if(limits) {
+    if (limits) {
         lim_min = start_col - *limits;
-        if(lim_min < 0) lim_min = 0;
-        if(left_mark < lim_min) left_mark = lim_min;
+        if (lim_min < 0) {
+            lim_min = 0;
+        }
+        if (left_mark < lim_min) {
+            left_mark = lim_min;
+        }
         limits++; /* prepare for next row */
-    } else
+    } else {
         lim_min = 0;
+    }
 
     while (right >= left_mark) {
         left_edge = left_ptrs[row][right];
-        if(left_edge < lim_min) left_edge = lim_min;
+        if (left_edge < lim_min) {
+            left_edge = lim_min;
+        }
 
         if (!is_clear(row, right)) {
             /* Jump to the far side of a stone wall. */
@@ -2397,10 +2688,14 @@ left_side(int row, int left_mark, int right, coordxy *limits)
                 left_edge = is_clear(row-step, left_mark) ?
                             left_mark-1 : left_mark;
             }
-            if(vis_func) {
-                for (i = left_edge; i <= right; i++) (*vis_func)(i, row, varg);
+            if (vis_func) {
+                for (i = left_edge; i <= right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
             } else {
-                for (i = left_edge; i <= right; i++) set_cs(rowp, i);
+                for (i = left_edge; i <= right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left_edge); set_max(right);
             }
             right = left_edge - 1; /* no limit check necessary */
@@ -2416,14 +2711,19 @@ left_side(int row, int left_mark, int right, coordxy *limits)
                     q3_path(start_row, start_col, row, right, lside1);
                 }
 lside1:         /* used if q?_path() is a macro */
-                if (result) break;
+                if (result) {
+                    break;
+                }
             }
 
             /* Check for boundary conditions. */
-            if (right < lim_min) return;
+            if (right < lim_min) {
+                return;
+            }
             if (right == lim_min) {
-                if(vis_func) (*vis_func)(lim_min, row, varg);
-                else {
+                if (vis_func) {
+                    (*vis_func)(lim_min, row, varg);
+                } else {
                     set_cs(rowp, lim_min);
                     set_min(lim_min);
                 }
@@ -2445,12 +2745,14 @@ lside1:         /* used if q?_path() is a macro */
                     q3_path(start_row, start_col, row, left, lside2);
                 }
 lside2:         /* used if q?_path() is a macro */
-                if (!result) break;
+                if (!result) {
+                    break;
+                }
             }
             left++; /* get rid of the last decrement */
-        }
-        else
+        } else {
             left = left_edge;
+        }
 
         if (left <= right) {
             /* An ugly special case. */
@@ -2458,16 +2760,24 @@ lside2:         /* used if q?_path() is a macro */
                 start_col > 0 && !is_clear(row, start_col-1))
                 left = start_col-1;
 
-            if(left < lim_min) left = lim_min;
-            if(vis_func)
-                for (i = left; i <= right; i++) (*vis_func)(i, row, varg);
-            else {
-                for (i = left; i <= right; i++) set_cs(rowp, i);
+            if (left < lim_min) {
+                left = lim_min;
+            }
+            if (vis_func) {
+                for (i = left; i <= right; i++) {
+                    (*vis_func)(i, row, varg);
+                }
+            } else {
+                for (i = left; i <= right; i++) {
+                    set_cs(rowp, i);
+                }
                 set_min(left);      set_max(right);
             }
 
             /* Recurse */
-            if (deeper) left_side(nrow, left, right, limits);
+            if (deeper) {
+                left_side(nrow, left, right, limits);
+            }
             right = left - 1; /* no limit check necessary */
         }
     }
@@ -2532,23 +2842,33 @@ view_from(
                 (is_clear(srow, scol+1) ? right_ptrs[srow][scol+1] : scol+1);
     }
 
-    if(range) {
-        if(range > MAX_RADIUS || range < 1)
+    if (range) {
+        if (range > MAX_RADIUS || range < 1) {
             panic("view_from called with range %d", range);
+        }
         limits = circle_ptr(range) + 1; /* start at next row */
-        if(left < scol - range) left = scol - range;
-        if(right > scol + range) right = scol + range;
-    } else
+        if (left < scol - range) {
+            left = scol - range;
+        }
+        if (right > scol + range) {
+            right = scol + range;
+        }
+    } else {
         limits = (coordxy *) 0;
+    }
 
-    if(func) {
-        for (i = left; i <= right; i++) (*func)(i, srow, arg);
+    if (func) {
+        for (i = left; i <= right; i++) {
+            (*func)(i, srow, arg);
+        }
     } else {
         /* Row pointer optimization. */
         rowp = cs_rows[srow];
 
         /* We know that we can see our row. */
-        for (i = left; i <= right; i++) set_cs(rowp, i);
+        for (i = left; i <= right; i++) {
+            set_cs(rowp, i);
+        }
         cs_left[srow]  = left;
         cs_right[srow] = right;
     }
@@ -2560,14 +2880,22 @@ view_from(
      */
     if ( (nrow = srow+1) < ROWNO ) {    /* move down */
         step =  1;
-        if (scol < COLNO-1) right_side(nrow, scol, right, limits);
-        if (scol) left_side (nrow, left,  scol, limits);
+        if (scol < COLNO-1) {
+            right_side(nrow, scol, right, limits);
+        }
+        if (scol) {
+            left_side(nrow, left,  scol, limits);
+        }
     }
 
     if ( (nrow = srow-1) >= 0 ) {   /* move up */
         step = -1;
-        if (scol < COLNO-1) right_side(nrow, scol, right, limits);
-        if (scol) left_side (nrow, left,  scol, limits);
+        if (scol < COLNO-1) {
+            right_side(nrow, scol, right, limits);
+        }
+        if (scol) {
+            left_side(nrow, left,  scol, limits);
+        }
     }
 }
 
@@ -2592,10 +2920,10 @@ do_clear_area(
     genericptr_t arg)
 {
     /* If not centered on hero, do the hard work of figuring the area */
-    if (scol != u.ux || srow != u.uy)
+    if (scol != u.ux || srow != u.uy) {
         view_from(srow, scol, (char **)0, (coordxy *)0, (coordxy *)0,
                   range, func, arg);
-    else {
+    } else {
         int x;
         int y, min_x, max_x, max_y, offset;
         const coordxy *limits;
@@ -2605,22 +2933,32 @@ do_clear_area(
            [this probably ought to be an arg supplied by our caller...] */
         override_vision = (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) && detecting(func);
 
-        if (range > MAX_RADIUS || range < 1)
+        if (range > MAX_RADIUS || range < 1) {
             panic("do_clear_area:  illegal range %d", range);
+        }
         if (vision_full_recalc) {
             vision_recalc(0); /* recalc vision if dirty */
         }
         limits = circle_ptr(range);
-        if ((max_y = (srow + range)) >= ROWNO) max_y = ROWNO-1;
-        if ((y = (srow - range)) < 0) y = 0;
+        if ((max_y = (srow + range)) >= ROWNO) {
+            max_y = ROWNO-1;
+        }
+        if ((y = (srow - range)) < 0) {
+            y = 0;
+        }
         for (; y <= max_y; y++) {
             offset = limits[v_abs(y-srow)];
-            if((min_x = (scol - offset)) < 0) min_x = 0;
-            if((max_x = (scol + offset)) >= COLNO) max_x = COLNO-1;
-            for (x = min_x; x <= max_x; x++)
+            if ((min_x = (scol - offset)) < 0) {
+                min_x = 0;
+            }
+            if ((max_x = (scol + offset)) >= COLNO) {
+                max_x = COLNO-1;
+            }
+            for (x = min_x; x <= max_x; x++) {
                 if (couldsee(x, y) || override_vision) {
                     (*func)(x, y, arg);
                 }
+            }
         }
     }
 }

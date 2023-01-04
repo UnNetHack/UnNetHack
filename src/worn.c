@@ -61,11 +61,13 @@ setworn(struct obj *obj, long int mask)
         for (wp = worn; wp->w_mask; wp++)  {
             if (wp->w_mask & mask) {
                 oobj = *(wp->w_obj);
-                if(oobj && !(oobj->owornmask & wp->w_mask))
+                if (oobj && !(oobj->owornmask & wp->w_mask)) {
                     warning("Setworn: mask = %ld.", wp->w_mask);
-                if(oobj) {
-                    if (u.twoweap && (oobj->owornmask & (W_WEP|W_SWAPWEP)))
+                }
+                if (oobj) {
+                    if (u.twoweap && (oobj->owornmask & (W_WEP|W_SWAPWEP))) {
                         u.twoweap = 0;
+                    }
                     oobj->owornmask &= ~wp->w_mask;
                     if (wp->w_mask & ~(W_SWAPWEP|W_QUIVER)) {
                         /* leave as "x = x <op> y", here and below, for broken
@@ -76,18 +78,20 @@ setworn(struct obj *obj, long int mask)
                         if ((p = w_blocks(oobj, mask)) != 0) {
                             u.uprops[p].blocked &= ~wp->w_mask;
                             /* HACK: telepathy-blocking items also block clairvoyance */
-                            if (p == TELEPAT)
+                            if (p == TELEPAT) {
                                 u.uprops[CLAIRVOYANT].blocked &= ~wp->w_mask;
+                            }
                         }
-                        if (oobj->oartifact)
+                        if (oobj->oartifact) {
                             set_artifact_intrinsic(oobj, 0, mask);
+                        }
                     }
                     /* in case wearing or removal is in progress or removal
                        is pending (via 'A' command for multiple items) */
                     cancel_doff(oobj, wp->w_mask);
                 }
                 *(wp->w_obj) = obj;
-                if(obj) {
+                if (obj) {
                     obj->owornmask |= wp->w_mask;
                     /* Prevent getting/blocking intrinsics from wielding
                      * potions, through the quiver, etc.
@@ -103,12 +107,14 @@ setworn(struct obj *obj, long int mask)
                             if ((p = w_blocks(obj, mask)) != 0) {
                                 u.uprops[p].blocked |= wp->w_mask;
                                 /* HACK: telepathy-blocking items also block clairvoyance */
-                                if (p == TELEPAT)
+                                if (p == TELEPAT) {
                                     u.uprops[CLAIRVOYANT].blocked |= wp->w_mask;
+                                }
                             }
                         }
-                        if (obj->oartifact)
+                        if (obj->oartifact) {
                             set_artifact_intrinsic(obj, 1, mask);
+                        }
                     }
                 }
             }
@@ -125,8 +131,12 @@ setnotworn(struct obj *obj)
     const struct worn *wp;
     int p;
 
-    if (!obj) return;
-    if (obj == uwep || obj == uswapwep) u.twoweap = 0;
+    if (!obj) {
+        return;
+    }
+    if (obj == uwep || obj == uswapwep) {
+        u.twoweap = 0;
+    }
     for (wp = worn; wp->w_mask; wp++) {
         if (obj == *(wp->w_obj)) {
             /* in case wearing or removal is in progress or removal
@@ -136,13 +146,15 @@ setnotworn(struct obj *obj)
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
             obj->owornmask &= ~wp->w_mask;
-            if (obj->oartifact)
+            if (obj->oartifact) {
                 set_artifact_intrinsic(obj, 0, wp->w_mask);
+            }
             if ((p = w_blocks(obj, wp->w_mask)) != 0) {
                 u.uprops[p].blocked &= ~wp->w_mask;
                 /* HACK: telepathy-blocking items also block clairvoyance */
-                if (p == TELEPAT)
+                if (p == TELEPAT) {
                     u.uprops[CLAIRVOYANT].blocked &= ~wp->w_mask;
+                }
             }
         }
     }
@@ -245,10 +257,13 @@ mon_set_minvis(struct monst *mon)
     mon->perminvis = 1;
     if (!mon->invis_blkd) {
         mon->minvis = 1;
-        if (mon->data == &mons[PM_GIANT_TURTLE])
+        if (mon->data == &mons[PM_GIANT_TURTLE]) {
             unblock_point(mon->mx, mon->my);
+        }
         newsym(mon->mx, mon->my);       /* make it disappear */
-        if (mon->wormno) see_wsegs(mon);    /* and any tail too */
+        if (mon->wormno) {
+            see_wsegs(mon); /* and any tail too */
+        }
     }
 }
 
@@ -267,14 +282,20 @@ mon_adjust_speed(struct monst *mon,
         give_msg = FALSE; /* special case monster creation */
         break;
     case  1:
-        if (mon->permspeed == MSLOW) mon->permspeed = 0;
-        else mon->permspeed = MFAST;
+        if (mon->permspeed == MSLOW) {
+            mon->permspeed = 0;
+        } else {
+            mon->permspeed = MFAST;
+        }
         break;
     case  0:            /* just check for worn speed boots */
         break;
     case -1:
-        if (mon->permspeed == MFAST) mon->permspeed = 0;
-        else mon->permspeed = MSLOW;
+        if (mon->permspeed == MFAST) {
+            mon->permspeed = 0;
+        } else {
+            mon->permspeed = MSLOW;
+        }
         break;
     case -2:
         mon->permspeed = MSLOW;
@@ -282,7 +303,9 @@ mon_adjust_speed(struct monst *mon,
         break;
     case -3:            /* petrification */
         /* take away intrinsic speed but don't reduce normal speed */
-        if (mon->permspeed == MFAST) mon->permspeed = 0;
+        if (mon->permspeed == MFAST) {
+            mon->permspeed = 0;
+        }
         petrify = TRUE;
         break;
     case -4: /* green slime */
@@ -293,13 +316,17 @@ mon_adjust_speed(struct monst *mon,
         break;
     }
 
-    for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
-        if (otmp->owornmask && objects[otmp->otyp].oc_oprop == FAST)
+    for (otmp = mon->minvent; otmp; otmp = otmp->nobj) {
+        if (otmp->owornmask && objects[otmp->otyp].oc_oprop == FAST) {
             break;
-    if (otmp)       /* speed boots */
+        }
+    }
+
+    if (otmp) { /* speed boots */
         mon->mspeed = MFAST;
-    else
+    } else {
         mon->mspeed = mon->permspeed;
+    }
 
     /* no message if monster is immobile (temp or perm) or unseen */
     if (give_msg && (mon->mspeed != oldspeed || petrify) &&
@@ -311,15 +338,16 @@ mon_adjust_speed(struct monst *mon,
         if (petrify) {
             /* mimic the player's petrification countdown; "slowing down"
                even if fast movement rate retained via worn speed boots */
-            if (flags.verbose) pline("%s is slowing down.", Monnam(mon));
-        } else if (adjust > 0 || mon->mspeed == MFAST)
+            if (flags.verbose) {
+                pline("%s is slowing down.", Monnam(mon));
+            }
+        } else if (adjust > 0 || mon->mspeed == MFAST) {
             if (is_weeping(mon->data)) {
                 pline("%s is suddenly changing positions %sfaster.", Monnam(mon), howmuch);
             } else {
                 pline("%s is suddenly moving %sfaster.", Monnam(mon), howmuch);
             }
-        else
-        if (is_weeping(mon->data)) {
+        } else if (is_weeping(mon->data)) {
             pline("%s is suddenly changing positions %sslower.", Monnam(mon), howmuch);
         } else {
             pline("%s seems to be moving %sslower.", Monnam(mon), howmuch);
@@ -344,15 +372,19 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on, boolean si
 
     unseen = !canseemon(mon);
     if (Is_glowing_dragon_armor(obj->otyp)) {
-        if (on)
+        if (on) {
             begin_burn(obj, FALSE);
-        else
+        } else {
             end_burn(obj, FALSE);
-        if (!unseen && !silently)
+        }
+        if (!unseen && !silently) {
             if (on) pline("%s begins to glow.", The(xname(obj)));
+        }
     }
 
-    if (!which) goto maybe_blocks;
+    if (!which) {
+        goto maybe_blocks;
+    }
 
     if (on) {
         switch (which) {
@@ -362,7 +394,9 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on, boolean si
         case FAST:
         {
             boolean save_in_mklev = in_mklev;
-            if (silently) in_mklev = TRUE;
+            if (silently) {
+                in_mklev = TRUE;
+            }
             mon_adjust_speed(mon, 0, obj);
             in_mklev = save_in_mklev;
             break;
@@ -402,7 +436,9 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on, boolean si
         case FAST:
         {
             boolean save_in_mklev = in_mklev;
-            if (silently) in_mklev = TRUE;
+            if (silently) {
+                in_mklev = TRUE;
+            }
             mon_adjust_speed(mon, 0, obj);
             in_mklev = save_in_mklev;
             break;
@@ -445,12 +481,14 @@ maybe_blocks:
         break;
     }
 
-    if (!on && mon == u.usteed && obj->otyp == SADDLE)
+    if (!on && mon == u.usteed && obj->otyp == SADDLE) {
         dismount_steed(DISMOUNT_FELL);
+    }
 
     /* if couldn't see it but now can, or vice versa, update display */
-    if (!silently && (unseen ^ !canseemon(mon)))
+    if (!silently && (unseen ^ !canseemon(mon))) {
         newsym(mon->mx, mon->my);
+    }
 }
 
 int
@@ -468,8 +506,9 @@ find_mac(struct monst *mon)
 
 
     for (obj = mon->minvent; obj; obj = obj->nobj) {
-        if (obj->owornmask & mwflags)
+        if (obj->owornmask & mwflags) {
             base -= ARM_BONUS(obj);
+        }
         /* since ARM_BONUS is positive, subtracting it increases AC */
     }
     return base;
@@ -501,8 +540,9 @@ m_dowear(struct monst *mon, boolean creation)
      * except for the additional restriction on intelligence.  (Players
      * are always intelligent, even if polymorphed).
      */
-    if (verysmall(mon->data) || nohands(mon->data) || is_animal(mon->data))
+    if (verysmall(mon->data) || nohands(mon->data) || is_animal(mon->data)) {
         return;
+    }
     /* give mummies a chance to wear their wrappings
      * and let skeletons wear their initial armor */
     if (mindless(mon->data) && (!creation ||
@@ -516,18 +556,22 @@ m_dowear(struct monst *mon, boolean creation)
     }
     /* treating small as a special case allows
        hobbits, gnomes, and kobolds to wear cloaks */
-    if (!cantweararm(mon->data) || mon->data->msize == MZ_SMALL)
+    if (!cantweararm(mon->data) || mon->data->msize == MZ_SMALL) {
         m_dowear_type(mon, W_ARMC, creation, FALSE);
+    }
     m_dowear_type(mon, W_ARMH, creation, FALSE);
-    if (!MON_WEP(mon) || !bimanual(MON_WEP(mon)))
+    if (!MON_WEP(mon) || !bimanual(MON_WEP(mon))) {
         m_dowear_type(mon, W_ARMS, creation, FALSE);
+    }
     m_dowear_type(mon, W_ARMG, creation, FALSE);
-    if (!slithy(mon->data) && mon->data->mlet != S_CENTAUR)
+    if (!slithy(mon->data) && mon->data->mlet != S_CENTAUR) {
         m_dowear_type(mon, W_ARMF, creation, FALSE);
-    if (!cantweararm(mon->data))
+    }
+    if (!cantweararm(mon->data)) {
         m_dowear_type(mon, W_ARM, creation, FALSE);
-    else
+    } else {
         m_dowear_type(mon, W_ARM, creation, RACE_EXCEPTION);
+    }
 }
 
 static void
@@ -538,18 +582,24 @@ m_dowear_type(struct monst *mon, long int flag, boolean creation, boolean racial
     int unseen = !canseemon(mon);
     char nambuf[BUFSZ];
 
-    if (mon->mfrozen) return; /* probably putting previous item on */
+    if (mon->mfrozen) {
+        return; /* probably putting previous item on */
+    }
 
     /* Get a copy of monster's name before altering its visibility */
     Strcpy(nambuf, See_invisible ? Monnam(mon) : mon_nam(mon));
 
     old = which_armor(mon, flag);
-    if (old && old->cursed) return;
-    if (old && flag == W_AMUL) return; /* no such thing as better amulets */
+    if (old && old->cursed) {
+        return;
+    }
+    if (old && flag == W_AMUL) {
+        return; /* no such thing as better amulets */
+    }
     best = old;
 
-    for(obj = mon->minvent; obj; obj = obj->nobj) {
-        switch(flag) {
+    for (obj = mon->minvent; obj; obj = obj->nobj) {
+        switch (flag) {
         case W_AMUL:
             if (obj->oclass != AMULET_CLASS ||
                 (obj->otyp != AMULET_OF_LIFE_SAVING &&
@@ -558,13 +608,19 @@ m_dowear_type(struct monst *mon, long int flag, boolean creation, boolean racial
             best = obj;
             goto outer_break; /* no such thing as better amulets */
         case W_ARMU:
-            if (!is_shirt(obj)) continue;
+            if (!is_shirt(obj)) {
+                continue;
+            }
             break;
         case W_ARMC:
-            if (!is_cloak(obj)) continue;
+            if (!is_cloak(obj)) {
+                continue;
+            }
             break;
         case W_ARMH:
-            if (!is_helmet(obj)) continue;
+            if (!is_helmet(obj)) {
+                continue;
+            }
             /* changing alignment is not implemented for monsters;
                priests and minions could change alignment but wouldn't
                want to, so they reject helms of opposite alignment */
@@ -573,35 +629,52 @@ m_dowear_type(struct monst *mon, long int flag, boolean creation, boolean racial
                 continue;
             }
             /* (flimsy exception matches polyself handling) */
-            if (has_horns(mon->data) && !is_flimsy(obj)) continue;
+            if (has_horns(mon->data) && !is_flimsy(obj)) {
+                continue;
+            }
             break;
         case W_ARMS:
-            if (!is_shield(obj)) continue;
+            if (!is_shield(obj)) {
+                continue;
+            }
             break;
         case W_ARMG:
-            if (!is_gloves(obj)) continue;
+            if (!is_gloves(obj)) {
+                continue;
+            }
             break;
         case W_ARMF:
-            if (!is_boots(obj)) continue;
+            if (!is_boots(obj)) {
+                continue;
+            }
             break;
         case W_ARM:
-            if (!is_suit(obj)) continue;
-            if (racialexception && (racial_exception(mon, obj) < 1)) continue;
+            if (!is_suit(obj)) {
+                continue;
+            }
+            if (racialexception && (racial_exception(mon, obj) < 1)) {
+                continue;
+            }
             break;
         }
-        if (obj->owornmask) continue;
+        if (obj->owornmask) {
+            continue;
+        }
         /* I'd like to define a VISIBLE_ARM_BONUS which doesn't assume the
          * monster knows obj->spe, but if I did that, a monster would keep
          * switching forever between two -2 caps since when it took off one
          * it would forget spe and once again think the object is better
          * than what it already has.
          */
-        if (best && (ARM_BONUS(best) + extra_pref(mon, best) >= ARM_BONUS(obj) + extra_pref(mon, obj)))
+        if (best && (ARM_BONUS(best) + extra_pref(mon, best) >= ARM_BONUS(obj) + extra_pref(mon, obj))) {
             continue;
+        }
         best = obj;
     }
 outer_break:
-    if (!best || best == old) return;
+    if (!best || best == old) {
+        return;
+    }
 
     /* same auto-cursing behavior as for hero */
     boolean autocurse = ((best->otyp == HELM_OF_OPPOSITE_ALIGNMENT || best->otyp == DUNCE_CAP) &&
@@ -615,19 +688,22 @@ outer_break:
     }
     /* when upgrading a piece of armor, account for time spent
        taking off current one */
-    if (old)
+    if (old) {
         m_delay += objects[old->otyp].oc_delay;
+    }
 
-    if (old) /* do this first to avoid "(being worn)" */
+    if (old) { /* do this first to avoid "(being worn)" */
         old->owornmask = 0L;
+    }
     if (!creation) {
         if (canseemon(mon)) {
             char buf[BUFSZ];
 
-            if (old)
+            if (old) {
                 Sprintf(buf, " removes %s and", distant_name(old, doname));
-            else
+            } else {
                 buf[0] = '\0';
+            }
             pline("%s%s puts on %s.", Monnam(mon),
                   buf, distant_name(best, doname));
             if (autocurse) {
@@ -638,10 +714,13 @@ outer_break:
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;
         mon->mfrozen = m_delay;
-        if (mon->mfrozen) mon->mcanmove = 0;
+        if (mon->mfrozen) {
+            mon->mcanmove = 0;
+        }
     }
-    if (old)
+    if (old) {
         update_mon_intrinsics(mon, old, FALSE, creation);
+    }
     mon->misc_worn_check |= flag;
     best->owornmask |= flag;
     if (autocurse) {
@@ -653,7 +732,9 @@ outer_break:
         if (mon->minvis && !See_invisible) {
             pline("Suddenly you cannot see %s.", nambuf);
             makeknown(best->otyp);
-        } /* else if (!mon->minvis) pline("%s suddenly appears!", Amonnam(mon)); */
+        /* } else if (!mon->minvis) {
+         *     pline("%s suddenly appears!", Amonnam(mon)); */
+        }
     }
 }
 #undef RACE_EXCEPTION
@@ -698,8 +779,9 @@ static void
 m_lose_armor(struct monst *mon, struct obj *obj)
 {
     mon->misc_worn_check &= ~obj->owornmask;
-    if (obj->owornmask)
+    if (obj->owornmask) {
         update_mon_intrinsics(mon, obj, FALSE, FALSE);
+    }
     obj->owornmask = 0L;
 
     obj_extract_self(obj);
@@ -747,12 +829,16 @@ clear_bypasses(void)
     for (otmp = invent; otmp; otmp = otmp->nobj) {
         otmp->bypass = 0;
     }
-    for (otmp = migrating_objs; otmp; otmp = otmp->nobj)
+    for (otmp = migrating_objs; otmp; otmp = otmp->nobj) {
         otmp->bypass = 0;
+    }
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp)) continue;
-        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+        if (DEADMONSTER(mtmp)) {
+            continue;
+        }
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
             otmp->bypass = 0;
+        }
         /* long worm created by polymorph has mon->mextra->mcorpsenm set
            to PM_LONG_WORM to flag it as not being subject to further
            polymorph (so polymorph zap won't hit monster to transform it
@@ -763,8 +849,9 @@ clear_bypasses(void)
         }
     }
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
-        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
             otmp->bypass = 0;
+        }
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
@@ -825,86 +912,107 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                 ; /* no message here;
                      "the dragon merges with his scaly armor" is odd
                      and the monster's previous form is already gone */
-            else if (vis)
+            else if (vis) {
                 pline("%s breaks out of %s armor!", Monnam(mon), ppronoun);
-            else
+            } else {
                 You_hear("a cracking sound.");
+            }
             m_useup(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMC)) != 0) {
             if (otmp->oartifact) {
-                if (vis)
+                if (vis) {
                     pline("%s %s falls off!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
-                if (polyspot) bypass_obj(otmp);
+                }
+                if (polyspot) {
+                    bypass_obj(otmp);
+                }
                 m_lose_armor(mon, otmp);
             } else {
-                if (vis)
+                if (vis) {
                     pline("%s %s tears apart!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
-                else
+                } else {
                     You_hear("a ripping sound.");
+                }
                 m_useup(mon, otmp);
             }
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
-            if (vis)
+            if (vis) {
                 pline("%s shirt rips to shreds!", s_suffix(Monnam(mon)));
-            else
+            } else {
                 You_hear("a ripping sound.");
+            }
             m_useup(mon, otmp);
         }
     } else if (sliparm(mdat)) {
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
-            if (vis)
+            if (vis) {
                 pline("%s armor falls around %s!",
                       s_suffix(Monnam(mon)), pronoun);
-            else
+            } else {
                 You_hear("a thud.");
-            if (polyspot) bypass_obj(otmp);
+            }
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMC)) != 0) {
             if (vis) {
-                if (is_whirly(mon->data))
+                if (is_whirly(mon->data)) {
                     pline("%s %s falls, unsupported!",
                           s_suffix(Monnam(mon)), cloak_simple_name(otmp));
-                else
+                } else {
                     pline("%s shrinks out of %s %s!", Monnam(mon),
                           ppronoun, cloak_simple_name(otmp));
+                }
             }
-            if (polyspot) bypass_obj(otmp);
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
-                if (sliparm(mon->data))
+                if (sliparm(mon->data)) {
                     pline("%s seeps right through %s shirt!",
                           Monnam(mon), ppronoun);
-                else
+                } else {
                     pline("%s becomes much too small for %s shirt!",
                           Monnam(mon), ppronoun);
+                }
             }
-            if (polyspot) bypass_obj(otmp);
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
     }
     if (handless_or_tiny) {
         /* [caller needs to handle weapon checks] */
         if ((otmp = which_armor(mon, W_ARMG)) != 0) {
-            if (vis)
+            if (vis) {
                 pline("%s drops %s gloves%s!", Monnam(mon), ppronoun,
                       MON_WEP(mon) ? " and weapon" : "");
-            if (polyspot) bypass_obj(otmp);
+            }
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMS)) != 0) {
-            if (vis)
+            if (vis) {
                 pline("%s can no longer hold %s shield!", Monnam(mon),
                       ppronoun);
-            else
+            } else {
                 You_hear("a clank.");
-            if (polyspot) bypass_obj(otmp);
+            }
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
     }
@@ -912,38 +1020,47 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         if ((otmp = which_armor(mon, W_ARMH)) != 0 &&
             /* flimsy test for horns matches polyself handling */
             (handless_or_tiny || !is_flimsy(otmp))) {
-            if (vis)
+            if (vis) {
                 pline("%s helmet falls to the %s!",
                       s_suffix(Monnam(mon)), surface(mon->mx, mon->my));
-            else
+            } else {
                 You_hear("a clank.");
-            if (polyspot) bypass_obj(otmp);
+            }
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
     }
     if (handless_or_tiny || slithy(mdat) || mdat->mlet == S_CENTAUR) {
         if ((otmp = which_armor(mon, W_ARMF)) != 0) {
             if (vis) {
-                if (is_whirly(mon->data))
+                if (is_whirly(mon->data)) {
                     pline("%s boots fall away!",
                           s_suffix(Monnam(mon)));
-                else pline("%s boots %s off %s feet!",
+                } else pline("%s boots %s off %s feet!",
                            s_suffix(Monnam(mon)),
                            verysmall(mdat) ? "slide" : "are pushed", ppronoun);
             }
-            if (polyspot) bypass_obj(otmp);
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
         }
     }
     if (!can_saddle(mon)) {
         if ((otmp = which_armor(mon, W_SADDLE)) != 0) {
-            if (polyspot) bypass_obj(otmp);
+            if (polyspot) {
+                bypass_obj(otmp);
+            }
             m_lose_armor(mon, otmp);
-            if (vis)
+            if (vis) {
                 pline("%s saddle falls off.", s_suffix(Monnam(mon)));
+            }
         }
-        if (mon == u.usteed)
+        if (mon == u.usteed) {
             goto noride;
+        }
     } else if (mon == u.usteed && !can_ride(mon)) {
 noride:
         You("can no longer ride %s.", mon_nam(mon));
@@ -969,8 +1086,9 @@ extra_pref(struct monst *mon, struct obj *obj)
     /* currently only does speed boots, but might be expanded if monsters
      * get to use more armor abilities. */
     if (obj) {
-        if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST)
+        if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST) {
             return 20;
+        }
     }
     return 0;
 }
@@ -990,8 +1108,9 @@ racial_exception(struct monst *mon, struct obj *obj)
 
     /* Acceptable Exceptions: */
     /* Allow hobbits to wear elven armor - LoTR */
-    if (ptr == &mons[PM_HOBBIT] && is_elven_armor(obj))
+    if (ptr == &mons[PM_HOBBIT] && is_elven_armor(obj)) {
         return 1;
+    }
     /* Unacceptable Exceptions: */
     /* Checks for object that certain races should never use go here */
     /*  return -1; */

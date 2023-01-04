@@ -69,8 +69,9 @@ init_rumors(dlb *fp)
         false_rumor_end   = dlb_ftell(fp);
         false_rumor_start = true_rumor_end; /* ok, so it's redundant... */
         false_rumor_size  = false_rumor_end - false_rumor_start;
-    } else
+    } else {
         true_rumor_size = -1L;  /* init failed */
+    }
 }
 
 /* exclude_cookie is a hack used because we sometimes want to get rumors in a
@@ -81,16 +82,17 @@ init_rumors(dlb *fp)
 char *
 getrumor(int truth, char *rumor_buf, boolean exclude_cookie)
            /* 1=true, -1=false, 0=either */
-                
-                       
+
+
 {
     dlb *rumors;
     long tidbit, beginning;
     char    *endp, line[BUFSZ], xbuf[BUFSZ];
 
     rumor_buf[0] = '\0';
-    if (true_rumor_size < 0L)   /* we couldn't open RUMORFILE */
+    if (true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
         return rumor_buf;
+    }
 
     rumors = dlb_fopen_area(NH_RUMORAREA, RUMORFILE, "r");
 
@@ -134,14 +136,19 @@ getrumor(int truth, char *rumor_buf, boolean exclude_cookie)
                 (void) dlb_fseek(rumors, beginning, SEEK_SET);
                 (void) dlb_fgets(line, sizeof line, rumors);
             }
-            if ((endp = index(line, '\n')) != 0) *endp = 0;
+            if ((endp = index(line, '\n')) != 0) {
+                *endp = 0;
+            }
             Strcat(rumor_buf, xcrypt(line, xbuf));
-        } while(count++ < 50 && exclude_cookie && (strstri(rumor_buf, "fortune") || strstri(rumor_buf, "pity")));
+        } while (count++ < 50 &&
+                 exclude_cookie &&
+                 (strstri(rumor_buf, "fortune") || strstri(rumor_buf, "pity")));
         (void) dlb_fclose(rumors);
-        if (count >= 50)
+        if (count >= 50) {
             warning("Can't find non-cookie rumor?");
-        else
+        } else {
             exercise(A_WIS, (adjtruth > 0));
+        }
     } else {
         pline("Can't open rumors file!");
         true_rumor_size = -1;   /* don't try to open it again */
@@ -152,7 +159,7 @@ getrumor(int truth, char *rumor_buf, boolean exclude_cookie)
 void
 outrumor(int truth, int mechanism)
            /* 1=true, -1=false, 0=either */
-              
+
 {
     static const char fortune_msg[] =
         "This cookie has a scrap of paper inside.";
@@ -163,18 +170,20 @@ outrumor(int truth, int mechanism)
 
     if (reading) {
         /* deal with various things that prevent reading */
-        if (is_fainted() && mechanism == BY_COOKIE)
+        if (is_fainted() && mechanism == BY_COOKIE) {
             return;
-        else if (Blind) {
-            if (mechanism == BY_COOKIE)
+        } else if (Blind) {
+            if (mechanism == BY_COOKIE) {
                 pline(fortune_msg);
+            }
             pline("What a pity that you cannot read it!");
             return;
         }
     }
     line = getrumor(truth, buf, reading ? FALSE : TRUE);
-    if (!*line)
+    if (!*line) {
         line = "UnNetHack rumors file closed for renovation.";
+    }
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
@@ -186,7 +195,7 @@ outrumor(int truth, int mechanism)
         return;
     case BY_COOKIE:
         pline(fortune_msg);
-    /* FALLTHRU */
+    /* fall through */
     case BY_PAPER:
         pline("It reads:");
         break;
@@ -220,8 +229,9 @@ save_oracles(int fd, int mode)
 {
     if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
-        if (oracle_cnt)
+        if (oracle_cnt) {
             bwrite(fd, (genericptr_t)oracle_loc, oracle_cnt*sizeof (long));
+        }
     }
     if (release_data(mode)) {
         if (oracle_cnt) {
@@ -251,9 +261,10 @@ outoracle(boolean special, boolean delphi)
     int oracle_idx;
     char xbuf[BUFSZ];
 
-    if(oracle_flg < 0 ||            /* couldn't open ORACLEFILE */
-       (oracle_flg > 0 && oracle_cnt == 0)) /* oracles already exhausted */
+    if (oracle_flg < 0 || /* couldn't open ORACLEFILE */
+        (oracle_flg > 0 && oracle_cnt == 0)) { /* oracles already exhausted */
         return;
+    }
 
     oracles = dlb_fopen_area(NH_ORACLEAREA, ORACLEFILE, "r");
 
@@ -262,26 +273,35 @@ outoracle(boolean special, boolean delphi)
         if (oracle_flg == 0) {  /* if this is the first outoracle() */
             init_oracles(oracles);
             oracle_flg = 1;
-            if (oracle_cnt == 0) return;
+            if (oracle_cnt == 0) {
+                return;
+            }
         }
         /* oracle_loc[0] is the special oracle;     */
         /* oracle_loc[1..oracle_cnt-1] are normal ones  */
-        if (oracle_cnt <= 1 && !special) return;  /*(shouldn't happen)*/
+        if (oracle_cnt <= 1 && !special) {
+            return; /*(shouldn't happen)*/
+        }
         oracle_idx = special ? 0 : rnd((int) oracle_cnt - 1);
         (void) dlb_fseek(oracles, oracle_loc[oracle_idx], SEEK_SET);
-        if (!special) oracle_loc[oracle_idx] = oracle_loc[--oracle_cnt];
+        if (!special) {
+            oracle_loc[oracle_idx] = oracle_loc[--oracle_cnt];
+        }
 
         tmpwin = create_nhwindow(NHW_TEXT);
-        if (delphi)
+        if (delphi) {
             putstr(tmpwin, 0, special ?
                    "The Oracle scornfully takes all your gold and says:" :
                    "The Oracle meditates for a moment and then intones:");
-        else
+        } else {
             putstr(tmpwin, 0, "The message reads:");
+        }
         putstr(tmpwin, 0, "");
 
-        while(dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {
-            if ((endp = index(line, '\n')) != 0) *endp = 0;
+        while (dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {
+            if ((endp = index(line, '\n')) != 0) {
+                *endp = 0;
+            }
             putstr(tmpwin, 0, xcrypt(line, xbuf));
         }
         display_nhwindow(tmpwin, TRUE);
@@ -358,12 +378,14 @@ doconsult(struct monst *oracl)
         u_pay = minor_cost;
         break;
     case 'n':
-        if (umoney <= (long)minor_cost ||   /* don't even ask */
+        if (umoney <= (long)minor_cost || /* don't even ask */
             (oracle_cnt == 1 || oracle_flg < 0)) return 0;
         Sprintf(qbuf,
                 "\"Then dost thou desire a major one?\" (%d %s)",
                 major_cost, currency((long)major_cost));
-        if (yn(qbuf) != 'y') return 0;
+        if (yn(qbuf) != 'y') {
+            return 0;
+        }
         u_pay = (umoney < (long)major_cost ? (int)umoney
                  : major_cost);
         break;
@@ -374,15 +396,17 @@ doconsult(struct monst *oracl)
     add_xpts = 0;   /* first oracle of each type gives experience points */
     if (u_pay == minor_cost) {
         outrumor(1, BY_ORACLE);
-        if (!u.uevent.minor_oracle)
+        if (!u.uevent.minor_oracle) {
             add_xpts = u_pay / (u.uevent.major_oracle ? 25 : 10);
+        }
         /* 5 pts if very 1st, or 2 pts if major already done */
         u.uevent.minor_oracle = TRUE;
     } else {
         boolean cheapskate = u_pay < major_cost;
         outoracle(cheapskate, TRUE);
-        if (!cheapskate && !u.uevent.major_oracle)
+        if (!cheapskate && !u.uevent.major_oracle) {
             add_xpts = u_pay / (u.uevent.minor_oracle ? 25 : 10);
+        }
         /* ~100 pts if very 1st, ~40 pts if minor already done */
         u.uevent.major_oracle = TRUE;
         exercise(A_WIS, !cheapskate);

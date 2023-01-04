@@ -128,12 +128,15 @@ int assign_videocolors(char *colorvals)
 
     i = strlen(colorvals);
     tmpcolor = (uchar *)alloc(i);
-    if (convert_uchars(colorvals, tmpcolor, i) < 0) return FALSE;
+    if (convert_uchars(colorvals, tmpcolor, i) < 0) {
+        return FALSE;
+    }
 
     icolor = CLR_RED;
-    for( i = 0; tmpcolor[i] != 0; ++i) {
-        if (icolor <= CLR_WHITE)
+    for (i = 0; tmpcolor[i] != 0; ++i) {
+        if (icolor <= CLR_WHITE) {
             ttycolors[icolor++] = tmpcolor[i];
+        }
     }
 
     colorflag = TRUE;
@@ -154,7 +157,7 @@ convert_uchars(
     list[count] = 0;
 
     while (1) {
-        switch(*bufp) {
+        switch (*bufp) {
         case ' ':  case '\0':
         case '\t': case '-':
         case '\n':
@@ -163,7 +166,9 @@ convert_uchars(
                 list[count] = 0;
                 num = 0;
             }
-            if ((count==size) || !*bufp) return count;
+            if ((count==size) || !*bufp) {
+                return count;
+            }
             bufp++;
             break;
         case '#':
@@ -176,7 +181,9 @@ convert_uchars(
         case '4': case '5': case '6': case '7':
         case '8': case '9':
             num = num*10 + (*bufp-'0');
-            if (num > 15) return -1;
+            if (num > 15) {
+                return -1;
+            }
             bufp++;
             break;
         default: return -1;
@@ -206,18 +213,23 @@ tty_startup(int *wid, int *hgt)
 
 # ifdef VMS
     term = verify_termcap();
-    if (!term)
+    if (!term) {
 # endif
     term = getenv("TERM");
+# ifdef VMS
+    }
+# endif
 
 # if defined(TOS) && defined(__GNUC__)
-    if (!term)
+    if (!term) {
         term = "builtin";       /* library has a default */
+    }
 # endif
-    if (!term)
+    if (!term) {
 #endif
 #ifndef ANSI_DEFAULT
     error("Can't get TERM.");
+    }
 #else
 # ifdef TOS
     {
@@ -245,8 +257,9 @@ tty_startup(int *wid, int *hgt)
 #  ifdef MICRO
         get_scr_size();
 #   ifdef CLIPPING
-        if(CO < COLNO || LI < ROWNO+3)
+        if (CO < COLNO || LI < ROWNO+3) {
             setclipped();
+        }
 #   endif
 #  endif
         HO = "\033[H";
@@ -278,20 +291,22 @@ tty_startup(int *wid, int *hgt)
 #  endif
         TE = VS = VE = nullstr;
 #  ifdef TEXTCOLOR
-        for (i = 0; i < CLR_MAX / 2; i++)
+        for (i = 0; i < CLR_MAX / 2; i++) {
             if (i != CLR_BLACK) {
                 hilites[i|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
                 Sprintf(hilites[i|BRIGHT], "\033[1;3%dm", i);
-                if (iflags.wc2_newcolors || (i != CLR_GRAY))
+                if (iflags.wc2_newcolors || (i != CLR_GRAY)) {
 #   ifdef MICRO
                     if (i == CLR_BLUE) hilites[CLR_BLUE] = hilites[CLR_BLUE|BRIGHT];
-                    else
+                } else {
 #   endif
                 {
                     hilites[i] = (char *) alloc(sizeof("\033[0;3%dm"));
+                }
                     Sprintf(hilites[i], "\033[0;3%dm", i);
                 }
             }
+        }
 #  endif
         *wid = CO;
         *hgt = LI;
@@ -305,26 +320,30 @@ tty_startup(int *wid, int *hgt)
     tptr = (char *) alloc(1024);
 
     tbufptr = tbuf;
-    if(!strncmp(term, "5620", 4))
+    if (!strncmp(term, "5620", 4)) {
         flags.null = FALSE; /* this should be a termcap flag */
-    if(tgetent(tptr, term) < 1) {
+    }
+    if (tgetent(tptr, term) < 1) {
         char buf[BUFSZ];
         (void) strncpy(buf, term,
                        (BUFSZ - 1) - (sizeof("Unknown terminal type: .  ")));
         buf[BUFSZ-1] = '\0';
         error("Unknown terminal type: %s.", term);
     }
-    if ((pc = Tgetstr("pc")) != 0)
+    if ((pc = Tgetstr("pc")) != 0) {
         PC = *pc;
+    }
 
-    if(!(BC = Tgetstr("le")))   /* both termcap and terminfo use le */
+    if (!(BC = Tgetstr("le"))) { /* both termcap and terminfo use le */
 # ifdef TERMINFO
         error("Terminal must backspace.");
+    }
 # else
-        if(!(BC = Tgetstr("bc"))) { /* termcap also uses bc/bs */
+        if (!(BC = Tgetstr("bc"))) { /* termcap also uses bc/bs */
 #  ifndef MINIMAL_TERM
-            if(!tgetflag("bs"))
+            if (!tgetflag("bs")) {
                 error("Terminal must backspace.");
+            }
 #  endif
             BC = tbufptr;
             tbufptr += 2;
@@ -343,31 +362,39 @@ tty_startup(int *wid, int *hgt)
      * the values from TERMCAP ...
      */
 # ifndef MICRO
-    if (!CO) CO = tgetnum("co");
-    if (!LI) LI = tgetnum("li");
+    if (!CO) {
+        CO = tgetnum("co");
+    }
+    if (!LI) {
+        LI = tgetnum("li");
+    }
 # else
 #  if defined(TOS) && defined(__GNUC__)
-    if (!strcmp(term, "builtin"))
+    if (!strcmp(term, "builtin")) {
         get_scr_size();
-    else {
+    } else {
 #  endif
     CO = tgetnum("co");
     LI = tgetnum("li");
-    if (!LI || !CO)             /* if we don't override it */
+    if (!LI || !CO) { /* if we don't override it */
         get_scr_size();
+    }
 #  if defined(TOS) && defined(__GNUC__)
 }
 #  endif
 # endif
 # ifdef CLIPPING
-    if(CO < COLNO || LI < ROWNO+3)
+    if (CO < COLNO || LI < ROWNO+3) {
         setclipped();
+    }
 # endif
     nh_ND = Tgetstr("nd");
-    if(tgetflag("os"))
+    if (tgetflag("os")) {
         error("UnNetHack can't have OS.");
-    if(tgetflag("ul"))
+    }
+    if (tgetflag("ul")) {
         ul_hack = TRUE;
+    }
     CE = Tgetstr("ce");
     UP = Tgetstr("up");
     /* It seems that xd is no longer supported, and we should use
@@ -376,9 +403,10 @@ tty_startup(int *wid, int *hgt)
        slightly. Let's leave that till the next release. */
     XD = Tgetstr("xd");
 /* not:     XD = Tgetstr("do"); */
-    if(!(nh_CM = Tgetstr("cm"))) {
-        if(!UP && !HO)
+    if (!(nh_CM = Tgetstr("cm"))) {
+        if (!UP && !HO) {
             error("UnNetHack needs CM or UP or HO.");
+        }
         tty_raw_print("Playing UnNetHack on terminals without CM is suspect.");
         tty_wait_synch();
     }
@@ -389,7 +417,9 @@ tty_startup(int *wid, int *hgt)
     ZH = Tgetstr("ZH"); /* italic start */
     ZR = Tgetstr("ZR"); /* italic end */
     SG = tgetnum("sg"); /* -1: not fnd; else # of spaces left by so */
-    if(!SO || !SE || (SG > 0)) SO = SE = nh_US = nh_UE = nullstr;
+    if (!SO || !SE || (SG > 0)) {
+        SO = SE = nh_US = nh_UE = nullstr;
+    }
     TI = Tgetstr("ti");
     TE = Tgetstr("te");
     VS = VE = nullstr;
@@ -438,10 +468,12 @@ tty_startup(int *wid, int *hgt)
 # endif
     *wid = CO;
     *hgt = LI;
-    if (!(CL = Tgetstr("cl")))  /* last thing set */
+    if (!(CL = Tgetstr("cl"))) { /* last thing set */
         error("UnNetHack needs CL.");
-    if ((int)(tbufptr - tbuf) > (int)(sizeof tbuf))
+    }
+    if ((int)(tbufptr - tbuf) > (int)(sizeof tbuf)) {
         error("TERMCAP entry too big...\n");
+    }
     free((genericptr_t)tptr);
 #endif /* TERMLIB */
 }
@@ -463,10 +495,14 @@ tty_number_pad(int state)
 {
     switch (state) {
     case -1:        /* activate keypad mode (escape sequences) */
-        if (KS && *KS) xputs(KS);
+        if (KS && *KS) {
+            xputs(KS);
+        }
         break;
     case  1:        /* activate numeric mode for keypad (digits) */
-        if (KE && *KE) xputs(KE);
+        if (KE && *KE) {
+            xputs(KE);
+        }
         break;
     case  0:        /* don't need to do anything--leave terminal as-is */
     default:
@@ -494,16 +530,26 @@ tty_decgraphics_termcap_fixup(void)
     static char numMode[] = "\033>";
 
     /* these values are missing from some termcaps */
-    if (!AS) AS = ctrlN;    /* ^N (shift-out [graphics font]) */
-    if (!AE) AE = ctrlO;    /* ^O (shift-in  [regular font])  */
-    if (!KS) KS = appMode;  /* ESC= (application keypad mode) */
-    if (!KE) KE = numMode;  /* ESC> (numeric keypad mode)     */
+    if (!AS) {
+        AS = ctrlN; /* ^N (shift-out [graphics font]) */
+    }
+    if (!AE) {
+        AE = ctrlO; /* ^O (shift-in  [regular font])  */
+    }
+    if (!KS) {
+        KS = appMode; /* ESC= (application keypad mode) */
+    }
+    if (!KE) {
+        KE = numMode; /* ESC> (numeric keypad mode)     */
+    }
     /*
      * Select the line-drawing character set as the alternate font.
      * Do not select NA ASCII as the primary font since people may
      * reasonably be using the UK character set.
      */
-    if (iflags.DECgraphics) xputs("\033)0");
+    if (iflags.DECgraphics) {
+        xputs("\033)0");
+    }
 #ifdef PC9800
     init_hilite();
 #endif
@@ -517,8 +563,12 @@ tty_decgraphics_termcap_fixup(void)
 
         if (digit(*ae)) { /* skip over delay prefix, if any */
             do ++ae; while (digit(*ae));
-            if (*ae == '.') { ++ae; if (digit(*ae)) ++ae; }
-            if (*ae == '*') ++ae;
+            if (*ae == '.') {
+                ++ae; if (digit(*ae)) ++ae;
+            }
+            if (*ae == '*') {
+                ++ae;
+            }
         }
         /* can't use nethack's case-insensitive strstri() here, and some old
            systems don't have strstr(), so use brute force substring search */
@@ -548,7 +598,7 @@ tty_ascgraphics_hilite_fixup(void)
 {
     int c;
 
-    for (c = 0; c < CLR_MAX / 2; c++)
+    for (c = 0; c < CLR_MAX / 2; c++) {
         if (c != CLR_BLACK) {
             hilites[c|BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
             Sprintf(hilites[c|BRIGHT], "\033[1;3%dm", c);
@@ -557,6 +607,7 @@ tty_ascgraphics_hilite_fixup(void)
                 Sprintf(hilites[c], "\033[0;3%dm", c);
             }
         }
+    }
 }
 #endif /* PC9800 */
 
@@ -566,23 +617,30 @@ tty_start_screen(void)
     xputs(TI);
     xputs(VS);
 #ifdef PC9800
-    if (!iflags.IBMgraphics && !iflags.DECgraphics)
+    if (!iflags.IBMgraphics && !iflags.DECgraphics) {
         tty_ascgraphics_hilite_fixup();
+    }
     /* set up callback in case option is not set yet but toggled later */
     ascgraphics_mode_callback = tty_ascgraphics_hilite_fixup;
 # ifdef ASCIIGRAPH
-    if (iflags.IBMgraphics) init_hilite();
+    if (iflags.IBMgraphics) {
+        init_hilite();
+    }
     /* set up callback in case option is not set yet but toggled later */
     ibmgraphics_mode_callback = init_hilite;
 # endif
 #endif /* PC9800 */
 
 #ifdef TERMLIB
-    if (iflags.DECgraphics) tty_decgraphics_termcap_fixup();
+    if (iflags.DECgraphics) {
+        tty_decgraphics_termcap_fixup();
+    }
     /* set up callback in case option is not set yet but toggled later */
     decgraphics_mode_callback = tty_decgraphics_termcap_fixup;
 #endif
-    if (iflags.num_pad) tty_number_pad(1);  /* make keypad send digits */
+    if (iflags.num_pad) {
+        tty_number_pad(1); /* make keypad send digits */
+    }
 }
 
 void
@@ -599,27 +657,27 @@ void
 nocmov(int x, int y)
 {
     if ((int) ttyDisplay->cury > y) {
-        if(UP) {
+        if (UP) {
             while ((int) ttyDisplay->cury > y) {    /* Go up. */
                 xputs(UP);
                 ttyDisplay->cury--;
             }
-        } else if(nh_CM) {
+        } else if (nh_CM) {
             cmov(x, y);
-        } else if(HO) {
+        } else if (HO) {
             home();
             tty_curs(BASE_WINDOW, x+1, y);
         } /* else impossible("..."); */
     } else if ((int) ttyDisplay->cury < y) {
-        if(XD) {
-            while((int) ttyDisplay->cury < y) {
+        if (XD) {
+            while ((int) ttyDisplay->cury < y) {
                 xputs(XD);
                 ttyDisplay->cury++;
             }
-        } else if(nh_CM) {
+        } else if (nh_CM) {
             cmov(x, y);
         } else {
-            while((int) ttyDisplay->cury < y) {
+            while ((int) ttyDisplay->cury < y) {
                 xputc('\n');
                 ttyDisplay->curx = 0;
                 ttyDisplay->cury++;
@@ -627,12 +685,15 @@ nocmov(int x, int y)
         }
     }
     if ((int) ttyDisplay->curx < x) {       /* Go to the right. */
-        if(!nh_ND) cmov(x, y); else /* bah */
+        if (!nh_ND) {
+            cmov(x, y);
+        } else { /* bah */
             /* should instead print what is there already */
             while ((int) ttyDisplay->curx < x) {
                 xputs(nh_ND);
                 ttyDisplay->curx++;
             }
+        }
     } else if ((int) ttyDisplay->curx > x) {
         while ((int) ttyDisplay->curx > x) {    /* Go to the left. */
             xputs(BC);
@@ -683,14 +744,14 @@ xputs(const char *s)
 void
 cl_end(void)
 {
-    if(CE)
+    if (CE) {
         xputs(CE);
-    else {  /* no-CE fix - free after Harold Rynes */
+    } else {  /* no-CE fix - free after Harold Rynes */
         /* this looks terrible, especially on a slow terminal
            but is better than nothing */
         int cx = ttyDisplay->curx+1;
 
-        while(cx < CO) {
+        while (cx < CO) {
             xputc(' ');
             cx++;
         }
@@ -714,57 +775,72 @@ clear_screen(void)
 void
 home(void)
 {
-    if(HO)
+    if (HO) {
         xputs(HO);
-    else if(nh_CM)
+    } else if (nh_CM) {
         xputs(tgoto(nh_CM, 0, 0));
-    else
+    } else {
         tty_curs(BASE_WINDOW, 1, 0);    /* using UP ... */
+    }
     ttyDisplay->curx = ttyDisplay->cury = 0;
 }
 
 void
 standoutbeg(void)
 {
-    if(SO) xputs(SO);
+    if (SO) {
+        xputs(SO);
+    }
 }
 
 void
 standoutend(void)
 {
-    if(SE) xputs(SE);
+    if (SE) {
+        xputs(SE);
+    }
 }
 
 #if 0   /* if you need one of these, uncomment it (here and in extern.h) */
 void
 revbeg(void)
 {
-    if(MR) xputs(MR);
+    if (MR) {
+        xputs(MR);
+    }
 }
 
 void
 boldbeg(void)
 {
-    if(MD) xputs(MD);
+    if (MD) {
+        xputs(MD);
+    }
 }
 
 void
 blinkbeg(void)
 {
-    if(MB) xputs(MB);
+    if (MB) {
+        xputs(MB);
+    }
 }
 
 void
 dimbeg(void)
 /* not in most termcap entries */
 {
-    if(MH) xputs(MH);
+    if (MH) {
+        xputs(MH);
+    }
 }
 
 void
 m_end(void)
 {
-    if(ME) xputs(ME);
+    if (ME) {
+        xputs(ME);
+    }
 }
 #endif
 
@@ -777,7 +853,9 @@ backsp(void)
 void
 tty_nhbell(void)
 {
-    if (flags.silent) return;
+    if (flags.silent) {
+        return;
+    }
     (void) putchar('\007');     /* curx does not change */
     (void) fflush(stdout);
 }
@@ -786,13 +864,17 @@ tty_nhbell(void)
 void
 graph_on(void)
 {
-    if (AS) xputs(AS);
+    if (AS) {
+        xputs(AS);
+    }
 }
 
 void
 graph_off(void)
 {
-    if (AE) xputs(AE);
+    if (AE) {
+        xputs(AE);
+    }
 }
 #endif
 
@@ -835,20 +917,21 @@ tty_delay_output(void)
 #else /* MICRO */
     /* BUG: if the padding character is visible, as it is on the 5620
        then this looks terrible. */
-    if(flags.null)
+    if (flags.null) {
 # ifdef TERMINFO
         tputs("$<50>", 1, xputc);
+    }
 # else
         tputs("50", 1, xputc);
 # endif
 
-    else if(ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {
+    else if (ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {
         /* delay by sending cm(here) an appropriate number of times */
         int cmlen = strlen(tgoto(nh_CM, ttyDisplay->curx,
                                           ttyDisplay->cury));
         int i = 500 + tmspc10[ospeed]/2;
 
-        while(i > 0) {
+        while (i > 0) {
             cmov((int)ttyDisplay->curx, (int)ttyDisplay->cury);
             i -= cmlen*tmspc10[ospeed];
         }
@@ -860,11 +943,11 @@ void
 cl_eos(void) /* free after Robert Viduya */
 {            /* must only be called with curx = 1 */
 
-    if(nh_CD)
+    if (nh_CD) {
         xputs(nh_CD);
-    else {
+    } else {
         int cy = ttyDisplay->cury+1;
-        while(cy <= LI-2) {
+        while (cy <= LI-2) {
             cl_end();
             xputc('\n');
             cy++;
@@ -1434,10 +1517,11 @@ init_hilite(void)
     for (c = 1; c < SIZE(hilites); c++) {
         char *foo;
         foo = (char *) alloc(sizeof("\033b0"));
-        if (tos_numcolors > 4)
+        if (tos_numcolors > 4) {
             Sprintf(foo, "\033b%c", (c&~BRIGHT)+'0');
-        else
+        } else {
             Strcpy(foo, "\033b0");
+        }
         hilites[c] = foo;
     }
 
@@ -1462,31 +1546,37 @@ init_hilite(void)
 
     int backg, foreg, hi_backg, hi_foreg;
 
-    for (c = 0; c < SIZE(hilites); c++)
+    for (c = 0; c < SIZE(hilites); c++) {
         hilites[c] = nh_HI;
+    }
     hilites[CLR_GRAY] = hilites[NO_COLOR] = (char *)0;
 
     analyze_seq(nh_HI, &hi_foreg, &hi_backg);
     analyze_seq(nh_HE, &foreg, &backg);
 
-    for (c = 0; c < SIZE(hilites); c++)
+    for (c = 0; c < SIZE(hilites); c++) {
         /* avoid invisibility */
         if ((backg & ~BRIGHT) != c) {
 #   ifdef MICRO
-            if (c == CLR_BLUE) continue;
+            if (c == CLR_BLUE) {
+                continue;
+            }
 #   endif
-            if (c == foreg)
+            if (c == foreg) {
                 hilites[c] = (char *)0;
-            else if (c != hi_foreg || backg != hi_backg) {
+            } else if (c != hi_foreg || backg != hi_backg) {
                 hilites[c] = (char *) alloc(sizeof("\033[%d;3%d;4%dm"));
                 Sprintf(hilites[c], "\033[%d", !!(c & BRIGHT));
-                if ((c | BRIGHT) != (foreg | BRIGHT))
+                if ((c | BRIGHT) != (foreg | BRIGHT)) {
                     Sprintf(eos(hilites[c]), ";3%d", c & ~BRIGHT);
-                if (backg != CLR_BLACK)
+                }
+                if (backg != CLR_BLACK) {
                     Sprintf(eos(hilites[c]), ";4%d", backg & ~BRIGHT);
+                }
                 Strcat(hilites[c], "m");
             }
         }
+    }
 
 #   ifdef MICRO
     /* brighten low-visibility colors */
@@ -1504,13 +1594,19 @@ kill_hilite(void)
 
     for (c = 0; c < CLR_MAX / 2; c++) {
         if ((!iflags.wc2_newcolors) &&
-            (c == CLR_BLUE || c == CLR_GRAY)) continue;
+            (c == CLR_BLUE || c == CLR_GRAY)) {
+            continue;
+        }
 
-        if (hilites[c|BRIGHT] == hilites[c]) hilites[c|BRIGHT] = 0;
-        if (hilites[c] && (hilites[c] != nh_HI))
-            free((genericptr_t) hilites[c]),  hilites[c] = 0;
-        if (hilites[c|BRIGHT] && (hilites[c|BRIGHT] != nh_HI))
+        if (hilites[c|BRIGHT] == hilites[c]) {
+            hilites[c|BRIGHT] = 0;
+        }
+        if (hilites[c] && (hilites[c] != nh_HI)) {
+            free((genericptr_t) hilites[c]), hilites[c] = 0;
+        }
+        if (hilites[c|BRIGHT] && (hilites[c|BRIGHT] != nh_HI)) {
             free((genericptr_t) hilites[c|BRIGHT]),  hilites[c|BRIGHT] = 0;
+        }
     }
 # endif
     return;
@@ -1614,7 +1710,7 @@ term_start_attr(int attr)
 void
 term_end_attr(int attr)
 {
-    if(attr) {
+    if (attr) {
         xputs(e_atr2str(attr));
     }
 }
@@ -1646,10 +1742,11 @@ term_end_color(void)
 void
 term_start_color(int color)
 {
-    if (iflags.wc2_newcolors)
+    if (iflags.wc2_newcolors) {
         xputs(hilites[ttycolors[color]]);
-    else
+    } else {
         xputs(hilites[color]);
+    }
 }
 
 

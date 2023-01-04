@@ -32,12 +32,13 @@ shuffle_tiles(void)
     int i;
     short tmp_tilemap[NUM_OBJECTS];
 
-    for (i = 0; i < NUM_OBJECTS; i++)
-        tmp_tilemap[i] =
-            glyph2tile[objects[i].oc_descr_idx + GLYPH_OBJ_OFF];
+    for (i = 0; i < NUM_OBJECTS; i++) {
+        tmp_tilemap[i] = glyph2tile[objects[i].oc_descr_idx + GLYPH_OBJ_OFF];
+    }
 
-    for (i = 0; i < NUM_OBJECTS; i++)
+    for (i = 0; i < NUM_OBJECTS; i++) {
         glyph2tile[i + GLYPH_OBJ_OFF] = tmp_tilemap[i];
+    }
 }
 #endif  /* USE_TILES */
 
@@ -46,15 +47,16 @@ setgemprobs(d_level *dlev)
 {
     int j, first, lev;
 
-    if (dlev)
-        lev = (ledger_no(dlev) > maxledgerno())
-              ? maxledgerno() : ledger_no(dlev);
-    else
+    if (dlev) {
+        lev = (ledger_no(dlev) > maxledgerno()) ? maxledgerno() : ledger_no(dlev);
+    } else {
         lev = 0;
+    }
     first = bases[GEM_CLASS];
 
-    for(j = 0; j < 9-lev/3; j++)
+    for (j = 0; j < 9-lev/3; j++) {
         objects[first+j].oc_prob = 0;
+    }
     first += j;
     if (first > LAST_GEM || objects[first].oc_class != GEM_CLASS ||
         OBJ_NAME(objects[first]) == (char *)0) {
@@ -62,8 +64,9 @@ setgemprobs(d_level *dlev)
                    first, j, LAST_GEM);
         wait_synch();
     }
-    for (j = first; j <= LAST_GEM; j++)
+    for (j = first; j <= LAST_GEM; j++) {
         objects[j].oc_prob = (171+j-first)/(LAST_GEM+1-first);
+    }
 }
 
 /* shuffle descriptions on objects o_low to o_high */
@@ -74,12 +77,19 @@ shuffle(int o_low, int o_high, boolean domaterial)
     short sw;
     int color;
 
-    for (num_to_shuffle = 0, j=o_low; j <= o_high; j++)
-        if (!objects[j].oc_name_known) num_to_shuffle++;
-    if (num_to_shuffle < 2) return;
+    for (num_to_shuffle = 0, j=o_low; j <= o_high; j++) {
+        if (!objects[j].oc_name_known) {
+            num_to_shuffle++;
+        }
+    }
+    if (num_to_shuffle < 2) {
+        return;
+    }
 
     for (j=o_low; j <= o_high; j++) {
-        if (objects[j].oc_name_known) continue;
+        if (objects[j].oc_name_known) {
+            continue;
+        }
         do
             i = j + rn2(o_high-j+1);
         while (objects[i].oc_name_known);
@@ -118,15 +128,17 @@ init_objects(void)
     /* bug fix to prevent "initialization error" abort on Intel Xenix.
      * reported by mikew@semike
      */
-    for (i = 0; i < MAXOCLASSES; i++)
+    for (i = 0; i < MAXOCLASSES; i++) {
         bases[i] = 0;
+    }
     /* initialize object descriptions */
-    for (i = 0; i < NUM_OBJECTS; i++)
+    for (i = 0; i < NUM_OBJECTS; i++) {
         objects[i].oc_name_idx = objects[i].oc_descr_idx = i;
+    }
     /* init base; if probs given check that they add up to 1000,
        otherwise compute probs */
     first = 0;
-    while( first < NUM_OBJECTS ) {
+    while (first < NUM_OBJECTS) {
         oclass = objects[first].oc_class;
         last = first+1;
         while (last < NUM_OBJECTS && objects[last].oc_class == oclass) last++;
@@ -156,14 +168,18 @@ init_objects(void)
         }
 check:
         sum = 0;
-        for(i = first; i < last; i++) sum += objects[i].oc_prob;
-        if(sum == 0) {
-            for(i = first; i < last; i++)
+        for (i = first; i < last; i++) {
+            sum += objects[i].oc_prob;
+        }
+        if (sum == 0) {
+            for (i = first; i < last; i++) {
                 objects[i].oc_prob = (1000+i-first)/(last-first);
+            }
             goto check;
         }
-        if(sum != 1000)
+        if (sum != 1000) {
             error("init-prob error for class %d (%d%%)", oclass, sum);
+        }
         first = last;
     }
     /* shuffle descriptions */
@@ -281,9 +297,11 @@ find_skates(void)
     int i;
     const char *s;
 
-    for (i = SPEED_BOOTS; i <= LEVITATION_BOOTS; i++)
-        if ((s = OBJ_DESCR(objects[i])) != 0 && !strcmp(s, "snow boots"))
+    for (i = SPEED_BOOTS; i <= LEVITATION_BOOTS; i++) {
+        if ((s = OBJ_DESCR(objects[i])) != 0 && !strcmp(s, "snow boots")) {
             return i;
+        }
+    }
 
     impossible("snow boots not found?");
     return -1;  /* not 0, or caller would try again each move */
@@ -311,7 +329,7 @@ savenames(int fd, int mode)
     /* as long as we use only one version of Hack we
        need not save oc_name and oc_descr, but we must save
        oc_uname for all objects */
-    for (i = 0; i < NUM_OBJECTS; i++)
+    for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
             if (perform_bwrite(mode)) {
                 len = strlen(objects[i].oc_uname)+1;
@@ -323,6 +341,7 @@ savenames(int fd, int mode)
                 objects[i].oc_uname = 0;
             }
         }
+    }
 }
 
 void
@@ -334,12 +353,13 @@ restnames(int fd)
     mread(fd, (genericptr_t) bases, sizeof bases);
     mread(fd, (genericptr_t) disco, sizeof disco);
     mread(fd, (genericptr_t) objects, sizeof(struct objclass) * NUM_OBJECTS);
-    for (i = 0; i < NUM_OBJECTS; i++)
+    for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
             mread(fd, (genericptr_t) &len, sizeof len);
             objects[i].oc_uname = (char *) alloc(len);
             mread(fd, (genericptr_t)objects[i].oc_uname, len);
         }
+    }
 #ifdef USE_TILES
     shuffle_tiles();
 #endif
@@ -355,20 +375,28 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
            uname'd) or the next open slot; one or the other will be found
            before we reach the next class...
          */
-        for (dindx = bases[acls]; disco[dindx] != 0; dindx++)
-            if (disco[dindx] == oindx) break;
+        for (dindx = bases[acls]; disco[dindx] != 0; dindx++) {
+            if (disco[dindx] == oindx) {
+                break;
+            }
+        }
         disco[dindx] = oindx;
 
         if (mark_as_known) {
             objects[oindx].oc_name_known = 1;
-            if (credit_hero) exercise(A_WIS, TRUE);
+            if (credit_hero) {
+                exercise(A_WIS, TRUE);
+            }
 
-            if (Is_dragon_scales(oindx))
+            if (Is_dragon_scales(oindx)) {
                 discover_object(Dragon_scales_to_mail(oindx), mark_as_known, FALSE);
-            else if (Is_dragon_mail(oindx))
+            } else if (Is_dragon_mail(oindx)) {
                 discover_object(Dragon_mail_to_scales(oindx), mark_as_known, FALSE);
+            }
         }
-        if (moves > 1L) update_inventory();
+        if (moves > 1L) {
+            update_inventory();
+        }
     }
 }
 
@@ -383,14 +411,18 @@ undiscover_object(int oindx)
         /* find the object; shift those behind it forward one slot */
         for (dindx = bases[acls];
              dindx < NUM_OBJECTS && disco[dindx] != 0
-             && objects[dindx].oc_class == acls; dindx++)
-            if (found)
+             && objects[dindx].oc_class == acls; dindx++) {
+            if (found) {
                 disco[dindx-1] = disco[dindx];
-            else if (disco[dindx] == oindx)
+            } else if (disco[dindx] == oindx) {
                 found = TRUE;
+            }
+        }
 
         /* clear last slot */
-        if (found) disco[dindx-1] = 0;
+        if (found) {
+            disco[dindx-1] = 0;
+        }
 #if 0
         /* don't freak out about already forgotten stuff */
         else warning("named object \"%s\"(index %d; base: %d; end: %d) not found in discovery list.",

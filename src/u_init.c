@@ -768,7 +768,9 @@ u_init(void)
     }
 
     init_uhunger();
-    for (i = 0; i <= MAXSPELL; i++) spl_book[i].sp_id = NO_SPELL;
+    for (i = 0; i <= MAXSPELL; i++) {
+        spl_book[i].sp_id = NO_SPELL;
+    }
     u.ublesscnt = 300;          /* no prayers just yet */
     u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
         aligns[flags.initalign].value;
@@ -792,9 +794,13 @@ u_init(void)
      */
     case PM_ARCHEOLOGIST:
         ini_inv(Archeologist);
-        if(!rn2(10)) ini_inv(Tinopener);
-        else if(!rn2(4)) ini_inv(Lamp);
-        else if(!rn2(10)) ini_inv(Magicmarker);
+        if (!rn2(10)) {
+            ini_inv(Tinopener);
+        } else if (!rn2(4)) {
+            ini_inv(Lamp);
+        } else if (!rn2(10)) {
+            ini_inv(Magicmarker);
+        }
         knows_object(SACK);
         knows_object(TOUCHSTONE);
         skill_init(Skill_A);
@@ -835,7 +841,9 @@ u_init(void)
     case PM_HEALER:
         u.umoney0 = rn1(1000, 1001);
         ini_inv(Healer);
-        if(!rn2(25)) ini_inv(Lamp);
+        if (!rn2(25)) {
+            ini_inv(Lamp);
+        }
         knows_object(POT_FULL_HEALING);
         skill_init(Skill_H);
         break;
@@ -854,8 +862,11 @@ u_init(void)
 
         Monk[M_BOOK].trotyp = M_spell[rn2(90) / 30]; /* [0..2] */
         ini_inv(Monk);
-        if(!rn2(5)) ini_inv(Magicmarker);
-        else if(!rn2(10)) ini_inv(Lamp);
+        if (!rn2(5)) {
+            ini_inv(Magicmarker);
+        } else if (!rn2(10)) {
+            ini_inv(Lamp);
+        }
         knows_class(ARMOR_CLASS);
         /* sufficiently martial-arts oriented item to ignore language issue */
         knows_object(SHURIKEN);
@@ -864,10 +875,15 @@ u_init(void)
     }
 
     case PM_PRIEST:
-        if (Race_switch == PM_ELF) Priest[PRI_MACE].trotyp = CLUB;
+        if (Race_switch == PM_ELF) {
+            Priest[PRI_MACE].trotyp = CLUB;
+        }
         ini_inv(Priest);
-        if(!rn2(10)) ini_inv(Magicmarker);
-        else if(!rn2(10)) ini_inv(Lamp);
+        if (!rn2(10)) {
+            ini_inv(Magicmarker);
+        } else if (!rn2(10)) {
+            ini_inv(Lamp);
+        }
         knows_object(POT_WATER);
         skill_init(Skill_P);
         /* KMH, conduct --
@@ -891,7 +907,9 @@ u_init(void)
         Rogue[R_DAGGERS].trquan = rn1(10, 6);
         u.umoney0 = 0;
         ini_inv(Rogue);
-        if(!rn2(5)) ini_inv(Blindfold);
+        if (!rn2(5)) {
+            ini_inv(Blindfold);
+        }
         knows_object(SACK);
         knows_class(WEAPON_CLASS); /* daggers only */
         skill_init(Skill_R);
@@ -912,10 +930,15 @@ u_init(void)
         Tourist[T_DARTS].trquan = rn1(43, 21); /* 63 darts ought to be enough for anybody. */
         u.umoney0 = rnd(1000);
         ini_inv(Tourist);
-        if(!rn2(25)) ini_inv(Tinopener);
-        else if(!rn2(25)) ini_inv(Leash);
-        else if(!rn2(25) && !towelday()) ini_inv(Towel);
-        else if(!rn2(25)) ini_inv(Magicmarker);
+        if (!rn2(25)) {
+            ini_inv(Tinopener);
+        } else if (!rn2(25)) {
+            ini_inv(Leash);
+        } else if (!rn2(25) && !towelday()) {
+            ini_inv(Towel);
+        } else if (!rn2(25)) {
+            ini_inv(Magicmarker);
+        }
         skill_init(Skill_T);
         break;
 
@@ -931,8 +954,12 @@ u_init(void)
 
     case PM_WIZARD:
         ini_inv(Wizard);
-        if(!rn2(5)) ini_inv(Magicmarker);
-        if(!rn2(5)) ini_inv(Blindfold);
+        if (!rn2(5)) {
+            ini_inv(Magicmarker);
+        }
+        if (!rn2(5)) {
+            ini_inv(Blindfold);
+        }
         skill_init(Skill_W);
         break;
 
@@ -948,11 +975,9 @@ u_init(void)
 
     /*** Race-specific initializations ***/
     switch (Race_switch) {
-
     case PM_HUMAN:
         /* Nothing special */
         break;
-
 
     case PM_ELF:
         /*
@@ -999,10 +1024,11 @@ u_init(void)
 
     case PM_ORC:
         /* compensate for generally inferior equipment */
-        if (!Role_if(PM_WIZARD))
+        if (!Role_if(PM_WIZARD)) {
             if (!Role_if(PM_CONVICT)) {
                 ini_inv(Xtra_food);
             }
+        }
         /* Orcs can recognize all orcish objects */
         knows_object(ORCISH_SHORT_SWORD);
         knows_object(ORCISH_ARROW);
@@ -1029,28 +1055,36 @@ u_init(void)
     }
 
     /* Towel Day: In Memoriam Douglas Adams */
-    if (towelday())
+    if (towelday()) {
         ini_inv(Towel);
+    }
 
     /*** Conduct specific initialisation ***/
 
     if (u.roleplay.blindfolded) {
-        if(!ublindf) ini_inv(Blindfold);
+        if (!ublindf) {
+            ini_inv(Blindfold);
+        }
     } else {
         violated(CONDUCT_BLINDFOLDED);
     }
-    if (u.roleplay.atheist)
+    if (u.roleplay.atheist) {
         u.ugangr++;
+    }
 
-    if (discover)
+    if (discover) {
         ini_inv(Wishing);
+    }
 
 #ifdef WIZARD
-    if (wizard)
+    if (wizard) {
         read_wizkit();
+    }
 #endif
 
-    if (u.umoney0) ini_inv(Money);
+    if (u.umoney0) {
+        ini_inv(Money);
+    }
     u.umoney0 += hidden_gold(); /* in case sack has gold in it */
 
     find_ac();          /* get initial ac value */
@@ -1059,17 +1093,24 @@ u_init(void)
 /*
  *  Do we really need this?
  */
-    for(i = 0; i < A_MAX; i++)
-        if(!rn2(20)) {
+    for (i = 0; i < A_MAX; i++) {
+        if (!rn2(20)) {
             int xd = rn2(7) - 2; /* biased variation */
             (void) adjattrib(i, xd, TRUE);
-            if (ABASE(i) < AMAX(i)) AMAX(i) = ABASE(i);
+            if (ABASE(i) < AMAX(i)) {
+                AMAX(i) = ABASE(i);
+            }
         }
+    }
 
     /* make sure you can carry all you have - especially for Tourists */
     while (inv_weight() > 0) {
-        if (adjattrib(A_STR, 1, TRUE)) continue;
-        if (adjattrib(A_CON, 1, TRUE)) continue;
+        if (adjattrib(A_STR, 1, TRUE)) {
+            continue;
+        }
+        if (adjattrib(A_CON, 1, TRUE)) {
+            continue;
+        }
         /* only get here when didn't boost strength or constitution */
         break;
     }
@@ -1239,8 +1280,9 @@ ini_inv(struct trobj *trop)
             }
 
             /* Don't start with +0 or negative rings */
-            if (objects[otyp].oc_charged && obj->spe <= 0)
+            if (objects[otyp].oc_charged && obj->spe <= 0) {
                 obj->spe = rne(3);
+            }
 
             /* Heavily relies on the fact that 1) we create wands
              * before rings, 2) that we create rings before
@@ -1294,10 +1336,13 @@ ini_inv(struct trobj *trop)
             obj->quan = u.umoney0;
         } else {
         obj->dknown = obj->bknown = obj->rknown = 1;
-        if (objects[otyp].oc_uses_known) obj->known = 1;
+        if (objects[otyp].oc_uses_known) {
+            obj->known = 1;
+        }
         obj->cursed = 0;
-        if (obj->opoisoned && u.ualign.type != A_CHAOTIC)
+        if (obj->opoisoned && u.ualign.type != A_CHAOTIC) {
             obj->opoisoned = 0;
+        }
         if (obj->oclass == WEAPON_CLASS ||
             obj->oclass == TOOL_CLASS) {
             obj->quan = (long) trop->trquan;
@@ -1309,20 +1354,24 @@ ini_inv(struct trobj *trop)
         if (obj->otyp == STRIPED_SHIRT ) {
             obj->cursed = TRUE;
         }
-        if (trop->trspe != UNDEF_SPE)
+        if (trop->trspe != UNDEF_SPE) {
             obj->spe = trop->trspe;
-        if (trop->trbless != UNDEF_BLESS)
+        }
+        if (trop->trbless != UNDEF_BLESS) {
             obj->blessed = trop->trbless;
+        }
     }
         /* defined after setting otyp+quan + blessedness */
         obj->owt = weight(obj);
         obj = addinv(obj);
 
         /* Make the type known if necessary */
-        if (OBJ_DESCR(objects[otyp]) && obj->known)
+        if (OBJ_DESCR(objects[otyp]) && obj->known) {
             discover_object(otyp, TRUE, FALSE);
-        if (otyp == OIL_LAMP)
+        }
+        if (otyp == OIL_LAMP) {
             discover_object(POT_OIL, TRUE, FALSE);
+        }
 
         if ((obj->oclass == ARMOR_CLASS && !u.roleplay.nudist)) {
             if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {

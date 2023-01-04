@@ -49,7 +49,9 @@ thitu(
     char onmbuf[BUFSZ], knmbuf[BUFSZ];
 
     if (!name) {
-        if (!obj) panic("thitu: name & obj both null?");
+        if (!obj) {
+            panic("thitu: name & obj both null?");
+        }
         name = strcpy(onmbuf,
                       (obj->quan > 1L) ? doname(obj) : mshot_xname(obj));
         knm = strcpy(knmbuf, killer_xname(obj));
@@ -77,10 +79,13 @@ thitu(
         } else {
             You("are almost hit by %s.", onm);
         }
-        return(0);
+        return 0;
     } else {
-        if(Blind || !flags.verbose) You("are hit!");
-        else You("are hit by %s%s", onm, exclam(dam));
+        if (Blind || !flags.verbose) {
+            You("are hit!");
+        } else {
+            You("are hit by %s%s", onm, exclam(dam));
+        }
 
         if (is_acid && Acid_resistance) {
             pline("It doesn't seem to hurt you.");
@@ -102,7 +107,7 @@ thitu(
             exercise(A_STR, FALSE);
         }
 
-        return(1);
+        return 1;
     }
 }
 
@@ -122,29 +127,37 @@ drop_throw(struct obj *obj, boolean ohit, coordxy x, coordxy y)
     if (obj->otyp == CREAM_PIE || obj->oclass == VENOM_CLASS ||
         (ohit && obj->otyp == EGG))
         create = 0;
-    else if (ohit && (is_multigen(obj) || obj->otyp == ROCK))
+    else if (ohit && (is_multigen(obj) || obj->otyp == ROCK)) {
         create = !rn2(3);
-    else create = 1;
+    } else {
+        create = 1;
+    }
 
     if (create && !((mtmp = m_at(x, y)) && (mtmp->mtrapped) &&
                     (t = t_at(x, y)) && is_pit(t->ttyp))) {
         int objgone = 0;
 
-        if (down_gate(x, y) != -1)
+        if (down_gate(x, y) != -1) {
             objgone = ship_object(obj, x, y, FALSE);
+        }
         if (!objgone) {
             /* don't double-dip on damage */
             if (!flooreffects(obj, x, y, "fall")) {
                 place_object(obj, x, y);
-                if (!mtmp && x == u.ux && y == u.uy)
+                if (!mtmp && x == u.ux && y == u.uy) {
                     mtmp = &youmonst;
-                if (mtmp && ohit)
+                }
+                if (mtmp && ohit) {
                     passive_obj(mtmp, obj, (struct attack *)0);
+                }
                 stackobj(obj);
                 retvalu = 0;
             }
         }
-    } else obfree(obj, (struct obj*) 0);
+    } else {
+        obfree(obj, (struct obj*) 0);
+    }
+
     return retvalu;
 }
 
@@ -277,8 +290,9 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
         }
         m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
         Strcpy(trgbuf, mtarg ? mon_nam(mtarg) : "");
-        if (!strcmp(trgbuf, "it"))
+        if (!strcmp(trgbuf, "it")) {
             Strcpy(trgbuf, humanoid(mtmp->data) ? "someone" : something);
+        }
         pline("%s %s %s%s%s!", Monnam(mtmp),
               m_shot.s ? "shoots" : "throws", onm,
               mtarg ? " at " : "", trgbuf);
@@ -293,10 +307,11 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
            if mtmp gets killed (shot kills adjacent gas spore and
            triggers explosion, perhaps), inventory will be dropped
            and otmp might go away via merging into another stack */
-        if (DEADMONSTER(mtmp) && m_shot.i < m_shot.n)
+        if (DEADMONSTER(mtmp) && m_shot.i < m_shot.n) {
             /* cancel pending shots (perhaps ought to give a message here
                since we gave one above about throwing/shooting N missiles) */
             break; /* endmultishot(FALSE); */
+        }
     }
     /* reset 'm_shot' */
     m_shot.n = m_shot.i = 0;
@@ -338,30 +353,41 @@ ohitmon(
     }
     if (tmp < rnd(20)) {
         if (!ismimic) {
-            if (vis) miss(distant_name(otmp, mshot_xname), mtmp);
-            else if (verbose) pline("It is missed.");
+            if (vis) {
+                miss(distant_name(otmp, mshot_xname), mtmp);
+            } else if (verbose) {
+                pline("It is missed.");
+            }
         }
         if (!range) { /* Last position; object drops */
             (void) drop_throw(otmp, 0, mtmp->mx, mtmp->my);
             return 1;
         }
     } else if (otmp->oclass == POTION_CLASS) {
-        if (ismimic) seemimic(mtmp);
+        if (ismimic) {
+            seemimic(mtmp);
+        }
         mtmp->msleeping = 0;
-        if (vis) otmp->dknown = 1;
+        if (vis) {
+            otmp->dknown = 1;
+        }
         /* probably thrown by a monster rather than 'other', but the
            distinction only matters when hitting the hero */
         potionhit(mtmp, otmp, POTHIT_OTHER_THROW);
         return 1;
     } else {
         damage = dmgval(otmp, mtmp);
-        if (otmp->otyp == ACID_VENOM && resists_acid(mtmp))
+        if (otmp->otyp == ACID_VENOM && resists_acid(mtmp)) {
             damage = 0;
+        }
 #if 0 /* can't use this because we don't have the attacker */
-        if (is_orc(mtmp->data) && is_elf(?magr?))
+        if (is_orc(mtmp->data) && is_elf(?magr?)) {
             damage++;
+        }
 #endif
-        if (ismimic) seemimic(mtmp);
+        if (ismimic) {
+            seemimic(mtmp);
+        }
         mtmp->msleeping = 0;
         if (vis) {
             if (otmp->otyp == EGG) {
@@ -381,21 +407,26 @@ ohitmon(
             damage = otmp->owt;
             weight_dmg(damage);
             mtmp->mhp-=damage;
-            if(vis)
+            if (vis) {
                 pline("It disintegrates!");
+            }
             obfree(otmp, (struct obj*) 0);
             return 1;
         }
 #endif
         if (otmp->opoisoned && is_poisonable(otmp)) {
             if (resists_poison(mtmp)) {
-                if (vis) pline_The("poison doesn't seem to affect %s.",
+                if (vis) {
+                    pline_The("poison doesn't seem to affect %s.",
                                    mon_nam(mtmp));
+                }
             } else {
                 if (rn2(30)) {
                     damage += rnd(6);
                 } else {
-                    if (vis) pline_The("poison was deadly...");
+                    if (vis) {
+                        pline_The("poison was deadly...");
+                    }
                     damage = mtmp->mhp;
                 }
             }
@@ -451,11 +482,14 @@ ohitmon(
             can_blnd((struct monst*)0, mtmp,
                      (uchar)(otmp->otyp == BLINDING_VENOM ? AT_SPIT : AT_WEAP),
                      otmp)) {
-            if (vis && mtmp->mcansee)
+            if (vis && mtmp->mcansee) {
                 pline("%s is blinded by %s.", Monnam(mtmp), the(xname(otmp)));
+            }
             mtmp->mcansee = 0;
             tmp = (int)mtmp->mblinded + rnd(25) + 20;
-            if (tmp > 127) tmp = 127;
+            if (tmp > 127) {
+                tmp = 127;
+            }
             mtmp->mblinded = tmp;
         }
 
@@ -533,11 +567,12 @@ m_throw(
 
     if ((singleobj->cursed || singleobj->greased) && (dx || dy) && !rn2(7)) {
         if (canseemon(mon) && flags.verbose) {
-            if (is_ammo(singleobj))
+            if (is_ammo(singleobj)) {
                 pline("%s misfires!", Monnam(mon));
-            else
+            } else {
                 pline("%s as %s throws it!",
                       Tobjnam(singleobj, "slip"), mon_nam(mon));
+            }
         }
         dx = rn2(3)-1;
         dy = rn2(3)-1;
@@ -562,8 +597,10 @@ m_throw(
      * early to avoid the dagger bug, anyone who modifies this code should
      * be careful not to use either one after it's been freed.
      */
-    if (sym) tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
-    while(range-- > 0) { /* Actually the loop is always exited by break */
+    if (sym) {
+        tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
+    }
+    while (range-- > 0) { /* Actually the loop is always exited by break */
         bhitpos.x += dx;
         bhitpos.y += dy;
         mtmp = m_at(bhitpos.x, bhitpos.y);
@@ -576,7 +613,9 @@ m_throw(
                 break;
             }
         } else if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
-            if (multi) nomul(0, 0);
+            if (multi) {
+                nomul(0, 0);
+            }
 
             if (singleobj->oclass == GEM_CLASS &&
                 singleobj->otyp <= LAST_GEM+9 /* 9 glass colors */
@@ -597,7 +636,9 @@ m_throw(
                 break;
             }
             if (singleobj->oclass == POTION_CLASS) {
-                if (!Blind) singleobj->dknown = 1;
+                if (!Blind) {
+                    singleobj->dknown = 1;
+                }
                 potionhit(&youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
             }
@@ -620,18 +661,26 @@ m_throw(
             default:
                 dam = dmgval(singleobj, &youmonst);
                 hitv = 3 - distmin(u.ux, u.uy, mon->mx, mon->my);
-                if (hitv < -4) hitv = -4;
+                if (hitv < -4) {
+                    hitv = -4;
+                }
                 if (is_elf(mon->data) &&
                     objects[singleobj->otyp].oc_skill == P_BOW) {
                     hitv++;
                     if (MON_WEP(mon) &&
                         MON_WEP(mon)->otyp == ELVEN_BOW)
                         hitv++;
-                    if(singleobj->otyp == ELVEN_ARROW) dam++;
+                    if (singleobj->otyp == ELVEN_ARROW) {
+                        dam++;
+                    }
                 }
-                if (bigmonst(youmonst.data)) hitv++;
+                if (bigmonst(youmonst.data)) {
+                    hitv++;
+                }
                 hitv += 8 + singleobj->spe;
-                if (dam < 1) dam = 1;
+                if (dam < 1) {
+                    dam = 1;
+                }
                 hitu = thitu(hitv, dam, &singleobj, (char *) 0);
             }
             if (hitu && singleobj->opoisoned && is_poisonable(singleobj)) {
@@ -652,13 +701,15 @@ m_throw(
                         (uchar)(singleobj->otyp == BLINDING_VENOM ?
                                 AT_SPIT : AT_WEAP), singleobj)) {
                 blindinc = rnd(25);
-                if(singleobj->otyp == CREAM_PIE) {
-                    if(!Blind) pline("Yecch!  You've been %s.",
-                                     piday() ? "pied" : "creamed");
-                    else pline("There's %s sticky all over your %s.",
+                if (singleobj->otyp == CREAM_PIE) {
+                    if (!Blind) {
+                        pline("Yecch!  You've been %s.", piday() ? "pied" : "creamed");
+                    } else {
+                        pline("There's %s sticky all over your %s.",
                                something,
                                body_part(FACE));
-                } else if(singleobj->otyp == BLINDING_VENOM) {
+                    }
+                } else if (singleobj->otyp == BLINDING_VENOM) {
                     const char *eyes = body_part(EYE);
 
                     if (eyecount(youmonst.data) != 1) {
@@ -708,7 +759,9 @@ m_throw(
     if (blindinc) {
         u.ucreamed += blindinc;
         make_blinded(Blinded + (long)blindinc, FALSE);
-        if (!Blind) Your("%s", vision_clears);
+        if (!Blind) {
+            Your("%s", vision_clears);
+        }
     }
 }
 
@@ -914,12 +967,16 @@ thrwmu(struct monst *mtmp)
     if (mtmp->weapon_check == NEED_WEAPON || !MON_WEP(mtmp)) {
         mtmp->weapon_check = NEED_RANGED_WEAPON;
         /* mon_wield_item resets weapon_check as appropriate */
-        if(mon_wield_item(mtmp) != 0) return;
+        if (mon_wield_item(mtmp) != 0) {
+            return;
+        }
     }
 
     /* Pick a weapon */
     otmp = select_rwep(mtmp);
-    if (!otmp) return;
+    if (!otmp) {
+        return;
+    }
 
     if (is_pole(otmp)) {
         int dam, hitv;
@@ -939,10 +996,16 @@ thrwmu(struct monst *mtmp)
 
         dam = dmgval(otmp, &youmonst);
         hitv = 3 - distmin(u.ux, u.uy, mtmp->mx, mtmp->my);
-        if (hitv < -4) hitv = -4;
-        if (bigmonst(youmonst.data)) hitv++;
+        if (hitv < -4) {
+            hitv = -4;
+        }
+        if (bigmonst(youmonst.data)) {
+            hitv++;
+        }
         hitv += 8 + otmp->spe;
-        if (dam < 1) dam = 1;
+        if (dam < 1) {
+            dam = 1;
+        }
 
         (void) thitu(hitv, dam, &otmp, (char *) 0);
         stop_occupation();
@@ -998,10 +1061,11 @@ spitmu(struct monst *mtmp, struct attack *mattk)
         }
         if (!rn2(BOLT_LIM-distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
             if (canseemon(mtmp)) {
-                if (mattk->adtyp == AD_COLD)
+                if (mattk->adtyp == AD_COLD) {
                     pline("%s spits ice!", Monnam(mtmp));
-                else
+                } else {
                     pline("%s spits venom!", Monnam(mtmp));
+                }
             }
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
@@ -1024,24 +1088,26 @@ breamu(struct monst *mtmp, struct attack *mattk)         /* monster breathes at 
     /* if new breath types are added, change AD_ACID to max type */
     int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp;
 
-    if(lined_up(mtmp)) {
+    if (lined_up(mtmp)) {
 
-        if(mtmp->mcan) {
-            if(flags.soundok) {
-                if(canseemon(mtmp))
+        if (mtmp->mcan) {
+            if (flags.soundok) {
+                if (canseemon(mtmp)) {
                     pline("%s coughs.", Monnam(mtmp));
-                else
+                } else {
                     You_hear("a cough.");
+                }
             }
-            return(0);
+            return 0;
         }
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 if (canseemon(mtmp)) {
                     pline("%s breathes %s!", Monnam(mtmp),
                           breathwep[typ-1]);
-                    if (monsndx(mtmp->data) >= PM_GRAY_DRAGON && monsndx(mtmp->data) <= PM_YELLOW_DRAGON )
+                    if (monsndx(mtmp->data) >= PM_GRAY_DRAGON && monsndx(mtmp->data) <= PM_YELLOW_DRAGON ) {
                         identify_dragon(monsndx(mtmp->data) - PM_GRAY_DRAGON);
+                    }
                 }
                 buzz((int) (-20 - (typ-1)), (int)mattk->damn,
                      mtmp->mx, mtmp->my, sgn(tbx), sgn(tby));
@@ -1049,14 +1115,18 @@ breamu(struct monst *mtmp, struct attack *mattk)         /* monster breathes at 
                 /* breath runs out sometimes. Also, give monster some
                  * cunning; don't breath if the player fell asleep.
                  */
-                if (!rn2(3))
+                if (!rn2(3)) {
                     mtmp->mspec_used = 10+rn2(20);
-                if (typ == AD_SLEE && !Sleep_resistance)
+                }
+                if (typ == AD_SLEE && !Sleep_resistance) {
                     mtmp->mspec_used += rnd(20);
-            } else warning("Breath weapon %d used", typ-1);
+                }
+            } else {
+                warning("Breath weapon %d used", typ-1);
+            }
         }
     }
-    return(1);
+    return 1;
 }
 
 boolean
@@ -1075,7 +1145,9 @@ linedup(
 
     /* sometimes displacement makes a monster think that you're at its
        own location; prevent it from throwing and zapping in that case */
-    if (!tbx && !tby) return FALSE;
+    if (!tbx && !tby) {
+        return FALSE;
+    }
 
     if ((!tbx || !tby || abs(tbx) == abs(tby)) /* straight line or diagonal */
        && distmin(tbx, tby, 0, 0) < BOLT_LIM) {
@@ -1140,10 +1212,13 @@ m_carrying(struct monst *mtmp, int type)
 {
     struct obj *otmp;
 
-    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == type)
-            return(otmp);
-    return((struct obj *) 0);
+    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
+        if (otmp->otyp == type) {
+            return otmp;
+        }
+    }
+
+    return (struct obj *) 0;
 }
 
 
@@ -1162,7 +1237,7 @@ hits_bars(
     int obj_type = otmp->otyp;
     boolean hits = always_hit;
 
-    if (!hits)
+    if (!hits) {
         switch (otmp->oclass) {
         case WEAPON_CLASS:
         {
@@ -1207,6 +1282,7 @@ hits_bars(
         default:
             break;
         }
+    }
 
     if (hits && whodidit != -1) {
         hit_bars(obj_p, x, y, barsx, barsy, whodidit, FALSE);
@@ -1240,13 +1316,13 @@ hit_bars(struct obj **obj_p, int objx, int objy, int barsx, int barsy, boolean y
             if (!unbreakable) {
                 dissolve_bars(barsx, barsy);
             }
-            if (your_fault && In_sokoban(&u.uz))
+            if (your_fault && In_sokoban(&u.uz)) {
                 sokoban_trickster();
+            }
         }
-    }
-    else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
+    } else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL) {
         pline("Whang!");
-    else if (otmp->oclass == COIN_CLASS ||
+    } else if (otmp->oclass == COIN_CLASS ||
              objects[obj_type].oc_material == GOLD ||
              objects[obj_type].oc_material == SILVER)
         pline("Clink!");

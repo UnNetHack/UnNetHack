@@ -147,8 +147,9 @@ gettty()
 #ifdef TEXTCOLOR
 	init_ttycolor();
 #else
-	for(k=0; k < CLR_MAX; ++k)
-		ttycolors[k] = 7;
+    for (k = 0; k < CLR_MAX; ++k) {
+        ttycolors[k] = 7;
+    }
 #endif
 }
 
@@ -644,7 +645,7 @@ int assign_videocolors(char *colorvals)
 	if (convert_uchars(colorvals,tmpcolor,i) < 0) return FALSE;
 
 	icolor = CLR_RED;
-	for( i = 0; tmpcolor[i] != 0; ++i) {
+    for (i = 0; tmpcolor[i] != 0; ++i) {
 	    if (icolor <= CLR_WHITE)
 		ttycolors[icolor++] = tmpcolor[i];
 	}
@@ -717,7 +718,7 @@ has_color(int color)
 void
 term_start_attr(int attrib)
 {
-    switch(attrib){
+    switch (attrib) {
         case ATR_INVERSE:
 		if (iflags.wc_inverse) {
 		   /* Suggestion by Lee Berger */
@@ -727,7 +728,7 @@ term_start_attr(int attrib)
 		   background = (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN);
 		   break;
 		}
-		/*FALLTHRU*/
+        /* fall through */
         case ATR_ULINE:
         case ATR_BLINK:
         case ATR_BOLD:
@@ -743,7 +744,7 @@ term_start_attr(int attrib)
 void
 term_end_attr(int attrib)
 {
-    switch(attrib){
+    switch (attrib) {
 
         case ATR_INVERSE:
 		if ((foreground & (FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_RED)) == 0)

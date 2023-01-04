@@ -34,7 +34,9 @@ alloc(unsigned int lth)
 
     ptr = calloc(lth, 1);
 #ifndef MONITOR_HEAP
-    if (!ptr) panic("Memory allocation failure; cannot get %u bytes", lth);
+    if (!ptr) {
+        panic("Memory allocation failure; cannot get %u bytes", lth);
+    }
 #endif
     return ptr;
 }
@@ -86,8 +88,9 @@ heapmon_init()
 {
     char *logname = getenv("NH_HEAPLOG");
 
-    if (logname && *logname)
+    if (logname && *logname) {
         heaplog = fopen(logname, "w");
+    }
     tried_heaplog = TRUE;
 }
 
@@ -100,14 +103,18 @@ int line;
     long *ptr = alloc(lth);
     char ptr_address[20];
 
-    if (!tried_heaplog) heapmon_init();
-    if (heaplog)
+    if (!tried_heaplog) {
+        heapmon_init();
+    }
+    if (heaplog) {
         (void) fprintf(heaplog, "+%5u %s %4d %s\n", lth,
                        fmt_ptr((genericptr_t)ptr, ptr_address),
                        line, file);
+    }
     /* potential panic in alloc() was deferred til here */
     if (!ptr) panic("Cannot get %u bytes, line %d of %s",
                     lth, line, file);
+    }
 
     return ptr;
 }
@@ -120,11 +127,14 @@ int line;
 {
     char ptr_address[20];
 
-    if (!tried_heaplog) heapmon_init();
-    if (heaplog)
+    if (!tried_heaplog) {
+        heapmon_init();
+    }
+    if (heaplog) {
         (void) fprintf(heaplog, "-      %s %4d %s\n",
                        fmt_ptr((genericptr_t)ptr, ptr_address),
                        line, file);
+    }
 
     free(ptr);
 }

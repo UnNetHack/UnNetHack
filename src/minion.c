@@ -6,8 +6,9 @@
 void
 newemin(struct monst *mtmp)
 {
-    if (!mtmp->mextra)
+    if (!mtmp->mextra) {
         mtmp->mextra = newmextra();
+    }
     if (!EMIN(mtmp)) {
         EMIN(mtmp) = (struct emin *) alloc(sizeof(struct emin));
         (void) memset((genericptr_t) EMIN(mtmp), 0, sizeof(struct emin));
@@ -32,10 +33,12 @@ monster_census(boolean spotted) /**< seen|sensed vs all */
     int count = 0;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
+        if (DEADMONSTER(mtmp)) {
             continue;
-        if (spotted && !canspotmon(mtmp))
+        }
+        if (spotted && !canspotmon(mtmp)) {
             continue;
+        }
         ++count;
     }
     return count;
@@ -109,7 +112,9 @@ msummon(struct monst *mon)
     }
 
     /* sanity checks */
-    if (cnt > 1 && (mons[dtype].geno & G_UNIQ)) cnt = 1;
+    if (cnt > 1 && (mons[dtype].geno & G_UNIQ)) {
+        cnt = 1;
+    }
     /*
      * If this daemon is unique and being re-summoned (the only way we
      * could get this far with an extinct dtype), try another.
@@ -271,7 +276,7 @@ demon_talk(struct monst *mtmp)
         if (!tele_restrict(mtmp)) {
             (void) rloc(mtmp, FALSE);
         }
-        return(1);
+        return 1;
     }
 
     /* This isn't _that_ much better than the old way, but it removes
@@ -293,17 +298,15 @@ demon_talk(struct monst *mtmp)
         return 0;
     } else {
         /* make sure that the demand is unmeetable if the monster
-           has the Amulet, preventing monster from being satisified
+           has the Amulet, preventing monster from being satisfied
            and removed from the game (along with said Amulet...) */
         /* [actually the Amulet is safe; it would be dropped when
            mongone() gets rid of the monster; force combat anyway;
            also make it unmeetable if the player is Deaf, to simplify
            handling that case as player-won't-pay] */
-        if (mon_has_amulet(mtmp))
-        if (mon_has_amulet(mtmp) || Deaf)
-            demand =
-                money_cnt(invent)
-                + (long)rn1(10000, 40);
+        if (mon_has_amulet(mtmp) || Deaf) {
+            demand = money_cnt(invent) + (long)rn1(10000, 40);
+        }
 
         if (!Deaf) {
             pline("%s demands %ld %s for safe passage.",
@@ -331,7 +334,7 @@ demon_talk(struct monst *mtmp)
         }
     }
     mongone(mtmp);
-    return(1);
+    return 1;
 }
 
 long
@@ -342,7 +345,9 @@ bribe(struct monst *mtmp)
     long umoney = money_cnt(invent);
 
     getlin("How much will you offer?", buf);
-    if (sscanf(buf, "%ld", &offer) != 1) offer = 0L;
+    if (sscanf(buf, "%ld", &offer) != 1) {
+        offer = 0L;
+    }
 
     /*Michael Paddon -- fix for negative offer to monster*/
     /*JAR880815 - */
@@ -364,7 +369,7 @@ bribe(struct monst *mtmp)
     }
     (void) money2mon(mtmp, offer);
     flags.botl = 1;
-    return(offer);
+    return offer;
 }
 
 int
@@ -376,9 +381,9 @@ dprince(aligntyp atyp)
         pm = rn1(PM_DEMOGORGON + 1 - PM_ORCUS, PM_ORCUS);
         if (!(mvitals[pm].mvflags & G_GONE) &&
             (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
-            return(pm);
+            return pm;
     }
-    return(dlord(atyp));    /* approximate */
+    return dlord(atyp);    /* approximate */
 }
 
 int
@@ -390,19 +395,20 @@ dlord(aligntyp atyp)
         pm = rn1(PM_YEENOGHU + 1 - PM_JUIBLEX, PM_JUIBLEX);
         if (!(mvitals[pm].mvflags & G_GONE) &&
             (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
-            return(pm);
+            return pm;
     }
-    return(ndemon(atyp));   /* approximate */
+    return ndemon(atyp);   /* approximate */
 }
 
 /* create lawful (good) lord */
 int
 llord(void)
 {
-    if (!(mvitals[PM_ARCHON].mvflags & G_GONE))
-        return(PM_ARCHON);
+    if (!(mvitals[PM_ARCHON].mvflags & G_GONE)) {
+        return PM_ARCHON;
+    }
 
-    return(lminion());  /* approximate */
+    return lminion();  /* approximate */
 }
 
 int
@@ -413,8 +419,9 @@ lminion(void)
 
     for (tryct = 0; tryct < 20; tryct++) {
         ptr = mkclass(S_ANGEL, 0);
-        if (ptr && !is_lord(ptr) && ptr != &mons[PM_ALEAX])
-            return(monsndx(ptr));
+        if (ptr && !is_lord(ptr) && ptr != &mons[PM_ALEAX]) {
+            return monsndx(ptr);
+        }
     }
 
     return NON_PM;
@@ -436,8 +443,9 @@ ndemon(aligntyp atyp) /**< A_NONE is used for 'any alignment' */
      * aspect of that changes someday.]
      */
 #if 0
-    if (atyp == A_NEUTRAL)
+    if (atyp == A_NEUTRAL) {
         return NON_PM;
+    }
 #endif
 
     ptr = mkclass_aligned(S_DEMON, 0, atyp);
@@ -466,9 +474,10 @@ lose_guardian_angel(struct monst *mon) /**< if null, angel hasn't been created y
     for (i = rn1(3, 2); i > 0; --i) {
         mm.x = u.ux;
         mm.y = u.uy;
-        if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL]))
+        if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL])) {
             (void) mk_roamer(&mons[PM_ANGEL], u.ualign.type, mm.x, mm.y,
                              FALSE);
+        }
     }
 }
 
@@ -483,18 +492,20 @@ gain_guardian_angel(void)
     Hear_again(); /* attempt to cure any deafness now (divine
                      message will be heard even if that fails) */
     if (Conflict) {
-        if (!Deaf)
+        if (!Deaf) {
             pline("A voice booms:");
-        else
+        } else {
             You_feel("a booming voice:");
+        }
         verbalize("Thy desire for conflict shall be fulfilled!");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
-        if (!Deaf)
+        if (!Deaf) {
             pline("A voice whispers:");
-        else
+        } else {
             You_feel("a soft voice:");
+        }
         verbalize("Thou hast been worthy of me!");
         mm.x = u.ux;
         mm.y = u.uy;
@@ -510,22 +521,25 @@ gain_guardian_angel(void)
             mtmp->mtame = 10;
             /* for 'hilite_pet'; after making tame, before next message */
             newsym(mtmp->mx, mtmp->my);
-            if (!Blind)
+            if (!Blind) {
                 pline("An angel appears near you.");
-            else
+            } else {
                 You_feel("the presence of a friendly angel near you.");
+            }
             /* make him strong enough vs. endgame foes */
             mtmp->m_lev = rn1(8, 15);
             mtmp->mhp = mtmp->mhpmax =
                 d((int) mtmp->m_lev, 10) + 30 + rnd(30);
             if ((otmp = select_hwep(mtmp)) == 0) {
                 otmp = mksobj(SILVER_SABER, FALSE, FALSE);
-                if (mpickobj(mtmp, otmp))
+                if (mpickobj(mtmp, otmp)) {
                     panic("merged weapon?");
+                }
             }
             bless(otmp);
-            if (otmp->spe < 4)
+            if (otmp->spe < 4) {
                 otmp->spe += rnd(4);
+            }
             if ((otmp = which_armor(mtmp, W_ARMS)) == 0
                 || otmp->otyp != SHIELD_OF_REFLECTION) {
                 (void) mongets(mtmp, AMULET_OF_REFLECTION);

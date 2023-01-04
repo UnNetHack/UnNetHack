@@ -38,7 +38,7 @@ dosit(void)
 
     if (u.usteed) {
         You("are already sitting on %s.", mon_nam(u.usteed));
-        return (0);
+        return 0;
     }
 
     if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
@@ -93,8 +93,9 @@ dosit(void)
                     losehp(Half_physical_damage ? rn2(2) : 1,
                             "sitting on an iron spike", KILLED_BY);
                     exercise(A_STR, FALSE);
-                } else
+                } else {
                     You("sit down in the pit.");
+                }
                 u.utrap += rn2(5);
             } else if (u.utraptype == TT_WEB) {
                 You("sit in the spider web and get entangled further!");
@@ -116,30 +117,33 @@ dosit(void)
             dotrap(trap, VIASITTING);
         }
     } else if ((Underwater || Is_waterlevel(&u.uz)) && !eggs_in_water(youmonst.data)) {
-        if (Is_waterlevel(&u.uz))
+        if (Is_waterlevel(&u.uz)) {
             There("are no cushions floating nearby.");
-        else
+        } else {
             You("sit down on the muddy bottom.");
+        }
     } else if (is_pool(u.ux, u.uy) && !eggs_in_water(youmonst.data)) {
 in_water:
         You("sit in the %s.", hliquid("water"));
-        if (!rn2(10) && uarm)
+        if (!rn2(10) && uarm) {
             (void) water_damage(uarm, "armor", TRUE);
-        if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS)
+        }
+        if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS) {
             (void) water_damage(uarm, "armor", TRUE);
+        }
 #ifdef SINKS
-    } else if(IS_SINK(typ)) {
+    } else if (IS_SINK(typ)) {
         You(sit_message, defsyms[S_sink].explanation);
         Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
 #endif
-    } else if(IS_ALTAR(typ)) {
+    } else if (IS_ALTAR(typ)) {
         You(sit_message, defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);
-    } else if(IS_GRAVE(typ)) {
+    } else if (IS_GRAVE(typ)) {
         You(sit_message, defsyms[S_grave].explanation);
-    } else if(typ == STAIRS) {
+    } else if (typ == STAIRS) {
         You(sit_message, "stairs");
-    } else if(typ == LADDER) {
+    } else if (typ == LADDER) {
         You(sit_message, "ladder");
     } else if (is_lava(u.ux, u.uy)) {
         /* must be WWalking */
@@ -156,13 +160,15 @@ in_water:
     } else if (is_ice(u.ux, u.uy)) {
 
         You(sit_message, defsyms[S_ice].explanation);
-        if (!Cold_resistance) pline_The("ice feels cold.");
+        if (!Cold_resistance) {
+            pline_The("ice feels cold.");
+        }
 
     } else if (typ == DRAWBRIDGE_DOWN) {
 
         You(sit_message, "drawbridge");
 
-    } else if(IS_THRONE(typ)) {
+    } else if (IS_THRONE(typ)) {
 
         You(sit_message, defsyms[S_throne].explanation);
         if (rnd(6) > 4)  {
@@ -184,10 +190,14 @@ in_water:
             case 4:
                 You_feel("much, much better!");
                 if (Upolyd) {
-                    if (u.mh >= (u.mhmax - 5)) u.mhmax += 4;
+                    if (u.mh >= (u.mhmax - 5)) {
+                        u.mhmax += 4;
+                    }
                     u.mh = u.mhmax;
                 }
-                if(u.uhp >= (u.uhpmax - 5)) u.uhpmax += 4;
+                if (u.uhp >= (u.uhpmax - 5)) {
+                    u.uhpmax += 4;
+                }
                 u.uhp = u.uhpmax;
                 check_uhpmax();
                 u.ucreamed = 0;
@@ -214,8 +224,9 @@ in_water:
                 pline("A voice echoes:");
                 verbalize("Thy audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
-                while(cnt--)
+                while (cnt--) {
                     (void) makemon(courtmon(), u.ux, u.uy, NO_MM_FLAGS);
+                }
                 break;
             }
             case 8:
@@ -230,7 +241,9 @@ in_water:
                 if (Luck > 0)  {
                     make_blinded(Blinded + rn1(100, 250), TRUE);
                     change_luck((Luck > 1) ? -rnd(2) : -1);
-                } else rndcurse();
+                } else {
+                    rndcurse();
+                }
                 break;
             case 10:
                 if (Luck < 0 || (HSee_invisible & INTRINSIC))  {
@@ -272,10 +285,11 @@ in_water:
                 break;
             }
         } else {
-            if (is_prince(youmonst.data))
+            if (is_prince(youmonst.data)) {
                 You_feel("very comfortable here.");
-            else
+            } else {
                 You_feel("somehow out of place...");
+            }
         }
 
         if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
@@ -325,7 +339,7 @@ in_water:
     } else {
         pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
     }
-    return(1);
+    return 1;
 }
 
 /** curse a few inventory items at random! */
@@ -340,7 +354,7 @@ rndcurse(void)
         return;
     }
 
-    if(Antimagic) {
+    if (Antimagic) {
         shieldeff(u.ux, u.uy);
         You(mal_aura, "you");
     }
@@ -352,10 +366,11 @@ rndcurse(void)
     if (u.usteed && !rn2(4) &&
         (otmp = which_armor(u.usteed, W_SADDLE)) != 0 &&
         !otmp->cursed) {    /* skip if already cursed */
-        if (otmp->blessed)
+        if (otmp->blessed) {
             unbless(otmp);
-        else
+        } else {
             curse(otmp);
+        }
         if (!Blind) {
             pline("%s %s %s.",
                   s_suffix(upstart(y_monnam(u.usteed))),
@@ -375,7 +390,9 @@ curse_objects(struct obj *firstobj, int ncurse, boolean showmsg)
 
     for (otmp = firstobj; otmp; otmp = otmp->nobj) {
         /* gold isn't subject to being cursed or blessed */
-        if (otmp->oclass == COIN_CLASS) continue;
+        if (otmp->oclass == COIN_CLASS) {
+            continue;
+        }
 
         nobj++;
     }
@@ -384,30 +401,38 @@ curse_objects(struct obj *firstobj, int ncurse, boolean showmsg)
             onum = rnd(nobj);
             for (otmp = firstobj; otmp; otmp = otmp->nobj) {
                 /* as above */
-                if (otmp->oclass == COIN_CLASS) continue;
+                if (otmp->oclass == COIN_CLASS) {
+                    continue;
+                }
 
-                if (--onum == 0) break; /* found the target */
+                if (--onum == 0) {
+                    break; /* found the target */
+                }
             }
             /* the !otmp case should never happen; picking an already
                cursed item happens--avoid "resists" message in that case */
-            if (!otmp) continue; /* next target */
-            else if (otmp->cursed) {
-                if (Is_container(otmp))
+            if (!otmp) {
+                continue; /* next target */
+            } else if (otmp->cursed) {
+                if (Is_container(otmp)) {
                     curse_objects(otmp->cobj, 1, FALSE);
+                }
                 continue;
             }
 
-            if(otmp->oartifact && spec_ability(otmp, SPFX_INTEL) &&
+            if (otmp->oartifact && spec_ability(otmp, SPFX_INTEL) &&
                rn2(10) < 8) {
-                if (showmsg)
+                if (showmsg) {
                     pline("%s!", Tobjnam(otmp, "resist"));
+                }
                 continue;
             }
 
-            if(otmp->blessed)
+            if (otmp->blessed) {
                 unbless(otmp);
-            else
+            } else {
                 curse(otmp);
+            }
         }
         update_inventory();
     }
@@ -417,7 +442,7 @@ curse_objects(struct obj *firstobj, int ncurse, boolean showmsg)
 void
 attrcurse(void)
 {
-    switch(rnd(11)) {
+    switch (rnd(11)) {
     case 1: if (HFire_resistance & INTRINSIC) {
             HFire_resistance &= ~INTRINSIC;
             You_feel("warmer.");
@@ -438,8 +463,9 @@ attrcurse(void)
              /* fall through */
     case 4: if (HTelepat & INTRINSIC) {
             HTelepat &= ~INTRINSIC;
-            if (Blind && !Blind_telepat)
+            if (Blind && !Blind_telepat) {
                 see_monsters(); /* Can't sense mons anymore! */
+            }
             Your("senses fail!");
             break;
     }

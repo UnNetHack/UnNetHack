@@ -20,8 +20,12 @@ initrack(void)
 void
 settrack(void)
 {
-    if(utcnt < UTSZ) utcnt++;
-    if(utpnt == UTSZ) utpnt = 0;
+    if (utcnt < UTSZ) {
+        utcnt++;
+    }
+    if (utpnt == UTSZ) {
+        utpnt = 0;
+    }
     utrack[utpnt].x = u.ux;
     utrack[utpnt].y = u.uy;
     utpnt++;
@@ -33,23 +37,29 @@ gettrack(coordxy x, coordxy y)
     int cnt, ndist;
     coord *tc;
     cnt = utcnt;
-    for(tc = &utrack[utpnt]; cnt--; ) {
-        if(tc == utrack) tc = &utrack[UTSZ-1];
-        else tc--;
+    for (tc = &utrack[utpnt]; cnt--; ) {
+        if (tc == utrack) {
+            tc = &utrack[UTSZ-1];
+        } else {
+            tc--;
+        }
         ndist = distmin(x, y, tc->x, tc->y);
 
         /* if far away, skip track entries til we're closer */
-        if(ndist > 2) {
+        if (ndist > 2) {
             ndist -= 2; /* be careful due to extra decrement at top of loop */
             cnt -= ndist;
-            if(cnt <= 0)
+            if (cnt <= 0) {
                 return (coord *) 0; /* too far away, no matches possible */
-            if(tc < &utrack[ndist])
+            }
+            if (tc < &utrack[ndist]) {
                 tc += (UTSZ-ndist);
-            else
+            } else {
                 tc -= ndist;
-        } else if(ndist <= 1)
-            return(ndist ? tc : 0);
+            }
+        } else if (ndist <= 1) {
+            return ndist ? tc : 0;
+        }
     }
     return (coord *)0;
 }

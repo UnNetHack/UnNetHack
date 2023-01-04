@@ -45,17 +45,19 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = 0;
 
-    if(ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) more();
+    if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP)) {
+        more();
+    }
     cw->flags &= ~WIN_STOP;
     ttyDisplay->toplin = 3; /* special prompt state */
     ttyDisplay->inread++;
     pline("%s ", query);
     *obufp = 0;
-    for(;;) {
+    for (;;) {
         (void) fflush(stdout);
         Sprintf(toplines, "%s ", query);
         Strcat(toplines, obufp);
-        if((c = Getchar()) == EOF) {
+        if ((c = Getchar()) == EOF) {
 #ifndef NEWAUTOCOMP
             *bufp = 0;
 #endif /* not NEWAUTOCOMP */
@@ -81,7 +83,7 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
             ttyDisplay->intr--;
             *bufp = 0;
         }
-        if(c == '\020') { /* ctrl-P */
+        if (c == '\020') { /* ctrl-P */
             if (iflags.prevmsg_window != 's') {
                 int sav = ttyDisplay->inread;
                 ttyDisplay->inread = 0;
@@ -94,8 +96,9 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
                 *bufp = 0;
                 addtopl(obufp);
             } else {
-                if (!doprev)
+                if (!doprev) {
                     (void) tty_doprev_message(); /* need two initially */
+                }
                 (void) tty_doprev_message();
                 doprev = 1;
                 continue;
@@ -109,8 +112,8 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
             *bufp = 0;
             addtopl(obufp);
         }
-        if(c == erase_char || c == '\b') {
-            if(bufp != obufp) {
+        if (c == erase_char || c == '\b') {
+            if (bufp != obufp) {
 #ifdef NEWAUTOCOMP
                 char *i;
 
@@ -120,21 +123,27 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
                 putsyms("\b \b");/* putsym converts \b */
 #else /* NEWAUTOCOMP */
                 putsyms("\b");
-                for (i = bufp; *i; ++i) putsyms(" ");
-                for (; i > bufp; --i) putsyms("\b");
+                for (i = bufp; *i; ++i) {
+                    putsyms(" ");
+                }
+                for (; i > bufp; --i) {
+                    putsyms("\b");
+                }
                 *bufp = 0;
 #endif /* NEWAUTOCOMP */
-            } else tty_nhbell();
+            } else {
+                tty_nhbell();
+            }
 #if defined(apollo)
-        } else if(c == '\n' || c == '\r') {
+        } else if (c == '\n' || c == '\r') {
 #else
-        } else if(c == '\n') {
+        } else if (c == '\n') {
 #endif
 #ifndef NEWAUTOCOMP
             *bufp = 0;
 #endif /* not NEWAUTOCOMP */
             break;
-        } else if(' ' <= (unsigned char) c && c != '\177' &&
+        } else if (' ' <= (unsigned char) c && c != '\177' &&
                   (bufp-obufp < BUFSZ-1 && bufp-obufp < COLNO)) {
             /* avoid isprint() - some people don't have it
                ' ' is not always a printing char */
@@ -152,29 +161,40 @@ hooked_tty_getlin(const char *query, char *bufp, getlin_hook_proc hook)
                 bufp = eos(bufp);
 #else /* NEWAUTOCOMP */
                 /* pointer and cursor left where they were */
-                for (i = bufp; *i; ++i) putsyms("\b");
+                for (i = bufp; *i; ++i) {
+                    putsyms("\b");
+                }
             } else if (i > bufp) {
                 char *s = i;
 
                 /* erase rest of prior guess */
-                for (; i > bufp; --i) putsyms(" ");
-                for (; s > bufp; --s) putsyms("\b");
+                for (; i > bufp; --i) {
+                    putsyms(" ");
+                }
+                for (; s > bufp; --s) {
+                    putsyms("\b");
+                }
 #endif /* NEWAUTOCOMP */
             }
-        } else if(c == kill_char || c == '\177') { /* Robert Viduya */
+        } else if (c == kill_char || c == '\177') { /* Robert Viduya */
             /* this test last - @ might be the kill_char */
 #ifndef NEWAUTOCOMP
-            while(bufp != obufp) {
+            while (bufp != obufp) {
                 bufp--;
                 putsyms("\b \b");
             }
 #else /* NEWAUTOCOMP */
-            for (; *bufp; ++bufp) putsyms(" ");
-            for (; bufp != obufp; --bufp) putsyms("\b \b");
+            for (; *bufp; ++bufp) {
+                putsyms(" ");
+            }
+            for (; bufp != obufp; --bufp) {
+                putsyms("\b \b");
+            }
             *bufp = 0;
 #endif /* NEWAUTOCOMP */
-        } else
+        } else {
             tty_nhbell();
+        }
     }
     ttyDisplay->toplin = 2;     /* nonempty, no --More-- required */
     ttyDisplay->inread--;
@@ -188,15 +208,17 @@ xwaitforspace(const char *s) /**< chars allowed besides return */
 
     morc = 0;
 
-    while((c = tty_nhgetch()) != '\n') {
-        if(iflags.cbreak) {
+    while ((c = tty_nhgetch()) != '\n') {
+        if (iflags.cbreak) {
             if ((s && index(s, c)) || c == x) {
                 morc = (char) c;
                 break;
             }
             tty_nhbell();
         }
-        if (c == -1) break; /* lost terminal or other error */
+        if (c == -1) {
+            break; /* lost terminal or other error */
+        }
     }
 
 }
@@ -253,7 +275,9 @@ tty_get_ext_cmd(void)
     int i;
     char buf[BUFSZ];
 
-    if (iflags.extmenu) return extcmd_via_menu();
+    if (iflags.extmenu) {
+        return extcmd_via_menu();
+    }
 
     suppress_history = TRUE;
     /* maybe a runtime option? */
@@ -265,16 +289,22 @@ tty_get_ext_cmd(void)
     hooked_tty_getlin("#", buf, ext_cmd_getlin_hook);
 #endif
     (void) mungspaces(buf);
-    if (buf[0] == 0 || buf[0] == '\033') return -1;
+    if (buf[0] == 0 || buf[0] == '\033') {
+        return -1;
+    }
 
-    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
-        if (!strcmpi(buf, extcmdlist[i].ef_txt)) break;
+    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
+        if (!strcmpi(buf, extcmdlist[i].ef_txt)) {
+            break;
+        }
+    }
 
 #ifdef REDO
     if (!in_doagain) {
         int j;
-        for (j = 0; buf[j]; j++)
+        for (j = 0; buf[j]; j++) {
             savech(buf[j]);
+        }
         savech('\n');
     }
 #endif

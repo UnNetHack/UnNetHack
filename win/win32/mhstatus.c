@@ -30,8 +30,8 @@ HWND mswin_init_status_window () {
 		register_status_window_class( );
 		run_once = 1;
 	}
-	
-	ret = CreateWindow(                                
+
+	ret = CreateWindow(
 			szStatusWindowClass,
 			NULL,
 			WS_CHILD | WS_DISABLED | WS_CLIPSIBLINGS,
@@ -44,7 +44,7 @@ HWND mswin_init_status_window () {
 			GetNHApp()->hApp,
 			NULL );
 	if( !ret ) panic("Cannot create status window");
-	
+
 	EnableWindow(ret, FALSE);
 
 	data = (PNHStatusWindow)malloc(sizeof(NHStatusWindow));
@@ -67,32 +67,32 @@ void register_status_window_class()
 	wcex.hInstance		= GetNHApp()->hApp;
 	wcex.hIcon			= NULL;
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= status_bg_brush 
+	wcex.hbrBackground	= status_bg_brush
 		? status_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_STATUS);
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= szStatusWindowClass;
 
 	RegisterClass(&wcex);
 }
-    
-    
+
+
 LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	RECT rt;
 	PAINTSTRUCT ps;
 	HDC hdc;
 	PNHStatusWindow data;
-	
+
 	data = (PNHStatusWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	switch (message) 
+	switch (message)
 	{
 	case WM_MSNH_COMMAND: {
 		switch( wParam ) {
 		case MSNH_MSG_PUTSTR: {
 			PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
-			strncpy(data->window_text[data->index], msg_data->text, 
+			strncpy(data->window_text[data->index], msg_data->text,
 				    MAXWINDOWTEXT);
-			strncat(data->window_text[data->index], "\n", 
+			strncat(data->window_text[data->index], "\n",
 				    MAXWINDOWTEXT-strlen(data->window_text[data->index]));
 			data->index = (data->index+1) % NHSW_LINES;
 			InvalidateRect(hWnd, NULL, TRUE);
@@ -115,20 +115,20 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
 			hdc = BeginPaint(hWnd, &ps);
 			GetClientRect(hWnd, &rt);
-			
+
 			oldFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
 
-			OldBg = SetBkColor(hdc, status_bg_brush 
+			OldBg = SetBkColor(hdc, status_bg_brush
 				? status_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_STATUS));
-			OldFg = SetTextColor(hdc, status_fg_brush 
+			OldFg = SetTextColor(hdc, status_fg_brush
 				? status_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_STATUS));
-			
-			for(i=0; i<NHSW_LINES; i++ ) {
-				GetTextExtentPoint32(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &sz);
-				NH_A2W(data->window_text[i], wbuf, BUFSZ);
-				DrawText(hdc, wbuf, strlen(data->window_text[i]), &rt, DT_LEFT | DT_END_ELLIPSIS);
-				rt.top += sz.cy;
-			}
+
+            for (i=0; i<NHSW_LINES; i++ ) {
+                GetTextExtentPoint32(hdc, NH_A2W(data->window_text[i], wbuf, sizeof(wbuf)), strlen(data->window_text[i]), &sz);
+                NH_A2W(data->window_text[i], wbuf, BUFSZ);
+                DrawText(hdc, wbuf, strlen(data->window_text[i]), &rt, DT_LEFT | DT_END_ELLIPSIS);
+                rt.top += sz.cy;
+            }
 
 			SelectObject(hdc, oldFont);
 			SetTextColor (hdc, OldFg);

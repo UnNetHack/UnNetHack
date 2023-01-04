@@ -341,7 +341,7 @@ void prompt_for_player_selection(void)
 	    do {
 		/* pick4u = lowc(readchar()); */
 		if (index(quitchars, pick4u)) pick4u = 'y';
-	    } while(!index(ynqchars, pick4u));
+	    } while (!index(ynqchars, pick4u));
 	    if ((int)strlen(prompt) + 1 < CO) {
 		/* Echo choice and move back down line */
 		/* tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline, pick4u); */
@@ -671,7 +671,7 @@ void mswin_get_nh_event(void)
 	MSG msg;
 
 	logDebug("mswin_get_nh_event()\n");
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)!=0 ) {
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) != 0) {
 		if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -1006,7 +1006,7 @@ void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
 
 		text = mswin_create_nhwindow(NHW_TEXT);
 
-		while (dlb_fgets(line, LLEN, f)) {
+        while (dlb_fgets(line, LLEN, f)) {
 			 size_t len;
 			 len = strlen(line);
 			 if( line[len-1]=='\n' ) line[len-1]='\x0';
@@ -1297,7 +1297,7 @@ int mswin_nhgetch()
 	logDebug("mswin_nhgetch()\n");
 
 
-	while( (event = mswin_input_pop()) == NULL ||
+    while ((event = mswin_input_pop()) == NULL ||
 		   event->type != NHEVENT_CHAR )
 		mswin_main_loop();
 
@@ -1327,7 +1327,7 @@ int mswin_nh_poskey(coordxy *x, coordxy *y, int *mod)
 
 	logDebug("mswin_nh_poskey()\n");
 
-	while( (event = mswin_input_pop())==NULL ) mswin_main_loop();
+    while ((event = mswin_input_pop())==NULL ) mswin_main_loop();
 
 	if( event->type==NHEVENT_MOUSE ) {
 		*mod = event->ms.mod;
@@ -1498,7 +1498,7 @@ char mswin_yn_function(const char *question, const char *choices,
 				ch = (char)0;
 			}
 		}
-	} while( !ch );
+    } while (!ch);
 
     createcaret = 0;
     SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE),
@@ -1919,7 +1919,7 @@ void mswin_main_loop()
 {
 	MSG msg;
 
-	while( !mswin_have_input() &&
+    while (!mswin_have_input() &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
  		if (GetNHApp()->regNetHackMode ||
  			!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg))
@@ -2016,26 +2016,28 @@ void mswin_popup_display(HWND hWnd, int* done_indicator)
 
 	mswin_layout_main_window(hWnd);
 
-	/* disable game windows */
-	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
-		 hChild;
-		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
-		if( hChild!= hWnd) EnableWindow(hChild, FALSE);
-	}
+    /* disable game windows */
+    for (hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
+            hChild;
+            hChild = GetWindow(hChild, GW_HWNDNEXT)) {
+        if (hChild!= hWnd) {
+            EnableWindow(hChild, FALSE);
+        }
+    }
 
 	/* disable menu */
 	hMenu = GetMenu( GetNHApp()->hMainWnd );
 	mi_count = GetMenuItemCount( hMenu );
-	for( i=0; i<mi_count; i++ ) {
-		EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_GRAYED);
-	}
+    for (i = 0; i < mi_count; i++) {
+        EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_GRAYED);
+    }
 	DrawMenuBar( GetNHApp()->hMainWnd );
 
 	/* bring menu window on top */
 	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
 	/* go into message loop */
-	while( IsWindow(hWnd) &&
+    while (IsWindow(hWnd) &&
 		   (done_indicator==NULL || !*done_indicator) &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
 		if( !IsDialogMessage(hWnd, &msg) ) {
@@ -2054,22 +2056,22 @@ void mswin_popup_destroy(HWND hWnd)
 	int mi_count;
 	int i;
 
-	/* enable game windows */
-	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
-		 hChild;
-		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
-		if( hChild!= hWnd) {
-			EnableWindow(hChild, TRUE);
-		}
-	}
+    /* enable game windows */
+    for (hChild = GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
+            hChild;
+            hChild = GetWindow(hChild, GW_HWNDNEXT)) {
+        if (hChild!= hWnd) {
+            EnableWindow(hChild, TRUE);
+        }
+    }
 
-	/* enable menu */
-	hMenu = GetMenu( GetNHApp()->hMainWnd );
-	mi_count = GetMenuItemCount( hMenu );
-	for( i=0; i<mi_count; i++ ) {
-		EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_ENABLED);
-	}
-	DrawMenuBar( GetNHApp()->hMainWnd );
+    /* enable menu */
+    hMenu = GetMenu( GetNHApp()->hMainWnd );
+    mi_count = GetMenuItemCount( hMenu );
+    for (i = 0; i < mi_count; i++) {
+        EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_ENABLED);
+    }
+    DrawMenuBar( GetNHApp()->hMainWnd );
 
 	SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW);
 	GetNHApp()->hPopupWnd = NULL;

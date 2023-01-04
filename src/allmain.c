@@ -39,7 +39,9 @@ hpnotify_format_str(char *str)
 
     buf[0] = '\0';
 
-    if (!str) return NULL;
+    if (!str) {
+        return NULL;
+    }
 
     f = str;
     p = buf;
@@ -50,8 +52,9 @@ hpnotify_format_str(char *str)
             switch (*f) {
             case 'a':
                 snprintf (p, end + 1 - p, "%ld", (long)abs(uhp()-prev_hp_notify));
-                while (*p != '\0')
+                while (*p != '\0') {
                     p++;
+                }
                 break;
             case 'c':
                 snprintf (p, end + 1 - p, "%c", (prev_hp_notify > uhp() ? '-' : '+'));
@@ -59,8 +62,9 @@ hpnotify_format_str(char *str)
                 break;
             case 'm':
                 snprintf (p, end + 1 - p, "%ld", (long)uhpmax());
-                while (*p != '\0')
+                while (*p != '\0') {
                     p++;
+                }
                 break;
             case 'H':
                 if (uhp() == uhpmax()) {
@@ -68,27 +72,31 @@ hpnotify_format_str(char *str)
                 } else {
                     snprintf (p, end + 1 - p, "%ld", (long)uhp());
                 }
-                while (*p != '\0')
+                while (*p != '\0') {
                     p++;
+                }
                 break;
             case 'h':
                 snprintf (p, end + 1 - p, "%ld", (long)uhp());
-                while (*p != '\0')
+                while (*p != '\0') {
                     p++;
+                }
                 break;
             default:
                 *p = *f;
-                if (p < end)
+                if (p < end) {
                     p++;
+                }
             }
             ispercent = 0;
         } else {
-            if (*f == '%')
+            if (*f == '%') {
                 ispercent = 1;
-            else {
+            } else {
                 *p = *f;
-                if (p < end)
+                if (p < end) {
                     p++;
+                }
             }
         }
         f++;
@@ -113,28 +121,64 @@ can_regenerate(void)
     }
     if (is_elf(youmonst.data)) {
         if (uwep && is_iron(uwep) &&
-            !is_quest_artifact(uwep) && !uarmg) return 0;
-        if (uarm && is_iron(uarm) && !uarmu) return 0;
-        if (uarmu && is_iron(uarmu)) return 0;
-        if (uarmc && is_iron(uarmc) && !uarmu && !uarm) return 0;
+            !is_quest_artifact(uwep) && !uarmg) {
+            return 0;
+        }
+        if (uarm && is_iron(uarm) && !uarmu) {
+            return 0;
+        }
+        if (uarmu && is_iron(uarmu)) {
+            return 0;
+        }
+        if (uarmc && is_iron(uarmc) && !uarmu && !uarm) {
+            return 0;
+        }
         if (uarmh && is_iron(uarmh) &&
-            !is_quest_artifact(uarmh)) return 0;
-        if (uarms && is_iron(uarms) && !uarmg) return 0;
-        if (uarmg && is_iron(uarmg)) return 0;
-        if (uarmf && is_iron(uarmf)) return 0;
-        if (uleft && is_iron(uleft)) return 0;
-        if (uright && is_iron(uright)) return 0;
+            !is_quest_artifact(uarmh)) {
+            return 0;
+        }
+        if (uarms && is_iron(uarms) && !uarmg) {
+            return 0;
+        }
+        if (uarmg && is_iron(uarmg)) {
+            return 0;
+        }
+        if (uarmf && is_iron(uarmf)) {
+            return 0;
+        }
+        if (uleft && is_iron(uleft)) {
+            return 0;
+        }
+        if (uright && is_iron(uright)) {
+            return 0;
+        }
         if (uamul && is_iron(uamul) &&
-            !is_quest_artifact(uamul) && !uarmu && !uarm) return 0;
-        if (ublindf && is_iron(ublindf)) return 0;
-        if (uchain && is_iron(uchain)) return 0;
-        if (uswapwep && is_iron(uswapwep) && u.twoweap) return 0;
+            !is_quest_artifact(uamul) && !uarmu && !uarm) {
+            return 0;
+        }
+        if (ublindf && is_iron(ublindf)) {
+            return 0;
+        }
+        if (uchain && is_iron(uchain)) {
+            return 0;
+        }
+        if (uswapwep && is_iron(uswapwep) && u.twoweap) {
+            return 0;
+        }
     } else if (is_vampiric(youmonst.data)) {
-        if (uwep && is_silver(uwep) && !uarmg) return 0;
+        if (uwep && is_silver(uwep) && !uarmg) {
+            return 0;
+        }
         if (uarms && is_silver(uarms) &&
-            !is_quest_artifact(uarms) && !uarmg) return 0;
-        if (uleft && is_silver(uleft)) return 0;
-        if (uright && is_silver(uright)) return 0;
+            !is_quest_artifact(uarms) && !uarmg) {
+            return 0;
+        }
+        if (uleft && is_silver(uleft)) {
+            return 0;
+        }
+        if (uright && is_silver(uright)) {
+            return 0;
+        }
     }
     return 1;
 }
@@ -158,10 +202,10 @@ moveloop(boolean resuming)
     boolean can_regen = can_regenerate();
 
     flags.moonphase = phase_of_the_moon();
-    if(flags.moonphase == FULL_MOON) {
+    if (flags.moonphase == FULL_MOON) {
         You("are lucky!  Full moon tonight.");
         change_luck(1);
-    } else if(flags.moonphase == NEW_MOON) {
+    } else if (flags.moonphase == NEW_MOON) {
         pline("Be careful!  New moon tonight.");
     }
     flags.friday13 = friday_13th();
@@ -204,14 +248,14 @@ moveloop(boolean resuming)
     touch_whereis();
 #endif
 
-    for(;;) {
+    for (;;) {
         get_nh_event();
 #ifdef POSITIONBAR
         do_positionbar();
 #endif
 
         didmove = flags.move;
-        if(didmove) {
+        if (didmove) {
             /* actual time passed */
             youmonst.movement -= NORMAL_SPEED;
 
@@ -221,8 +265,9 @@ moveloop(boolean resuming)
                 flags.mon_moving = TRUE;
                 do {
                     monscanmove = movemon();
-                    if (youmonst.movement > NORMAL_SPEED)
+                    if (youmonst.movement > NORMAL_SPEED) {
                         break;  /* it's now your turn */
+                    }
                 } while (monscanmove);
                 flags.mon_moving = FALSE;
 
@@ -236,8 +281,9 @@ moveloop(boolean resuming)
                     mcalcdistress();    /* adjust monsters' trap, blind, etc */
 
                     /* reallocate movement rations to monsters */
-                    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+                    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                         mtmp->movement += mcalcmove(mtmp);
+                    }
 
                     /* Vanilla generates a critter every 70-ish turns.
                      * The rate accelerates to every 50 or so below the Castle,
@@ -271,8 +317,12 @@ moveloop(boolean resuming)
                         }
                     }
                     /* make sure we don't fall off the edges */
-                    if (monclock < MAX_MONGEN_RATE) { monclock = MAX_MONGEN_RATE; }
-                    if (monclock > MIN_MONGEN_RATE) { monclock = MIN_MONGEN_RATE; }
+                    if (monclock < MAX_MONGEN_RATE) {
+                        monclock = MAX_MONGEN_RATE;
+                    }
+                    if (monclock > MIN_MONGEN_RATE) {
+                        monclock = MIN_MONGEN_RATE;
+                    }
 
                     /* TODO: adj difficulty in makemon */
                     if (!rn2(monclock)) {
@@ -292,13 +342,17 @@ moveloop(boolean resuming)
                     } else {
                         moveamt = youmonst.data->mmove;
 
-                        if (Very_fast) {    /* speed boots or potion */
+                        if (Very_fast) { /* speed boots or potion */
                             /* average movement is 1.67 times normal */
                             moveamt += NORMAL_SPEED / 2;
-                            if (rn2(3) == 0) moveamt += NORMAL_SPEED / 2;
+                            if (rn2(3) == 0) {
+                                moveamt += NORMAL_SPEED / 2;
+                            }
                         } else if (Fast) {
                             /* average movement is 1.33 times normal */
-                            if (rn2(3) != 0) moveamt += NORMAL_SPEED / 2;
+                            if (rn2(3) != 0) {
+                                moveamt += NORMAL_SPEED / 2;
+                            }
                         }
                     }
 
@@ -312,7 +366,9 @@ moveloop(boolean resuming)
                     }
 
                     youmonst.movement += moveamt;
-                    if (youmonst.movement < 0) youmonst.movement = 0;
+                    if (youmonst.movement < 0) {
+                        youmonst.movement = 0;
+                    }
                     settrack();
 
                     monstermoves++;
@@ -326,16 +382,23 @@ moveloop(boolean resuming)
                     /* once-per-turn things go here */
                     /********************************/
 
-                    if (flags.bypasses) clear_bypasses();
-                    if(Glib) glibr();
+                    if (flags.bypasses) {
+                        clear_bypasses();
+                    }
+                    if (Glib) {
+                        glibr();
+                    }
                     nh_timeout();
                     run_regions();
 #ifdef DUNGEON_GROWTH
                     dgn_growths(TRUE, TRUE);
 #endif
-                    if (u.ublesscnt) u.ublesscnt--;
-                    if(flags.time && !flags.run)
+                    if (u.ublesscnt) {
+                        u.ublesscnt--;
+                    }
+                    if (flags.time && !flags.run) {
                         flags.botl = 1;
+                    }
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
@@ -351,12 +414,13 @@ moveloop(boolean resuming)
                         if (u.mh > 1) {
                             u.mh--;
                             flags.botl = 1;
-                        } else if (u.mh < 1)
+                        } else if (u.mh < 1) {
                             rehumanize();
+                        }
                     } else if (Upolyd && u.mh < u.mhmax) {
-                        if (u.mh < 1)
+                        if (u.mh < 1) {
                             rehumanize();
-                        else if (can_regenerate() && (Regeneration ||
+                        } else if (can_regenerate() && (Regeneration ||
                                                       (wtcap < MOD_ENCUMBER && !(moves%20)))) {
                             flags.botl = 1;
                             u.mh++;
@@ -372,12 +436,15 @@ moveloop(boolean resuming)
                                     heal = 1;
                                 } else {
                                     heal = rnd(Con);
-                                    if (heal > u.ulevel-9) heal = u.ulevel-9;
+                                    if (heal > u.ulevel-9) {
+                                        heal = u.ulevel-9;
+                                    }
                                 }
                                 flags.botl = 1;
                                 u.uhp += heal;
-                                if(u.uhp > u.uhpmax)
+                                if (u.uhp > u.uhpmax) {
                                     u.uhp = u.uhpmax;
+                                }
                                 interrupt_multi("Hit points", u.uhp, u.uhpmax);
                             }
                         } else if (Regeneration ||
@@ -393,7 +460,7 @@ moveloop(boolean resuming)
 
                     /* moving around while encumbered is hard work */
                     if (wtcap > MOD_ENCUMBER && u.umoved) {
-                        if(!(wtcap < EXT_ENCUMBER ? moves%30 : moves%10)) {
+                        if (!(wtcap < EXT_ENCUMBER ? moves%30 : moves%10)) {
                             if (Upolyd && u.mh > 1) {
                                 u.mh--;
                             } else if (!Upolyd && u.uhp > 1) {
@@ -412,13 +479,15 @@ moveloop(boolean resuming)
                                     (Role_if(PM_WIZARD) ? 3 : 4) / 6))))
                          || Energy_regeneration)) {
                         u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
-                        if (u.uen > u.uenmax) u.uen = u.uenmax;
+                        if (u.uen > u.uenmax) {
+                            u.uen = u.uenmax;
+                        }
                         flags.botl = 1;
                         interrupt_multi("Magic energy", u.uen, u.uenmax);
                     }
 
-                    if(!u.uinvulnerable) {
-                        if(Teleportation && !rn2(85)) {
+                    if (!u.uinvulnerable) {
+                        if (Teleportation && !rn2(85)) {
                             coordxy old_ux = u.ux, old_uy = u.uy;
                             tele();
                             if (u.ux != old_ux || u.uy != old_uy) {
@@ -436,36 +505,48 @@ moveloop(boolean resuming)
                         if ((change == 1 && !Polymorph) ||
                             (change == 2 && u.ulycn == NON_PM))
                             change = 0;
-                        if(Polymorph && !rn2(100))
+                        if (Polymorph && !rn2(100)) {
                             change = 1;
-                        else if (u.ulycn >= LOW_PM && !Upolyd &&
-                                 !rn2(80 - (20 * night())))
+                        } else if (u.ulycn >= LOW_PM && !Upolyd &&
+                                   !rn2(80 - (20 * night()))) {
                             change = 2;
+                        }
                         if (change && !Unchanging) {
                             if (multi >= 0) {
-                                if (occupation)
+                                if (occupation) {
                                     stop_occupation();
-                                else
+                                } else {
                                     nomul(0, 0);
-                                if (change == 1) polyself(FALSE);
-                                else you_were();
+                                }
+                                if (change == 1) {
+                                    polyself(FALSE);
+                                } else {
+                                    you_were();
+                                }
                                 change = 0;
                             }
                         }
                     }
 
-                    if(Searching && multi >= 0) (void) dosearch0(1);
+                    if (Searching && multi >= 0) {
+                        (void) dosearch0(1);
+                    }
                     dosounds();
                     do_storms();
                     gethungry();
                     age_spells();
                     exerchk();
                     invault();
-                    if (u.uhave.amulet) amulet();
-                    if (!rn2(40+(int)(ACURR(A_DEX)*3)))
+                    if (u.uhave.amulet) {
+                        amulet();
+                    }
+                    if (!rn2(40+(int)(ACURR(A_DEX)*3))) {
                         u_wipe_engr(rnd(3));
+                    }
                     if (u.uevent.udemigod && !u.uinvulnerable) {
-                        if (u.udg_cnt) u.udg_cnt--;
+                        if (u.udg_cnt) {
+                            u.udg_cnt--;
+                        }
                         if (!u.udg_cnt) {
                             intervene();
                             u.udg_cnt = rn1(200, (42+Luck));
@@ -473,19 +554,24 @@ moveloop(boolean resuming)
                     }
                     restore_attrib();
                     /* underwater and waterlevel vision are done here */
-                    if (Is_waterlevel(&u.uz))
+                    if (Is_waterlevel(&u.uz)) {
                         movebubbles();
-                    else if (Underwater)
+                    } else if (Underwater) {
                         under_water(0);
+                    }
                     /* vision while buried done here */
-                    else if (u.uburied) under_ground(0);
+                    else if (u.uburied) {
+                        under_ground(0);
+                    }
 
                     /* when immobile, count is in turns */
-                    if(multi < 0) {
+                    if (multi < 0) {
                         if (++multi == 0) { /* finished yet? */
                             unmul((char *)0);
                             /* if unmul caused a level change, take it now */
-                            if (u.utotype) deferred_goto();
+                            if (u.utotype) {
+                                deferred_goto();
+                            }
                         }
                     }
                 }
@@ -498,9 +584,9 @@ moveloop(boolean resuming)
             hero_seq++; /* moves*8 + n for n == 1..7 */
 
             if (u.utrap && u.utraptype == TT_LAVA) {
-                if (!is_lava(u.ux, u.uy))
+                if (!is_lava(u.ux, u.uy)) {
                     u.utrap = 0;
-                else if (!u.uinvulnerable) {
+                } else if (!u.uinvulnerable) {
                     u.utrap -= 1<<8;
                     if (u.utrap < 1<<8) {
                         killer.format = KILLED_BY;
@@ -522,19 +608,24 @@ moveloop(boolean resuming)
         game_loop_counter++;
 
         find_ac();
-        if(!flags.mv || Blind) {
+        if (!flags.mv || Blind) {
             /* redo monsters if hallu or wearing a helm of telepathy */
             if (Hallucination) {    /* update screen randomly */
                 see_monsters();
                 see_objects();
                 see_traps();
-                if (u.uswallow) swallowed(0);
+                if (u.uswallow) {
+                    swallowed(0);
+                }
             } else if (Unblind_telepat) {
                 see_monsters();
-            } else if (Warning || Warn_of_mon)
+            } else if (Warning || Warn_of_mon) {
                 see_monsters();
+            }
 
-            if (vision_full_recalc) vision_recalc(0);   /* vision! */
+            if (vision_full_recalc) {
+                vision_recalc(0); /* vision! */
+            }
         }
 
         /* check changes of Elbereth at current player location */
@@ -562,7 +653,9 @@ moveloop(boolean resuming)
         }
 #endif
 
-        if(flags.botl || flags.botlx) bot();
+        if (flags.botl || flags.botlx) {
+            bot();
+        }
 
         if (iflags.hp_notify && (prev_hp_notify != uhp())) {
             pline("%s", hpnotify_format_str(iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]"));
@@ -581,23 +674,27 @@ moveloop(boolean resuming)
 
         flags.move = 1;
 
-        if(multi >= 0 && occupation) {
+        if (multi >= 0 && occupation) {
 #if defined(MICRO) || defined(WIN32)
             abort_lev = 0;
             if (kbhit()) {
-                if ((ch = Getchar()) == ABORT)
+                if ((ch = Getchar()) == ABORT) {
                     abort_lev++;
+                }
 # ifdef REDO
                 else
                     pushch(ch);
 # endif /* REDO */
             }
-            if (!abort_lev && (*occupation)() == 0)
-#else
-            if ((*occupation)() == 0)
-#endif
+            if (!abort_lev && (*occupation)() == 0) {
                 occupation = 0;
-            if(
+            }
+#else
+            if ((*occupation)() == 0) {
+                occupation = 0;
+            }
+#endif
+            if (
 #if defined(MICRO) || defined(WIN32)
                 abort_lev ||
 #endif
@@ -606,8 +703,9 @@ moveloop(boolean resuming)
                 reset_eat();
             }
 #if defined(MICRO) || defined(WIN32)
-            if (!(++occtime % 7))
+            if (!(++occtime % 7)) {
                 display_nhwindow(WIN_MAP, FALSE);
+            }
 #endif
             continue;
         }
@@ -618,8 +716,9 @@ moveloop(boolean resuming)
             do_vicinity_map();
 
 #ifdef WIZARD
-        if (iflags.sanity_check || iflags.debug_fuzzer)
+        if (iflags.sanity_check || iflags.debug_fuzzer) {
             sanity_check();
+        }
 #endif
 
 #ifdef CLIPPING
@@ -634,12 +733,15 @@ moveloop(boolean resuming)
             if (!multi) {
                 /* lookaround may clear multi */
                 flags.move = 0;
-                if (flags.time) flags.botl = 1;
+                if (flags.time) {
+                    flags.botl = 1;
+                }
                 continue;
             }
             if (flags.mv) {
-                if(multi < COLNO && !--multi)
+                if (multi < COLNO && !--multi) {
                     flags.travel = iflags.travel1 = flags.mv = flags.run = 0;
+                }
                 domove();
             } else {
                 --multi;
@@ -653,17 +755,23 @@ moveloop(boolean resuming)
             maybe_tutorial();
             rhack((char *)0);
         }
-        if (u.utotype)      /* change dungeon level */
+        if (u.utotype) { /* change dungeon level */
             deferred_goto();    /* after rhack() */
+        }
         /* !flags.move here: multiple movement command stopped */
-        else if (flags.time && (!flags.move || !flags.mv))
+        else if (flags.time && (!flags.move || !flags.mv)) {
             flags.botl = 1;
+        }
 
-        if (vision_full_recalc) vision_recalc(0);   /* vision! */
+        if (vision_full_recalc) {
+            vision_recalc(0); /* vision! */
+        }
         /* when running in non-tport mode, this gets done through domove() */
         if ((!flags.run || iflags.runmode == RUN_TPORT) &&
             (multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
-            if (flags.time && flags.run) flags.botl = 1;
+            if (flags.time && flags.run) {
+                flags.botl = 1;
+            }
             display_nhwindow(WIN_MAP, FALSE);
         }
     }
@@ -672,9 +780,10 @@ moveloop(boolean resuming)
 void
 stop_occupation(void)
 {
-    if(occupation) {
-        if (!maybe_finished_meal(TRUE))
+    if (occupation) {
+        if (!maybe_finished_meal(TRUE)) {
             You("stop %s.", occtxt);
+        }
         occupation = 0;
         flags.botl = 1; /* in case u.uhs changed */
 /* fainting stops your occupation, there's no reason to sync.
@@ -744,8 +853,9 @@ newgame(void)
 
     flags.ident = 1;
 
-    for (i = 0; i < NUMMONS; i++)
+    for (i = 0; i < NUMMONS; i++) {
         mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
+    }
 
     flags.pantheon = -1; /* role_init() will reset this */
     role_init();         /* must be before init_dungeons(), u_init(),
@@ -766,7 +876,9 @@ newgame(void)
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
 #ifdef NEWS
-    if(iflags.news) display_file_area(NEWS_AREA, NEWS, FALSE);
+    if (iflags.news) {
+        display_file_area(NEWS_AREA, NEWS, FALSE);
+    }
 #endif
     load_qtlist();  /* load up the quest text info */
 /*  quest_init();*/ /* Now part of role_init() */
@@ -782,7 +894,9 @@ newgame(void)
      * makedog() will fail when it calls makemon().
      *          - ucsfcgl!kneller
      */
-    if(MON_AT(u.ux, u.uy)) mnexto(m_at(u.ux, u.uy));
+    if (MON_AT(u.ux, u.uy)) {
+        mnexto(m_at(u.ux, u.uy));
+    }
     (void) makedog();
     docrt();
     if (Role_if(PM_CONVICT)) {
@@ -837,8 +951,9 @@ welcome(boolean new_game) /**< FALSE => restoring an old game */
      * restores it's only shown if different from its original value.
      */
     *buf = '\0';
-    if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT])
+    if (new_game || u.ualignbase[A_ORIGINAL] != u.ualignbase[A_CURRENT]) {
         Sprintf(eos(buf), " %s", align_str(u.ualignbase[A_ORIGINAL]));
+    }
     if (!urole.name.f &&
         (new_game ? (urole.allow & ROLE_GENDMASK) == (ROLE_MALE|ROLE_FEMALE) :
          currentgend != flags.initgend))
@@ -944,7 +1059,9 @@ interrupt_multi(const char *points, int current_points, int max_points)
     if (multi > 0 &&
         current_points == max_points) {
         nomul(0, 0);
-        if (flags.verbose) pline("%s restored.", points);
+        if (flags.verbose) {
+            pline("%s restored.", points);
+        }
     }
 }
 

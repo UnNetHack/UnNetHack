@@ -11,8 +11,12 @@
 boolean
 check_tutorial_message(int msgnum)
 {
-    if (!flags.tutorial) return FALSE;
-    if (pl_tutorial[msgnum - QT_T_FIRST] > 0) return FALSE;
+    if (!flags.tutorial) {
+        return FALSE;
+    }
+    if (pl_tutorial[msgnum - QT_T_FIRST] > 0) {
+        return FALSE;
+    }
     pl_tutorial[msgnum - QT_T_FIRST] = 1;
     flush_screen(1);
     com_pager(msgnum);
@@ -27,7 +31,7 @@ check_tutorial_message(int msgnum)
 int
 check_tutorial_oclass(int oclass)
 {
-    switch(oclass) {
+    switch (oclass) {
     case WEAPON_CLASS: check_tutorial_message(QT_T_ITEM_WEAPON);   return 1;
     case FOOD_CLASS:   check_tutorial_message(QT_T_ITEM_FOOD);     return 1;
     case GEM_CLASS:    check_tutorial_message(QT_T_ITEM_GEM);      return 1;
@@ -52,53 +56,73 @@ int
 check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
 {
     struct rm *l = &(levl[lx][ly]);
-    if (!flags.tutorial) return FALSE; /* short-circuit */
-    if (glyph_is_trap(l->glyph)) /* seen traps only */
+    if (!flags.tutorial) {
+        return FALSE; /* short-circuit */
+    }
+    if (glyph_is_trap(l->glyph)) { /* seen traps only */
         if (check_tutorial_message(QT_T_TRAP)) return TRUE;
-    if (IS_DOOR(l->typ) && l->doormask >= D_ISOPEN)
+    }
+    if (IS_DOOR(l->typ) && l->doormask >= D_ISOPEN) {
         if (check_tutorial_message(QT_T_DOORS)) return TRUE;
-    if (l->typ == CORR)
+    }
+    if (l->typ == CORR) {
         if (check_tutorial_message(QT_T_CORRIDOR)) return TRUE;
+    }
     /* A freebie: we give away the location of a secret door or
        corridor, once. This is so that the advice to search will
        always end up coming good, to avoid confusing new players;
        it also deals with the horrific possibility of a player's
        first game having no visible exits from the first room (it
        can happen!) */
-    if (l->typ == SCORR || l->typ == SDOOR)
+    if (l->typ == SCORR || l->typ == SDOOR) {
         if (check_tutorial_message(QT_T_SECRETDOOR)) return TRUE;
-    if (l->typ == POOL || l->typ == MOAT)
+    }
+    if (l->typ == POOL || l->typ == MOAT) {
         if (check_tutorial_message(QT_T_POOLORMOAT)) return TRUE;
-    if (l->typ == LAVAPOOL)
+    }
+    if (l->typ == LAVAPOOL) {
         if (check_tutorial_message(QT_T_LAVA)) return TRUE;
+    }
     if (l->typ == STAIRS) {
         /* In which direction? */
         if ((lx == xupstair   && ly == yupstair) ||
             (lx == xupladder  && ly == yupladder) ||
             (lx == sstairs.sx && ly == sstairs.sy && sstairs.up)) {
             if (u.uz.dlevel > 1) {
-                if (check_tutorial_message(QT_T_STAIRS)) return TRUE;
-                else if (from_farlook)
+                if (check_tutorial_message(QT_T_STAIRS)) {
+                    return TRUE;
+                } else if (from_farlook) {
                     if (check_tutorial_message(QT_T_L1UPSTAIRS)) return TRUE;
+                }
             }
         } else if ((lx == xdnstair   && ly == ydnstair) ||
                    (lx == xdnladder  && ly == ydnladder) ||
                    (lx == sstairs.sx && ly == sstairs.sy && !sstairs.up)) {
-            if (check_tutorial_message(QT_T_STAIRS)) return TRUE;
-        } else impossible("Stairs go neither up nor down?");
+            if (check_tutorial_message(QT_T_STAIRS)) {
+                return TRUE;
+            }
+        } else {
+            impossible("Stairs go neither up nor down?");
+        }
     }
-    if (l->typ == FOUNTAIN)
+    if (l->typ == FOUNTAIN) {
         if (check_tutorial_message(QT_T_FOUNTAIN)) return TRUE;
-    if (l->typ == THRONE)
+    }
+    if (l->typ == THRONE) {
         if (check_tutorial_message(QT_T_THRONE)) return TRUE;
-    if (l->typ == SINK)
+    }
+    if (l->typ == SINK) {
         if (check_tutorial_message(QT_T_SINK)) return TRUE;
-    if (l->typ == GRAVE)
+    }
+    if (l->typ == GRAVE) {
         if (check_tutorial_message(QT_T_GRAVE)) return TRUE;
-    if (l->typ == ALTAR)
+    }
+    if (l->typ == ALTAR) {
         if (check_tutorial_message(QT_T_ALTAR)) return TRUE;
-    if (IS_DRAWBRIDGE(l->typ))
+    }
+    if (IS_DRAWBRIDGE(l->typ)) {
         if (check_tutorial_message(QT_T_DRAWBRIDGE)) return TRUE;
+    }
     return FALSE;
 }
 /* Display tutorial messages that may result from farlook data. */
@@ -107,7 +131,9 @@ check_tutorial_farlook(coordxy x, coordxy y)
 {
     int glyph = glyph_at(x, y);
     /* Monsters */
-    if (!flags.tutorial) return; /* short-circuit */
+    if (!flags.tutorial) {
+        return; /* short-circuit */
+    }
     if (glyph_is_invisible(glyph)) {
         check_tutorial_message(QT_T_LOOK_INVISIBLE);
         return;
@@ -117,14 +143,19 @@ check_tutorial_farlook(coordxy x, coordxy y)
         return;
     }
     if (glyph_is_monster(glyph)) {
-        if (x == u.ux && y == u.uy) return; /* you aren't hostile */
-        if (!MON_AT(x, y)) return; /* to prevent null pointer deref */
-        if (m_at(x, y)->mpeaceful)
+        if (x == u.ux && y == u.uy) {
+            return; /* you aren't hostile */
+        }
+        if (!MON_AT(x, y)) {
+            return; /* to prevent null pointer deref */
+        }
+        if (m_at(x, y)->mpeaceful) {
             check_tutorial_message(QT_T_LOOK_PEACEFUL);
-        else if (m_at(x, y)->mtame) /* without showpet on */
+        } else if (m_at(x, y)->mtame) { /* without showpet on */
             check_tutorial_message(QT_T_LOOK_TAME);
-        else
+        } else {
             check_tutorial_message(QT_T_LOOK_HOSTILE);
+        }
         return;
     }
     /* Items */
@@ -156,7 +187,11 @@ check_tutorial_command(char c)
     boolean look_reminder = TRUE;
     int secondwield = 0;
     if (c == 'm') {
-        if (u.dx && u.dy) c = 'y'; else c = 'b';
+        if (u.dx && u.dy) {
+            c = 'y';
+        } else {
+            c = 'b';
+        }
     }
     check_tutorial_command_buffer[check_tutorial_command_pointer] = c;
     i = check_tutorial_command_pointer;
@@ -169,19 +204,34 @@ check_tutorial_command(char c)
     do
     {
         c = check_tutorial_command_buffer[i];
-        if (lc != c) repeat = FALSE;
-        if (c != 'y' && c != 'b' && c != 'G') travel = FALSE;
-        if (c != 'y' && c != 'b') farmove = FALSE;
-        if (c != 'R' && c != 'T') massunequip = FALSE;
-        if (c == ';') look_reminder = FALSE;
-        if (c == 'w') secondwield++;
+        if (lc != c) {
+            repeat = FALSE;
+        }
+        if (c != 'y' && c != 'b' && c != 'G') {
+            travel = FALSE;
+        }
+        if (c != 'y' && c != 'b') {
+            farmove = FALSE;
+        }
+        if (c != 'R' && c != 'T') {
+            massunequip = FALSE;
+        }
+        if (c == ';') {
+            look_reminder = FALSE;
+        }
+        if (c == 'w') {
+            secondwield++;
+        }
         r++;
-        if (r > check_tutorial_command_count) break;
+        if (r > check_tutorial_command_count) {
+            break;
+        }
         if (moves > 125 && r > 5 && farmove) {
-            if (iflags.num_pad)
+            if (iflags.num_pad) {
                 check_tutorial_command_message = QT_T_FARMOVE_NUMPAD;
-            else
+            } else {
                 check_tutorial_command_message = QT_T_FARMOVE_VIKEYS;
+            }
             break;
         }
         if (moves > 125 && r > 30 && travel) {
@@ -189,17 +239,19 @@ check_tutorial_command(char c)
             break;
         }
         if (moves > 80 && r > 20 && c == 'b') {
-            if (iflags.num_pad)
+            if (iflags.num_pad) {
                 check_tutorial_command_message = QT_T_DIAGONALS_NUM;
-            else
+            } else {
                 check_tutorial_command_message = QT_T_DIAGONALS_VI;
+            }
             break;
         }
         if (repeat && r > 5 && c == 's') {
-            if (iflags.num_pad)
+            if (iflags.num_pad) {
                 check_tutorial_command_message = QT_T_REPEAT_NUMPAD;
-            else
+            } else {
                 check_tutorial_command_message = QT_T_REPEAT_VIKEYS;
+            }
             break;
         }
         if (moves > 45 && r >= 2 && massunequip) {
@@ -223,10 +275,12 @@ check_tutorial_command(char c)
             break;
         }
         i--;
-        if (i == -1) i = CHECK_TUTORIAL_COMMAND_BUFSIZE - 1;
+        if (i == -1) {
+            i = CHECK_TUTORIAL_COMMAND_BUFSIZE - 1;
+        }
         lc = c;
-    }
-    while(r < 100);
+    } while (r < 100);
+
     if (check_tutorial_command_message == 0 && look_reminder &&
         check_tutorial_command_count >= 100)
         check_tutorial_command_message = QT_T_LOOK_REMINDER;
@@ -247,55 +301,71 @@ maybe_tutorial(void)
     static struct attribs oldattribs = {{0, 0, 0, 0, 0, 0}};
     static int oldac = 300; /* an impossible value */
 
-    if (!flags.tutorial) return; /* short-circuit */
+    if (!flags.tutorial) {
+        return; /* short-circuit */
+    }
 
     /* Check to see if any tutorial triggers have occured.
        Stop checking once one message is output. */
 
     /* Welcome message: show immediately */
-    if (check_tutorial_message(QT_T_WELCOME)) return;
+    if (check_tutorial_message(QT_T_WELCOME)) {
+        return;
+    }
 
     /* Terrain checks; these only occur if at least 3 turns have elapsed,
        to avoid overwhelming the player early on. */
     if (moves > 3) {
         int dx, dy;
         int monsterglyph = -1;
-        for (dx = -1; dx <= 1; dx++)
+        for (dx = -1; dx <= 1; dx++) {
             for (dy = -1; dy <= 1; dy++) {
                 if (isok(u.ux+dx, u.uy+dy)) {
                     int lx = u.ux+dx;
                     int ly = u.uy+dy;
                     /* Terrain checks */
-                    if (check_tutorial_location(lx, ly, FALSE)) return;
+                    if (check_tutorial_location(lx, ly, FALSE)) {
+                        return;
+                    }
                     /* Some non-terrain checks in the same loop */
-                    if (glyph_is_invisible(glyph_at(lx, ly)))
+                    if (glyph_is_invisible(glyph_at(lx, ly))) {
                         if (check_tutorial_message(QT_T_LOOK_INVISIBLE)) return;
+                    }
                     if (glyph_is_monster(glyph_at(lx, ly))) {
-                        if (monsterglyph == glyph_at(lx, ly))
+                        if (monsterglyph == glyph_at(lx, ly)) {
                             if (check_tutorial_message(QT_T_CALLMONSTER)) return;
+                        }
                         monsterglyph = glyph_at(lx, ly);
                     }
                 }
             }
+        }
     }
     /* Check to see if we're in combat. */
     ++time_since_combat;
     old_time_since_combat = time_since_combat;
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        if (!DEADMONSTER(mtmp) && cansee(mtmp->mx, mtmp->my) && !mtmp->mtame)
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (!DEADMONSTER(mtmp) && cansee(mtmp->mx, mtmp->my) && !mtmp->mtame) {
             time_since_combat = 0;
+        }
+    }
     /* Ambient messages that only come up during combat, and only one
        message per combat */
     if (!time_since_combat && old_time_since_combat > 5) {
         if (!firstcombat) {
-            if (u.uz.dlevel >= 3)
+            if (u.uz.dlevel >= 3) {
                 if (check_tutorial_message(QT_T_ELBERETH)) return;
+            }
             for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
                 if (spellid(i) == SPE_FORCE_BOLT) {
-                    if (check_tutorial_message(QT_T_SPELLS)) return;
+                    if (check_tutorial_message(QT_T_SPELLS)) {
+                        return;
+                    }
                 }
             }
-            if (check_tutorial_message(QT_T_MELEE)) return;
+            if (check_tutorial_message(QT_T_MELEE)) {
+                return;
+            }
         } else {
             old_time_since_combat = 0;
             firstcombat = 0;
@@ -308,106 +378,159 @@ maybe_tutorial(void)
             (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE) ||
             (uarmg && is_metallic(uarmg)) ||
             (uarmf && is_metallic(uarmf)))
-            if (check_tutorial_message(QT_T_CASTER_ARMOR)) return;
+            if (check_tutorial_message(QT_T_CASTER_ARMOR)) {
+                return;
+            }
     }
-    if (uwep && uwep != &zeroobj && weapon_dam_bonus(uwep) < 0 && !u.twoweap)
+    if (uwep && uwep != &zeroobj && weapon_dam_bonus(uwep) < 0 && !u.twoweap) {
         if (check_tutorial_message(QT_T_WEAPON_SKILL)) return;
-    if (u.ulevel >= 2)
+    }
+    if (u.ulevel >= 2) {
         if (check_tutorial_message(QT_T_LEVELUP)) return;
-    if (u.ulevel >= 3)
-        if (check_tutorial_message(QT_T_RANKUP)) return;
-    {
-        int incdec = 0;
-        boolean firstturn = oldattribs.a[0] == 0;
-        for (i = 0; i < A_MAX; i++) {
-            if (u.acurr.a[i] > oldattribs.a[i]) incdec = 1;
-            if (u.acurr.a[i] < oldattribs.a[i]) incdec = -1;
-            oldattribs.a[i] = u.acurr.a[i];
-        }
-        if (!firstturn) {
-            if (incdec > 0)
-                if (check_tutorial_message(QT_T_ABILUP)) return;
-            if (incdec < 0)
-                if (check_tutorial_message(QT_T_ABILDOWN)) return;
+    }
+    if (u.ulevel >= 3) {
+        if (check_tutorial_message(QT_T_RANKUP)) {
+            return;
         }
     }
-    if (u.uac < oldac && oldac != 300)
-        if (check_tutorial_message(QT_T_ACIMPROVED)) return;
+    int incdec = 0;
+    boolean firstturn = oldattribs.a[0] == 0;
+    for (i = 0; i < A_MAX; i++) {
+        if (u.acurr.a[i] > oldattribs.a[i]) {
+            incdec = 1;
+        }
+        if (u.acurr.a[i] < oldattribs.a[i]) {
+            incdec = -1;
+        }
+        oldattribs.a[i] = u.acurr.a[i];
+    }
+    if (!firstturn) {
+        if (incdec > 0) {
+            if (check_tutorial_message(QT_T_ABILUP)) {
+                return;
+            }
+        }
+        if (incdec < 0) {
+            if (check_tutorial_message(QT_T_ABILDOWN)) {
+                return;
+            }
+        }
+    }
+    if (u.uac < oldac && oldac != 300) {
+        if (check_tutorial_message(QT_T_ACIMPROVED)) {
+            return;
+        }
+    }
     oldac = u.uac;
-    if (Confusion || Sick || Blind || Stunned || Hallucination || Slimed)
+    if (Confusion || Sick || Blind || Stunned || Hallucination || Slimed) {
         if (check_tutorial_message(QT_T_STATUS)) return;
-    if (u.uz.dlevel >= 2)
+    }
+    if (u.uz.dlevel >= 2) {
         if (check_tutorial_message(QT_T_DLEVELCHANGE)) return;
-    if (u.uz.dlevel >= 10)
+    }
+    if (u.uz.dlevel >= 10) {
         if (check_tutorial_message(QT_T_DGN_OVERVIEW)) return;
-    if (u.uhp < u.uhpmax)
+    }
+    if (u.uhp < u.uhpmax) {
         if (check_tutorial_message(QT_T_DAMAGED)) return;
-    if (u.uen < u.uenmax)
+    }
+    if (u.uen < u.uenmax) {
         if (check_tutorial_message(QT_T_PWUSED)) return;
-    if (u.uen < 5 && u.uenmax > 10)
+    }
+    if (u.uen < 5 && u.uenmax > 10) {
         if (check_tutorial_message(QT_T_PWEMPTY)) return;
-    if (u.umonster != u.umonnum)
+    }
+    if (u.umonster != u.umonnum) {
         if (check_tutorial_message(QT_T_POLYSELF)) return;
-    if (u.uexp > 0)
+    }
+    if (u.uexp > 0) {
         if (check_tutorial_message(QT_T_GAINEDEXP)) return;
-    if (u.uhs >= HUNGRY)
+    }
+    if (u.uhs >= HUNGRY) {
         if (check_tutorial_message(QT_T_HUNGER)) return;
-    if (u.uhs <= SATIATED)
+    }
+    if (u.uhs <= SATIATED) {
         if (check_tutorial_message(QT_T_SATIATION)) return;
-    if (can_advance_something())
+    }
+    if (can_advance_something()) {
         if (check_tutorial_message(QT_T_ENHANCE)) return;
-    if (u.uswallow)
+    }
+    if (u.uswallow) {
         if (check_tutorial_message(QT_T_ENGULFED)) return;
-    if (near_capacity() > UNENCUMBERED)
+    }
+    if (near_capacity() > UNENCUMBERED) {
         if (check_tutorial_message(QT_T_BURDEN)) return;
-    if (in_trouble() > 0 && can_pray(0) && !IS_ALTAR(levl[u.ux][u.uy].typ))
+    }
+    if (in_trouble() > 0 && can_pray(0) && !IS_ALTAR(levl[u.ux][u.uy].typ)) {
         if (check_tutorial_message(QT_T_MAJORTROUBLE)) return;
-    if (inside_shop(u.ux, u.uy))
+    }
+    if (inside_shop(u.ux, u.uy)) {
         if (check_tutorial_message(QT_T_SHOPENTRY)) return;
-    if (u.uz.dnum == mines_dnum)
+    }
+    if (u.uz.dnum == mines_dnum) {
         if (check_tutorial_message(QT_T_MINES)) return;
-    if (u.uz.dnum == sokoban_dnum)
+    }
+    if (u.uz.dnum == sokoban_dnum) {
         if (check_tutorial_message(QT_T_SOKOBAN)) return;
-    if (check_tutorial_command_message == QT_T_FIRE)
+    }
+    if (check_tutorial_command_message == QT_T_FIRE) {
         if (check_tutorial_message(QT_T_FIRE)) return;
+    }
     /* Item-dependent events. */
     {
         int projectile_groups = 0;
         int launcher_groups = 0;
         struct obj *otmp;
         for (otmp = invent; otmp; otmp = otmp->nobj) {
-            if (otmp->bknown && otmp->cursed)
+            if (otmp->bknown && otmp->cursed) {
                 if (check_tutorial_message(QT_T_EQUIPCURSE)) return;
+            }
 #ifdef MAIL
-            if (otmp->otyp == SCR_MAIL)
+            if (otmp->otyp == SCR_MAIL) {
                 if (check_tutorial_message(QT_T_MAILSCROLL)) return;
+            }
 #endif
-            if (otmp->oartifact)
+            if (otmp->oartifact) {
                 if (check_tutorial_message(QT_T_ARTIFACT)) return;
-            if (otmp->unpaid)
+            }
+            if (otmp->unpaid) {
                 if (check_tutorial_message(QT_T_SHOPBUY)) return;
-            if (!objects[otmp->otyp].oc_name_known)
+            }
+            if (!objects[otmp->otyp].oc_name_known) {
                 switch (objects[otmp->otyp].oc_class) {
                 case POTION_CLASS:
-                    if (otmp->otyp == POT_WATER) break;
+                    if (otmp->otyp == POT_WATER) {
+                        break;
+                    }
                 /* fall through */
                 case SCROLL_CLASS:
-                    if (otmp->otyp == SCR_BLANK_PAPER) break;
+                    if (otmp->otyp == SCR_BLANK_PAPER) {
+                        break;
+                    }
 #ifdef MAIL
-                    if (otmp->otyp == SCR_MAIL) break;
+                    if (otmp->otyp == SCR_MAIL) {
+                        break;
+                    }
 #endif
                 /* fall through */
                 case WAND_CLASS:
                 case SPBOOK_CLASS:
-                    if (otmp->otyp == SPE_BLANK_PAPER) break;
-                    if (otmp->otyp == SPE_BOOK_OF_THE_DEAD) break;
+                    if (otmp->otyp == SPE_BLANK_PAPER) {
+                        break;
+                    }
+                    if (otmp->otyp == SPE_BOOK_OF_THE_DEAD) {
+                        break;
+                    }
                 /* fall through */
                 case RING_CLASS:
                 case AMULET_CLASS:
-                    if (check_tutorial_message(QT_T_RANDAPPEARANCE)) return;
+                    if (check_tutorial_message(QT_T_RANDAPPEARANCE)) {
+                        return;
+                    }
                     break;
                 default: break;
                 }
+            }
             /* Containers; minor spoiler here, in that it doesn't trigger
                off a bag of tricks and a savvy player might notice that, but
                that's not a freebie I'm worried about. */
@@ -415,15 +538,21 @@ maybe_tutorial(void)
             case SACK:
                 /* starting inventory for arcs/rogues, and we don't want to
                    give the message until a second container's listed */
-                if(Role_if(PM_ARCHEOLOGIST)) break;
-                if(Role_if(PM_ROGUE)) break;
+                if (Role_if(PM_ARCHEOLOGIST)) {
+                    break;
+                }
+                if (Role_if(PM_ROGUE)) {
+                    break;
+                }
                 /* fall through */
             case LARGE_BOX:
             case CHEST:
             case ICE_BOX:
             case OILSKIN_SACK:
             case BAG_OF_HOLDING:
-                if (check_tutorial_message(QT_T_ITEM_CONTAINER)) return;
+                if (check_tutorial_message(QT_T_ITEM_CONTAINER)) {
+                    return;
+                }
                 break;
             default: break;
             }
@@ -471,15 +600,20 @@ maybe_tutorial(void)
                 case ELVEN_DAGGER:
                 case ORCISH_DAGGER:
                 case SILVER_DAGGER:
-                    if (otmp == uwep) break;
-                    if (check_tutorial_message(QT_T_THROWNWEAPONS)) return;
+                    if (otmp == uwep) {
+                        break;
+                    }
+                    if (check_tutorial_message(QT_T_THROWNWEAPONS)) {
+                        return;
+                    }
                     break;
                 default: break;
                 }
             }
         }
-        if (projectile_groups & launcher_groups)
+        if (projectile_groups & launcher_groups) {
             if (check_tutorial_message(QT_T_PROJECTILES)) return;
+        }
     }
     /* Items on the current square. */
     {
@@ -489,7 +623,9 @@ maybe_tutorial(void)
             case LARGE_BOX:
             case CHEST:
             case ICE_BOX:
-                if (check_tutorial_message(QT_T_ITEM_CONTAINER)) return;
+                if (check_tutorial_message(QT_T_ITEM_CONTAINER)) {
+                    return;
+                }
                 break;
             default: break;
             }
@@ -497,18 +633,24 @@ maybe_tutorial(void)
     }
     /* Ambient messages that only come up outside combat */
     if (time_since_combat > 5) {
-        if (check_tutorial_command_message > 0)
+        if (check_tutorial_command_message > 0) {
             if (check_tutorial_message(check_tutorial_command_message)) return;
-        if (moves >= 10)
+        }
+        if (moves >= 10) {
             if (check_tutorial_message(QT_T_VIEWTUTORIAL)) return;
-        if (moves >= 30)
+        }
+        if (moves >= 30) {
             if (check_tutorial_message(QT_T_CHECK_ITEMS)) return;
-        if (moves >= 60)
+        }
+        if (moves >= 60) {
             if (check_tutorial_message(QT_T_OBJECTIVE)) return;
-        if (moves >= 100)
+        }
+        if (moves >= 100) {
             if (check_tutorial_message(QT_T_SAVELOAD)) return;
-        if (moves >= 150)
+        }
+        if (moves >= 150) {
             if (check_tutorial_message(QT_T_MESSAGERECALL)) return;
+        }
     }
 }
 

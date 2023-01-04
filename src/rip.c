@@ -76,7 +76,9 @@ center(int line, char *text)
     char *ip, *op;
     ip = text;
     op = &rip[line][STONE_LINE_CENT - ((strlen(text)+1)>>1)];
-    while(*ip) *op++ = *ip++;
+    while (*ip) {
+        *op++ = *ip++;
+    }
 }
 
 
@@ -128,11 +130,16 @@ genl_outrip(winid tmpwin, int how)
         int i, i0;
         char tmpchar;
 
-        if ( (i0=strlen(dpx)) > STONE_LINE_LEN) {
-            for(i = STONE_LINE_LEN;
-                ((i0 > STONE_LINE_LEN) && i); i--)
-                if(dpx[i] == ' ') i0 = i;
-            if(!i) i0 = STONE_LINE_LEN;
+        if ((i0=strlen(dpx)) > STONE_LINE_LEN) {
+            for (i = STONE_LINE_LEN;
+                 ((i0 > STONE_LINE_LEN) && i); i--) {
+                if (dpx[i] == ' ') {
+                    i0 = i;
+                }
+            }
+            if (!i) {
+                i0 = STONE_LINE_LEN;
+            }
         }
         tmpchar = dpx[i0];
         dpx[i0] = 0;
@@ -140,7 +147,9 @@ genl_outrip(winid tmpwin, int how)
         if (tmpchar != ' ') {
             dpx[i0] = tmpchar;
             dpx= &dpx[i0];
-        } else dpx= &dpx[i0+1];
+        } else {
+            dpx= &dpx[i0+1];
+        }
     }
 
     /* Put year on stone */
@@ -148,8 +157,9 @@ genl_outrip(winid tmpwin, int how)
     center(YEAR_LINE, buf);
 
     putstr(tmpwin, 0, "");
-    for(; *dp; dp++)
+    for (; *dp; dp++) {
         putstr(tmpwin, 0, *dp);
+    }
 
     putstr(tmpwin, 0, "");
     putstr(tmpwin, 0, "");

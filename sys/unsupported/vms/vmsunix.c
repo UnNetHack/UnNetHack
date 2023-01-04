@@ -131,7 +131,7 @@ gotlock:
 			error("cannot close lock");
 		}
 	}
-}	
+}
 
 void
 regularize(s)	/* normalize file name */
@@ -204,7 +204,7 @@ int flag;
     switch (flag) {
 	case ENV_JOB:	/* job logical name */
 		tbl_dsc.len = strlen( tbl_dsc.adr = "LNM$JOB" );
-	    /*FALLTHRU*/
+        /* fall through */
 	case ENV_SUP:	/* supervisor-mode process logical name */
 		result = lib$set_logical(&nam_dsc, &val_dsc, &tbl_dsc);
 	    break;

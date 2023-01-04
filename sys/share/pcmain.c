@@ -388,10 +388,10 @@ char *argv[];
 		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
 #ifdef NEWS
-		if(iflags.news){
-		    display_file_area(NEWS_AREA, NEWS, FALSE);
-		    iflags.news = FALSE;
-		}
+        if (iflags.news) {
+            display_file_area(NEWS_AREA, NEWS, FALSE);
+            iflags.news = FALSE;
+        }
 #endif
 		pline("Restoring save file...");
 		mark_synch();	/* flush output */
@@ -405,11 +405,11 @@ char *argv[];
 		if (discover)
 			You("are in non-scoring discovery mode.");
 
-		if (discover || wizard) {
-			if(yn("Do you want to keep the save file?") == 'n'){
-				(void) delete_savefile();
-			}
-		}
+        if (discover || wizard) {
+            if (yn("Do you want to keep the save file?") == 'n') {
+                (void) delete_savefile();
+            }
+        }
 
 		flags.move = 0;
         resuming = TRUE;
@@ -440,16 +440,15 @@ process_options(argc, argv)
 int argc;
 char *argv[];
 {
-	int i;
+    int i;
 
-
-	/*
-	 * Process options.
-	 */
-	while(argc > 1 && argv[1][0] == '-'){
-		argv++;
-		argc--;
-		switch(argv[0][1]){
+    /*
+     * Process options.
+     */
+    while (argc > 1 && argv[1][0] == '-') {
+        argv++;
+        argc--;
+        switch (argv[0][1]) {
 		case 'a':
 			if (argv[0][2]) {
 			    if ((i = str2align(&argv[0][2])) >= 0)

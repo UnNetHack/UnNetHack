@@ -52,12 +52,13 @@ initedog(struct monst *mtmp)
 static int
 pet_type(void)
 {
-    if (urole.petnum != NON_PM)
+    if (urole.petnum != NON_PM) {
         return (urole.petnum);
-    else if (preferred_pet == 'c')
+    } else if (preferred_pet == 'c') {
         return (PM_KITTEN);
-    else if (preferred_pet == 'd')
+    } else if (preferred_pet == 'd') {
         return (PM_LITTLE_DOG);
+    }
 #ifdef EXOTIC_PETS
     else if (Role_if(PM_ROGUE) &&
              ((preferred_pet == 'e') || (!rn2(3))))
@@ -90,10 +91,11 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
                it has a special limit (erinys, Nazgul) */
             if ((mvitals[mndx].mvflags & G_EXTINCT) &&
                 mbirth_limit(mndx) != MAXMONNO) {
-                if (!quietly)
+                if (!quietly) {
                     /* have just been given "You <do something with>
                        the figurine and it transforms." message */
                     pline("... into a pile of dust.");
+                }
                 break; /* mtmp is null */
             }
         } else if (!rn2(3)) {
@@ -101,16 +103,18 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
         } else {
             pm = rndmonst();
             if (!pm) {
-                if (!quietly)
+                if (!quietly) {
                     There("seems to be nothing available for a familiar.");
+                }
                 break;
             }
         }
 
         mtmp = makemon(pm, x, y, MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
         if (otmp && !mtmp) { /* monster was genocided or square occupied */
-            if (!quietly)
+            if (!quietly) {
                 pline_The("figurine writhes and then shatters into pieces!");
+            }
             break;
         }
     } while (!mtmp && --trycnt > 0);
@@ -119,8 +123,9 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
         return (struct monst *)0;
     }
 
-    if (is_pool(mtmp->mx, mtmp->my) && minliquid(mtmp))
+    if (is_pool(mtmp->mx, mtmp->my) && minliquid(mtmp)) {
         return (struct monst *)0;
+    }
 
     initedog(mtmp);
     mtmp->msleeping = 0;
@@ -133,8 +138,9 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
         if (chance > 0) {
             mtmp->mtame = 0; /* not tame after all */
             if (chance == 2) { /* hostile (cursed figurine) */
-                if (!quietly)
+                if (!quietly) {
                     You("get a bad feeling about this.");
+                }
                 mtmp->mpeaceful = 0;
                 set_malign(mtmp);
             }
@@ -165,46 +171,61 @@ makedog(void)
     static int petname_used = 0;
 
     if (preferred_pet == 'n') {
-        return((struct monst *) 0);
+        return (struct monst *) 0;
     }
 
     pettype = pet_type();
-    if (pettype == PM_LITTLE_DOG)
+    if (pettype == PM_LITTLE_DOG) {
         petname = dogname;
-    else if (pettype == PM_PONY)
+    } else if (pettype == PM_PONY) {
         petname = horsename;
+    }
 #ifdef EXOTIC_PETS
-    else if (pettype == PM_MONKEY)
+    else if (pettype == PM_MONKEY) {
         petname = monkeyname;
-    else if ((pettype == PM_WOLF) ||
+    } else if ((pettype == PM_WOLF) ||
              (pettype == PM_WINTER_WOLF_CUB))
         petname = wolfname;
-    else if (pettype == PM_BABY_CROCODILE)
+    else if (pettype == PM_BABY_CROCODILE) {
         petname = crocodilename;
+    }
 #endif
-    else if (pettype == PM_SEWER_RAT)
+    else if (pettype == PM_SEWER_RAT) {
         petname = ratname;
-    else
+    } else {
         petname = catname;
+    }
 
     /* default pet names */
     if (!*petname) {
         if (pettype == PM_LITTLE_DOG) {
             /* All of these names were for dogs. */
-            if(Role_if(PM_CAVEMAN)) petname = "Slasher";   /* The Warrior */
-            if(Role_if(PM_SAMURAI)) petname = "Hachi";     /* Shibuya Station */
-            if(Role_if(PM_BARBARIAN)) petname = "Idefix";  /* Obelix */
-            if(Role_if(PM_RANGER)) petname = "Sirius";     /* Orion's dog */
+            if (Role_if(PM_CAVEMAN)) {
+                petname = "Slasher"; /* The Warrior */
+            }
+            if (Role_if(PM_SAMURAI)) {
+                petname = "Hachi"; /* Shibuya Station */
+            }
+            if (Role_if(PM_BARBARIAN)) {
+                petname = "Idefix"; /* Obelix */
+            }
+            if (Role_if(PM_RANGER)) {
+                petname = "Sirius"; /* Orion's dog */
+            }
         }
     }
 
     if (!*petname && pettype == PM_SEWER_RAT) {
-        if(Role_if(PM_CONVICT)) petname = "Nicodemus"; /* Rats of NIMH */
+        if (Role_if(PM_CONVICT)) {
+            petname = "Nicodemus"; /* Rats of NIMH */
+        }
     }
 
     mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
 
-    if(!mtmp) return((struct monst *) 0); /* pets were genocided */
+    if (!mtmp) {
+        return (struct monst *) 0; /* pets were genocided */
+    }
 
 #ifdef EXOTIC_PETS
     /*  Keep the exotic pets from being higher-level than normal starting
@@ -228,15 +249,19 @@ makedog(void)
     }
 
     if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
-        if (mtmp->female) petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
-        else petname = "Kali"; /* RIP 1 May 2000 - 22 Oct 2012 */
+        if (mtmp->female) {
+            petname = "Shiva"; /* RIP 1 Oct 1998 - 6 Sep 2009 */
+        } else {
+            petname = "Kali"; /* RIP 1 May 2000 - 22 Oct 2012 */
+        }
     }
 
-    if (!petname_used++ && *petname)
+    if (!petname_used++ && *petname) {
         mtmp = christen_monst(mtmp, petname);
+    }
 
     initedog(mtmp);
-    return(mtmp);
+    return mtmp;
 }
 
 /* record `last move time' for all monsters prior to level save so that
@@ -277,12 +302,14 @@ losedogs(void)
 
     /* check for returning shk(s) */
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
-        if (mtmp->mux != u.uz.dnum || mtmp->muy != u.uz.dlevel)
+        if (mtmp->mux != u.uz.dnum || mtmp->muy != u.uz.dlevel) {
             continue;
+        }
         if (mtmp->isshk) {
             if (ESHK(mtmp)->dismiss_kops) {
-                if (dismissKops == 0)
+                if (dismissKops == 0) {
                     dismissKops = 1;
+                }
                 ESHK(mtmp)->dismiss_kops = FALSE; /* reset */
             } else if (!mtmp->mpeaceful) {
                 /* an unpacified shk is returning; don't dismiss kops
@@ -297,8 +324,9 @@ losedogs(void)
         if (mtmp->isshk) {
             /* hostile shk might accompany hero [ESHK(mtmp)->dismiss_kops
                can't be set here; it's only used for migrating_mons] */
-            if (!mtmp->mpeaceful)
+            if (!mtmp->mpeaceful) {
                 dismissKops = -1;
+            }
         }
     }
 
@@ -325,13 +353,15 @@ losedogs(void)
             if (mtmp == migrating_mons) {
                 migrating_mons = mtmp->nmon;
             } else {
-                for (mtmp0 = migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
+                for (mtmp0 = migrating_mons; mtmp0; mtmp0 = mtmp0->nmon) {
                     if (mtmp0->nmon == mtmp) {
                         mtmp0->nmon = mtmp->nmon;
                         break;
                     }
-                if (!mtmp0)
+                }
+                if (!mtmp0) {
                     panic("losedogs: can't find migrating mon");
+                }
             }
             mon_arrive(mtmp, FALSE);
         }
@@ -350,8 +380,9 @@ mon_arrive(struct monst *mtmp, boolean with_you)
 
     mtmp->nmon = fmon;
     fmon = mtmp;
-    if (mtmp->isshk)
+    if (mtmp->isshk) {
         set_residency(mtmp, FALSE);
+    }
 
     num_segs = mtmp->wormno;
     /* baby long worms have no tail so don't use is_longworm() */
@@ -377,8 +408,9 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
     mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
 
-    if (mtmp == u.usteed)
+    if (mtmp == u.usteed) {
         return; /* don't place steed on the map */
+    }
 
     if (with_you) {
         /* When a monster accompanies you, sometimes it will arrive
@@ -448,14 +480,17 @@ mon_arrive(struct monst *mtmp, boolean with_you)
             break;
         }
         /* find the arrival portal */
-        for (t = ftrap; t; t = t->ntrap)
-            if (t->ttyp == MAGIC_PORTAL) break;
+        for (t = ftrap; t; t = t->ntrap) {
+            if (t->ttyp == MAGIC_PORTAL) {
+                break;
+            }
+        }
         if (t) {
             xlocale = t->tx,  ylocale = t->ty;
             break;
         } else {
             impossible("mon_arrive: no corresponding portal?");
-        } /*FALLTHRU*/
+        } /* fall through */
     default:
     case MIGR_RANDOM:  xlocale = ylocale = 0;
         break;
@@ -477,10 +512,11 @@ mon_arrive(struct monst *mtmp, boolean with_you)
             coord c;
 
             /* somexy() handles irregular rooms */
-            if (somexy(&rooms[*r - ROOMOFFSET], &c))
+            if (somexy(&rooms[*r - ROOMOFFSET], &c)) {
                 xlocale = c.x,  ylocale = c.y;
-            else
+            } else {
                 xlocale = ylocale = 0;
+            }
         } else { /* not in a room */
             int i, j;
 
@@ -523,10 +559,11 @@ mon_catchup_elapsed_time(
         impossible("catchup from now?");
     } else
 #endif
-    if (nmv >= LARGEST_INT)     /* paranoia */
+    if (nmv >= LARGEST_INT) { /* paranoia */
         imv = LARGEST_INT - 1;
-    else
+    } else {
         imv = (int)nmv;
+    }
 
     /* might stop being afraid, blind or frozen */
     /* set to 1 and allow final decrement in movemon() */
@@ -553,9 +590,15 @@ mon_catchup_elapsed_time(
     }
 
     /* might recover from temporary trouble */
-    if (mtmp->mtrapped && rn2(imv + 1) > 40/2) mtmp->mtrapped = 0;
-    if (mtmp->mconf    && rn2(imv + 1) > 50/2) mtmp->mconf = 0;
-    if (mtmp->mstun    && rn2(imv + 1) > 10/2) mtmp->mstun = 0;
+    if (mtmp->mtrapped && rn2(imv + 1) > 40/2) {
+        mtmp->mtrapped = 0;
+    }
+    if (mtmp->mconf    && rn2(imv + 1) > 50/2) {
+        mtmp->mconf = 0;
+    }
+    if (mtmp->mstun    && rn2(imv + 1) > 10/2) {
+        mtmp->mstun = 0;
+    }
 
     /* might finish eating or be able to use special ability again */
     if (imv > mtmp->meating) {
@@ -628,8 +671,9 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
             continue;
         }
         if (pets_only) {
-            if (!mtmp->mtame)
+            if (!mtmp->mtame) {
                 continue; /* reject non-pets */
+            }
             /* don't block pets from accompanying hero's dungeon
                escape or ascension simply due to mundane trifles;
                unlike level change for steed, don't bother trying
@@ -653,8 +697,9 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
             /* monster won't follow if it hasn't noticed you yet */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {
             stay_behind = FALSE;
-            if (mtmp->mtrapped)
+            if (mtmp->mtrapped) {
                 (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
+            }
             if (mtmp == u.usteed) {
                 /* make sure steed is eligible to accompany hero */
                 mtmp->mtrapped = 0;       /* escape trap */
@@ -675,9 +720,10 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
                 stay_behind = TRUE;
 #endif /* BLACKMARKET */
             } else if (mon_has_amulet(mtmp)) {
-                if (canseemon(mtmp))
+                if (canseemon(mtmp)) {
                     pline("%s seems very disoriented for a moment.",
                           Monnam(mtmp));
+                }
                 stay_behind = TRUE;
             }
             if (stay_behind) {
@@ -696,8 +742,9 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
                 }
                 continue;
             }
-            if (mtmp->isshk)
+            if (mtmp->isshk) {
                 set_residency(mtmp, TRUE);
+            }
 
             if (mtmp->wormno) {
                 int cnt;
@@ -711,9 +758,10 @@ keepdogs(boolean pets_only) /**< TRUE for ascension or final escape */
             }
 
             /* set minvent's obj->no_charge to 0 */
-            for(obj = mtmp->minvent; obj; obj = obj->nobj) {
-                if (Has_contents(obj))
+            for (obj = mtmp->minvent; obj; obj = obj->nobj) {
+                if (Has_contents(obj)) {
                     picked_container(obj); /* does the right thing */
+                }
                 obj->no_charge = 0;
             }
 
@@ -748,8 +796,9 @@ migrate_to_level(
     coordxy xyflags;
     int num_segs = 0;   /* count of worm segments */
 
-    if (mtmp->isshk)
+    if (mtmp->isshk) {
         set_residency(mtmp, TRUE);
+    }
 
     if (mtmp->wormno) {
         int cnt = count_wsegs(mtmp);
@@ -762,9 +811,10 @@ migrate_to_level(
     }
 
     /* set minvent's obj->no_charge to 0 */
-    for(obj = mtmp->minvent; obj; obj = obj->nobj) {
-        if (Has_contents(obj))
+    for (obj = mtmp->minvent; obj; obj = obj->nobj) {
+        if (Has_contents(obj)) {
             picked_container(obj); /* does the right thing */
+        }
         obj->no_charge = 0;
     }
 
@@ -806,10 +856,11 @@ dogfood(struct monst *mon, struct obj *obj)
     boolean herbi = herbivorous(mptr);
     boolean starving, mblind;
 
-    if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
+    if (is_quest_artifact(obj) || obj_resists(obj, 0, 95)) {
         return (obj->cursed ? TABU : APPORT);
+    }
 
-    switch(obj->oclass) {
+    switch (obj->oclass) {
     case FOOD_CLASS:
         if (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG) {
             fptr = &mons[obj->corpsenm];
@@ -848,13 +899,14 @@ dogfood(struct monst *mon, struct obj *obj)
            they'll eat fresh non-veggy corpses and hatchable eggs
            when starving; they never eat stone-to-flesh'd meat */
         if (mptr == &mons[PM_GHOUL]) {
-            if (obj->otyp == CORPSE)
+            if (obj->otyp == CORPSE) {
                 return (peek_at_iced_corpse_age(obj) + 50L <= monstermoves
                         && fptr != &mons[PM_LIZARD]
                         && fptr != &mons[PM_LICHEN])
                            ? DOGFOOD
                            : (starving && !vegan(fptr))
                               ? ACCFOOD : POISON;
+            }
             if (obj->otyp == EGG) {
                 return stale_egg(obj) ? CADAVER : starving ? ACCFOOD : POISON;
             }
@@ -905,7 +957,9 @@ dogfood(struct monst *mon, struct obj *obj)
             return ((mon->data->mlet == S_YETI && herbi) ? DOGFOOD :
                     ((herbi || starving) ? ACCFOOD : MANFOOD));
         default:
-            if (starving) return ACCFOOD;
+            if (starving) {
+                return ACCFOOD;
+            }
             return (obj->otyp > SLIME_MOLD ?
                     (carni ? ACCFOOD : MANFOOD) :
                     (herbi ? ACCFOOD : MANFOOD));
@@ -916,9 +970,10 @@ dogfood(struct monst *mon, struct obj *obj)
             return TABU;
         if (hates_silver(mon->data) &&
             objects[obj->otyp].oc_material == SILVER)
-            return(TABU);
-        if (mon->data == &mons[PM_GELATINOUS_CUBE] && is_organic(obj))
-            return(ACCFOOD);
+            return TABU;
+        if (mon->data == &mons[PM_GELATINOUS_CUBE] && is_organic(obj)) {
+            return ACCFOOD;
+        }
         if (metallivorous(mon->data) && is_metallic(obj)
             && (is_rustprone(obj) || mptr != &mons[PM_RUST_MONSTER])) {
             /* Non-rustproofed ferrous based metals are preferred. */
@@ -931,14 +986,14 @@ dogfood(struct monst *mon, struct obj *obj)
             return DOGFOOD;
         }
 
-        if(!obj->cursed
+        if (!obj->cursed
            && obj->oclass != BALL_CLASS
            && obj->oclass != CHAIN_CLASS)
-            return(APPORT);
+            return APPORT;
 
     /* fall through */
     case ROCK_CLASS:
-        return(UNDEF);
+        return UNDEF;
     }
 }
 
@@ -959,7 +1014,7 @@ tamedog(struct monst *mtmp, struct obj *obj)
     /* worst case, at least it'll be peaceful. */
     mtmp->mpeaceful = 1;
     set_malign(mtmp);
-    if(flags.moonphase == FULL_MOON && night() && rn2(6) && obj
+    if (flags.moonphase == FULL_MOON && night() && rn2(6) && obj
        && mtmp->data->mlet == S_DOG) {
         return FALSE;
     }
@@ -976,10 +1031,11 @@ tamedog(struct monst *mtmp, struct obj *obj)
 
     /* make grabber let go now, whether it becomes tame or not */
     if (mtmp == u.ustuck) {
-        if (u.uswallow)
+        if (u.uswallow) {
             expels(mtmp, mtmp->data, TRUE);
-        else if (!(Upolyd && sticks(youmonst.data)))
+        } else if (!(Upolyd && sticks(youmonst.data))) {
             unstuck(mtmp);
+        }
     }
 
     /* feeding it treats makes it tamer */
@@ -997,8 +1053,9 @@ tamedog(struct monst *mtmp, struct obj *obj)
                 pline("%s catches %s%s",
                       Monnam(mtmp), the(xname(obj)),
                       !big_corpse ? "." : ", or vice versa!");
-            } else if (cansee(mtmp->mx, mtmp->my))
+            } else if (cansee(mtmp->mx, mtmp->my)) {
                 pline("%s.", Tobjnam(obj, "stop"));
+            }
             /* dog_eat expects a floor object */
             place_object(obj, mtmp->mx, mtmp->my);
             (void) dog_eat(mtmp, obj, mtmp->mx, mtmp->my, FALSE);

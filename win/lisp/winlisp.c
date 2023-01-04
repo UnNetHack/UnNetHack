@@ -1173,14 +1173,12 @@ lisp_get_menu_identifier(
 {
   int i;
 
-  for(i=0; i < lisp_menu_list_num; i++)
-    {
-      if( lisp_menu_item_list[i].accelerator == ch )
-	{
-	  *identifier = lisp_menu_item_list[i].identifier;
-	  return 1;
-	}
-    }
+  for (i=0; i < lisp_menu_list_num; i++) {
+      if (lisp_menu_item_list[i].accelerator == ch) {
+          *identifier = lisp_menu_item_list[i].identifier;
+          return 1;
+      }
+  }
 
   return 0;
 }

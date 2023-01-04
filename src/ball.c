@@ -23,12 +23,15 @@ ballrelease(boolean showmsg)
         if (showmsg) {
             pline(Hallucination ? "Wow, you really dropped the ball." : "Startled, you drop the iron ball.");
         }
-        if (uwep == uball)
+        if (uwep == uball) {
             setuwep((struct obj *)0);
-        if (uswapwep == uball)
+        }
+        if (uswapwep == uball) {
             setuswapwep((struct obj *)0);
-        if (uquiver == uball)
+        }
+        if (uquiver == uball) {
             setuqwep((struct obj *)0);
+        }
         /* [this used to test 'if (uwep != uball)' but that always passes
            after the setuwep() above] */
         freeinv(uball); /* remove from inventory but don't place on floor */
@@ -54,8 +57,9 @@ ballfall(void)
             if (is_metallic(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 dmg = 3;
-            } else if (flags.verbose)
+            } else if (flags.verbose) {
                 pline("%s does not protect you.", Yname2(uarmh));
+            }
         }
         losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
                NO_KILLER_PREFIX);
@@ -122,9 +126,9 @@ placebc_core(void)
 
     (void) flooreffects(uchain, u.ux, u.uy, "");    /* chain might rust */
 
-    if (carried(uball))     /* the ball is carried */
+    if (carried(uball)) { /* the ball is carried */
         u.bc_order = BCPOS_DIFFER;
-    else {
+    } else {
         /* ball might rust -- already checked when carried */
         (void) flooreffects(uball, u.ux, u.uy, "");
         place_object(uball, u.ux, u.uy);
@@ -159,14 +163,16 @@ unplacebc_core(void)
 
     if (!carried(uball)) {
         obj_extract_self(uball);
-        if (Blind && (u.bc_felt & BC_BALL)) /* drop glyph */
+        if (Blind && (u.bc_felt & BC_BALL)) { /* drop glyph */
             levl[uball->ox][uball->oy].glyph = u.bglyph;
+        }
 
         newsym(uball->ox, uball->oy);
     }
     obj_extract_self(uchain);
-    if (Blind && (u.bc_felt & BC_CHAIN))        /* drop glyph */
+    if (Blind && (u.bc_felt & BC_CHAIN)) { /* drop glyph */
         levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+    }
 
     newsym(uchain->ox, uchain->oy);
     u.bc_felt = 0;                  /* feel nothing */
@@ -365,8 +371,12 @@ bc_order(void)
         return BCPOS_DIFFER;
 
     for (obj = level.objects[uball->ox][uball->oy]; obj; obj = obj->nexthere) {
-        if (obj == uchain) return BCPOS_CHAIN;
-        if (obj == uball) return BCPOS_BALL;
+        if (obj == uchain) {
+            return BCPOS_CHAIN;
+        }
+        if (obj == uball) {
+            return BCPOS_BALL;
+        }
     }
     impossible("bc_order:  ball&chain not in same location!");
     return BCPOS_DIFFER;
@@ -397,7 +407,9 @@ set_bc(int already_blind)
      *  disgusting, but it will work.
      */
     remove_object(uchain);
-    if (ball_on_floor) remove_object(uball);
+    if (ball_on_floor) {
+        remove_object(uball);
+    }
 
     newsym(uchain->ox, uchain->oy);
     u.cglyph = levl[uchain->ox][uchain->oy].glyph;
@@ -408,17 +420,17 @@ set_bc(int already_blind)
         if (ball_on_floor) {
             newsym(uball->ox, uball->oy);   /* see under ball */
             u.bglyph = levl[uball->ox][uball->oy].glyph;
-            place_object(uball,  uball->ox, uball->oy);
+            place_object(uball, uball->ox, uball->oy);
             newsym(uball->ox, uball->oy);   /* restore ball */
         }
     } else {
         u.bglyph = u.cglyph;
         if (u.bc_order == BCPOS_CHAIN) {
-            place_object(uball,  uball->ox, uball->oy);
+            place_object(uball, uball->ox, uball->oy);
             place_object(uchain, uchain->ox, uchain->oy);
         } else {
             place_object(uchain, uchain->ox, uchain->oy);
-            place_object(uball,  uball->ox, uball->oy);
+            place_object(uball, uball->ox, uball->oy);
         }
         newsym(uball->ox, uball->oy);
     }
@@ -456,10 +468,12 @@ move_bc(
                 /*
                  *  Both ball and chain moved.  If felt, drop glyph.
                  */
-                if (u.bc_felt & BC_BALL)
+                if (u.bc_felt & BC_BALL) {
                     levl[uball->ox][uball->oy].glyph = u.bglyph;
-                if (u.bc_felt & BC_CHAIN)
+                }
+                if (u.bc_felt & BC_CHAIN) {
                     levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+                }
                 u.bc_felt = 0;
 
                 /* Pick up glyph at new location. */
@@ -538,15 +552,21 @@ move_bc(
             if ((control & BC_CHAIN) ||
                 (!control && u.bc_order == BCPOS_CHAIN)) {
                 /* If the chain moved or nothing moved & chain on top. */
-                if (on_floor) place_object(uball,  ballx, bally);
+                if (on_floor) {
+                    place_object(uball, ballx, bally);
+                }
                 place_object(uchain, chainx, chainy); /* chain on top */
             } else {
                 place_object(uchain, chainx, chainy);
-                if (on_floor) place_object(uball,  ballx, bally);
+                if (on_floor) {
+                    place_object(uball, ballx, bally);
+                }
                 /* ball on top */
             }
             newsym(chainx, chainy);
-            if (on_floor) newsym(ballx, bally);
+            if (on_floor) {
+                newsym(ballx, bally);
+            }
         }
     }
 }
@@ -627,13 +647,14 @@ drag_ball(
         else
             already_in_rock = FALSE;
 
-        switch(dist2(x, y, uball->ox, uball->oy)) {
+        switch (dist2(x, y, uball->ox, uball->oy)) {
         /* two spaces diagonal from ball, move chain inbetween */
         case 8:
             *chainx = (uball->ox + x)/2;
             *chainy = (uball->oy + y)/2;
-            if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock)
+            if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock) {
                 SKIP_TO_DRAG;
+            }
             break;
 
         /* player is distance 2/1 from ball; move chain to one of the
@@ -712,12 +733,14 @@ drag_ball(
         /* ball is two spaces horizontal or vertical from player; move*/
         /* chain inbetween *unless* current chain position is OK */
         case 4:
-            if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy))
+            if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy)) {
                 break;
+            }
             *chainx = (x + uball->ox)/2;
             *chainy = (y + uball->oy)/2;
-            if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock)
+            if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock) {
                 SKIP_TO_DRAG;
+            }
             break;
 
         /* ball is one space diagonal from player.  Check for the
@@ -731,20 +754,23 @@ drag_ball(
         case 2:
             if (dist2(x, y, uball->ox, uball->oy) == 2 &&
                 dist2(x, y, uchain->ox, uchain->oy) == 4) {
-                if (uchain->oy == y)
+                if (uchain->oy == y) {
                     *chainx = uball->ox;
-                else
+                } else {
                     *chainy = uball->oy;
-                if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock)
+                }
+                if (IS_CHAIN_ROCK(*chainx, *chainy) && !already_in_rock) {
                     SKIP_TO_DRAG;
+                }
                 break;
             }
         /* fall through */
         case 1:
         case 0:
             /* do nothing if possible */
-            if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy))
+            if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy)) {
                 break;
+            }
             /* otherwise try to drag chain to player's old position */
             if (CHAIN_IN_MIDDLE(u.ux, u.uy)) {
                 *chainx = u.ux;
@@ -784,7 +810,9 @@ drag:
 
         if (Levitation) {
             You_feel("a tug from the iron ball.");
-            if (t) t->tseen = 1;
+            if (t) {
+                t->tseen = 1;
+            }
         } else {
             struct monst *victim;
 
@@ -941,8 +969,9 @@ drop_ball(coordxy x, coordxy y)
 
         if (Blind) {
             /* drop glyph under the chain */
-            if (u.bc_felt & BC_CHAIN)
+            if (u.bc_felt & BC_CHAIN) {
                 levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+            }
             u.bc_felt  = 0; /* feel nothing */
             /* pick up new glyph */
             u.cglyph = (u.bc_order) ? u.bglyph : levl[u.ux][u.uy].glyph;
@@ -954,8 +983,9 @@ drop_ball(coordxy x, coordxy y)
         newsym(u.ux0, u.uy0);   /* clean up old position */
         if (u.ux0 != u.ux || u.uy0 != u.uy) {
             spoteffects(TRUE);
-            if (In_sokoban(&u.uz))
+            if (In_sokoban(&u.uz)) {
                 sokoban_trickster(); /* Sokoban guilt */
+            }
         }
     }
 }
@@ -999,8 +1029,9 @@ drag_down(void)
 
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
-    if (carried(uball))
+    if (carried(uball)) {
         You("lose your grip on the iron ball.");
+    }
 
     cls(); /* previous level is still displayed although you
               went down the stairs. Avoids bug C343-20 */

@@ -138,18 +138,22 @@ set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
     if (orientation == ALIGN_TOP || orientation == ALIGN_BOTTOM) {
         if (minh < 0) {
             *winh = (*h - ROWNO - border_space);
-            if (-minh > *winh)
+            if (-minh > *winh) {
                 *winh = -minh;
-        } else
+            }
+        } else {
             *winh = minh;
+        }
         *h -= (*winh + border_space);
     } else {
         if (minw < 0) {
             *winw = (*w - COLNO - border_space);
-            if (-minw > *winw)
+            if (-minw > *winw) {
                 *winw = -minw;
-        } else
+            }
+        } else {
             *winw = minw;
+        }
         *w -= (*winw + border_space);
     }
 
@@ -159,13 +163,15 @@ set_window_position(int *winx, int *winy, int *winw, int *winh, int orientation,
     /* Set window position */
     if (orientation != ALIGN_RIGHT) {
         *winx = *x;
-        if (orientation == ALIGN_LEFT)
+        if (orientation == ALIGN_LEFT) {
             *x += *winw + border_space;
+        }
     }
     if (orientation != ALIGN_BOTTOM) {
         *winy = *y;
-        if (orientation == ALIGN_TOP)
+        if (orientation == ALIGN_TOP) {
             *y += *winh + border_space;
+        }
     }
 }
 
@@ -283,12 +289,13 @@ curses_create_main_windows(void)
 
     /* Vertical windows have priority. Otherwise, priotity is:
         status > inv > msg */
-    if (status_vertical)
+    if (status_vertical) {
         set_window_position(&status_x, &status_y,
                             &status_width, &status_height,
                             status_orientation,
                             &map_x, &map_y, &map_width, &map_height,
                             border_space, 20, 26);
+    }
 
     if (iflags.perm_invent) {
         /* Take up all width unless msgbar is also vertical. */
@@ -303,27 +310,32 @@ curses_create_main_windows(void)
         }
     }
 
-    if (msg_vertical)
+    if (msg_vertical) {
         set_window_position(&message_x, &message_y, &message_width, &message_height,
                             message_orientation, &map_x, &map_y, &map_width, &map_height,
                             border_space, -1, -25);
+    }
 
     /* Now draw horizontal windows */
-    if (!status_vertical)
+    if (!status_vertical) {
         set_window_position(&status_x, &status_y, &status_width, &status_height,
                             status_orientation, &map_x, &map_y, &map_width, &map_height,
                             border_space, statusheight, 0);
+    }
 
-    if (!msg_vertical)
+    if (!msg_vertical) {
         set_window_position(&message_x, &message_y, &message_width, &message_height,
                             message_orientation, &map_x, &map_y, &map_width, &map_height,
                             border_space, -1, -25);
+    }
 
-    if (map_width > COLNO)
+    if (map_width > COLNO) {
         map_width = COLNO;
+    }
 
-    if (map_height > ROWNO)
+    if (map_height > ROWNO) {
         map_height = ROWNO;
+    }
 
     if (curses_get_nhwin(STATUS_WIN)) {
         curses_del_nhwin(STATUS_WIN);
@@ -402,8 +414,9 @@ curses_init_nhcolors(void)
             }
 
             boolean hicolor = FALSE;
-            if (COLORS >= 16)
+            if (COLORS >= 16) {
                 hicolor = TRUE;
+            }
 
             /* Work around the crazy definitions above for more background colors... */
             for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
@@ -580,56 +593,62 @@ curses_choose_character(void)
 
     if (!flags.randomall && flags.initrole < 0) {
         /* select a role */
-        for (n = 0; roles[n].name.m; n++)
+        for (n = 0; roles[n].name.m; n++) {
             continue;
+        }
         choices = (const char **) alloc(sizeof (char *) * (n + 1));
         pickmap = (int *) alloc(sizeof (int) * (n + 1));
         for (;;) {
             for (n = 0, i = 0; roles[i].name.m; i++) {
                 if (ok_role(i, flags.initrace, flags.initgend, flags.initalign)) {
-                    if (flags.initgend >= 0 && flags.female && roles[i].name.f)
+                    if (flags.initgend >= 0 && flags.female && roles[i].name.f) {
                         choices[n] = roles[i].name.f;
-                    else
+                    } else {
                         choices[n] = roles[i].name.m;
+                    }
                     pickmap[n++] = i;
                 }
             }
-            if (n > 0)
+            if (n > 0) {
                 break;
-            else if (flags.initalign >= 0)
+            } else if (flags.initalign >= 0) {
                 flags.initalign = -1;   /* reset */
-            else if (flags.initgend >= 0)
+            } else if (flags.initgend >= 0) {
                 flags.initgend = -1;
-            else if (flags.initrace >= 0)
+            } else if (flags.initrace >= 0) {
                 flags.initrace = -1;
-            else
+            } else {
                 panic("no available ROLE+race+gender+alignment combinations");
+            }
         }
         choices[n] = (const char *) 0;
-        if (n > 1)
+        if (n > 1) {
             sel =
                 curses_character_dialog(choices,
                                         "Choose one of the following roles:");
-        else
+        } else {
             sel = 0;
-        if (sel >= 0)
+        }
+        if (sel >= 0) {
             sel = pickmap[sel];
-        else if (sel == ROLE_NONE) {    /* Quit */
+        } else if (sel == ROLE_NONE) {    /* Quit */
             clearlocks();
             curses_bail(0);
         }
         free(choices);
         free(pickmap);
-    } else if (flags.initrole < 0)
+    } else if (flags.initrole < 0) {
         sel = ROLE_RANDOM;
-    else
+    } else {
         sel = flags.initrole;
+    }
 
     if (sel == ROLE_RANDOM) {   /* Random role */
         sel = pick_role(flags.initrace, flags.initgend,
                         flags.initalign, PICK_RANDOM);
-        if (sel < 0)
+        if (sel < 0) {
             sel = randrole();
+        }
     }
 
     flags.initrole = sel;
@@ -641,19 +660,22 @@ curses_choose_character(void)
         if (flags.initrace == ROLE_RANDOM || flags.randomall) {
             flags.initrace = pick_race(flags.initrole, flags.initgend,
                                        flags.initalign, PICK_RANDOM);
-            if (flags.initrace < 0)
+            if (flags.initrace < 0) {
                 flags.initrace = randrace(flags.initrole);
+            }
         } else {
             /* Count the number of valid races */
             n = 0;              /* number valid */
             for (i = 0; races[i].noun; i++) {
-                if (ok_race(flags.initrole, i, flags.initgend, flags.initalign))
+                if (ok_race(flags.initrole, i, flags.initgend, flags.initalign)) {
                     n++;
+                }
             }
             if (n == 0) {
                 for (i = 0; races[i].noun; i++) {
-                    if (validrace(flags.initrole, i))
+                    if (validrace(flags.initrole, i)) {
                         n++;
+                    }
                 }
             }
 
@@ -667,15 +689,16 @@ curses_choose_character(void)
             }
             choices[n] = (const char *) 0;
             /* Permit the user to pick, if there is more than one */
-            if (n > 1)
+            if (n > 1) {
                 sel =
                     curses_character_dialog(choices,
                                             "Choose one of the following races:");
-            else
+            } else {
                 sel = 0;
-            if (sel >= 0)
+            }
+            if (sel >= 0) {
                 sel = pickmap[sel];
-            else if (sel == ROLE_NONE) {        /* Quit */
+            } else if (sel == ROLE_NONE) {        /* Quit */
                 clearlocks();
                 curses_bail(0);
             }
@@ -686,8 +709,9 @@ curses_choose_character(void)
         if (flags.initrace == ROLE_RANDOM) {    /* Random role */
             sel = pick_race(flags.initrole, flags.initgend,
                             flags.initalign, PICK_RANDOM);
-            if (sel < 0)
+            if (sel < 0) {
                 sel = randrace(flags.initrole);
+            }
             flags.initrace = sel;
         }
     }
@@ -700,19 +724,22 @@ curses_choose_character(void)
         if (flags.initgend == ROLE_RANDOM || flags.randomall) {
             flags.initgend = pick_gend(flags.initrole, flags.initrace,
                                        flags.initalign, PICK_RANDOM);
-            if (flags.initgend < 0)
+            if (flags.initgend < 0) {
                 flags.initgend = randgend(flags.initrole, flags.initrace);
+            }
         } else {
             /* Count the number of valid genders */
             n = 0;              /* number valid */
             for (i = 0; i < ROLE_GENDERS; i++) {
-                if (ok_gend(flags.initrole, flags.initrace, i, flags.initalign))
+                if (ok_gend(flags.initrole, flags.initrace, i, flags.initalign)) {
                     n++;
+                }
             }
             if (n == 0) {
                 for (i = 0; i < ROLE_GENDERS; i++) {
-                    if (validgend(flags.initrole, flags.initrace, i))
+                    if (validgend(flags.initrole, flags.initrace, i)) {
                         n++;
+                    }
                 }
             }
 
@@ -726,15 +753,16 @@ curses_choose_character(void)
             }
             choices[n] = (const char *) 0;
             /* Permit the user to pick, if there is more than one */
-            if (n > 1)
+            if (n > 1) {
                 sel =
                     curses_character_dialog(choices,
                                             "Choose one of the following genders:");
-            else
+            } else {
                 sel = 0;
-            if (sel >= 0)
+            }
+            if (sel >= 0) {
                 sel = pickmap[sel];
-            else if (sel == ROLE_NONE) {        /* Quit */
+            } else if (sel == ROLE_NONE) {        /* Quit */
                 clearlocks();
                 curses_bail(0);
             }
@@ -745,8 +773,9 @@ curses_choose_character(void)
         if (flags.initgend == ROLE_RANDOM) {    /* Random gender */
             sel = pick_gend(flags.initrole, flags.initrace,
                             flags.initalign, PICK_RANDOM);
-            if (sel < 0)
+            if (sel < 0) {
                 sel = randgend(flags.initrole, flags.initrace);
+            }
             flags.initgend = sel;
         }
     }
@@ -758,19 +787,23 @@ curses_choose_character(void)
         if (flags.initalign == ROLE_RANDOM || flags.randomall) {
             flags.initalign = pick_align(flags.initrole, flags.initrace,
                                          flags.initgend, PICK_RANDOM);
-            if (flags.initalign < 0)
+            if (flags.initalign < 0) {
                 flags.initalign = randalign(flags.initrole, flags.initrace);
+            }
         } else {
             /* Count the number of valid alignments */
             n = 0;              /* number valid */
             for (i = 0; i < ROLE_ALIGNS; i++) {
-                if (ok_align(flags.initrole, flags.initrace, flags.initgend, i))
+                if (ok_align(flags.initrole, flags.initrace, flags.initgend, i)) {
                     n++;
+                }
             }
             if (n == 0) {
-                for (i = 0; i < ROLE_ALIGNS; i++)
-                    if (validalign(flags.initrole, flags.initrace, i))
+                for (i = 0; i < ROLE_ALIGNS; i++) {
+                    if (validalign(flags.initrole, flags.initrace, i)) {
                         n++;
+                    }
+                }
             }
 
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
@@ -783,15 +816,16 @@ curses_choose_character(void)
             }
             choices[n] = (const char *) 0;
             /* Permit the user to pick, if there is more than one */
-            if (n > 1)
+            if (n > 1) {
                 sel =
                     curses_character_dialog(choices,
                                             "Choose one of the following alignments:");
-            else
+            } else {
                 sel = 0;
-            if (sel >= 0)
+            }
+            if (sel >= 0) {
                 sel = pickmap[sel];
-            else if (sel == ROLE_NONE) {        /* Quit */
+            } else if (sel == ROLE_NONE) {        /* Quit */
                 clearlocks();
                 curses_bail(0);
             }
@@ -802,8 +836,9 @@ curses_choose_character(void)
         if (flags.initalign == ROLE_RANDOM) {
             sel = pick_align(flags.initrole, flags.initrace,
                              flags.initgend, PICK_RANDOM);
-            if (sel < 0)
+            if (sel < 0) {
                 sel = randalign(flags.initrole, flags.initrace);
+            }
             flags.initalign = sel;
         }
     }

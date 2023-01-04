@@ -102,7 +102,7 @@ again:
      * of the level. */
     carve_path(probs);
 
-    for (i1 = 1; i1 < COLNO; ++i1)
+    for (i1 = 1; i1 < COLNO; ++i1) {
         for (i2 = 0; i2 < ROWNO; ++i2) {
             testval = 1;
             if (probs[i1 + i2 * COLNO].out_of != 0) {
@@ -114,25 +114,30 @@ again:
                 if (levl[i1][i2].typ == ICEWALL ||
                     levl[i1][i2].typ == CRYSTALICEWALL)
                     levl[i1][i2].typ = ICE;
-                else if (levl[i1][i2].typ != POOL)
+                else if (levl[i1][i2].typ != POOL) {
                     levl[i1][i2].typ = ROOM;
+                }
 
-            }
-            else if (levl[i1][i2].typ == POOL)
+            } else if (levl[i1][i2].typ == POOL) {
                 levl[i1][i2].typ = ICEWALL;
+            }
         }
+    }
 
     /* Sometimes, put a lot of clouds somewhere on the level. */
-    if (!rn2(5))
+    if (!rn2(5)) {
         place_clouds();
+    }
 
-    if (verify_stairs_place() == STAT_REJECT)
+    if (verify_stairs_place() == STAT_REJECT) {
         goto again;
+    }
 
     finalize_map();
 
-    if (plug_unreachable_places() == STAT_REJECT)
+    if (plug_unreachable_places() == STAT_REJECT) {
         goto again;
+    }
 
     free(probs);
 }
@@ -178,11 +183,12 @@ init_level_base_voronoi(schar* vtyps, int numtyps, int numpoints)
         }
     }
 
-    for (i1 = 1; i1 < COLNO; ++i1)
+    for (i1 = 1; i1 < COLNO; ++i1) {
         for (i2 = 0; i2 < ROWNO; ++i2) {
             winner_patch = check_voronoi_winner(points, patches, i1, i2);
             levl[i1][i2].typ = points[winner_patch].typ;
         }
+    }
 
     free(points);
 }
@@ -196,8 +202,7 @@ check_voronoi_winner(patchcoord *coords, int num_coords, coordxy x, coordxy y)
 
     winner_distance = 10000;
 
-    for (i1 = 0; i1 < num_coords; ++i1)
-    {
+    for (i1 = 0; i1 < num_coords; ++i1) {
         d = dist2(coords[i1].c.x, coords[i1].c.y, x, y);
         if (d < winner_distance) {
             winner_distance = d;
@@ -236,21 +241,22 @@ carve_path(floorprob *floorprobs)
     int tries;
 
     /* Attempt to make ~random point paths to the end. */
-    while(1) {
+    while (1) {
         path_x = -2;
         path_y = ROWNO / 2;
 
         for (i1 = 0; i1 < 100; ++i1) {
             tries = 0;
-            while(tries < 100) {
+            while (tries < 100) {
                 tries++;
                 points[i1].x = path_x;
                 points[i1].y = path_y;
 
-                if (!rn2(2))
+                if (!rn2(2)) {
                     points[i1].x += rn2(11)-5;
-                else
+                } else {
                     points[i1].x += rn2(6)-2;
+                }
                 points[i1].y += rn2(11)-5;
 
                 if (points[i1].y < 0 ||
@@ -258,29 +264,31 @@ carve_path(floorprob *floorprobs)
                     points[i1].x < 1 ||
                     points[i1].x >= COLNO)
                     continue;
-                for (i2 = 0; i2 < i1; ++i2)
-                    if (dist2(points[i2].x, points[i2].y,
-                              points[i1].x, points[i1].y) <=
-                        16)
+                for (i2 = 0; i2 < i1; ++i2) {
+                    if (dist2(points[i2].x, points[i2].y, points[i1].x, points[i1].y) <= 16) {
                         break;
-                if (i2 < i1)
+                    }
+                }
+                if (i2 < i1) {
                     continue;
+                }
                 break;
             }
-            if (tries >= 100)
-            {
+            if (tries >= 100) {
                 path_x = -2;
                 path_y = ROWNO / 2;
                 i1 = -1;
                 continue;
             }
-            if (i1 > 0 && points[i1-1].x >= COLNO-5)
+            if (i1 > 0 && points[i1-1].x >= COLNO-5) {
                 break;
+            }
             path_x = points[i1].x;
             path_y = points[i1].y;
         }
-        if (i1 >= 100)
+        if (i1 >= 100) {
             continue;
+        }
         break;
     }
 
@@ -291,8 +299,7 @@ carve_path(floorprob *floorprobs)
                                     points[i1+1].x, points[i1+1].y)+
                               dist2(points[i1+1].x, points[i1+1].y,
                                     points[i1+2].x, points[i1+2].y))*20;
-        for (i2 = 0; i2 <= sample_points; ++i2)
-        {
+        for (i2 = 0; i2 <= sample_points; ++i2) {
             r_i2 = sample_points - i2;
             #define BEZNUMERICAL(targ, m, idx1, idx2) \
     targ = points[idx1].m * i2 / sample_points; \
@@ -310,10 +317,11 @@ carve_path(floorprob *floorprobs)
 
             #undef BEZNUMERICAL
 
-            if (under_middle())
+            if (under_middle()) {
                 fuzzy_circle(x, y, 1, 0, floorprobs);
-            else
+            } else {
                 fuzzy_circle(x, y, 1, 2, floorprobs);
+            }
         }
     }
 }
@@ -331,20 +339,22 @@ fuzzy_circle(coordxy x, coordxy y, int guaranteed_passage_radius, int fallout, f
     int fallout_2 = fallout * fallout;
     int d;
 
-    if (fallout < guaranteed_passage_radius)
+    if (fallout < guaranteed_passage_radius) {
         fallout = guaranteed_passage_radius;
+    }
 
-    for (i1 = x - fallout; i1 <= x + fallout; ++i1)
+    for (i1 = x - fallout; i1 <= x + fallout; ++i1) {
         for (i2 = y - fallout; i2 <= y + fallout; ++i2) {
             if (i1 < 1 || i1 >= COLNO ||
                 i2 < 0 || i2 >= ROWNO)
                 continue;
             d = dist2(i1, i2, x, y);
-            if (d > fallout_2)
+            if (d > fallout_2) {
                 continue;
-            if (d <= guaranteed_passage_radius)
+            }
+            if (d <= guaranteed_passage_radius) {
                 floorprobs[i1 + i2 * COLNO].guaranteed = 1;
-            else {
+            } else {
                 d -= guaranteed_passage_radius;
                 d = (d * 100) /
                     ((fallout_2 -
@@ -354,6 +364,7 @@ fuzzy_circle(coordxy x, coordxy y, int guaranteed_passage_radius, int fallout, f
                 floorprobs[i1+i2*COLNO].out_of += 100;
             }
         }
+    }
 }
 
 static void
@@ -362,16 +373,23 @@ wallify_map(void)
 
     int x, y, xx, yy;
 
-    for(x = 1; x < COLNO; x++)
-        for(y = 0; y < ROWNO; y++)
-            if(levl[x][y].typ == STONE) {
-                for(yy = y - 1; yy <= y+1; yy++)
-                    for(xx = x - 1; xx <= x+1; xx++)
-                        if(isok(xx, yy) && levl[xx][yy].typ == ROOM) {
-                            if(yy != y) levl[x][y].typ = HWALL;
-                            else levl[x][y].typ = VWALL;
+    for (x = 1; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            if (levl[x][y].typ == STONE) {
+                for (yy = y - 1; yy <= y+1; yy++) {
+                    for (xx = x - 1; xx <= x+1; xx++) {
+                        if (isok(xx, yy) && levl[xx][yy].typ == ROOM) {
+                            if (yy != y) {
+                                levl[x][y].typ = HWALL;
+                            } else {
+                                levl[x][y].typ = VWALL;
+                            }
                         }
+                    }
+                }
             }
+        }
+    }
 }
 
 #define VALID_PASSABLE(x, y) (levl[x][y].typ == ICE || \
@@ -395,7 +413,7 @@ plug_unreachable_places(void)
     memset(fillmap, 0, sizeof(fillmap));
 
     tries = 100;
-    while(tries > 0) {
+    while (tries > 0) {
         tries--;
         x = rn1(COLNO-2, 1);
         y = rn2(ROWNO);
@@ -404,8 +422,9 @@ plug_unreachable_places(void)
             continue;
         break;
     }
-    if (tries <= 0)
+    if (tries <= 0) {
         return STAT_REJECT;
+    }
 
     /* flood fill */
     done = 0;
@@ -413,13 +432,13 @@ plug_unreachable_places(void)
     flood_y = y;
     fillmap[flood_x][flood_y] = 1;
 
-    while(!done) {
+    while (!done) {
         done = 1;
-        for (x = 2; x < COLNO-1; ++x)
-            for (y = 1; y < ROWNO-1; ++y)
-            {
-                if (!fillmap[x][y])
+        for (x = 2; x < COLNO-1; ++x) {
+            for (y = 1; y < ROWNO-1; ++y) {
+                if (!fillmap[x][y]) {
                     continue;
+                }
                 if (fillmap[x+1][y] == 0 &&
                     VALID_PASSABLE(x+1, y)) {
                     fillmap[x+1][y] = 1;
@@ -441,19 +460,21 @@ plug_unreachable_places(void)
                     done = 0;
                 }
             }
+        }
     }
 
-    for (x = 1; x < COLNO; ++x)
-        for (y = 0; y < ROWNO; ++y)
-            if (VALID_PASSABLE(x, y) &&
-                fillmap[x][y] != 1)
-            {
+    for (x = 1; x < COLNO; ++x) {
+        for (y = 0; y < ROWNO; ++y) {
+            if (VALID_PASSABLE(x, y) && fillmap[x][y] != 1) {
                 not_passable = 1;
                 break;
             }
+        }
+    }
 
-    if (!not_passable)
+    if (!not_passable) {
         return STAT_ALLREACHABLE;
+    }
 
     /* flood fill again, but go through ice this time */
     done = 0;
@@ -461,13 +482,13 @@ plug_unreachable_places(void)
     memset(fillmap, 0, sizeof(fillmap));
     fillmap[flood_x][flood_y] = 1;
 
-    while(!done) {
+    while (!done) {
         done = 1;
-        for (x = 2; x < COLNO-1; ++x)
-            for (y = 1; y < ROWNO-1; ++y)
-            {
-                if (!fillmap[x][y])
+        for (x = 2; x < COLNO-1; ++x) {
+            for (y = 1; y < ROWNO-1; ++y) {
+                if (!fillmap[x][y]) {
                     continue;
+                }
                 if (fillmap[x+1][y] == 0 &&
                     VALID_PASSABLE2(x+1, y)) {
                     fillmap[x+1][y] = 1;
@@ -489,19 +510,21 @@ plug_unreachable_places(void)
                     done = 0;
                 }
             }
+        }
     }
 
-    for (x = 1; x < COLNO; ++x)
-        for (y = 0; y < ROWNO; ++y)
-            if (VALID_PASSABLE(x, y) &&
-                fillmap[x][y] != 1)
-            {
+    for (x = 1; x < COLNO; ++x) {
+        for (y = 0; y < ROWNO; ++y) {
+            if (VALID_PASSABLE(x, y) && fillmap[x][y] != 1) {
                 not_passable = 1;
                 break;
             }
+        }
+    }
 
-    if (not_passable)
+    if (not_passable) {
         return STAT_REJECT;
+    }
     return STAT_SEMIPLUGGED;
 }
 
@@ -534,21 +557,23 @@ again:
 
     finalize_map();
 
-    if (plug_unreachable_places() == STAT_REJECT)
+    if (plug_unreachable_places() == STAT_REJECT) {
         goto again;
+    }
 }
 
 static void
 finalize_map(void) {
     int i1, i2;
 
-    for (i1 = 1; i1 < COLNO; ++i1)
+    for (i1 = 1; i1 < COLNO; ++i1) {
         for (i2 = 0; i2 < ROWNO; ++i2) {
             levl[i1][i2].lit = TRUE; /* lit things up */
             if (IS_ROCK(levl[i1][i2].typ) &&
                 !IS_ANY_ICEWALL(levl[i1][i2].typ))
                 levl[i1][i2].wall_info |= W_NONDIGGABLE;
         }
+    }
 
     wallify_map();
 
@@ -562,24 +587,32 @@ verify_stairs_place(void) {
 
     /* Make sure there is ROOM somewhere in both sides of the level */
     for (i1 = 1; i1 <= 15; ++i1) {
-        for (i2 = 0; i2 < ROWNO; ++i2)
-            if (levl[i1][i2].typ == ROOM)
+        for (i2 = 0; i2 < ROWNO; ++i2) {
+            if (levl[i1][i2].typ == ROOM) {
                 break;
-        if (i2 < ROWNO)
+            }
+        }
+        if (i2 < ROWNO) {
             break;
+        }
     }
-    if (i1 > 15)
+    if (i1 > 15) {
         return STAT_REJECT;
+    }
 
     for (i1 = 65; i1 < COLNO; ++i1) {
-        for (i2 = 0; i2 < ROWNO; ++i2)
-            if (levl[i1][i2].typ == ROOM)
+        for (i2 = 0; i2 < ROWNO; ++i2) {
+            if (levl[i1][i2].typ == ROOM) {
                 break;
-        if (i2 < ROWNO)
+            }
+        }
+        if (i2 < ROWNO) {
             break;
+        }
     }
-    if (i1 >= COLNO)
+    if (i1 >= COLNO) {
         return STAT_REJECT;
+    }
 
     return STAT_STAIRSOK;
 }
@@ -592,7 +625,7 @@ place_clouds(void) {
 
     num_clouds = rn2(25) + rn2(40) + 5;
 
-    while(1) {
+    while (1) {
         x = rn1(COLNO-2, 1);
         y = rn2(ROWNO);
         if (levl[x][y].typ == ICE ||
@@ -601,14 +634,13 @@ place_clouds(void) {
     }
 
     tries = 200;
-    while(num_clouds > 0 && tries > 0) {
+    while (num_clouds > 0 && tries > 0) {
         if (levl[x][y].typ == ICE ||
             levl[x][y].typ == ROOM) {
             levl[x][y].typ = CLOUD;
             num_clouds--;
             tries = 200;
-        }
-        else {
+        } else {
             --tries;
             shake_position(&x, &y);
         }
@@ -630,8 +662,9 @@ shake_position(int *x, int *y)
     tries = 10;
 
 again:
-    if (!tries)
+    if (!tries) {
         return;
+    }
     --tries;
 
     (*x) = old_x;
@@ -640,37 +673,40 @@ again:
     if (!rn2(30)) {
         (*x) += rn2(7)-3;
         (*y) += rn2(7)-3;
-    }
-    else {
+    } else {
         (*x) += rn2(3)-1;
         (*y) += rn2(3)-1;
     }
 
-    if ((*x) >= COLNO)
+    if ((*x) >= COLNO) {
         (*x) = COLNO-1;
-    if ((*x) < 1)
+    }
+    if ((*x) < 1) {
         (*x) = 1;
-    if ((*y) < 0)
+    }
+    if ((*y) < 0) {
         (*y) = 0;
-    if ((*y) >= ROWNO)
+    }
+    if ((*y) >= ROWNO) {
         (*y) = ROWNO-1;
+    }
 
     dx = (*x) > old_x ? 1 : -1;
     dy = (*y) > old_y ? 1 : -1;
 
-    for (i1 = old_x; i1 != (*x); i1 += dx)
-    {
+    for (i1 = old_x; i1 != (*x); i1 += dx) {
         if (levl[i1][old_y].typ != ICE ||
             levl[i1][old_y].typ != ROOM ||
             levl[i1][old_y].typ != CLOUD)
             goto again;
     }
+
     if (levl[*x][old_y].typ != ICE ||
         levl[*x][old_y].typ != ROOM ||
         levl[*x][old_y].typ != CLOUD)
         goto again;
-    for (i1 = old_y; i1 != (*y); i1 += dy)
-    {
+
+    for (i1 = old_y; i1 != (*y); i1 += dy) {
         if (levl[*x][i1].typ != ICE ||
             levl[*x][i1].typ != ROOM ||
             levl[*x][i1].typ != CLOUD)

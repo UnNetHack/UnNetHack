@@ -495,25 +495,31 @@ calculate_rip_text(int how)
 			break;
 	}
 
-	/* Put death type on stone */
-	for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
-		register int i,i0;
-		char tmpchar;
+    /* Put death type on stone */
+    for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
+        int i, i0;
+        char tmpchar;
 
-		if ( (i0=strlen(dpx)) > STONE_LINE_LEN) {
-			for(i = STONE_LINE_LEN;
-			    ((i0 > STONE_LINE_LEN) && i); i--)
-				if(dpx[i] == ' ') i0 = i;
-			if(!i) i0 = STONE_LINE_LEN;
-		}
-		tmpchar = dpx[i0];
-		dpx[i0] = 0;
-		strcpy(rip_line[line], dpx);
-		if (tmpchar != ' ') {
-			dpx[i0] = tmpchar;
-			dpx= &dpx[i0];
-		} else  dpx= &dpx[i0+1];
-	}
+        if ((i0=strlen(dpx)) > STONE_LINE_LEN) {
+            for (i = STONE_LINE_LEN;
+                 ((i0 > STONE_LINE_LEN) && i); i--) {
+                if (dpx[i] == ' ') {
+                    i0 = i;
+                }
+            if (!i) {
+                i0 = STONE_LINE_LEN;
+            }
+        }
+        tmpchar = dpx[i0];
+        dpx[i0] = 0;
+        strcpy(rip_line[line], dpx);
+        if (tmpchar != ' ') {
+            dpx[i0] = tmpchar;
+            dpx= &dpx[i0];
+        } else {
+            dpx= &dpx[i0+1];
+        }
+    }
 
 	/* Put year on stone */
 	Sprintf(rip_line[YEAR_LINE], "%4d", getyear());

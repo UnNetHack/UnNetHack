@@ -86,13 +86,13 @@ int
 findfirst(path)
 char *path;
 {
-	if (ffhandle){
-		 FindClose(ffhandle);
-		 ffhandle = (HANDLE)0;
-	}
-	ffhandle = FindFirstFile(path,&ffd);
-	return
-	  (ffhandle == INVALID_HANDLE_VALUE) ? 0 : 1;
+    if (ffhandle) {
+        FindClose(ffhandle);
+        ffhandle = (HANDLE)0;
+    }
+    ffhandle = FindFirstFile(path,&ffd);
+    return
+        (ffhandle == INVALID_HANDLE_VALUE) ? 0 : 1;
 }
 
 int

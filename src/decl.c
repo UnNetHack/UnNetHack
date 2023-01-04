@@ -170,20 +170,20 @@ NEARDATA struct flag flags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
 
-NEARDATA struct obj *invent = (struct obj *)0,
-                    *uwep = (struct obj *)0, *uarm = (struct obj *)0,
-                    *uswapwep = (struct obj *)0,
-                    *uquiver = (struct obj *)0, /* quiver */
-                    *uarmu = (struct obj *)0, /* under-wear, so to speak */
-                    *uskin = (struct obj *)0, /* dragon armor, if a dragon */
-                    *uarmc = (struct obj *)0, *uarmh = (struct obj *)0,
-                    *uarms = (struct obj *)0, *uarmg = (struct obj *)0,
-                    *uarmf = (struct obj *)0, *uamul = (struct obj *)0,
-                    *uright = (struct obj *)0,
-                    *uleft = (struct obj *)0,
-                    *ublindf = (struct obj *)0,
-                    *uchain = (struct obj *)0,
-                    *uball = (struct obj *)0;
+NEARDATA struct obj *invent = (struct obj *) 0,
+                    *uwep = (struct obj *) 0, *uarm = (struct obj *) 0,
+                    *uswapwep = (struct obj *) 0,
+                    *uquiver = (struct obj *) 0, /* quiver */
+                    *uarmu = (struct obj *) 0, /* under-wear, so to speak */
+                    *uskin = (struct obj *) 0, /* dragon armor, if a dragon */
+                    *uarmc = (struct obj *) 0, *uarmh = (struct obj *) 0,
+                    *uarms = (struct obj *) 0, *uarmg = (struct obj *) 0,
+                    *uarmf = (struct obj *) 0, *uamul = (struct obj *) 0,
+                    *uright = (struct obj *) 0,
+                    *uleft = (struct obj *) 0,
+                    *ublindf = (struct obj *) 0,
+                    *uchain = (struct obj *) 0,
+                    *uball = (struct obj *) 0;
 
 #ifdef TEXTCOLOR
 /*
@@ -221,9 +221,9 @@ long hero_seq = 1L << 3; /* hero_seq: sequence number for hero movement, 'moves*
 NEARDATA long wailmsg = 0L;
 
 /* objects that are moving to another dungeon level */
-NEARDATA struct obj *migrating_objs = (struct obj *)0;
+NEARDATA struct obj *migrating_objs = (struct obj *) 0;
 /* objects not yet paid for */
-NEARDATA struct obj *billobjs = (struct obj *)0;
+NEARDATA struct obj *billobjs = (struct obj *) 0;
 
 /* used to zero all elements of a struct obj */
 struct obj zeroobj = DUMMY;           /* used to zero out a struct obj */

@@ -498,8 +498,9 @@ process_substitutions(FILE *ofp)
             span++;
             fprintf(ofp, "short std_tiles%d[] = { ", span);
             for (k = substitutes[i].first_glyph;
-                    k < substitutes[i].last_glyph; k++)
+                    k < substitutes[i].last_glyph; k++) {
                 fprintf(ofp, "%d, ", tilemap[k]);
+            }
             fprintf(ofp, "%d };\n",
                     tilemap[substitutes[i].last_glyph]);
         }

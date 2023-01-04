@@ -227,9 +227,11 @@ char *argv[];
         if (!initflag) {
             build_bmfh(&bmp.bmfh);
             build_bmih(&bmp.bmih);
-            for (i = 0; i < MAX_Y; ++i)
-                for (j = 0; j < MAX_X; ++j)
+            for (i = 0; i < MAX_Y; ++i) {
+                for (j = 0; j < MAX_X; ++j) {
                     bmp.packtile[i][j] = (uchar)0;
+                }
+            }
             for (i = 0; i < num_colors; i++) {
                 bmp.bmaColors[i].rgbRed = ColorMap[CM_RED][i];
                 bmp.bmaColors[i].rgbGreen = ColorMap[CM_GREEN][i];

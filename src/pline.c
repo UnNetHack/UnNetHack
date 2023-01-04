@@ -18,7 +18,9 @@ void
 msgpline_add(int typ, char *pattern)
 {
     struct _plinemsg *tmp = (struct _plinemsg *) alloc(sizeof(struct _plinemsg));
-    if (!tmp) return;
+    if (!tmp) {
+        return;
+    }
     tmp->msgtype = typ;
     tmp->pattern = strdup(pattern);
     tmp->next = pline_msg;
@@ -44,7 +46,9 @@ msgpline_type(char *msg)
 {
     struct _plinemsg *tmp = pline_msg;
     while (tmp) {
-        if (pmatch(tmp->pattern, msg)) return tmp->msgtype;
+        if (pmatch(tmp->pattern, msg)) {
+            return tmp->msgtype;
+        }
         tmp = tmp->next;
     }
     return MSGTYP_NORMAL;
@@ -108,7 +112,9 @@ pline VA_DECL(const char *, line)
     int typ;
 /* Do NOT use VA_START and VA_END in here... see above */
 
-    if (!line || !*line) return;
+    if (!line || !*line) {
+        return;
+    }
     if (index(line, '%')) {
         Vsprintf(pbuf, line, VA_ARGS);
         line = pbuf;
@@ -133,8 +139,9 @@ pline VA_DECL(const char *, line)
         return;
     }
 #ifndef MAC
-    if (no_repeat && !strcmp(line, toplines))
+    if (no_repeat && !strcmp(line, toplines)) {
         return;
+    }
 #endif /* MAC */
     if (vision_full_recalc) {
         vision_recalc(0);
@@ -142,11 +149,17 @@ pline VA_DECL(const char *, line)
     if (u.ux) {
         flush_screen(1); /* %% */
     }
-    if (typ == MSGTYP_NOSHOW) return;
-    if (typ == MSGTYP_NOREP && !strcmp(line, prevmsg)) return;
+    if (typ == MSGTYP_NOSHOW) {
+        return;
+    }
+    if (typ == MSGTYP_NOREP && !strcmp(line, prevmsg)) {
+        return;
+    }
     putmesg(line);
     strncpy(prevmsg, line, BUFSZ);
-    if (typ == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+    if (typ == MSGTYP_STOP) {
+        display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+    }
 }
 
 /* pline() variant which can override MSGTYPE handling or suppress
@@ -203,7 +216,9 @@ static char *
 You_buf(int siz)
 {
     if (siz > you_buf_siz) {
-        if (you_buf) free((genericptr_t) you_buf);
+        if (you_buf) {
+            free((genericptr_t) you_buf);
+        }
         you_buf_siz = siz + 10;
         you_buf = (char *) alloc((unsigned) you_buf_siz);
     }
@@ -213,7 +228,9 @@ You_buf(int siz)
 void
 free_youbuf(void)
 {
-    if (you_buf) free((genericptr_t) you_buf),  you_buf = (char *)0;
+    if (you_buf) {
+        free((genericptr_t) you_buf), you_buf = (char *) 0;
+    }
     you_buf_siz = 0;
 }
 
@@ -376,9 +393,9 @@ raw_printf VA_DECL(const char *, line)
 #endif
 /* Do NOT use VA_START and VA_END in here... see above */
 
-    if(!index(line, '%'))
+    if (!index(line, '%')) {
         raw_print(line);
-    else {
+    } else {
         char pbuf[BUFSZ];
         Vsprintf(pbuf, line, VA_ARGS);
         raw_print(pbuf);
@@ -460,14 +477,16 @@ mstatusline(struct monst *mtmp)
 #ifdef WIZARD
                           if (wizard) {
                               Sprintf(eos(info), " (%d", mtmp->mtame);
-                              if (!mtmp->isminion)
+                              if (!mtmp->isminion) {
                                   Sprintf(eos(info), "; hungry %ld; apport %d",
                                           EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
+                              }
                               Strcat(info, ")");
                           }
 #endif
+    } else if (mtmp->mpeaceful) {
+        Strcat(info, ", peaceful");
     }
-    else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
 
     if (mtmp->data == &mons[PM_LONG_WORM]) {
         int segndx, nsegs = count_wsegs(mtmp);
@@ -488,44 +507,74 @@ mstatusline(struct monst *mtmp)
            just expose the fact that this current form isn't it */
         Strcat(info, ", shapechanger");
     }
-    if (mtmp->meating) Strcat(info, ", eating");
+    if (mtmp->meating) {
+        Strcat(info, ", eating");
+    }
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
     if (mtmp->mundetected || mtmp->m_ap_type) {
         mhidden_description(mtmp, TRUE, eos(info));
     }
-    if (mtmp->mcan) Strcat(info, ", cancelled");
-    if (mtmp->mconf) Strcat(info, ", confused");
-    if (mtmp->mblinded || !mtmp->mcansee)
+    if (mtmp->mcan) {
+        Strcat(info, ", cancelled");
+    }
+    if (mtmp->mconf) {
+        Strcat(info, ", confused");
+    }
+    if (mtmp->mblinded || !mtmp->mcansee) {
         Strcat(info, ", blind");
-    if (mtmp->mstun) Strcat(info, ", stunned");
-    if (mtmp->msleeping) Strcat(info, ", asleep");
+    }
+    if (mtmp->mstun) {
+        Strcat(info, ", stunned");
+    }
+    if (mtmp->msleeping) {
+        Strcat(info, ", asleep");
+    }
 #if 0   /* unfortunately mfrozen covers temporary sleep and being busy
            (donning armor, for instance) as well as paralysis */
-    else if (mtmp->mfrozen) Strcat(info, ", paralyzed");
+    else if (mtmp->mfrozen) {
+        Strcat(info, ", paralyzed");
+    }
 #else
-    else if (mtmp->mfrozen || !mtmp->mcanmove)
+    else if (mtmp->mfrozen || !mtmp->mcanmove) {
         Strcat(info, ", can't move");
+    }
 #endif
     /* [arbitrary reason why it isn't moving] */
-    else if (mtmp->mstrategy & STRAT_WAITMASK)
+    else if (mtmp->mstrategy & STRAT_WAITMASK) {
         Strcat(info, ", meditating");
-    else if (mtmp->mflee) Strcat(info, ", scared");
-    if (mtmp->mtrapped) Strcat(info, ", trapped");
-    if (mtmp->mfeetfrozen) Strcat(info, ", stuck in ice");
-    if (mtmp->mspeed) Strcat(info,
-                             mtmp->mspeed == MFAST ? ", fast" :
-                             mtmp->mspeed == MSLOW ? ", slow" :
-                             ", ???? speed");
-    if (mtmp->mundetected) Strcat(info, ", concealed");
-    if (mtmp->minvis) Strcat(info, ", invisible");
-    if (mtmp == u.ustuck) Strcat(info,
-                                 (sticks(youmonst.data)) ? ", held by you" :
-                                 !u.uswallow ? ", holding you" :
-                                 attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST) ? ", digesting you" :
-                                 (is_animal(u.ustuck->data) ?  ", swallowing you" :
-                                  ", engulfed you"));
-    if (mtmp == u.usteed) Strcat(info, ", carrying you");
+    } else if (mtmp->mflee) {
+        Strcat(info, ", scared");
+    }
+    if (mtmp->mtrapped) {
+        Strcat(info, ", trapped");
+    }
+    if (mtmp->mfeetfrozen) {
+        Strcat(info, ", stuck in ice");
+    }
+    if (mtmp->mspeed) {
+        Strcat(info,
+               mtmp->mspeed == MFAST ? ", fast" :
+               mtmp->mspeed == MSLOW ? ", slow" :
+               ", ???? speed");
+    }
+    if (mtmp->mundetected) {
+        Strcat(info, ", concealed");
+    }
+    if (mtmp->minvis) {
+        Strcat(info, ", invisible");
+    }
+    if (mtmp == u.ustuck) {
+        Strcat(info,
+               (sticks(youmonst.data)) ? ", held by you" :
+               !u.uswallow ? ", holding you" :
+               attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST) ? ", digesting you" :
+               (is_animal(u.ustuck->data) ?  ", swallowing you" :
+                ", engulfed you"));
+    }
+    if (mtmp == u.usteed) {
+        Strcat(info, ", carrying you");
+    }
 
 #ifdef WIZARD
     if (wizard &&
@@ -550,9 +599,10 @@ mstatusline(struct monst *mtmp)
 
     /* Heisenberg's code */
     if (mtmp->data == &mons[PM_QUANTUM_MECHANIC]) {
-        if (canspotmon(mtmp))
+        if (canspotmon(mtmp)) {
             pline("Having determined %s's speed, you are unable to know its location.",
                   mon_nam(mtmp));
+        }
         (void) rloc(mtmp, FALSE);
     } else if (mtmp->data == &mons[PM_CTHULHU]) {
         pline("There are some things incapable of being understood!");
@@ -569,19 +619,31 @@ ustatusline(void)
     info[0] = '\0';
     if (Sick) {
         Strcat(info, ", dying from");
-        if (u.usick_type & SICK_VOMITABLE)
+        if (u.usick_type & SICK_VOMITABLE) {
             Strcat(info, " food poisoning");
+        }
         if (u.usick_type & SICK_NONVOMITABLE) {
-            if (u.usick_type & SICK_VOMITABLE)
+            if (u.usick_type & SICK_VOMITABLE) {
                 Strcat(info, " and");
+            }
             Strcat(info, " illness");
         }
     }
-    if (Stoned) Strcat(info, ", solidifying");
-    if (Slimed) Strcat(info, ", becoming slimy");
-    if (Strangled) Strcat(info, ", being strangled");
-    if (Vomiting) Strcat(info, ", nauseated");       /* !"nauseous" */
-    if (Confusion) Strcat(info, ", confused");
+    if (Stoned) {
+        Strcat(info, ", solidifying");
+    }
+    if (Slimed) {
+        Strcat(info, ", becoming slimy");
+    }
+    if (Strangled) {
+        Strcat(info, ", being strangled");
+    }
+    if (Vomiting) {
+        Strcat(info, ", nauseated"); /* !"nauseous" */
+    }
+    if (Confusion) {
+        Strcat(info, ", confused");
+    }
     if (Blind) {
         Strcat(info, ", blind");
         if (u.ucreamed) {
@@ -591,28 +653,42 @@ ustatusline(void)
             Strcat(info, "ed by sticky goop");
         }   /* note: "goop" == "glop"; variation is intentional */
     }
-    if (Stunned) Strcat(info, ", stunned");
+    if (Stunned) {
+        Strcat(info, ", stunned");
+    }
     if (!u.usteed) {
         if (Wounded_legs) {
             const char *what = body_part(LEG);
-            if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)
+            if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES) {
                 what = makeplural(what);
+            }
             Sprintf(eos(info), ", injured %s", what);
         }
     }
-    if (Glib) Sprintf(eos(info), ", slippery %s",
-                      makeplural(body_part(HAND)));
-    if (u.utrap) Strcat(info, ", trapped");
-    if (u.ufeetfrozen) Strcat(info, ", stuck in ice");
-    if (Fast) Strcat(info, Very_fast ?
-                     ", very fast" : ", fast");
-    if (u.uundetected) Strcat(info, ", concealed");
-    if (Invis) Strcat(info, ", invisible");
+    if (Glib) {
+        Sprintf(eos(info), ", slippery %s", makeplural(body_part(HAND)));
+    }
+    if (u.utrap) {
+        Strcat(info, ", trapped");
+    }
+    if (u.ufeetfrozen) {
+        Strcat(info, ", stuck in ice");
+    }
+    if (Fast) {
+        Strcat(info, Very_fast ?  ", very fast" : ", fast");
+    }
+    if (u.uundetected) {
+        Strcat(info, ", concealed");
+    }
+    if (Invis) {
+        Strcat(info, ", invisible");
+    }
     if (u.ustuck) {
-        if (sticks(youmonst.data))
+        if (sticks(youmonst.data)) {
             Strcat(info, ", holding ");
-        else
+        } else {
             Strcat(info, ", held by ");
+        }
         Strcat(info, mon_nam(u.ustuck));
     }
 

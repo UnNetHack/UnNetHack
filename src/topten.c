@@ -108,19 +108,21 @@ static winid toptenwin = WIN_ERR;
 static void
 topten_print(const char *x)
 {
-    if (toptenwin == WIN_ERR)
+    if (toptenwin == WIN_ERR) {
         raw_print(x);
-    else
+    } else {
         putstr(toptenwin, ATR_NONE, x);
+    }
 }
 
 static void
 topten_print_bold(const char *x)
 {
-    if (toptenwin == WIN_ERR)
+    if (toptenwin == WIN_ERR) {
         raw_print_bold(x);
-    else
+    } else {
         putstr(toptenwin, ATR_BOLD, x);
+    }
 }
 
 static coordxy
@@ -129,12 +131,19 @@ observable_depth(d_level *lev)
 #ifdef RANDOMIZED_PLANES    /* if we ever randomize the order of the elemental planes, we
                                must use a constant external representation in the record file */
     if (In_endgame(lev)) {
-        if (Is_astralevel(lev)) return -5;
-        else if (Is_waterlevel(lev)) return -4;
-        else if (Is_firelevel(lev)) return -3;
-        else if (Is_airlevel(lev)) return -2;
-        else if (Is_earthlevel(lev)) return -1;
-        else return 0;              /* ? */
+        if (Is_astralevel(lev)) {
+            return -5;
+        } else if (Is_waterlevel(lev)) {
+            return -4;
+        } else if (Is_firelevel(lev)) {
+            return -3;
+        } else if (Is_airlevel(lev)) {
+            return -2;
+        } else if (Is_earthlevel(lev)) {
+            return -1;
+        } else {
+            return 0; /* ? */
+        }
     } else
 #endif
     return depth(lev);
@@ -158,15 +167,15 @@ readentry(FILE *rfile, struct toptenentry *tt)
     final_fpos = tt->fpos = ftell(rfile);
 #endif
 #define TTFIELDS 13
-    if(fscanf(rfile, fmt,
+    if (fscanf(rfile, fmt,
               &tt->ver_major, &tt->ver_minor, &tt->patchlevel,
               &tt->points, &tt->deathdnum, &tt->deathlev,
               &tt->maxlvl, &tt->hp, &tt->maxhp, &tt->deaths,
               &tt->deathdate, &tt->birthdate,
-              &tt->uid) != TTFIELDS)
+              &tt->uid) != TTFIELDS) {
 #undef TTFIELDS
         tt->points = 0;
-    else {
+    } else {
         /* Check for backwards compatibility */
         if (tt->ver_major < 3 ||
             (tt->ver_major == 3 && tt->ver_minor < 3)) {
@@ -174,20 +183,23 @@ readentry(FILE *rfile, struct toptenentry *tt)
 
             if (fscanf(rfile, fmt32,
                        tt->plrole, tt->plgend,
-                       tt->name, tt->death) != 4)
+                       tt->name, tt->death) != 4) {
                 tt->points = 0;
+            }
             tt->plrole[1] = '\0';
-            if ((i = str2role(tt->plrole)) >= 0)
+            if ((i = str2role(tt->plrole)) >= 0) {
                 Strcpy(tt->plrole, roles[i].filecode);
+            }
             Strcpy(tt->plrace, "?");
             Strcpy(tt->plgend, (tt->plgend[0] == 'M') ? "Mal" : "Fem");
             Strcpy(tt->plalign, "?");
         } else if (fscanf(rfile, fmt33,
                           tt->plrole, tt->plrace, tt->plgend,
-                          tt->plalign, tt->name, tt->death) != 6)
+                          tt->plalign, tt->name, tt->death) != 6) {
             tt->points = 0;
+        }
 #ifdef NO_SCAN_BRACK
-        if(tt->points > 0) {
+        if (tt->points > 0) {
             nsb_unmung_line(tt->name);
             nsb_unmung_line(tt->death);
         }
@@ -196,8 +208,12 @@ readentry(FILE *rfile, struct toptenentry *tt)
 
     /* check old score entries for Y2K problem and fix whenever found */
     if (tt->points > 0) {
-        if (tt->birthdate < 19000000L) tt->birthdate += 19000000L;
-        if (tt->deathdate < 19000000L) tt->deathdate += 19000000L;
+        if (tt->birthdate < 19000000L) {
+            tt->birthdate += 19000000L;
+        }
+        if (tt->deathdate < 19000000L) {
+            tt->deathdate += 19000000L;
+        }
     }
 }
 
@@ -252,11 +268,12 @@ munge_xlstring(char *dest, char *src, int n)
 {
     int i;
 
-    for(i = 0; i < (n - 1) && src[i] != '\0'; i++) {
-        if(src[i] == SEPC || src[i] == '\n')
+    for (i = 0; i < (n - 1) && src[i] != '\0'; i++) {
+        if (src[i] == SEPC || src[i] == '\n') {
             dest[i] = '_';
-        else
+        } else {
             dest[i] = src[i];
+        }
     }
 
     dest[i] = '\0';
@@ -272,31 +289,60 @@ encode_uevent(void)
     /* game plot events */
     if (u.uevent.minor_oracle ||
         u.uevent.major_oracle) c |= 0x00001UL;      /* any Oracle consultation */
-    if (u.uevent.qcalled) c |= 0x00002UL;           /* reached quest portal level */
+    if (u.uevent.qcalled) {
+        c |= 0x00002UL; /* reached quest portal level */
+    }
     if (quest_status.got_quest ||
         quest_status.got_thanks) c |= 0x00004UL;    /* was accepted for quest */
-    if (u.uevent.qcompleted) c |= 0x00008UL;        /* showed quest arti to leader */
-    if (u.uevent.uopened_dbridge) c |= 0x00010UL;   /* opened/destroyed Castle drawbridge */
-    if (u.uevent.gehennom_entered) c |= 0x00020UL;  /* entered Gehennom the front way */
-    if (u.uevent.udemigod) c |= 0x00040UL;          /* provoked Rodney's wrath */
-    if (u.uevent.invoked) c |= 0x00080UL;           /* did the invocation */
-    if (u.uevent.ascended) c |= 0x00100UL;          /* someone needs to use this variable */
+    if (u.uevent.qcompleted) {
+        c |= 0x00008UL; /* showed quest arti to leader */
+    }
+    if (u.uevent.uopened_dbridge) {
+        c |= 0x00010UL; /* opened/destroyed Castle drawbridge */
+    }
+    if (u.uevent.gehennom_entered) {
+        c |= 0x00020UL; /* entered Gehennom the front way */
+    }
+    if (u.uevent.udemigod) {
+        c |= 0x00040UL; /* provoked Rodney's wrath */
+    }
+    if (u.uevent.invoked) {
+        c |= 0x00080UL; /* did the invocation */
+    }
+    if (u.uevent.ascended) {
+        c |= 0x00100UL; /* someone needs to use this variable */
+    }
 
     /* notable other events */
-    if (u.uevent.uhand_of_elbereth) c |= 0x00200UL; /* was crowned */
+    if (u.uevent.uhand_of_elbereth) {
+        c |= 0x00200UL; /* was crowned */
+    }
 
     /* boss kills */
-    if (quest_status.killed_nemesis) c |= 0x00400UL; /* defeated quest nemesis */
-    if (mvitals[PM_CROESUS].died) c |= 0x00800UL;   /* defeated Croesus */
-    if (mvitals[PM_MEDUSA].died) c |= 0x01000UL;    /* defeated Medusa */
-    if (mvitals[PM_VLAD_THE_IMPALER].
-        died) c |= 0x02000UL;                       /* defeated Vlad */
-    if (mvitals[PM_WIZARD_OF_YENDOR].
-        died) c |= 0x04000UL;                       /* defeated Rodney */
-    if (mvitals[PM_HIGH_PRIEST].died) c |= 0x08000UL; /* defeated a high priest */
-    if (mvitals[PM_ONE_EYED_SAM].
-        died) c |= 0x10000UL;                       /* defeated One-eyed Sam */
-    if (mvitals[PM_CTHULHU].died) c |= 0x20000UL;   /* defeated Cthulhu */
+    if (quest_status.killed_nemesis) {
+        c |= 0x00400UL; /* defeated quest nemesis */
+    }
+    if (mvitals[PM_CROESUS].died) {
+        c |= 0x00800UL; /* defeated Croesus */
+    }
+    if (mvitals[PM_MEDUSA].died) {
+        c |= 0x01000UL; /* defeated Medusa */
+    }
+    if (mvitals[PM_VLAD_THE_IMPALER].died) {
+        c |= 0x02000UL; /* defeated Vlad */
+    }
+    if (mvitals[PM_WIZARD_OF_YENDOR].died) {
+        c |= 0x04000UL; /* defeated Rodney */
+    }
+    if (mvitals[PM_HIGH_PRIEST].died) {
+        c |= 0x08000UL; /* defeated a high priest */
+    }
+    if (mvitals[PM_ONE_EYED_SAM].died) {
+        c |= 0x10000UL; /* defeated One-eyed Sam */
+    }
+    if (mvitals[PM_CTHULHU].died) {
+        c |= 0x20000UL; /* defeated Cthulhu */
+    }
 
     return c;
 }
@@ -308,11 +354,21 @@ encode_carried(void)
 
     /* this encodes important items potentially owned by the player at the
        time of death */
-    if (u.uhave.amulet) c |= 0x0001UL; /* real Amulet of Yendor */
-    if (u.uhave.bell) c |= 0x0002UL;   /* Bell of Opening */
-    if (u.uhave.book) c |= 0x0004UL;   /* Book of the Dead */
-    if (u.uhave.menorah) c |= 0x0008UL; /* Candelabrum of Invocation */
-    if (u.uhave.questart) c |= 0x0010UL; /* own quest artifact */
+    if (u.uhave.amulet) {
+        c |= 0x0001UL; /* real Amulet of Yendor */
+    }
+    if (u.uhave.bell) {
+        c |= 0x0002UL; /* Bell of Opening */
+    }
+    if (u.uhave.book) {
+        c |= 0x0004UL; /* Book of the Dead */
+    }
+    if (u.uhave.menorah) {
+        c |= 0x0008UL; /* Candelabrum of Invocation */
+    }
+    if (u.uhave.questart) {
+        c |= 0x0010UL; /* own quest artifact */
+    }
 
     return c;
 }
@@ -563,8 +619,9 @@ topten(int how)
  * topten uses alloc() several times, which will lead to
  * problems if the panic was the result of an alloc() failure.
  */
-    if (program_state.panicking)
+    if (program_state.panicking) {
         return;
+    }
 
     if (flags.toptenwin) {
         toptenwin = create_nhwindow(NHW_TEXT);
@@ -640,7 +697,7 @@ topten(int how)
 #else
     if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
 #endif
-        if(!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
+        if (!(lfile = fopen_datafile_area(LOGAREA, LOGFILE, "a", SCOREPREFIX))) {
             HUP raw_print("Cannot open log file!");
         } else {
             writeentry(lfile, t0);
@@ -656,7 +713,7 @@ topten(int how)
 #else
     if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
 #endif
-        if(!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
+        if (!(xlfile = fopen_datafile_area(LOGAREA, XLOGFILE, "a", SCOREPREFIX))) {
             HUP raw_print("Cannot open extended log file!");
         } else {
             write_xlentry(xlfile, t0);
@@ -685,11 +742,12 @@ topten(int how)
     }
 
 #ifdef FILE_AREAS
-    if (!lock_file_area(NH_RECORD_AREA, RECORD, 60))
+    if (!lock_file_area(NH_RECORD_AREA, RECORD, 60)) {
 #else
-    if (!lock_file(RECORD, SCOREPREFIX, 60))
+    if (!lock_file(RECORD, SCOREPREFIX, 60)) {
 #endif
         goto destroywin;
+    }
 
 #ifdef UPDATE_RECORD_IN_PLACE
     rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r+", SCOREPREFIX);
@@ -709,20 +767,25 @@ topten(int how)
 #endif
 
     /* assure minimum number of points */
-    if(t0->points < POINTSMIN) t0->points = 0;
+    if (t0->points < POINTSMIN) {
+        t0->points = 0;
+    }
 
     t1 = tt_head = newttentry();
     tprev = 0;
     /* rank0: -1 undefined, 0 not_on_list, n n_th on list */
-    for(rank = 1; ; ) {
+    for (rank = 1; ; ) {
         readentry(rfile, t1);
-        if (t1->points < POINTSMIN) t1->points = 0;
-        if(rank0 < 0 && t1->points < t0->points) {
+        if (t1->points < POINTSMIN) {
+            t1->points = 0;
+        }
+        if (rank0 < 0 && t1->points < t0->points) {
             rank0 = rank++;
-            if(tprev == 0)
+            if (tprev == 0) {
                 tt_head = t0;
-            else
+            } else {
                 tprev->tt_next = t0;
+            }
             t0->tt_next = t1;
 #ifdef UPDATE_RECORD_IN_PLACE
             t0->fpos = t1->fpos; /* insert here */
@@ -730,10 +793,14 @@ topten(int how)
             t0_used = TRUE;
             occ_cnt--;
             flg++;  /* ask for a rewrite */
-        } else tprev = t1;
+        } else {
+            tprev = t1;
+        }
 
-        if(t1->points == 0) break;
-        if(
+        if (t1->points == 0) {
+            break;
+        }
+        if (
 #ifdef PERS_IS_UID
             t1->uid == t0->uid &&
 #else
@@ -741,7 +808,7 @@ topten(int how)
 #endif
             !strncmp(t1->plrole, t0->plrole, ROLESZ) &&
             --occ_cnt <= 0) {
-            if(rank0 < 0) {
+            if (rank0 < 0) {
                 rank0 = 0;
                 rank1 = rank;
                 HUP {
@@ -757,38 +824,39 @@ topten(int how)
 #endif
                 }
             }
-            if(occ_cnt < 0) {
+            if (occ_cnt < 0) {
                 flg++;
                 continue;
             }
         }
-        if(rank <= ENTRYMAX) {
+        if (rank <= ENTRYMAX) {
             t1->tt_next = newttentry();
             t1 = t1->tt_next;
             rank++;
         }
-        if(rank > ENTRYMAX) {
+        if (rank > ENTRYMAX) {
             t1->points = 0;
             break;
         }
     }
-    if(flg) {   /* rewrite record file */
+    if (flg) {   /* rewrite record file */
 #ifdef UPDATE_RECORD_IN_PLACE
         (void) fseek(rfile, (t0->fpos >= 0 ?
                              t0->fpos : final_fpos), SEEK_SET);
 #else
         (void) fclose(rfile);
-        if(!(rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "w", SCOREPREFIX))) {
+        if (!(rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "w", SCOREPREFIX))) {
             HUP raw_print("Cannot write record file");
             unlock_file_area(NH_RECORD_AREA, RECORD);
             free_ttlist(tt_head);
             goto destroywin;
         }
 #endif  /* UPDATE_RECORD_IN_PLACE */
-        if(rank0 > 0) {
-            if(rank0 <= 10) {
-                if(!done_stopprint)
+        if (rank0 > 0) {
+            if (rank0 <= 10) {
+                if (!done_stopprint) {
                     topten_print("You made the top ten list!");
+                }
 #ifdef DUMP_LOG
                 dump("", "You made the top ten list!");
 #endif
@@ -797,12 +865,16 @@ topten(int how)
                 Sprintf(pbuf,
                         "You reached the %d%s place on the top %d list.",
                         rank0, ordin(rank0), ENTRYMAX);
-                if(!done_stopprint) topten_print(pbuf);
+                if (!done_stopprint) {
+                    topten_print(pbuf);
+                }
 #ifdef DUMP_LOG
                 dump("", pbuf);
 #endif
             }
-            if(!done_stopprint) topten_print("");
+            if (!done_stopprint) {
+                topten_print("");
+            }
 #ifdef DUMP_LOG
             dump("", "");
 #endif
@@ -811,12 +883,18 @@ topten(int how)
 #ifdef DUMP_LOG
     dump_html("<pre>", "");
 #endif
-    if(rank0 == 0) rank0 = rank1;
-    if(rank0 <= 0) rank0 = rank;
-    if(!done_stopprint) outheader();
+    if (rank0 == 0) {
+        rank0 = rank1;
+    }
+    if (rank0 <= 0) {
+        rank0 = rank;
+    }
+    if (!done_stopprint) {
+        outheader();
+    }
     t1 = tt_head;
-    for(rank = 1; t1->points != 0; rank++, t1 = t1->tt_next) {
-        if(flg
+    for (rank = 1; t1->points != 0; rank++, t1 = t1->tt_next) {
+        if (flg
 #ifdef UPDATE_RECORD_IN_PLACE
            && rank >= rank0
 #endif
@@ -835,22 +913,27 @@ topten(int how)
         if (rank == rank0 - flags.end_around &&
             rank0 > flags.end_top + flags.end_around + 1 &&
             !flags.end_own) {
-            if(!done_stopprint) topten_print("");
+            if (!done_stopprint) {
+                topten_print("");
+            }
 #ifdef DUMP_LOG
             dump("", "");
 #endif
         }
-        if(rank != rank0)
+        if (rank != rank0) {
             outentry(rank, t1, FALSE);
-        else if(!rank1)
+        } else if (!rank1) {
             outentry(rank, t1, TRUE);
-        else {
+        } else {
             outentry(rank, t1, TRUE);
             outentry(0, t0, TRUE);
         }
     }
-    if(rank0 >= rank) if(!done_stopprint)
+    if (rank0 >= rank) {
+        if (!done_stopprint) {
             outentry(0, t0, TRUE);
+        }
+    }
 #ifdef DUMP_LOG
     dump_html("</pre>", "");
 #endif
@@ -880,9 +963,13 @@ topten(int how)
     free_ttlist(tt_head);
 
 showwin:
-    if (flags.toptenwin && !done_stopprint) display_nhwindow(toptenwin, 1);
+    if (flags.toptenwin && !done_stopprint) {
+        display_nhwindow(toptenwin, 1);
+    }
 destroywin:
-    if (!t0_used) dealloc_ttentry(t0);
+    if (!t0_used) {
+        dealloc_ttentry(t0);
+    }
     if (flags.toptenwin) {
         destroy_nhwindow(toptenwin);
         toptenwin=WIN_ERR;
@@ -897,9 +984,13 @@ outheader(void)
 
     Strcpy(linebuf, " No  Points     Name");
     bp = eos(linebuf);
-    while(bp < linebuf + COLNO - 9) *bp++ = ' ';
+    while (bp < linebuf + COLNO - 9) {
+        *bp++ = ' ';
+    }
     Strcpy(bp, "Hp [max]");
-    if(!done_stopprint) topten_print(linebuf);
+    if (!done_stopprint) {
+        topten_print(linebuf);
+    }
 #ifdef DUMP_LOG
     dump("", linebuf);
 #endif
@@ -917,22 +1008,27 @@ outentry(int rank, struct toptenentry *t1, boolean so)
 
 
     linebuf[0] = '\0';
-    if (rank) Sprintf(eos(linebuf), "%3d", rank);
-    else Strcat(linebuf, "   ");
+    if (rank) {
+        Sprintf(eos(linebuf), "%3d", rank);
+    } else {
+        Strcat(linebuf, "   ");
+    }
 
     Sprintf(eos(linebuf), " %10ld  %.10s", t1->points, t1->name);
     Sprintf(eos(linebuf), "-%s", t1->plrole);
-    if (t1->plrace[0] != '?')
+    if (t1->plrace[0] != '?') {
         Sprintf(eos(linebuf), "-%s", t1->plrace);
+    }
     /* Printing of gender and alignment is intentional.  It has been
      * part of the NetHack Geek Code, and illustrates a proper way to
      * specify a character from the command line.
      */
     Sprintf(eos(linebuf), "-%s", t1->plgend);
-    if (t1->plalign[0] != '?')
+    if (t1->plalign[0] != '?') {
         Sprintf(eos(linebuf), "-%s ", t1->plalign);
-    else
+    } else {
         Strcat(linebuf, " ");
+    }
 #ifdef ASTRAL_ESCAPE
     if (!strncmp("defied", t1->death, 6)) {
         Sprintf(eos(linebuf), "defied the Gods and escaped the dungeon %s",
@@ -944,8 +1040,9 @@ outentry(int rank, struct toptenentry *t1, boolean so)
                 !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
                 t1->maxlvl);
         /* fixup for closing paren in "escaped... with...Amulet)[max..." */
-        if ((bp = index(linebuf, ')')) != 0)
+        if ((bp = index(linebuf, ')')) != 0) {
             *bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
+        }
         second_line = FALSE;
     } else if (!strncmp("ascended ", t1->death, 9)) {
         Strcat(linebuf, "the ");
@@ -973,7 +1070,9 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             Strcat(linebuf, "was crushed to death");
         } else if (!strncmp(t1->death, "petrified by ", 13)) {
             Strcat(linebuf, "turned to stone");
-        } else Strcat(linebuf, "died");
+        } else {
+            Strcat(linebuf, "died");
+        }
 
         if (t1->deathdnum == astral_level.dnum) {
             const char *arg, *fmt = " on the Plane of %s";
@@ -996,33 +1095,41 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             Sprintf(eos(linebuf), fmt, arg);
         } else {
             Sprintf(eos(linebuf), " in %s", dungeons[t1->deathdnum].dname);
-            if (t1->deathdnum != knox_level.dnum)
+            if (t1->deathdnum != knox_level.dnum) {
                 Sprintf(eos(linebuf), " on level %d", t1->deathlev);
-            if (t1->deathlev != t1->maxlvl)
+            }
+            if (t1->deathlev != t1->maxlvl) {
                 Sprintf(eos(linebuf), " [max %d]", t1->maxlvl);
+            }
         }
 
         /* kludge for "quit while already on Charon's boat" */
         /* and "quit after breaking pacifism conduct"   */
-        if (!strncmp(t1->death, "quit ", 5))
+        if (!strncmp(t1->death, "quit ", 5)) {
             Strcat(linebuf, t1->death + 4);
+        }
     }
     Strcat(linebuf, ".");
 
     /* Quit, starved, ascended, and escaped contain no second line */
-    if (second_line)
+    if (second_line) {
         Sprintf(eos(linebuf), "  %c%s.", highc(*(t1->death)), t1->death+1);
+    }
 
     lngr = (int)strlen(linebuf);
-    if (t1->hp <= 0) hpbuf[0] = '-', hpbuf[1] = '\0';
-    else Sprintf(hpbuf, "%d", t1->hp);
+    if (t1->hp <= 0) {
+        hpbuf[0] = '-', hpbuf[1] = '\0';
+    } else {
+        Sprintf(hpbuf, "%d", t1->hp);
+    }
     /* beginning of hp column after padding (not actually padded yet) */
     hppos = COLNO - (sizeof("  Hp [max]")-1); /* sizeof(str) includes \0 */
     while (lngr >= hppos) {
-        for(bp = eos(linebuf);
+        for (bp = eos(linebuf);
             !(*bp == ' ' && (bp-linebuf < hppos));
-            bp--)
+            bp--) {
             ;
+        }
         /* check for un-wrappable word */
         if (linebuf+15 == bp) {
             bp += hppos-15;
@@ -1030,7 +1137,9 @@ outentry(int rank, struct toptenentry *t1, boolean so)
         }
         /* special case: if about to wrap in the middle of maximum
            dungeon depth reached, wrap in front of it instead */
-        if (bp > linebuf + 5 && !strncmp(bp - 5, " [max", 5)) bp -= 5;
+        if (bp > linebuf + 5 && !strncmp(bp - 5, " [max", 5)) {
+            bp -= 5;
+        }
         if (nospacefound) {
             /* word wrap in the middle of a long word */
             Strcpy(linebuf3, bp);
@@ -1043,12 +1152,16 @@ outentry(int rank, struct toptenentry *t1, boolean so)
         if (so) {
             while (bp < linebuf + (COLNO-1)) *bp++ = ' ';
             *bp = 0;
-            if(!done_stopprint) topten_print_bold(linebuf);
+            if (!done_stopprint) {
+                topten_print_bold(linebuf);
+            }
 #ifdef DUMP_LOG
             dump("*", linebuf[0]==' ' ? linebuf+1 : linebuf);
 #endif
         } else {
-            if(!done_stopprint) topten_print(linebuf);
+            if (!done_stopprint) {
+                topten_print(linebuf);
+            }
 #ifdef DUMP_LOG
             dump(" ", linebuf[0]==' ' ? linebuf+1 : linebuf);
 #endif
@@ -1071,12 +1184,19 @@ outentry(int rank, struct toptenentry *t1, boolean so)
 
     if (so) {
         bp = eos(linebuf);
-        if (so >= COLNO) so = COLNO-1;
+        if (so >= COLNO) {
+            so = COLNO-1;
+        }
         while (bp < linebuf + so) *bp++ = ' ';
         *bp = 0;
-        if(!done_stopprint) topten_print_bold(linebuf);
-    } else
-    if(!done_stopprint) topten_print(linebuf);
+        if (!done_stopprint) {
+            topten_print_bold(linebuf);
+        }
+    } else {
+    if (!done_stopprint) {
+        topten_print(linebuf);
+    }
+    }
 #ifdef DUMP_LOG
     dump(" ", linebuf[0]==' ' ? linebuf+1 : linebuf);
 #endif
@@ -1093,8 +1213,9 @@ score_wanted(boolean current_ver, int rank, struct toptenentry *t1, int playerct
         return 0;
 
 #ifdef PERS_IS_UID
-    if (!playerct && t1->uid == uid)
+    if (!playerct && t1->uid == uid) {
         return 1;
+    }
 #else
     nhUse(uid);
 #endif
@@ -1125,11 +1246,21 @@ encode_xlogflags(void)
 {
     long e = 0L;
 
-    if (wizard) e |= 0x001L;              /* wizard mode */
-    if (discover) e |= 0x002L;            /* explore mode */
-    if (killer_flags & 0x1) e |= 0x004L;  /* died, (with the Amulet) */
-    if (killer_flags & 0x2) e |= 0x008L;  /* died, (in celestial disgrace) */
-    if (killer_flags & 0x4) e |= 0x010L;  /* died, (with a fake Amulet) */
+    if (wizard) {
+        e |= 0x001L; /* wizard mode */
+    }
+    if (discover) {
+        e |= 0x002L; /* explore mode */
+    }
+    if (killer_flags & 0x1) {
+        e |= 0x004L; /* died, (with the Amulet) */
+    }
+    if (killer_flags & 0x2) {
+        e |= 0x008L; /* died, (in celestial disgrace) */
+    }
+    if (killer_flags & 0x4) {
+        e |= 0x010L; /* died, (with a fake Amulet) */
+    }
 
     return e;
 }
@@ -1140,18 +1271,42 @@ encodeconduct(void)
 {
     long e = 0L;
 
-    if(!u.uconduct.food) e |= 0x001L;
-    if(!u.uconduct.unvegan) e |= 0x002L;
-    if(!u.uconduct.unvegetarian) e |= 0x004L;
-    if(!u.uconduct.gnostic) e |= 0x008L;
-    if(!u.uconduct.weaphit) e |= 0x010L;
-    if(!u.uconduct.killer) e |= 0x020L;
-    if(!u.uconduct.literate) e |= 0x040L;
-    if(!u.uconduct.polypiles) e |= 0x080L;
-    if(!u.uconduct.polyselfs) e |= 0x100L;
-    if(!u.uconduct.wishes) e |= 0x200L;
-    if(!u.uconduct.wisharti) e |= 0x400L;
-    if(!num_genocides()) e |= 0x800L;
+    if (!u.uconduct.food) {
+        e |= 0x001L;
+    }
+    if (!u.uconduct.unvegan) {
+        e |= 0x002L;
+    }
+    if (!u.uconduct.unvegetarian) {
+        e |= 0x004L;
+    }
+    if (!u.uconduct.gnostic) {
+        e |= 0x008L;
+    }
+    if (!u.uconduct.weaphit) {
+        e |= 0x010L;
+    }
+    if (!u.uconduct.killer) {
+        e |= 0x020L;
+    }
+    if (!u.uconduct.literate) {
+        e |= 0x040L;
+    }
+    if (!u.uconduct.polypiles) {
+        e |= 0x080L;
+    }
+    if (!u.uconduct.polyselfs) {
+        e |= 0x100L;
+    }
+    if (!u.uconduct.wishes) {
+        e |= 0x200L;
+    }
+    if (!u.uconduct.wisharti) {
+        e |= 0x400L;
+    }
+    if (!num_genocides()) {
+        e |= 0x800L;
+    }
 
     return e;
 }
@@ -1181,18 +1336,42 @@ encodeachieve(void)
 
     r = 0;
 
-    if(achieve.get_bell) r |= 1L << 0;
-    if(achieve.enter_gehennom) r |= 1L << 1;
-    if(achieve.get_candelabrum) r |= 1L << 2;
-    if(achieve.get_book) r |= 1L << 3;
-    if(achieve.perform_invocation) r |= 1L << 4;
-    if(achieve.get_amulet) r |= 1L << 5;
-    if(In_endgame(&u.uz)) r |= 1L << 6;
-    if(Is_astralevel(&u.uz)) r |= 1L << 7;
-    if(achieve.ascended) r |= 1L << 8;
-    if(achieve.get_luckstone) r |= 1L << 9;
-    if(achieve.finish_sokoban) r |= 1L << 10;
-    if(achieve.killed_medusa) r |= 1L << 11;
+    if (achieve.get_bell) {
+        r |= 1L << 0;
+    }
+    if (achieve.enter_gehennom) {
+        r |= 1L << 1;
+    }
+    if (achieve.get_candelabrum) {
+        r |= 1L << 2;
+    }
+    if (achieve.get_book) {
+        r |= 1L << 3;
+    }
+    if (achieve.perform_invocation) {
+        r |= 1L << 4;
+    }
+    if (achieve.get_amulet) {
+        r |= 1L << 5;
+    }
+    if (In_endgame(&u.uz)) {
+        r |= 1L << 6;
+    }
+    if (Is_astralevel(&u.uz)) {
+        r |= 1L << 7;
+    }
+    if (achieve.ascended) {
+        r |= 1L << 8;
+    }
+    if (achieve.get_luckstone) {
+        r |= 1L << 9;
+    }
+    if (achieve.finish_sokoban) {
+        r |= 1L << 10;
+    }
+    if (achieve.killed_medusa) {
+        r |= 1L << 11;
+    }
 
     return r;
 }
@@ -1207,14 +1386,20 @@ killed_uniques(void)
     int i;
     for (i = LOW_PM; i < NUMMONS; i++) {
         if ((mons[i].geno & G_UNIQ) && mvitals[i].died) {
-            if (i == PM_LONG_WORM_TAIL) continue;
-            if (i == PM_HIGH_PRIEST) continue;
+            if (i == PM_LONG_WORM_TAIL) {
+                continue;
+            }
+            if (i == PM_HIGH_PRIEST) {
+                continue;
+            }
             Sprintf(eos(_killed_uniques), "%s,", mons[i].mname);
         }
     }
 
     int len;
-    if ((len=strlen(_killed_uniques))) { _killed_uniques[len-1] = '\0'; }
+    if ((len=strlen(_killed_uniques))) {
+        _killed_uniques[len-1] = '\0';
+    }
 
     return _killed_uniques;
 }
@@ -1270,7 +1455,9 @@ prscore(int argc, char **argv)
     if (!argv[1][2]) {   /* plain "-s" */
         argc--;
         argv++;
-    } else argv[1] += 2;
+    } else {
+        argv[1] += 2;
+    }
 
     if (argc > 1 && !strcmp(argv[1], "-v")) {
         current_ver = FALSE;
@@ -1285,12 +1472,13 @@ prscore(int argc, char **argv)
         players = (const char **)0;
 #else
         player0 = plname;
-        if (!*player0)
+        if (!*player0) {
 # ifdef AMIGA
             player0 = "all";    /* single user system */
 # else
             player0 = "hackplayer";
 # endif
+        }
         playerct = 1;
         players = &player0;
 #endif
@@ -1303,7 +1491,9 @@ prscore(int argc, char **argv)
     t1 = tt_head = newttentry();
     for (rank = 1; ; rank++) {
         readentry(rfile, t1);
-        if (t1->points == 0) break;
+        if (t1->points == 0) {
+            break;
+        }
         if (!match_found &&
             score_wanted(current_ver, rank, t1, playerct, players, uid))
             match_found = TRUE;
@@ -1321,20 +1511,27 @@ prscore(int argc, char **argv)
         outheader();
         t1 = tt_head;
         for (rank = 1; t1->points != 0; rank++, t1 = t1->tt_next) {
-            if (score_wanted(current_ver, rank, t1, playerct, players, uid))
+            if (score_wanted(current_ver, rank, t1, playerct, players, uid)) {
                 (void) outentry(rank, t1, 0);
+            }
         }
     } else {
         Sprintf(pbuf, "Cannot find any %sentries for ",
                 current_ver ? "current " : "");
-        if (playerct < 1) Strcat(pbuf, "you.");
-        else {
-            if (playerct > 1) Strcat(pbuf, "any of ");
+        if (playerct < 1) {
+            Strcat(pbuf, "you.");
+        } else {
+            if (playerct > 1) {
+                Strcat(pbuf, "any of ");
+            }
             for (i = 0; i < playerct; i++) {
                 /* stop printing players if there are too many to fit */
                 if (strlen(pbuf) + strlen(players[i]) + 2 >= BUFSZ) {
-                    if (strlen(pbuf) < BUFSZ-4) Strcat(pbuf, "...");
-                    else Strcpy(pbuf+strlen(pbuf)-4, "...");
+                    if (strlen(pbuf) < BUFSZ-4) {
+                        Strcat(pbuf, "...");
+                    } else {
+                        Strcpy(pbuf+strlen(pbuf)-4, "...");
+                    }
                     break;
                 }
                 Strcat(pbuf, players[i]);
@@ -1369,17 +1566,21 @@ classmon(char *plch, boolean fem)
     int i;
 
     /* Look for this role in the role table */
-    for (i = 0; roles[i].name.m; i++)
+    for (i = 0; roles[i].name.m; i++) {
         if (!strncmp(plch, roles[i].filecode, ROLESZ)) {
-            if (fem && roles[i].femalenum != NON_PM)
+            if (fem && roles[i].femalenum != NON_PM) {
                 return roles[i].femalenum;
-            else if (roles[i].malenum != NON_PM)
+            } else if (roles[i].malenum != NON_PM) {
                 return roles[i].malenum;
-            else
+            } else {
                 return PM_HUMAN;
+            }
         }
+    }
     /* this might be from a 3.2.x score for former Elf class */
-    if (!strcmp(plch, "E")) return PM_RANGER;
+    if (!strcmp(plch, "E")) {
+        return PM_RANGER;
+    }
 
     warning("What weird role is this? (%s)", plch);
     return (PM_HUMAN_MUMMY);
@@ -1398,7 +1599,9 @@ tt_oname(struct obj *otmp)
     FILE *rfile;
     struct toptenentry tt_buf;
 
-    if (!otmp) return((struct obj *) 0);
+    if (!otmp) {
+        return (struct obj *) 0;
+    }
 
     rfile = fopen_datafile_area(NH_RECORD_AREA, RECORD, "r", SCOREPREFIX);
     if (!rfile) {
@@ -1409,13 +1612,15 @@ tt_oname(struct obj *otmp)
     tt = &tt_buf;
     rank = rnd(10);
 pickentry:
-    for(i = rank; i; i--) {
+    for (i = rank; i; i--) {
         readentry(rfile, tt);
-        if(tt->points == 0) break;
+        if (tt->points == 0) {
+            break;
+        }
     }
 
-    if(tt->points == 0) {
-        if(rank > 1) {
+    if (tt->points == 0) {
+        if (rank > 1) {
             rank = 1;
             rewind(rfile);
             goto pickentry;
@@ -1423,11 +1628,15 @@ pickentry:
         otmp = (struct obj *) 0;
     } else {
         /* reset timer in case corpse started out as lizard or troll */
-        if (otmp->otyp == CORPSE) obj_stop_timers(otmp);
+        if (otmp->otyp == CORPSE) {
+            obj_stop_timers(otmp);
+        }
         otmp->corpsenm = classmon(tt->plrole, (tt->plgend[0] == 'F'));
         otmp->owt = weight(otmp);
         otmp = oname(otmp, tt->name);
-        if (otmp->otyp == CORPSE) start_corpse_timeout(otmp);
+        if (otmp->otyp == CORPSE) {
+            start_corpse_timeout(otmp);
+        }
     }
 
     (void) fclose(rfile);

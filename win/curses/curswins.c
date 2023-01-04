@@ -107,10 +107,11 @@ curses_create_window(int width, int height, orient orientation)
         starty = height - mapy - 1 - mapb_offset;
         break;
     case LEFT:
-        if (map_border && (width < term_cols))
+        if (map_border && (width < term_cols)) {
             startx = 1;
-        else
+        } else {
             startx = 0;
+        }
         starty = term_rows - height;
         break;
     case RIGHT:
@@ -523,13 +524,16 @@ curses_alert_win_border(winid wid, boolean onoff)
 {
     WINDOW *win = curses_get_nhwin(wid);
 
-    if (!win || !curses_window_has_border(wid))
+    if (!win || !curses_window_has_border(wid)) {
         return;
-    if (onoff)
+    }
+    if (onoff) {
         curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, ON);
+    }
     box(win, 0, 0);
-    if (onoff)
+    if (onoff) {
         curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, OFF);
+    }
     wnoutrefresh(win);
 }
 
@@ -560,7 +564,7 @@ wpututf8char(WINDOW *win, int y, int x, glyph_t c)
 {
     if (c < 0x80) {
         return mvwprintw(win, y, x, "%c", c);
-    } else if(c < 0x800) {
+    } else if (c < 0x800) {
         return mvwprintw(win, y, x, "%c%c",
                          0xC0 | (c >> 6),
                          0x80 | (c & 0x3F));

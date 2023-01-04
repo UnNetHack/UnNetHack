@@ -59,7 +59,7 @@ boolean
 comp_times(filetime)
 long filetime;
 {
-    return((boolean)(filetime < BUILD_TIME));
+    return (boolean)(filetime < BUILD_TIME);
 }
 #endif
 
@@ -74,8 +74,9 @@ check_version(struct version_info *version_data, const char *filename, boolean c
         version_data->incarnation != VERSION_NUMBER
 #endif
         ) {
-        if (complain)
+        if (complain) {
             pline("Version mismatch for file \"%s\".", filename);
+        }
         return FALSE;
     } else if (
 #ifndef IGNORED_FEATURES
@@ -86,9 +87,10 @@ check_version(struct version_info *version_data, const char *filename, boolean c
 #endif
         version_data->entity_count != VERSION_SANITY1 ||
         version_data->struct_sizes != VERSION_SANITY2) {
-        if (complain)
+        if (complain) {
             pline("Configuration incompatibility for file \"%s\".",
                   filename);
+        }
         return FALSE;
     }
     return TRUE;
@@ -113,7 +115,9 @@ uptodate(int fd, const char *name)
         return FALSE;
     }
     if (!check_version(&vers_info, name, verbose)) {
-        if (verbose) wait_synch();
+        if (verbose) {
+            wait_synch();
+        }
         return FALSE;
     }
     return TRUE;
@@ -146,7 +150,9 @@ get_feature_notice_ver(char *str)
     char *istr[3];
     int j = 0;
 
-    if (!str) return 0L;
+    if (!str) {
+        return 0L;
+    }
     str = strcpy(buf, str);
     istr[j] = str;
     while (*str) {
@@ -154,13 +160,18 @@ get_feature_notice_ver(char *str)
             *str++ = '\0';
             j++;
             istr[j] = str;
-            if (j == 2) break;
+            if (j == 2) {
+                break;
+            }
         } else if (index("0123456789", *str) != 0) {
             str++;
-        } else
+        } else {
             return 0L;
+        }
     }
-    if (j != 2) return 0L;
+    if (j != 2) {
+        return 0L;
+    }
     ver_maj = atoi(istr[0]);
     ver_min = atoi(istr[1]);
     patch = atoi(istr[2]);

@@ -216,7 +216,9 @@ fname_encode(const char *legal, char quotechar, char *s, char *callerbuf, int bu
 
     while (*sp) {
         /* Do we have room for one more character or encoding? */
-        if ((bufsz - cnt) <= 4) return callerbuf;
+        if ((bufsz - cnt) <= 4) {
+            return callerbuf;
+        }
 
         if (*sp == quotechar) {
             (void)sprintf(op, "%c%02X", quotechar, *sp);
@@ -259,15 +261,29 @@ fname_decode(char quotechar, char *s, char *callerbuf, int bufsz)
 
     while (*sp) {
         /* Do we have room for one more character? */
-        if ((bufsz - cnt) <= 2) return callerbuf;
+        if ((bufsz - cnt) <= 2) {
+            return callerbuf;
+        }
         if (*sp == quotechar) {
             sp++;
-            for (k=0; k < 16; ++k) if (*sp == hexdigits[k]) break;
-            if (k >= 16) return callerbuf;  /* impossible, so bail */
+            for (k=0; k < 16; ++k) {
+                if (*sp == hexdigits[k]) {
+                    break;
+                }
+            }
+            if (k >= 16) {
+                return callerbuf; /* impossible, so bail */
+            }
             calc = k << 4;
             sp++;
-            for (k=0; k < 16; ++k) if (*sp == hexdigits[k]) break;
-            if (k >= 16) return callerbuf;  /* impossible, so bail */
+            for (k=0; k < 16; ++k) {
+                if (*sp == hexdigits[k]) {
+                    break;
+                }
+            }
+            if (k >= 16) {
+                return callerbuf; /* impossible, so bail */
+            }
             calc += k;
             sp++;
             *op++ = calc;
@@ -292,10 +308,12 @@ fqname(const char *basename, int whichprefix, int buffnum)
     nhUse(buffnum);
     return basename;
 #else
-    if (!basename || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
+    if (!basename || whichprefix < 0 || whichprefix >= PREFIX_COUNT) {
         return basename;
-    if (!fqn_prefix[whichprefix])
+    }
+    if (!fqn_prefix[whichprefix]) {
         return basename;
+    }
     if (buffnum < 0 || buffnum >= FQN_NUMBUF) {
         impossible("Invalid fqn_filename_buffer specified: %d",
                    buffnum);
@@ -324,36 +342,48 @@ validate_prefix_locations(char *reasonbuf)
     int prefcnt, failcount = 0;
     char panicbuf1[BUFSZ], panicbuf2[BUFSZ], *details;
 
-    if (reasonbuf) reasonbuf[0] = '\0';
+    if (reasonbuf) {
+        reasonbuf[0] = '\0';
+    }
     for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
         /* don't test writing to configdir or datadir; they're readonly */
-        if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
+        if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) {
+            continue;
+        }
         filename = fqname("validate", prefcnt, 3);
         if ((fp = fopen(filename, "w"))) {
             fclose(fp);
             (void) unlink(filename);
         } else {
             if (reasonbuf) {
-                if (failcount) Strcat(reasonbuf, ", ");
+                if (failcount) {
+                    Strcat(reasonbuf, ", ");
+                }
                 Strcat(reasonbuf, fqn_prefix_names[prefcnt]);
             }
             /* the paniclog entry gets the value of errno as well */
             Sprintf(panicbuf1, "Invalid %s", fqn_prefix_names[prefcnt]);
 #if defined (NHSTDC) && !defined(NOTSTDC)
-            if (!(details = strerror(errno)))
+            if (!(details = strerror(errno))) {
 #endif
             details = "";
+#if defined (NHSTDC) && !defined(NOTSTDC)
+            }
+#endif
             Sprintf(panicbuf2, "\"%s\", (%d) %s",
                     fqn_prefix[prefcnt], errno, details);
             paniclog(panicbuf1, panicbuf2);
             failcount++;
         }
     }
-    if (failcount)
+    if (failcount) {
         return 0;
-    else
-#endif
+    } else {
+        return 1;
+    }
+#else
     return 1;
+#endif
 }
 
 /* fopen a file, with OS-dependent bells and whistles */
@@ -368,8 +398,9 @@ fopen_datafile(const char *filename, const char *mode, int prefix)
     {
         char tmp[BUFSIZ];
 
-        if (!index(filename, '.') && !index(filename, ';'))
+        if (!index(filename, '.') && !index(filename, ';')) {
             filename = strcat(strcpy(tmp, filename), ";0");
+        }
         fp = fopen(filename, mode, "mbc=16");
     }
 #else
@@ -417,7 +448,9 @@ set_levelfile_name(char *file, int lev)
     char *tf;
 
     tf = rindex(file, '.');
-    if (!tf) tf = eos(file);
+    if (!tf) {
+        tf = eos(file);
+    }
     Sprintf(tf, ".%d", lev);
 #ifdef VMS
     Strcat(tf, ";1");
@@ -433,7 +466,9 @@ create_levelfile(int lev, char *errbuf)
     const char *fq_lock;
 #endif
 
-    if (errbuf) *errbuf = '\0';
+    if (errbuf) {
+        *errbuf = '\0';
+    }
     set_levelfile_name(lock, lev);
 #ifndef FILE_AREAS
     fq_lock = fqname(lock, LEVELPREFIX, 0);
@@ -448,12 +483,15 @@ create_levelfile(int lev, char *errbuf)
                    O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 # else
 #  ifdef HOLD_LOCKFILE_OPEN
-    if (lev == 0)
+    if (lev == 0) {
         fd = open_levelfile_exclusively(fq_lock, lev,
                                         O_WRONLY |O_CREAT | O_TRUNC | O_BINARY);
-    else
+    } else {
 #  endif
     fd = open(fq_lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+#  ifdef HOLD_LOCKFILE_OPEN
+    }
+#  endif
 # endif
 #else   /* MICRO */
 # ifdef FILE_AREAS
@@ -467,12 +505,13 @@ create_levelfile(int lev, char *errbuf)
 # endif /* FILE_AREAS */
 #endif /* MICRO || WIN32 */
 
-    if (fd >= 0)
+    if (fd >= 0) {
         level_info[lev].flags |= LFILE_EXISTS;
-    else if (errbuf)    /* failure explanation */
+    } else if (errbuf) { /* failure explanation */
         Sprintf(errbuf,
                 "Cannot create file \"%s\" for level %d (errno %d).",
                 lock, lev, errno);
+    }
 
     return fd;
 }
@@ -486,15 +525,18 @@ open_levelfile(int lev, char *errbuf)
     const char *fq_lock;
 #endif
 
-    if (errbuf) *errbuf = '\0';
+    if (errbuf) {
+        *errbuf = '\0';
+    }
     set_levelfile_name(lock, lev);
 #ifndef FILE_AREAS
     fq_lock = fqname(lock, LEVELPREFIX, 0);
 #endif
 #ifdef MFLOPPY
     /* If not currently accessible, swap it in. */
-    if (level_info[lev].where != ACTIVE)
+    if (level_info[lev].where != ACTIVE) {
         swapin_file(lev);
+    }
 #endif
 #ifdef FILE_AREAS
     fd = open_area(FILE_AREA_LEVL, lock, O_RDONLY | O_BINARY, 0);
@@ -503,21 +545,25 @@ open_levelfile(int lev, char *errbuf)
     fd = macopen(fq_lock, O_RDONLY | O_BINARY, LEVL_TYPE);
 # else
 #  ifdef HOLD_LOCKFILE_OPEN
-    if (lev == 0)
+    if (lev == 0) {
         fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY );
-    else
+    } else {
 #  endif
     fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
+#  ifdef HOLD_LOCKFILE_OPEN
+    }
+#  endif
 # endif
 #endif  /* FILE_AREAS */
 
     /* for failure, return an explanation that our caller can use;
        settle for `lock' instead of `fq_lock' because the latter
        might end up being too big for nethack's BUFSZ */
-    if (fd < 0 && errbuf)
+    if (fd < 0 && errbuf) {
         Sprintf(errbuf,
                 "Cannot open file \"%s\" for level %d (errno %d).",
                 lock, lev, errno);
+    }
 
     return fd;
 }
@@ -536,7 +582,9 @@ delete_levelfile(int lev)
         (void) remove_area(FILE_AREA_LEVL, lock);
 #else
 # ifdef HOLD_LOCKFILE_OPEN
-        if (lev == 0) really_close();
+        if (lev == 0) {
+            really_close();
+        }
 # endif
         (void) unlink(fqname(lock, LEVELPREFIX, 0));
 #endif
@@ -550,8 +598,9 @@ clearlocks(void)
 {
 #if !defined(PC_LOCKING) && defined(MFLOPPY) && !defined(AMIGA)
     eraseall(levels, alllevels);
-    if (ramdisk)
+    if (ramdisk) {
         eraseall(permbones, alllevels);
+    }
 #else
     int x;
 
@@ -559,8 +608,9 @@ clearlocks(void)
     (void) signal(SIGHUP, SIG_IGN);
 # endif
     /* can't access maxledgerno() before dungeons are created -dlc */
-    for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--)
+    for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--) {
         delete_levelfile(x);    /* not all levels need be present */
+    }
 #endif
 #ifdef WHEREIS_FILE
     delete_whereis();
@@ -583,8 +633,9 @@ int lev, oflag;
         if (lftrack.oflag == oflag) {
             fd = lftrack.fd;
             reslt = lseek(fd, 0L, SEEK_SET);
-            if (reslt == -1L)
+            if (reslt == -1L) {
                 panic("open_levelfile_exclusively: lseek failed %d", errno);
+            }
             lftrack.nethack_thinks_it_is_open = TRUE;
         } else {
             really_close();
@@ -597,8 +648,9 @@ int lev, oflag;
         fd = sopen(name, oflag, SH_DENYRW, FCMASK);
         lftrack.fd = fd;
         lftrack.oflag = oflag;
-        if (fd >= 0)
+        if (fd >= 0) {
             lftrack.nethack_thinks_it_is_open = TRUE;
+        }
     }
     return fd;
 }
@@ -665,7 +717,9 @@ write_whereis(
 {
     FILE* fp;
     char whereis_work[511];
-    if (strstr(whereis_file, "%n")) set_whereisfile();
+    if (strstr(whereis_file, "%n")) {
+        set_whereisfile();
+    }
     Sprintf(whereis_work,
             "player=%s:depth=%d:dnum=%d:dname=%s:hp=%d:maxhp=%d:turns=%ld:score=%ld:role=%s:race=%s:gender=%s:align=%s:conduct=0x%lx:amulet=%d:ascended=%d:playing=%d\n",
             plname,
@@ -744,10 +798,11 @@ set_bonesfile_name(char *file, d_level *lev)
     Sprintf(file, "bon%c%s", dungeons[lev->dnum].boneid,
             In_quest(lev) ? urole.filecode : "0");
     dptr = eos(file);
-    if ((sptr = Is_special(lev)) != 0)
+    if ((sptr = Is_special(lev)) != 0) {
         Sprintf(dptr, ".%c", sptr->boneid);
-    else
+    } else {
         Sprintf(dptr, ".%d", lev->dlevel);
+    }
 
 #ifdef BONES_POOL
     /* Simple bones pool by adding a number to the bones filename.
@@ -759,7 +814,7 @@ set_bonesfile_name(char *file, d_level *lev)
 #ifdef VMS
     Strcat(dptr, ";1");
 #endif
-    return(dptr-2);
+    return dptr-2;
 }
 
 /* set up temporary file name for writing bones, to avoid another game's
@@ -774,7 +829,9 @@ set_bonestemp_name(void)
     char *tf;
 
     tf = rindex(lock, '.');
-    if (!tf) tf = eos(lock);
+    if (!tf) {
+        tf = eos(lock);
+    }
     Sprintf(tf, ".bn");
 #ifdef VMS
     Strcat(tf, ";1");
@@ -788,7 +845,9 @@ create_bonesfile(d_level *lev, char **bonesid, char *errbuf)
     const char *file;
     int fd;
 
-    if (errbuf) *errbuf = '\0';
+    if (errbuf) {
+        *errbuf = '\0';
+    }
     *bonesid = set_bonesfile_name(bones, lev);
     file = set_bonestemp_name();
 #ifndef FILE_AREAS
@@ -816,10 +875,11 @@ create_bonesfile(d_level *lev, char **bonesid, char *errbuf)
 # endif
 # endif /* FILE_AREAS */
 #endif
-    if (fd < 0 && errbuf) /* failure explanation */
+    if (fd < 0 && errbuf) { /* failure explanation */
         Sprintf(errbuf,
                 "Cannot create bones \"%s\", id %s (errno %d).",
                 lock, *bonesid, errno);
+    }
 
 # if defined(VMS) && !defined(SECURE)
     /*
@@ -891,11 +951,14 @@ commit_bonesfile(d_level *lev)
 # endif
 #endif  /* FILE_AREAS */
 #ifdef WIZARD
-    if (wizard && ret != 0)
 #ifdef FILE_AREAS
+    if (wizard && ret != 0) {
         pline("couldn't rename %s to %s.", tempname, bones);
+    }
 #else
+    if (wizard && ret != 0) {
         pline("couldn't rename %s to %s.", tempname, fq_bones);
+    }
 #endif
 #endif
 }
@@ -1027,7 +1090,9 @@ set_error_savefile(void)
 # ifdef VMS
     {
         char *semi_colon = rindex(SAVEF, ';');
-        if (semi_colon) *semi_colon = '\0';
+        if (semi_colon) {
+            *semi_colon = '\0';
+        }
     }
     Strcat(SAVEF, ".e;1");
 # else
@@ -1135,8 +1200,9 @@ restore_saved_game(void)
 
     set_savefile_name();
 #ifdef MFLOPPY
-    if (!saveDiskPrompt(1))
+    if (!saveDiskPrompt(1)) {
         return -1;
+    }
 #endif /* MFLOPPY */
 #ifndef FILE_AREAS
     fq_save = fqname(SAVEF, SAVEPREFIX, 0);
@@ -1145,7 +1211,9 @@ restore_saved_game(void)
 #else
     uncompress_area(FILE_AREA_SAVE, SAVEF);
 #endif
-    if ((fd = open_savefile()) < 0) return fd;
+    if ((fd = open_savefile()) < 0) {
+        return fd;
+    }
 
 #ifndef FILE_AREAS
     if (!uptodate(fd, fq_save)) {
@@ -1200,15 +1268,18 @@ const char* filename;
     if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
 #undef EXTSTR
         /* "_" most likely means " ", which certainly looks nicer */
-        for (k=0; name[k]; k++)
-            if ( name[k]=='_' )
-                name[k]=' ';
+        for (k=0; name[k]; k++) {
+            if (name[k] == '_' ) {
+                name[k] = ' ';
+            }
+        }
         return strdup(name);
-    } else
-# endif
-    {
+    } else {
         return 0;
     }
+# else
+    return 0;
+# endif
 #endif
 }
 #endif /* defined(UNIX) && defined(QT_GRAPHICS) */
@@ -1232,18 +1303,20 @@ get_saved_games(void)
                     char* r;
                     Sprintf(filename, "save/%d%s", uid, name);
                     r = plname_from_file(filename);
-                    if ( r )
+                    if ( r ) {
                         result[j++] = r;
+                    }
                 }
             }
         }
         result[j++] = 0;
         return result;
-    } else
-#endif
-    {
+    } else {
         return 0;
     }
+#else
+    return 0;
+#endif
 }
 
 void
@@ -1306,13 +1379,16 @@ docompress_file(const char *filearea, const char *filename, boolean uncomp)
 # endif
     /* when compressing, we know the file exists */
     if (uncomp) {
-        if ((cf = fopen_datafile_area(filearea, cfn, RDBMODE, FALSE)) == (FILE *)0)
+        if ((cf = fopen_datafile_area(filearea, cfn, RDBMODE, FALSE)) == (FILE *)0) {
             return;
+        }
         (void) fclose(cf);
     }
 
     args[0] = COMPRESS;
-    if (uncomp) args[++i] = "-d";   /* uncompress */
+    if (uncomp) {
+        args[++i] = "-d"; /* uncompress */
+    }
 # ifdef COMPRESS_OPTIONS
     {
         /* we can't guarantee there's only one additional option, sigh */
@@ -1342,8 +1418,9 @@ docompress_file(const char *filearea, const char *filename, boolean uncomp)
      * there is an error message from the compression, the 'y' or 'n' can
      * end up being displayed after the error message.
      */
-    if (istty)
+    if (istty) {
         mark_synch();
+    }
 # endif
     f = fork();
     if (f == 0) {   /* child */
@@ -1353,8 +1430,9 @@ docompress_file(const char *filearea, const char *filename, boolean uncomp)
          * them will have to clear the first line.  This should be
          * invisible if there are no error messages.
          */
-        if (istty)
+        if (istty) {
             raw_print("");
+        }
 # endif
         /* run compressor without privileges, in case other programs
          * have surprises along the line of gzip once taking filenames
@@ -1389,22 +1467,25 @@ docompress_file(const char *filearea, const char *filename, boolean uncomp)
     (void) wait((int *)&i);
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 # ifdef WIZARD
-    if (wizard) (void) signal(SIGQUIT, SIG_DFL);
+    if (wizard) {
+        (void) signal(SIGQUIT, SIG_DFL);
+    }
 # endif
     if (i == 0) {
         /* (un)compress succeeded: remove file left behind */
-        if (uncomp)
+        if (uncomp) {
 #ifndef FILE_AREAS
             (void) unlink(cfn);
 #else
             (void) remove_area(filearea, cfn);
 #endif
-        else
+        } else {
 #ifndef FILE_AREAS
             (void) unlink(filename);
 #else
             (void) remove_area(filearea, filename);
 #endif
+        }
     } else {
         /* (un)compress failed; remove the new, bad file */
         if (uncomp) {
@@ -1421,8 +1502,7 @@ docompress_file(const char *filearea, const char *filename, boolean uncomp)
          * messages are being written on top of the screen, but at least
          * the user can read them.
          */
-        if (istty)
-        {
+        if (istty) {
             clear_nhwindow(WIN_MESSAGE);
             more();
             /* No way to know if this is feasible */
@@ -1497,7 +1577,9 @@ char *lockname;
 #  ifdef VMS
     {
         char *semi_colon = rindex(lockname, ';');
-        if (semi_colon) *semi_colon = '\0';
+        if (semi_colon) {
+            *semi_colon = '\0';
+        }
     }
     Strcat(lockname, ".lock;1");
 #  else
@@ -1718,8 +1800,9 @@ unlock_file(const char *filename)
 # endif
 
 # if defined(UNIX) || defined(VMS)
-        if (unlink(lockname) < 0)
+        if (unlink(lockname) < 0) {
             HUP raw_printf("Can't unlink %s.", lockname);
+        }
 #  ifdef NO_FILE_LINKS
         (void) close(lockfd);
 #  endif
@@ -1727,7 +1810,9 @@ unlock_file(const char *filename)
 # endif  /* UNIX || VMS */
 
 # if defined(AMIGA) || defined(WIN32) || defined(MSDOS)
-        if (lockptr) Close(lockptr);
+        if (lockptr) {
+            Close(lockptr);
+        }
         DeleteFile(lockname);
         lockptr = 0;
 # endif /* AMIGA || WIN32 || MSDOS */
@@ -1836,7 +1921,7 @@ fopen_config_file(const char *filename, int src)
 #endif
         if ((fp = fopenp(filename, "r")) != (FILE *)0) {
             configfile = filename;
-            return(fp);
+            return fp;
 #if defined(UNIX) || defined(VMS)
         } else {
             /* access() above probably caught most problems for UNIX */
@@ -1849,62 +1934,71 @@ fopen_config_file(const char *filename, int src)
     }
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
-        return(fp);
+    if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0) {
+        return fp;
+    }
     /* try .nethackrc? */
-    else if ((fp = fopenp(fqname(oldconfigfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
-        return(fp);
+    else if ((fp = fopenp(fqname(oldconfigfile, CONFIGPREFIX, 0), "r")) != (FILE *)0) {
+        return fp;
+    }
 # ifdef MSDOS
     else if ((fp = fopenp(fqname(backward_compat_configfile,
-                                 CONFIGPREFIX, 0), "r")) != (FILE *)0)
-        return(fp);
+                                 CONFIGPREFIX, 0), "r")) != (FILE *)0) {
+        return fp;
+    }
 # endif
 #else
     /* constructed full path names don't need fqname() */
 # ifdef VMS
-    if ((fp = fopenp(fqname("nethackini", CONFIGPREFIX, 0), "r"))
-        != (FILE *)0) {
+    if ((fp = fopenp(fqname("nethackini", CONFIGPREFIX, 0), "r")) != (FILE *)0) {
         configfile = "nethackini";
-        return(fp);
+        return fp;
     }
     if ((fp = fopenp("sys$login:nethack.ini", "r")) != (FILE *)0) {
         configfile = "nethack.ini";
-        return(fp);
+        return fp;
     }
 
     envp = nh_getenv("HOME");
-    if (!envp)
+    if (!envp) {
         Strcpy(tmp_config, "NetHack.cnf");
-    else
+    } else {
         Sprintf(tmp_config, "%s%s", envp, "NetHack.cnf");
-    if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-        return(fp);
+    }
+    if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+        return fp;
+    }
 # else  /* should be only UNIX left */
     envp = nh_getenv("HOME");
-    if (!envp)
+    if (!envp) {
         Strcpy(tmp_config, configfile);
-    else
+    } else {
         Sprintf(tmp_config, "%s/%s", envp, configfile);
-    if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-        return(fp);
-    else {
+    }
+    if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+        return fp;
+    } else {
         /* try .nethackrc? */
-        if (!envp)
+        if (!envp) {
             Strcpy(tmp_config, oldconfigfile);
-        else
+        } else {
             Sprintf(tmp_config, "%s/%s", envp, oldconfigfile);
-        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-            return(fp);
+        }
+        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+            return fp;
+        }
     }
 # if defined(__APPLE__)
     /* try an alternative */
     if (envp) {
         Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults");
-        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-            return(fp);
+        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+            return fp;
+        }
         Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults.txt");
-        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
-            return(fp);
+        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+            return fp;
+        }
     }
 # endif
     if (errno != ENOENT) {
@@ -1914,9 +2008,12 @@ fopen_config_file(const char *filename, int src)
          * directory restricted to user */
 
 #if defined (NHSTDC) && !defined(NOTSTDC)
-        if ((details = strerror(errno)) == 0)
+        if ((details = strerror(errno)) == 0) {
 #endif
         details = "";
+#if defined (NHSTDC) && !defined(NOTSTDC)
+        }
+#endif
         raw_printf("Couldn't open default config file %s %s(%d).",
                    tmp_config, details, errno);
         wait_synch();
@@ -1949,17 +2046,21 @@ get_uchars(
     boolean havenum = FALSE;
 
     while (1) {
-        switch(*bufp) {
+        switch (*bufp) {
         case ' ':  case '\0':
         case '\t': case '\n':
             if (havenum) {
                 /* if modifying in place, don't insert zeros */
-                if (num || !modlist) list[count] = num;
+                if (num || !modlist) {
+                    list[count] = num;
+                }
                 count++;
                 num = 0;
                 havenum = FALSE;
             }
-            if (count == size || !*bufp) return count;
+            if (count == size || !*bufp) {
+                return count;
+            }
             bufp++;
             break;
 
@@ -1972,10 +2073,13 @@ get_uchars(
             break;
 
         case '\\':
-            if (fp == (FILE *)0)
+            if (fp == (FILE *)0) {
                 goto gi_error;
+            }
             do  {
-                if (!fgets(buf, BUFSZ, fp)) goto gi_error;
+                if (!fgets(buf, BUFSZ, fp)) {
+                    goto gi_error;
+                }
             } while (buf[0] == '#');
             bufp = buf;
             break;
@@ -1998,9 +2102,13 @@ int prefixid;
 {
     char *ptr;
 
-    if (!bufp) return;
+    if (!bufp) {
+        return;
+    }
     /* Backward compatibility, ignore trailing ;n */
-    if ((ptr = index(bufp, ';')) != 0) *ptr = '\0';
+    if ((ptr = index(bufp, ';')) != 0) {
+        *ptr = '\0';
+    }
     if (strlen(bufp) > 0) {
         fqn_prefix[prefixid] = (char *)alloc(strlen(bufp)+2);
         Strcpy(fqn_prefix[prefixid], bufp);
@@ -2032,24 +2140,30 @@ parse_config_line(FILE *fp,
     boolean in_sysconf = (src == set_in_sysconf);
 #endif
 
-    if (*buf == '#')
+    if (*buf == '#') {
         return 1;
+    }
 
     /* remove trailing whitespace */
     bufp = eos(buf);
     while (--bufp > buf && isspace(*bufp))
         continue;
 
-    if (bufp <= buf)
+    if (bufp <= buf) {
         return 1;       /* skip all-blank lines */
-    else
+    } else {
         *(bufp + 1) = '\0'; /* terminate line */
+    }
 
     /* find the '=' or ':' */
     bufp = index(buf, '=');
     altp = index(buf, ':');
-    if (!bufp || (altp && altp < bufp)) bufp = altp;
-    if (!bufp) return 0;
+    if (!bufp || (altp && altp < bufp)) {
+        bufp = altp;
+    }
+    if (!bufp) {
+        return 0;
+    }
 
     /* skip  whitespace between '=' and value */
     do { ++bufp; } while (isspace(*bufp));
@@ -2060,8 +2174,9 @@ parse_config_line(FILE *fp,
      */
     if (match_varname(buf, "OPTIONS", 4)) {
         parseoptions(bufp, TRUE, TRUE);
-        if (plname[0])      /* If a name was given */
+        if (plname[0]) { /* If a name was given */
             plnamesuffix(); /* set the character class */
+        }
 #ifdef AUTOPICKUP_EXCEPTIONS
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
@@ -2139,19 +2254,26 @@ parse_config_line(FILE *fp,
         char msgtype[11];
         if (sscanf(bufp, "%10s \"%255[^\"]\"", msgtype, pattern) == 2) {
             int typ = MSGTYP_NORMAL;
-            if (!strcasecmp("norep", msgtype)) typ = MSGTYP_NOREP;
-            else if (!strcasecmp("hide", msgtype)) typ = MSGTYP_NOSHOW;
-            else if (!strcasecmp("noshow", msgtype)) typ = MSGTYP_NOSHOW;
-            else if (!strcasecmp("more", msgtype)) typ = MSGTYP_STOP;
-            else if (!strcasecmp("stop", msgtype)) typ = MSGTYP_STOP;
+            if (!strcasecmp("norep", msgtype)) {
+                typ = MSGTYP_NOREP;
+            } else if (!strcasecmp("hide", msgtype)) {
+                typ = MSGTYP_NOSHOW;
+            } else if (!strcasecmp("noshow", msgtype)) {
+                typ = MSGTYP_NOSHOW;
+            } else if (!strcasecmp("more", msgtype)) {
+                typ = MSGTYP_STOP;
+            } else if (!strcasecmp("stop", msgtype)) {
+                typ = MSGTYP_STOP;
+            }
             if (typ != MSGTYP_NORMAL) {
                 msgpline_add(typ, pattern);
             }
         }
     } else if (match_varname(buf, "ROLE", 4) ||
                match_varname(buf, "CHARACTER", 4)) {
-        if ((len = str2role(bufp)) >= 0)
+        if ((len = str2role(bufp)) >= 0) {
             flags.initrole = len;
+        }
 
     } else if (match_varname(buf, "DOGNAME", 3)) {
         (void) strncpy(dogname, bufp, PL_PSIZ-1);
@@ -2172,7 +2294,9 @@ parse_config_line(FILE *fp,
             char include_buf[4*BUFSZ];
             /* parse a config file from a global path or relative
              * to the program binary */
-            if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) return 0;
+            if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) {
+                return 0;
+            }
 
             while (fgets(include_buf, 4*BUFSZ, include_fp)) {
                 if (!parse_config_line(include_fp, include_buf, (char *)0, (char *)0, FALSE, src)) {
@@ -2300,8 +2424,7 @@ parse_config_line(FILE *fp,
     } else if (match_varname(buf, "FONT", 4)) {
         char *t;
 
-        if( t = strchr( buf+5, ':' ) )
-        {
+        if (t = strchr( buf+5, ':')) {
             *t = 0;
             amii_set_text_font( buf+5, atoi( t + 1 ) );
             *t = ':';
@@ -2322,54 +2445,55 @@ parse_config_line(FILE *fp,
         }
     } else if (match_varname(buf, "SCREENMODE", 10 )) {
         extern long amii_scrnmode;
-        if (!stricmp(bufp, "req"))
+        if (!stricmp(bufp, "req")) {
             amii_scrnmode = 0xffffffff; /* Requester */
-        else if( sscanf(bufp, "%x", &amii_scrnmode) != 1 )
+        } else if ( sscanf(bufp, "%x", &amii_scrnmode) != 1 ) {
             amii_scrnmode = 0;
+        }
     } else if (match_varname(buf, "MSGPENS", 7)) {
         extern int amii_msgAPen, amii_msgBPen;
         char *t = strtok(bufp, ",/");
-        if( t )
-        {
+        if (t) {
             sscanf(t, "%d", &amii_msgAPen);
-            if( t = strtok((char*)0, ",/") )
+            if ( t = strtok((char*)0, ",/") ) {
                 sscanf(t, "%d", &amii_msgBPen);
+            }
         }
     } else if (match_varname(buf, "TEXTPENS", 8)) {
         extern int amii_textAPen, amii_textBPen;
         char *t = strtok(bufp, ",/");
-        if( t )
-        {
+        if (t) {
             sscanf(t, "%d", &amii_textAPen);
-            if( t = strtok((char*)0, ",/") )
+            if ( t = strtok((char*)0, ",/") ) {
                 sscanf(t, "%d", &amii_textBPen);
+            }
         }
     } else if (match_varname(buf, "MENUPENS", 8)) {
         extern int amii_menuAPen, amii_menuBPen;
         char *t = strtok(bufp, ",/");
-        if( t )
-        {
+        if (t) {
             sscanf(t, "%d", &amii_menuAPen);
-            if( t = strtok((char*)0, ",/") )
+            if (t = strtok((char*)0, ",/")) {
                 sscanf(t, "%d", &amii_menuBPen);
+            }
         }
     } else if (match_varname(buf, "STATUSPENS", 10)) {
         extern int amii_statAPen, amii_statBPen;
         char *t = strtok(bufp, ",/");
-        if( t )
-        {
+        if (t) {
             sscanf(t, "%d", &amii_statAPen);
-            if( t = strtok((char*)0, ",/") )
+            if (t = strtok((char*)0, ",/")) {
                 sscanf(t, "%d", &amii_statBPen);
+            }
         }
     } else if (match_varname(buf, "OTHERPENS", 9)) {
         extern int amii_otherAPen, amii_otherBPen;
         char *t = strtok(bufp, ",/");
-        if( t )
-        {
+        if (t) {
             sscanf(t, "%d", &amii_otherAPen);
-            if( t = strtok((char*)0, ",/") )
+            if (t = strtok((char*)0, ",/")) {
                 sscanf(t, "%d", &amii_otherBPen);
+            }
         }
     } else if (match_varname(buf, "PENS", 4)) {
         extern unsigned short amii_init_map[ AMII_MAXCOLORS ];
@@ -2378,8 +2502,7 @@ parse_config_line(FILE *fp,
 
         for (i = 0, t = strtok(bufp, ",/");
              i < AMII_MAXCOLORS && t != (char *)0;
-             t = strtok((char *)0, ",/"), ++i)
-        {
+             t = strtok((char *)0, ",/"), ++i) {
             sscanf(t, "%hx", &amii_init_map[i]);
         }
         amii_setpens( amii_numcolors = i );
@@ -2390,8 +2513,7 @@ parse_config_line(FILE *fp,
 
         for (i = 0, t = strtok(bufp, ",/");
              i < AMII_MAXCOLORS && t != (char *)0;
-             t = strtok((char *)0, ",/"), ++i)
-        {
+             t = strtok((char *)0, ",/"), ++i) {
             sscanf(t, "%d", &foreg[i]);
         }
     } else if (match_varname(buf, "BGPENS", 6)) {
@@ -2401,8 +2523,7 @@ parse_config_line(FILE *fp,
 
         for (i = 0, t = strtok(bufp, ",/");
              i < AMII_MAXCOLORS && t != (char *)0;
-             t = strtok((char *)0, ",/"), ++i)
-        {
+             t = strtok((char *)0, ",/"), ++i) {
             sscanf(t, "%d", &backg[i]);
         }
 #endif
@@ -2416,22 +2537,27 @@ parse_config_line(FILE *fp,
         /* These should move to wc_ options */
     } else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
         extern char *qt_tilewidth;
-        if (qt_tilewidth == NULL)
+        if (qt_tilewidth == NULL) {
             qt_tilewidth=(char *)strdup(bufp);
+        }
     } else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
         extern char *qt_tileheight;
-        if (qt_tileheight == NULL)
+        if (qt_tileheight == NULL) {
             qt_tileheight=(char *)strdup(bufp);
+        }
     } else if (match_varname(buf, "QT_FONTSIZE", 11)) {
         extern char *qt_fontsize;
-        if (qt_fontsize == NULL)
+        if (qt_fontsize == NULL) {
             qt_fontsize=(char *)strdup(bufp);
+        }
     } else if (match_varname(buf, "QT_COMPACT", 10)) {
         extern int qt_compact_mode;
         qt_compact_mode = atoi(bufp);
 #endif
-    } else
+    } else {
         return 0;
+    }
+
     return 1;
 }
 
@@ -2496,11 +2622,13 @@ read_config_file(const char *filename, int src)
 #  ifndef AMIGA
     if (tmp_ramdisk[0]) {
         Strcpy(levels, tmp_ramdisk);
-        if (strcmp(permbones, levels))      /* if not identical */
+        if (strcmp(permbones, levels)) { /* if not identical */
             ramdisk = TRUE;
-    } else
+        }
+    } else {
 #  endif /* AMIGA */
     Strcpy(levels, tmp_levels);
+    }
 
     Strcpy(bones, levels);
 # endif /* MFLOPPY */
@@ -2519,8 +2647,12 @@ fopen_wizkit_file(void)
     char *envp;
 
     envp = nh_getenv("WIZKIT");
-    if (envp && *envp) (void) strncpy(wizkit, envp, WIZKIT_MAX - 1);
-    if (!wizkit[0]) return (FILE *)0;
+    if (envp && *envp) {
+        (void) strncpy(wizkit, envp, WIZKIT_MAX - 1);
+    }
+    if (!wizkit[0]) {
+        return (FILE *)0;
+    }
 
 #ifdef UNIX
     if (access(wizkit, 4) == -1) {
@@ -2537,7 +2669,7 @@ fopen_wizkit_file(void)
     } else
 #endif
     if ((fp = fopenp(wizkit, "r")) != (FILE *)0) {
-        return(fp);
+        return fp;
 #if defined(UNIX) || defined(VMS)
     } else {
         /* access() above probably caught most problems for UNIX */
@@ -2548,26 +2680,31 @@ fopen_wizkit_file(void)
     }
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r"))
-        != (FILE *)0)
-        return(fp);
+    if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r")) {
+        != (FILE *)0) {
+        return fp;
+    }
 #else
 # ifdef VMS
     envp = nh_getenv("HOME");
-    if (envp)
+    if (envp) {
         Sprintf(tmp_wizkit, "%s%s", envp, wizkit);
-    else
+    } else {
         Sprintf(tmp_wizkit, "%s%s", "sys$login:", wizkit);
-    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0)
-        return(fp);
+    }
+    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0) {
+        return fp;
+    }
 # else  /* should be only UNIX left */
     envp = nh_getenv("HOME");
-    if (envp)
+    if (envp) {
         Sprintf(tmp_wizkit, "%s/%s", envp, wizkit);
-    else Strcpy(tmp_wizkit, wizkit);
-    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0)
-        return(fp);
-    else if (errno != ENOENT) {
+    } else {
+        Strcpy(tmp_wizkit, wizkit);
+    }
+    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0) {
+        return fp;
+    } else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home
          * directory restricted to user */
         raw_printf("Couldn't open default wizkit file %s (%d).",
@@ -2587,21 +2724,29 @@ read_wizkit(void)
     struct obj *otmp;
     boolean bad_items = FALSE, skip = FALSE;
 
-    if (!wizard || !(fp = fopen_wizkit_file())) return;
+    if (!wizard || !(fp = fopen_wizkit_file())) {
+        return;
+    }
 
     while (fgets(buf, (int)(sizeof buf), fp)) {
         ep = index(buf, '\n');
         if (skip) { /* in case previous line was too long */
-            if (ep) skip = FALSE; /* found newline; next line is normal */
+            if (ep) {
+                skip = FALSE; /* found newline; next line is normal */
+            }
         } else {
-            if (!ep) skip = TRUE; /* newline missing; discard next fgets */
-            else *ep = '\0';    /* remove newline */
+            if (!ep) {
+                skip = TRUE; /* newline missing; discard next fgets */
+            } else {
+                *ep = '\0'; /* remove newline */
+            }
 
             if (buf[0]) {
                 otmp = readobjnam(buf, (struct obj *)0);
                 if (otmp) {
-                    if (otmp != &zeroobj)
+                    if (otmp != &zeroobj) {
                         otmp = addinv(otmp);
+                    }
                 } else {
                     /* .60 limits output line width to 79 chars */
                     raw_printf("Bad wizkit item: \"%.60s\"", buf);
@@ -2610,8 +2755,9 @@ read_wizkit(void)
             }
         }
     }
-    if (bad_items)
+    if (bad_items) {
         wait_synch();
+    }
     (void) fclose(fp);
     return;
 }
@@ -2715,8 +2861,9 @@ check_recordfile(const char *dir)
 # endif
             raw_printf("Warning: cannot write record %s", tmp);
             wait_synch();
-        } else
+        } else {
             (void) close(fd);
+        }
     } else      /* open succeeded */
         (void) close(fd);
 #else /* MICRO || WIN32*/
@@ -2725,12 +2872,16 @@ check_recordfile(const char *dir)
     /* Create the "record" file, if necessary */
     fq_record = fqname(RECORD, SCOREPREFIX, 0);
     fd = macopen (fq_record, O_RDWR | O_CREAT, TEXT_TYPE);
-    if (fd != -1) macclose (fd);
+    if (fd != -1) macclose {
+        (fd);
+    }
 
     /* Create the logfile, if necessary */
     fq_record = fqname(LOGFILE, SCOREPREFIX, 0);
     fd = macopen (fq_record, O_RDWR | O_CREAT, LOGF_TYPE);
-    if (fd != -1) macclose (fd);
+    if (fd != -1) macclose {
+        (fd);
+    }
 # endif /* MAC */
 
 #endif /* MICRO || WIN32*/
@@ -2781,8 +2932,9 @@ recover_savefile()
     int processed[256];
     char savename[SAVESIZE], errbuf[BUFSZ];
 
-    for (lev = 0; lev < 256; lev++)
+    for (lev = 0; lev < 256; lev++) {
         processed[lev] = 0;
+    }
 
     /* level 0 file contains:
      *  pid of creating process (ignored here)
@@ -2801,16 +2953,16 @@ recover_savefile()
         (void)close(gfd);
         return FALSE;
     }
-    if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
+    if (read(gfd, (genericptr_t) &savelev, sizeof(savelev)) {
         != sizeof(savelev)) {
         raw_printf("\nCheckpointing was not in effect for %s -- recovery impossible.\n",
                    lock);
         (void)close(gfd);
         return FALSE;
     }
-    if ((read(gfd, (genericptr_t) savename, sizeof savename)
+    if ((read(gfd, (genericptr_t) savename, sizeof savename) {
          != sizeof savename) ||
-        (read(gfd, (genericptr_t) &version_data, sizeof version_data)
+        (read(gfd, (genericptr_t) &version_data, sizeof version_data) {
          != sizeof version_data)) {
         raw_printf("\nError reading %s -- can't recover.\n", lock);
         (void)close(gfd);
@@ -2840,7 +2992,7 @@ recover_savefile()
         return FALSE;
     }
 
-    if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
+    if (write(sfd, (genericptr_t) &version_data, sizeof version_data) {
         != sizeof version_data) {
         raw_printf("\nError writing %s; recovery failed.", SAVEF);
         (void)close(gfd);
@@ -2918,7 +3070,9 @@ int ifd, ofd;
     do {
         nfrom = read(ifd, buf, BUFSIZ);
         nto = write(ofd, buf, nfrom);
-        if (nto != nfrom) return FALSE;
+        if (nto != nfrom) {
+            return FALSE;
+        }
     } while (nfrom == BUFSIZ);
     return TRUE;
 }

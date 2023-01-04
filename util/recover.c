@@ -241,14 +241,14 @@ restore_savefile(char *basename, const char *directory)
                     "\nTrouble accessing level 0 (errno = %d).\n", errno);
 #endif
         Fprintf(stderr, "Cannot open level 0 for %s.\n", basename);
-        return(-1);
+        return -1;
     }
     if (read(gfd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
         Fprintf(stderr, "%s\n%s%s%s\n",
                 "Checkpoint data incompletely written or subsequently clobbered;",
                 "recovery for \"", basename, "\" impossible.");
         Close(gfd);
-        return(-1);
+        return -1;
     }
     if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
             != sizeof(savelev)) {
@@ -256,7 +256,7 @@ restore_savefile(char *basename, const char *directory)
                 "Checkpointing was not in effect for %s -- recovery impossible.\n",
                 basename);
         Close(gfd);
-        return(-1);
+        return -1;
     }
     if ((read(gfd, (genericptr_t) savename, sizeof savename)
                 != sizeof savename) ||
@@ -264,7 +264,7 @@ restore_savefile(char *basename, const char *directory)
              != sizeof version_data)) {
         Fprintf(stderr, "Error reading %s -- can't recover.\n", lock);
         Close(gfd);
-        return(-1);
+        return -1;
     }
 
     /* save file should contain:
@@ -277,7 +277,7 @@ restore_savefile(char *basename, const char *directory)
     if (sfd < 0) {
         Fprintf(stderr, "Cannot create savefile %s.\n", savename);
         Close(gfd);
-        return(-1);
+        return -1;
     }
 
     lfd = open_levelfile(savelev, directory);
@@ -285,7 +285,7 @@ restore_savefile(char *basename, const char *directory)
         Fprintf(stderr, "Cannot open level of save for %s.\n", basename);
         Close(gfd);
         Close(sfd);
-        return(-1);
+        return -1;
     }
 
     if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
@@ -293,7 +293,7 @@ restore_savefile(char *basename, const char *directory)
         Fprintf(stderr, "Error writing %s; recovery failed.\n", savename);
         Close(gfd);
         Close(sfd);
-        return(-1);
+        return -1;
     }
 
     copy_bytes(lfd, sfd);
@@ -336,7 +336,7 @@ restore_savefile(char *basename, const char *directory)
         (void) sprintf(iconfile, "%s.info", savename);
         in = open("NetHack:default.icon", O_RDONLY);
         out = open(iconfile, O_WRONLY | O_TRUNC | O_CREAT);
-        if(in > -1 && out > -1){
+        if (in > -1 && out > -1) {
             copy_bytes(in,out);
         }
         if(in > -1)close(in);
@@ -344,7 +344,7 @@ restore_savefile(char *basename, const char *directory)
     }
 #endif
 #endif
-    return(0);
+    return 0;
 }
 
 #ifdef EXEPATH

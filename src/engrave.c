@@ -120,8 +120,9 @@ random_engraving(char *outbuf)
 
     /* a random engraving may come from the "rumors" file,
        or from the list above */
-    if (!rn2(4) || !(rumor = getrumor(0, outbuf, TRUE)) || !*rumor)
+    if (!rn2(4) || !(rumor = getrumor(0, outbuf, TRUE)) || !*rumor) {
         Strcpy(outbuf, random_mesg[rn2(SIZE(random_mesg))]);
+    }
 
     wipeout_text(outbuf, (int)(strlen(outbuf) / 4), 0);
     return outbuf;
@@ -173,7 +174,9 @@ wipeout_text(
                 use_rubout = seed & 3;
             }
             s = &engr[nxt];
-            if (*s == ' ') continue;
+            if (*s == ' ') {
+                continue;
+            }
 
             /* rub out unreadable & small punctuation marks */
             if (index("?.,'`-|_", *s)) {
@@ -181,26 +184,30 @@ wipeout_text(
                 continue;
             }
 
-            if (!use_rubout)
+            if (!use_rubout) {
                 i = SIZE(rubouts);
-            else
-                for (i = 0; i < SIZE(rubouts); i++)
+            } else {
+                for (i = 0; i < SIZE(rubouts); i++) {
                     if (*s == rubouts[i].wipefrom) {
                         /*
                          * Pick one of the substitutes at random.
                          */
-                        if (!seed)
+                        if (!seed) {
                             j = rn2(strlen(rubouts[i].wipeto));
-                        else {
+                        } else {
                             seed *= 31,  seed %= (BUFSZ-1);
                             j = seed % (strlen(rubouts[i].wipeto));
                         }
                         *s = rubouts[i].wipeto[j];
                         break;
                     }
+                }
+            }
 
             /* didn't pick rubout; use '?' for unreadable character */
-            if (i == SIZE(rubouts)) *s = '?';
+            if (i == SIZE(rubouts)) {
+                *s = '?';
+            }
         }
     }
 
@@ -266,25 +273,25 @@ surface(coordxy x, coordxy y)
     if ((x == u.ux) && (y == u.uy) && u.uswallow &&
         is_animal(u.ustuck->data))
         return "maw";
-    else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
+    else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz)) {
         return "air";
-    else if (is_pool(x, y))
+    } else if (is_pool(x, y)) {
         return (Underwater && !Is_waterlevel(&u.uz)) ? "bottom" : hliquid("water");
-    else if (is_ice(x, y))
+    } else if (is_ice(x, y)) {
         return "ice";
-    else if (is_lava(x, y))
+    } else if (is_lava(x, y)) {
         return hliquid("lava");
-    else if (lev->typ == DRAWBRIDGE_DOWN)
+    } else if (lev->typ == DRAWBRIDGE_DOWN) {
         return "bridge";
-    else if(IS_ALTAR(levl[x][y].typ))
+    } else if (IS_ALTAR(levl[x][y].typ)) {
         return "altar";
-    else if(IS_GRAVE(levl[x][y].typ))
+    } else if (IS_GRAVE(levl[x][y].typ)) {
         return "headstone";
-    else if(IS_FOUNTAIN(levl[x][y].typ))
+    } else if (IS_FOUNTAIN(levl[x][y].typ)) {
         return "fountain";
-    else if (is_swamp(x, y))
+    } else if (is_swamp(x, y)) {
         return "swamp";
-    else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)) ||
+    } else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)) ||
              IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
         return "floor";
     else
@@ -300,17 +307,17 @@ ceiling(coordxy x, coordxy y)
     /* other room types will no longer exist when we're interested --
      * see check_special_room()
      */
-    if (*in_rooms(x, y, VAULT))
+    if (*in_rooms(x, y, VAULT)) {
         what = "vault's ceiling";
-    else if (*in_rooms(x, y, TEMPLE))
+    } else if (*in_rooms(x, y, TEMPLE)) {
         what = "temple's ceiling";
-    else if (*in_rooms(x, y, SHOPBASE))
+    } else if (*in_rooms(x, y, SHOPBASE)) {
         what = "shop's ceiling";
-    else if (level.flags.sky)
+    } else if (level.flags.sky) {
         what = "sky";
-    else if (Underwater)
+    } else if (Underwater) {
         what = "water's surface";
-    else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)) ||
+    } else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)) ||
              IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
         what = "ceiling";
     else
@@ -324,12 +331,13 @@ engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = head_engr;
 
-    while(ep) {
-        if(x == ep->engr_x && y == ep->engr_y)
-            return(ep);
+    while (ep) {
+        if (x == ep->engr_x && y == ep->engr_y) {
+            return ep;
+        }
         ep = ep->nxt_engr;
     }
-    return((struct engr *) 0);
+    return (struct engr *) 0;
 }
 
 /* Decide whether a particular string is engraved at a specified
@@ -368,8 +376,9 @@ nengr_at(coordxy x, coordxy y)
     unsigned count = 0;
     const char *p;
 
-    if (!ep || HEADSTONE == ep->engr_type)
+    if (!ep || HEADSTONE == ep->engr_type) {
         return 0;
+    }
 
     p = ep->engr_txt;
     while (strstri(p, s)) {
@@ -384,8 +393,9 @@ nengr_at(coordxy x, coordxy y)
 void
 u_wipe_engr(int cnt)
 {
-    if (can_reach_floor(TRUE))
+    if (can_reach_floor(TRUE)) {
         wipe_engr_at(u.ux, u.uy, cnt);
+    }
 }
 
 void
@@ -394,15 +404,18 @@ wipe_engr_at(coordxy x, coordxy y, xint16 cnt)
     struct engr *ep = engr_at(x, y);
 
     /* Headstones are indelible */
-    if(ep && ep->engr_type != HEADSTONE) {
-        if(ep->engr_type != BURN || is_ice(x, y)) {
-            if(ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
+    if (ep && ep->engr_type != HEADSTONE) {
+        if (ep->engr_type != BURN || is_ice(x, y)) {
+            if (ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
                 cnt = rn2(1 + 50/(cnt+1)) ? 0 : 1;
             }
             wipeout_text(ep->engr_txt, (int)cnt, 0);
-            while(ep->engr_txt[0] == ' ')
+            while (ep->engr_txt[0] == ' ') {
                 ep->engr_txt++;
-            if(!ep->engr_txt[0]) del_engr(ep);
+            }
+            if (!ep->engr_txt[0]) {
+                del_engr(ep);
+            }
         }
     }
 }
@@ -418,9 +431,9 @@ read_engr_at(coordxy x, coordxy y)
      * nor does it necessarily imply comprehension (literacy).
      */
     if (ep && ep->engr_txt[0]) {
-        switch(ep->engr_type) {
+        switch (ep->engr_type) {
         case DUST:
-            if(!Blind) {
+            if (!Blind) {
                 sensed = 1;
                 pline("%s is written here in the %s.", Something,
                       is_ice(x, y) ? "frost" : "dust");
@@ -444,7 +457,7 @@ read_engr_at(coordxy x, coordxy y)
             }
             break;
         case MARK:
-            if(!Blind) {
+            if (!Blind) {
                 sensed = 1;
                 pline("There's some graffiti on the %s here.",
                       surface(x, y));
@@ -455,7 +468,7 @@ read_engr_at(coordxy x, coordxy y)
              * "What's it say?"
              * "It says... `See you next Wednesday.'" -- Thriller
              */
-            if(!Blind) {
+            if (!Blind) {
                 sensed = 1;
                 You_see("a message scrawled in blood here.");
             }
@@ -472,16 +485,21 @@ read_engr_at(coordxy x, coordxy y)
                 (void) strncpy(buf,  ep->engr_txt, (int)maxelen);
                 buf[maxelen] = '\0';
                 et = buf;
-            } else
+            } else {
                 et = ep->engr_txt;
+            }
             if (u.roleplay.illiterate && strcmp(et, "X")) {
                 pline("But you cannot read.");
             } else {
                 You("%s: \"%s\".",
                     (Blind) ? "feel the words" : "read",  et);
             }
-            if(flags.run > 1) nomul(0, 0);
-            if (moves > 5) check_tutorial_message(QT_T_ENGRAVING);
+            if (flags.run > 1) {
+                nomul(0, 0);
+            }
+            if (moves > 5) {
+                check_tutorial_message(QT_T_ENGRAVING);
+            }
         }
     }
 }
@@ -492,8 +510,9 @@ make_engr_at(coordxy x, coordxy y, const char *s, long int e_time, xint16 e_type
     struct engr *ep;
     size_t smem = strlen(s) + 1;
 
-    if ((ep = engr_at(x, y)) != 0)
+    if ((ep = engr_at(x, y)) != 0) {
         del_engr(ep);
+    }
     ep = newengr(smem);
     (void) memset(ep, 0, smem + sizeof(struct engr));
     ep->nxt_engr = head_engr;
@@ -503,9 +522,13 @@ make_engr_at(coordxy x, coordxy y, const char *s, long int e_time, xint16 e_type
     ep->engr_txt = (char *)(ep + 1);
     Strcpy(ep->engr_txt, s);
     /* engraving Elbereth shows wisdom */
-    if (!in_mklev && !strcmp(s, "Elbereth")) exercise(A_WIS, TRUE);
+    if (!in_mklev && !strcmp(s, "Elbereth")) {
+        exercise(A_WIS, TRUE);
+    }
     /* engraving Owlbreath shows the opposite of wisdom */
-    if (!in_mklev && !strcmp(s, "Owlbreath")) exercise(A_WIS, FALSE);
+    if (!in_mklev && !strcmp(s, "Owlbreath")) {
+        exercise(A_WIS, FALSE);
+    }
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE-1);
     ep->engr_lth = smem;
@@ -517,7 +540,9 @@ del_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
 
-    if (ep) del_engr(ep);
+    if (ep) {
+        del_engr(ep);
+    }
 }
 
 /*
@@ -624,34 +649,36 @@ engrave(const char *engraving, boolean fingers)
     if (oep) {
         oetype = oep->engr_type;
     }
-    if (is_demon(youmonst.data) || is_vampire(youmonst.data))
+    if (is_demon(youmonst.data) || is_vampire(youmonst.data)) {
         type = ENGR_BLOOD;
+    }
 
     /* Can the adventurer engrave at all? */
 
     if (u.uswallow) {
         if (is_animal(u.ustuck->data)) {
             pline("What would you write?  \"Jonah was here\"?");
-            return(0);
+            return 0;
         } else if (is_whirly(u.ustuck->data)) {
             You_cant_reach_the_floor(u.ux, u.uy, FALSE);
-            return(0);
-        } else
+            return 0;
+        } else {
             jello = TRUE;
+        }
     } else if (is_lava(u.ux, u.uy)) {
         You_cant("write on the %s!", surface(u.ux, u.uy));
-        return(0);
+        return 0;
     } else if (Underwater) {
         You_cant("write underwater!");
-        return(0);
+        return 0;
     } else if (is_pool(u.ux, u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ) ||
                is_swamp(u.ux, u.uy)) {
         You_cant("write on the %s!", surface(u.ux, u.uy));
-        return(0);
+        return 0;
     }
-    if(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) /* in bubble */) {
+    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) /* in bubble */) {
         You_cant("write in thin air!");
-        return(0);
+        return 0;
     } else if (!accessible(u.ux, u.uy)) {
         /* stone, tree, wall, secret corridor, pool, lava, bars */
         You_cant("write here.");
@@ -659,9 +686,11 @@ engrave(const char *engraving, boolean fingers)
     }
     if (cantwield(youmonst.data)) {
         You_cant("even hold anything!");
-        return(0);
+        return 0;
     }
-    if (check_capacity((char *)0)) return (0);
+    if (check_capacity((char *)0)) {
+        return 0;
+    }
 
     /* One may write with finger, or weapon, or wand, or..., or...
      * Edited by GAN 10/20/86 so as not to change weapon wielded.
@@ -676,44 +705,49 @@ engrave(const char *engraving, boolean fingers)
     } else {
         otmp = getobj(styluses, "write with");
     }
-    if(!otmp) return(0);        /* otmp == zeroobj if fingers */
+    if (!otmp) {
+        return 0; /* otmp == zeroobj if fingers */
+    }
 
-    if (otmp == &zeroobj) writer = makeplural(body_part(FINGER));
-    else writer = xname(otmp);
+    if (otmp == &zeroobj) {
+        writer = makeplural(body_part(FINGER));
+    } else {
+        writer = xname(otmp);
+    }
 
     /* There's no reason you should be able to write with a wand
      * while both your hands are tied up.
      */
     if (!freehand() && otmp != uwep && !otmp->owornmask) {
         You("have no free %s to write with!", body_part(HAND));
-        return(0);
+        return 0;
     }
 
     if (jello) {
         You("tickle %s with your %s.", mon_nam(u.ustuck), writer);
         Your("message dissolves...");
-        return(0);
+        return 0;
     }
     if (otmp->oclass != WAND_CLASS && !can_reach_floor(TRUE)) {
         You_cant_reach_the_floor(u.ux, u.uy, TRUE);
-        return(0);
+        return 0;
     }
     if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
         You("make a motion towards the altar with your %s.", writer);
         altar_wrath(u.ux, u.uy);
-        return(0);
+        return 0;
     }
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
         if (otmp == &zeroobj) { /* using only finger */
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
-            return(0);
+            return 0;
         } else if (!levl[u.ux][u.uy].disturbed) {
             You("disturb the undead!");
             levl[u.ux][u.uy].disturbed = 1;
             (void) makemon(&mons[PM_GHOUL], u.ux, u.uy, NO_MM_FLAGS);
             exercise(A_WIS, FALSE);
-            return(1);
+            return 1;
         }
     }
 
@@ -870,8 +904,9 @@ engrave(const char *engraving, boolean fingers)
                             "The bugs on the %s stop moving!",
                             surface(u.ux, u.uy));
                     /* automatically use the process of elimination */
-                    if (objects[WAN_SLEEP].oc_name_known || objects[WAN_DEATH].oc_name_known)
+                    if (objects[WAN_SLEEP].oc_name_known || objects[WAN_DEATH].oc_name_known) {
                         eknown = TRUE;
+                    }
                 }
                 break;
 
@@ -881,8 +916,9 @@ engrave(const char *engraving, boolean fingers)
                            "A few ice cubes drop from the wand.");
                     eknown = TRUE;
                 }
-                if(!oep || (oep->engr_type != BURN))
+                if (!oep || (oep->engr_type != BURN)) {
                     break;
+                }
             /* fall through */
             case WAN_CANCELLATION:
             case WAN_MAKE_INVISIBLE:
@@ -918,10 +954,11 @@ engrave(const char *engraving, boolean fingers)
             case WAN_DIGGING:
                 ptext = TRUE;
                 type  = ENGRAVE;
-                if(!objects[otmp->otyp].oc_name_known) {
-                    if (flags.verbose)
+                if (!objects[otmp->otyp].oc_name_known) {
+                    if (flags.verbose) {
                         pline("This %s is a wand of digging!",
                               xname(otmp));
+                    }
                     doknown = TRUE;
                 }
                 if (!Blind) {
@@ -940,9 +977,10 @@ engrave(const char *engraving, boolean fingers)
             case WAN_FIRE:
                 ptext = TRUE;
                 type  = BURN;
-                if(!objects[otmp->otyp].oc_name_known) {
-                    if (flags.verbose)
+                if (!objects[otmp->otyp].oc_name_known) {
+                    if (flags.verbose) {
                         pline("This %s is a wand of fire!", xname(otmp));
+                    }
                     doknown = TRUE;
                 }
                 Strcpy(post_engr_text,
@@ -952,18 +990,20 @@ engrave(const char *engraving, boolean fingers)
             case WAN_LIGHTNING:
                 ptext = TRUE;
                 type  = BURN;
-                if(!objects[otmp->otyp].oc_name_known) {
-                    if (flags.verbose)
+                if (!objects[otmp->otyp].oc_name_known) {
+                    if (flags.verbose) {
                         pline("This %s is a wand of lightning!",
                               xname(otmp));
+                    }
                     doknown = TRUE;
                 }
                 if (!Blind) {
                     Strcpy(post_engr_text,
                            "Lightning arcs from the wand.");
                     doblind = TRUE;
-                } else
+                } else {
                     Strcpy(post_engr_text, "You hear crackling!");
+                }
                 break;
 
                 /* type = MARK wands */
@@ -988,25 +1028,27 @@ engrave(const char *engraving, boolean fingers)
 
     case WEAPON_CLASS:
         if (is_blade(otmp)) {
-            if ((int)otmp->spe > -3)
+            if ((int)otmp->spe > -3) {
                 type = ENGRAVE;
-            else
+            } else {
                 pline("%s too dull for engraving.", Yobjnam2(otmp, "are"));
+            }
         }
         break;
 
     case TOOL_CLASS:
-        if(otmp == ublindf) {
+        if (otmp == ublindf) {
             pline(
                 "That is a bit difficult to engrave with, don't you think?");
-            return(0);
+            return 0;
         }
         switch (otmp->otyp)  {
         case MAGIC_MARKER:
-            if (otmp->spe <= 0)
+            if (otmp->spe <= 0) {
                 Your("marker has dried out.");
-            else
+            } else {
                 type = MARK;
+            }
             break;
         case TOWEL:
             /* Can't really engrave with a towel */
@@ -1018,13 +1060,14 @@ engrave(const char *engraving, boolean fingers)
                     if (is_wet_towel(otmp)) {
                         dry_a_towel(otmp, -1, TRUE);
                     }
-                    if (!Blind)
+                    if (!Blind) {
                         You("wipe out the message here.");
-                    else
+                    } else {
                         Your("%s %s %s.", xname(otmp),
                              otense(otmp, "get"),
                              is_ice(u.ux, u.uy) ?
                              "frosty" : "dusty");
+                    }
                     dengr = TRUE;
                 } else {
                     pline("%s can't wipe out this engraving.", Yname2(otmp));
@@ -1053,9 +1096,9 @@ engrave(const char *engraving, boolean fingers)
     }
 
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
-        if (type == ENGRAVE || type == 0)
+        if (type == ENGRAVE || type == 0) {
             type = HEADSTONE;
-        else {
+        } else {
             /* ensures the "cannot wipe out" case */
             type = DUST;
             dengr = FALSE;
@@ -1092,9 +1135,10 @@ engrave(const char *engraving, boolean fingers)
     if (zapwand && (otmp->spe < 0)) {
         pline("%s %sturns to dust.",
               The(xname(otmp)), Blind ? "" : "glows violently, then ");
-        if (!IS_GRAVE(levl[u.ux][u.uy].typ))
+        if (!IS_GRAVE(levl[u.ux][u.uy].typ)) {
             You("are not going to get anywhere trying to write in the %s with your dust.",
                 is_ice(u.ux, u.uy) ? "frost" : "dust");
+        }
         useup(otmp);
         otmp = NULL; /* wand is now gone */
         ptext = FALSE;
@@ -1102,9 +1146,10 @@ engrave(const char *engraving, boolean fingers)
 
     if (!ptext) {
         /* Early exit for some implements. */
-        if (otmp && otmp->oclass == WAND_CLASS && !can_reach_floor(TRUE))
+        if (otmp && otmp->oclass == WAND_CLASS && !can_reach_floor(TRUE)) {
             You_cant_reach_the_floor(u.ux, u.uy, TRUE);
-        return(1);
+        }
+        return 1;
     }
 
     /* Special effects should have deleted the current engraving (if
@@ -1123,14 +1168,14 @@ engrave(const char *engraving, boolean fingers)
                             ynqchars, 'y');
             if (c == 'q') {
                 pline("%s", Never_mind);
-                return(0);
+                return 0;
             }
         }
 
         if (c == 'n' || Blind ||
             (engraving && (oep->engr_type != type))) {
 
-            if( (oep->engr_type == DUST) || (oep->engr_type == ENGR_BLOOD) ||
+            if ( (oep->engr_type == DUST) || (oep->engr_type == ENGR_BLOOD) ||
                 (oep->engr_type == MARK) ) {
                 if (!Blind) {
                     You("wipe out the message that was %s here.",
@@ -1139,21 +1184,21 @@ engrave(const char *engraving, boolean fingers)
                           "written")));
                     del_engr(oep);
                     oep = (struct engr *)0;
-                } else
+                } else {
                     /* Don't delete engr until after we *know* we're engraving */
                     eow = TRUE;
-            } else
-            if ( (type == DUST) || (type == MARK) || (type == ENGR_BLOOD) ) {
+                }
+            } else if ((type == DUST) || (type == MARK) || (type == ENGR_BLOOD)) {
                 You(
                     "cannot wipe out the message that is %s the %s here.",
                     oep->engr_type == BURN ?
                     (is_ice(u.ux, u.uy) ? "melted into" : "burned into") :
                     "engraved in", surface(u.ux, u.uy));
-                return(1);
-            } else
-            if ( (type != oep->engr_type) || (c == 'n') ) {
-                if (!Blind || can_reach_floor(TRUE))
+                return 1;
+            } else if ((type != oep->engr_type) || (c == 'n')) {
+                if (!Blind || can_reach_floor(TRUE)) {
                     You("will overwrite the current message.");
+                }
                 eow = TRUE;
             }
         }
@@ -1161,7 +1206,7 @@ engrave(const char *engraving, boolean fingers)
 
     eword = (u.roleplay.illiterate ? "your name " : "");
     eground = surface(u.ux, u.uy);
-    switch(type) {
+    switch (type) {
     default:
         everb = (oep && !eow ? "add" : "write");
         eloc = (oep && !eow ? "to the weird writing on" :
@@ -1198,18 +1243,19 @@ engrave(const char *engraving, boolean fingers)
     }
 
     /* Tell adventurer what is going on */
-    if (engraving && otmp == &zeroobj)
+    if (engraving && otmp == &zeroobj) {
         You("%s \"%s\" %swith your %s %s the %s.", everb, engraving,
             eword, makeplural(body_part(FINGER)), eloc, eground);
-    else if (engraving && otmp != &zeroobj)
+    } else if (engraving && otmp != &zeroobj) {
         You("%s \"%s\" %swith %s %s the %s.", everb, engraving,
             eword, doname(otmp), eloc, eground);
-    else if (otmp != &zeroobj)
+    } else if (otmp != &zeroobj) {
         You("%s %swith %s %s the %s.", everb, eword, doname(otmp),
             eloc, eground);
-    else
+    } else {
         You("%s %swith your %s %s the %s.", everb, eword,
             makeplural(body_part(FINGER)), eloc, eground);
+    }
 
     /* Prompt for engraving! (if literate) */
     if (u.roleplay.illiterate) {
@@ -1227,17 +1273,22 @@ engrave(const char *engraving, boolean fingers)
 
     /* Count the actual # of chars engraved not including spaces */
     len = strlen(ebuf);
-    for (sp = ebuf; *sp; sp++) if (isspace(*sp)) len -= 1;
+    for (sp = ebuf; *sp; sp++) {
+        if (isspace(*sp)) {
+            len -= 1;
+        }
+    }
 
     if (len == 0 || index(ebuf, '\033')) {
         if (zapwand) {
-            if (!Blind)
+            if (!Blind) {
                 pline("%s, then %s.",
                       Tobjnam(otmp, "glow"), otense(otmp, "fade"));
-            return(1);
+            }
+            return 1;
         } else {
             pline("%s", Never_mind);
-            return(0);
+            return 0;
         }
     }
 
@@ -1252,7 +1303,9 @@ engrave(const char *engraving, boolean fingers)
     /* Mix up engraving if surface or state of mind is unsound.
        Note: this won't add or remove any spaces. */
     for (sp = ebuf; *sp; sp++) {
-        if (isspace(*sp)) continue;
+        if (isspace(*sp)) {
+            continue;
+        }
         if (((type == DUST || type == ENGR_BLOOD) && !rn2(25)) ||
             (Blind && !rn2(11)) || (Confusion && !rn2(7)) ||
             (Stunned && !rn2(4)) || (Hallucination && !rn2(2)))
@@ -1269,14 +1322,18 @@ engrave(const char *engraving, boolean fingers)
     /* Figure out how long it took to engrave, and if player has
      * engraved too much.
      */
-    switch(type) {
+    switch (type) {
     default:
         multi = -(len/10);
-        if (multi) nomovemsg = "You finish your weird engraving.";
+        if (multi) {
+            nomovemsg = "You finish your weird engraving.";
+        }
         break;
     case DUST:
         multi = -(len/10);
-        if (multi) nomovemsg = "You finish writing in the dust.";
+        if (multi) {
+            nomovemsg = "You finish writing in the dust.";
+        }
         break;
     case HEADSTONE:
     case ENGRAVE:
@@ -1296,21 +1353,27 @@ engrave(const char *engraving, boolean fingers)
             if (len > maxelen) {
                 multi = -maxelen;
                 otmp->spe = -3;
-            } else if (len > 1)
+            } else if (len > 1) {
                 otmp->spe -= len >> 1;
-            else otmp->spe -= 1; /* Prevent infinite engraving */
-        } else
+            } else {
+                otmp->spe -= 1; /* Prevent infinite engraving */
+            }
+        } else {
         if ( (otmp->oclass == RING_CLASS) ||
              (otmp->oclass == GEM_CLASS) )
             multi = -len;
-        if (multi) nomovemsg = "You finish engraving.";
+        }
+        if (multi) {
+            nomovemsg = "You finish engraving.";
+        }
         break;
     case BURN:
         multi = -(len/10);
-        if (multi)
+        if (multi) {
             nomovemsg = is_ice(u.ux, u.uy) ?
                         "You finish melting your message into the ice." :
                         "You finish burning your message into the floor.";
+        }
         break;
     case MARK:
         multi = -(len/10);
@@ -1321,31 +1384,44 @@ engrave(const char *engraving, boolean fingers)
                 Your("marker dries out.");
                 otmp->spe = 0;
                 multi = -(maxelen/10);
-            } else
-            if (len > 1) otmp->spe -= len >> 1;
-            else otmp->spe -= 1; /* Prevent infinite graffiti */
+            } else if (len > 1) {
+                otmp->spe -= len >> 1;
+            } else {
+                otmp->spe -= 1; /* Prevent infinite graffiti */
+            }
         }
-        if (multi) nomovemsg = "You finish defacing the dungeon.";
+        if (multi) {
+            nomovemsg = "You finish defacing the dungeon.";
+        }
         break;
     case ENGR_BLOOD:
         multi = -(len/10);
-        if (multi) nomovemsg = "You finish scrawling.";
+        if (multi) {
+            nomovemsg = "You finish scrawling.";
+        }
         break;
     }
 
     /* Chop engraving down to size if necessary */
     if (len > maxelen) {
-        for (sp = ebuf; (maxelen && *sp); sp++)
-            if (!isspace(*sp)) maxelen--;
+        for (sp = ebuf; (maxelen && *sp); sp++) {
+            if (!isspace(*sp)) {
+                maxelen--;
+            }
+        }
         if (!maxelen && *sp) {
             *sp = (char)0;
-            if (multi) nomovemsg = "You cannot write any more.";
+            if (multi) {
+                nomovemsg = "You cannot write any more.";
+            }
             You("only are able to write \"%s\"", ebuf);
         }
     }
 
     /* Add to existing engraving */
-    if (oep) Strcpy(buf, oep->engr_txt);
+    if (oep) {
+        Strcpy(buf, oep->engr_txt);
+    }
 
     (void) strncat(buf, ebuf, (BUFSZ - (int)strlen(buf) - 1));
     /* Put the engraving onto the map */
@@ -1354,14 +1430,17 @@ engrave(const char *engraving, boolean fingers)
         unsigned ecount1, ecount0 = nengr_at(u.ux, u.uy);
         make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
         ecount1 = nengr_at(u.ux, u.uy);
-        if (ecount1 > ecount0)
+        if (ecount1 > ecount0) {
             u.uconduct.elbereths += (ecount1 - ecount0);
+        }
     }
 #else
     make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
 #endif
 
-    if (post_engr_text[0]) pline("%s", post_engr_text);
+    if (post_engr_text[0]) {
+        pline("%s", post_engr_text);
+    }
 
     /* identify stylus after seeing its effect */
     if (eknown) {
@@ -1372,10 +1451,12 @@ engrave(const char *engraving, boolean fingers)
     if (doblind && !resists_blnd(&youmonst)) {
         You("are blinded by the flash!");
         make_blinded((long)rnd(50), FALSE);
-        if (!Blind) Your("%s", vision_clears);
+        if (!Blind) {
+            Your("%s", vision_clears);
+        }
     }
 
-    return(1);
+    return 1;
 }
 
 /* while loading bones, clean up text which might accidentally
@@ -1403,14 +1484,17 @@ save_engravings(int fd, int mode)
             bwrite(fd, (genericptr_t)&(ep->engr_lth), sizeof(ep->engr_lth));
             bwrite(fd, (genericptr_t)ep, sizeof(struct engr) + ep->engr_lth);
         }
-        if (release_data(mode))
+        if (release_data(mode)) {
             dealloc_engr(ep);
+        }
         ep = ep2;
     }
-    if (perform_bwrite(mode))
+    if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t)&no_more_engr, sizeof no_more_engr);
-    if (release_data(mode))
+    }
+    if (release_data(mode)) {
         head_engr = 0;
+    }
 }
 
 void
@@ -1420,9 +1504,11 @@ rest_engravings(int fd)
     unsigned lth;
 
     head_engr = 0;
-    while(1) {
+    while (1) {
         mread(fd, &lth, sizeof lth);
-        if(lth == 0) return;
+        if (lth == 0) {
+            return;
+        }
         ep = newengr(lth);
         mread(fd, (genericptr_t) ep, sizeof(struct engr) + lth);
         ep->nxt_engr = head_engr;
@@ -1458,11 +1544,12 @@ del_engr(struct engr *ep)
     } else {
         struct engr *ept;
 
-        for (ept = head_engr; ept; ept = ept->nxt_engr)
+        for (ept = head_engr; ept; ept = ept->nxt_engr) {
             if (ept->nxt_engr == ep) {
                 ept->nxt_engr = ep->nxt_engr;
                 break;
             }
+        }
         if (!ept) {
             warning("Error in del_engr?");
             return;
@@ -1478,7 +1565,9 @@ rloc_engr(struct engr *ep)
     int tx, ty, tryct = 200;
 
     do  {
-        if (--tryct < 0) return;
+        if (--tryct < 0) {
+            return;
+        }
         tx = rn1(COLNO-3, 2);
         ty = rn2(ROWNO);
     } while (engr_at(tx, ty) ||
@@ -1619,13 +1708,17 @@ void
 make_grave(coordxy x, coordxy y, const char *str)
 {
     /* Can we put a grave here? */
-    if ((levl[x][y].typ != ROOM && levl[x][y].typ != GRAVE) || t_at(x, y)) return;
+    if ((levl[x][y].typ != ROOM && levl[x][y].typ != GRAVE) || t_at(x, y)) {
+        return;
+    }
 
     /* Make the grave */
     levl[x][y].typ = GRAVE;
 
     /* Engrave the headstone */
-    if (!str) str = epitaphs[rn2(SIZE(epitaphs))];
+    if (!str) {
+        str = epitaphs[rn2(SIZE(epitaphs))];
+    }
     del_engr_at(x, y);
     make_engr_at(x, y, str, 0L, HEADSTONE);
     return;

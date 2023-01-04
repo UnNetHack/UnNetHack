@@ -42,7 +42,9 @@ get_dump_filename(void)
 
     buf[0] = '\0';
 
-    if (!dump_fn[0]) return NULL;
+    if (!dump_fn[0]) {
+        return NULL;
+    }
 
     f = dump_fn;
     p = buf;
@@ -172,10 +174,12 @@ void
 dump(const char *pre, const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "%s%s\n", pre, str);
-    if (html_dump_fp)
+    }
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "%s%s\n", pre, str);
+    }
 #endif
 }
 
@@ -184,8 +188,9 @@ void
 dump_html(const char *format, const char *str)
 {
 #ifdef DUMP_LOG
-    if (html_dump_fp)
+    if (html_dump_fp) {
         fprintf(html_dump_fp, format, str);
+    }
 #endif
 }
 
@@ -194,8 +199,9 @@ void
 dump_text(const char *format, const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, format, str);
+    }
 #endif
 }
 
@@ -204,8 +210,9 @@ void
 dump_line(const char *pre, const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "%s%s\n", pre, str);
+    }
     if (html_dump_fp) {
         while (*pre != '\0') {
             fprintf(html_dump_fp, "%s", html_escape_character(*pre++));
@@ -244,8 +251,9 @@ dump_object(const char c, const struct obj *obj, const char *str)
 {
 #ifdef DUMP_LOG
     const char *starting_inventory = obj->was_in_starting_inventory ? "*" : "";
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "  %c - %s%s\n", c, str, starting_inventory);
+    }
     if (html_dump_fp) {
         char *link = html_link(dump_typename(obj->otyp), str);
 # ifdef TTY_GRAPHICS
@@ -255,10 +263,11 @@ dump_object(const char c, const struct obj *obj, const char *str)
         if (iflags.use_menu_color &&
             get_menu_coloring(str, &color, &attr)) {
             fprintf(html_dump_fp, "<span class=\"nh_color_%d\"><span class=\"nh_item_letter\">%c</span> - %s</span>%s<br />\n", color, c, link, starting_inventory);
-        } else
+        } else {
 #  endif
 # endif
         fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s%s<br />\n", c, link, starting_inventory);
+        }
     }
 #endif
 }
@@ -282,10 +291,12 @@ dump_title(char *str)
     if (str[len-1] == ':') {
         str[len-1] = '\0';
     }
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "%s\n", str);
-    if (html_dump_fp)
+    }
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<h2>%s</h2>\n", str);
+    }
 #endif
 }
 
@@ -294,8 +305,9 @@ void
 dump_list_start(void)
 {
 #ifdef DUMP_LOG
-    if (html_dump_fp)
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<ul>\n");
+    }
 #endif
 }
 
@@ -304,10 +316,12 @@ void
 dump_list_item_link(const char *link, const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "  %s\n", str);
-    if (html_dump_fp)
+    }
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<li>%s</li>\n", html_link(link, str));
+    }
 #endif
 }
 
@@ -316,8 +330,9 @@ void
 dump_list_item_object(struct obj *obj)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "  %s\n", doname(obj));
+    }
     if (html_dump_fp) {
         const char* str = doname(obj);
         char *link = html_link(dump_typename(obj->otyp), str);
@@ -328,10 +343,11 @@ dump_list_item_object(struct obj *obj)
         if (iflags.use_menu_color &&
             get_menu_coloring(str, &color, &attr)) {
             fprintf(html_dump_fp, "<li class=\"nh_color_%d\">%s</li>\n", color, link);
-        } else
+        } else {
 #  endif
 # endif
         fprintf(html_dump_fp, "<li>%s</li>\n", link);
+        }
     }
 #endif
 }
@@ -341,10 +357,12 @@ void
 dump_list_item(const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "  %s\n", str);
-    if (html_dump_fp)
+    }
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<li>%s</li>\n", str);
+    }
 #endif
 }
 
@@ -360,8 +378,9 @@ void
 dump_blockquote_start(void)
 {
 #ifdef DUMP_LOG
-    if (html_dump_fp)
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<blockquote>\n");
+    }
 #endif
 }
 
@@ -380,8 +399,9 @@ void
 dump_definition_list_start(void)
 {
 #ifdef DUMP_LOG
-    if (html_dump_fp)
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<dl>\n");
+    }
 #endif
 }
 
@@ -390,8 +410,9 @@ void
 dump_definition_list_dt(const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "  %s\n", str);
+    }
     if (html_dump_fp) {
         fprintf(html_dump_fp, "<dt>");
         while (*str != '\0')
@@ -406,10 +427,12 @@ void
 dump_definition_list_dd(const char *str)
 {
 #ifdef DUMP_LOG
-    if (dump_fp)
+    if (dump_fp) {
         fprintf(dump_fp, "  %s\n", str);
-    if (html_dump_fp)
+    }
+    if (html_dump_fp) {
         fprintf(html_dump_fp, "<dd>%s</dd>\n", str);
+    }
 #endif
 }
 

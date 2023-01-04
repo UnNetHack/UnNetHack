@@ -111,8 +111,9 @@ verbose_help(void)
     };
     const char **str;
 
-    for (str = long_help; *str; str++)
-	(void) printf("%s\n", *str);
+    for (str = long_help; *str; str++) {
+        (void) printf("%s\n", *str);
+    }
     usage();
 }
 
@@ -239,8 +240,8 @@ main(int argc, char **argv)
 	/* doesn't return */
     }
 
-    for(cp=0;argv[1][cp];cp++){
-	switch(argv[1][cp]){
+    for (cp=0;argv[1][cp];cp++) {
+        switch(argv[1][cp]) {
 	    default:
 		usage();	/* doesn't return */
 	    case '-':	/* silently ignore */
@@ -266,15 +267,15 @@ main(int argc, char **argv)
 	    case 'C':
 		if (ap == argc) usage();
 #ifdef AMIGA
-		if(!getcwd(origdir,sizeof(origdir))){
-		    printf("Can't get current directory.\n");
-		    xexit(EXIT_FAILURE);
-		}
+        if (!getcwd(origdir,sizeof(origdir))) {
+            printf("Can't get current directory.\n");
+            xexit(EXIT_FAILURE);
+        }
 #endif
-		if(chdir(argv[ap++])){
-		    printf("Can't chdir to %s\n",argv[--ap]);
-		    xexit(EXIT_FAILURE);
-		}
+        if (chdir(argv[ap++])) {
+            printf("Can't chdir to %s\n",argv[--ap]);
+            xexit(EXIT_FAILURE);
+        }
 		break;
 	    case 'v':
 		verbose=1;
@@ -282,21 +283,21 @@ main(int argc, char **argv)
 	    case 't':
 	    case 'c':
 	    case 'x':
-		if(action != ' '){
-		    printf("Only one of t,x,c may be specified.\n");
-		    usage();
-		}
+        if (action != ' ') {
+            printf("Only one of t,x,c may be specified.\n");
+            usage();
+        }
 		action=argv[1][cp];
 		break;
 	}
     }
 
-    if(argv[ap] && iseen){
-	printf("Too many arguments.\n");
-	xexit(EXIT_FAILURE);
+    if (argv[ap] && iseen) {
+        printf("Too many arguments.\n");
+        xexit(EXIT_FAILURE);
     }
 
-    switch(action){
+    switch(action) {
     default:
 	printf("Internal error - action.\n");
 	xexit(EXIT_FAILURE);
@@ -337,8 +338,11 @@ main(int argc, char **argv)
 	    if (argv[ap]) {
 		/* if files are listed, see if current is wanted */
 		int c;
-		for (c = ap; c < argc; c++)
-		    if (!FILENAME_CMP(lib.dir[i].fname, argv[c])) break;
+        for (c = ap; c < argc; c++) {
+            if (!FILENAME_CMP(lib.dir[i].fname, argv[c])) {
+                break;
+            }
+        }
 		if (c == argc) continue;	/* skip */
 	    } else if (!FILENAME_CMP(lib.dir[i].fname, DLB_DIRECTORY)) {
 		/*
@@ -509,8 +513,9 @@ main(int argc, char **argv)
 	    write_dlb_directory(out, nfiles, ld, slen, dir_size, flen);
 	}
 
-	for (i = 0; i < nfiles; i++)
-	    free((genericptr_t) ld[i].fname),  ld[i].fname = 0;
+    for (i = 0; i < nfiles; i++) {
+        free((genericptr_t) ld[i].fname),  ld[i].fname = 0;
+    }
 
 	(void) close(out);
 	xexit(EXIT_SUCCESS);

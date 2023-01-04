@@ -16,11 +16,12 @@ char erase_char, kill_char;
  * Called by startup() in termcap.c and after returning from ! or ^Z
  */
 void
-gettty(){
+gettty()
+{
 	erase_char = '\b';
 	kill_char = 21;		/* cntl-U */
 	iflags.cbreak = TRUE;
-#if !defined(TOS) 
+#if !defined(TOS)
 	disable_ctrlP();	/* turn off ^P processing */
 #endif
 #if defined(MSDOS) && defined(NO_TERMS)

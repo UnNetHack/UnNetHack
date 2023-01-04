@@ -214,16 +214,20 @@ charm_monsters(int distance)
     struct monst *mtmp, *mtmp2;
 
     if (u.uswallow) {
-        if (!resist(u.ustuck, TOOL_CLASS, 0, NOTELL))
+        if (!resist(u.ustuck, TOOL_CLASS, 0, NOTELL)) {
             (void) tamedog(u.ustuck, (struct obj *) 0);
+        }
     } else {
         for (mtmp = fmon; mtmp; mtmp = mtmp2) {
             mtmp2 = mtmp->nmon;
-            if (DEADMONSTER(mtmp)) continue;
+            if (DEADMONSTER(mtmp)) {
+                continue;
+            }
 
             if (distu(mtmp->mx, mtmp->my) <= distance) {
-                if (!resist(mtmp, TOOL_CLASS, 0, NOTELL))
+                if (!resist(mtmp, TOOL_CLASS, 0, NOTELL)) {
                     (void) tamedog(mtmp, (struct obj *) 0);
+                }
             }
         }
     }
@@ -253,56 +257,75 @@ do_earthquake(int force)
     start_y = u.uy - (force * 2);
     end_x = u.ux + (force * 2);
     end_y = u.uy + (force * 2);
-    if (start_x < 1) start_x = 1;
-    if (start_y < 1) start_y = 1;
-    if (end_x >= COLNO) end_x = COLNO - 1;
-    if (end_y >= ROWNO) end_y = ROWNO - 1;
+    if (start_x < 1) {
+        start_x = 1;
+    }
+    if (start_y < 1) {
+        start_y = 1;
+    }
+    if (end_x >= COLNO) {
+        end_x = COLNO - 1;
+    }
+    if (end_y >= ROWNO) {
+        end_y = ROWNO - 1;
+    }
     for (x = start_x; x <= end_x; x++) {
         for (y = start_y; y <= end_y; y++) {
             if ((mtmp = m_at(x, y)) != 0) {
                 wakeup(mtmp, TRUE); /* peaceful monster will become hostile */
                 if (mtmp->mundetected && is_hider(mtmp->data)) {
                     mtmp->mundetected = 0;
-                    if (cansee(x, y))
+                    if (cansee(x, y)) {
                         pline("%s is shaken loose from the ceiling!",
                               Amonnam(mtmp));
-                    else
+                    } else {
                         You_hear("a thumping sound.");
-                    if (x==u.ux && y==u.uy)
+                    }
+                    if (x==u.ux && y==u.uy) {
                         You("easily dodge the falling %s.",
                             mon_nam(mtmp));
+                    }
                     newsym(x, y);
                 }
             }
             if (!rn2(14 - force)) switch (levl[x][y].typ) {
                 case FOUNTAIN: /* Make the fountain disappear */
-                    if (cansee(x, y))
+                    if (cansee(x, y)) {
                         pline_The("fountain falls into a chasm.");
+                    }
                     goto do_pit;
 #ifdef SINKS
                 case SINK:
-                    if (cansee(x, y))
+                    if (cansee(x, y)) {
                         pline_The("kitchen sink falls into a chasm.");
+                    }
                     goto do_pit;
 #endif
                 case ALTAR:
-                    if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) break;
+                    if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
+                        break;
+                    }
 
-                    if (cansee(x, y))
+                    if (cansee(x, y)) {
                         pline_The("altar falls into a chasm.");
+                    }
                     goto do_pit;
                 case GRAVE:
-                    if (cansee(x, y))
+                    if (cansee(x, y)) {
                         pline_The("headstone topples into a chasm.");
+                    }
                     goto do_pit;
                 case THRONE:
-                    if (cansee(x, y))
+                    if (cansee(x, y)) {
                         pline_The("throne falls into a chasm.");
+                    }
                 /* fall through */
                 case ROOM:
                 case CORR: /* Try to make a pit */
 do_pit:             chasm = maketrap(x, y, PIT);
-                    if (!chasm) break; /* no pit if portal at that location */
+                    if (!chasm) {
+                        break; /* no pit if portal at that location */
+                    }
                     chasm->tseen = 1;
 
                     /* TODO:
@@ -325,11 +348,13 @@ do_pit:             chasm = maketrap(x, y, PIT);
                     mtmp = m_at(x, y);
 
                     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
-                        if (cansee(x, y))
+                        if (cansee(x, y)) {
                             pline("KADOOM!  The boulder falls into a chasm%s!",
                                   ((x == u.ux) && (y == u.uy)) ? " below you" : "");
-                        if (mtmp)
+                        }
+                        if (mtmp) {
                             mtmp->mtrapped = 0;
+                        }
                         obj_extract_self(otmp);
                         (void) flooreffects(otmp, x, y, "");
                         break;
@@ -339,7 +364,7 @@ do_pit:             chasm = maketrap(x, y, PIT);
                        falls in a chasm... */
 
                     if (mtmp) {
-                        if(!is_flyer(mtmp->data) && !is_clinger(mtmp->data)) {
+                        if (!is_flyer(mtmp->data) && !is_clinger(mtmp->data)) {
                             boolean m_already_trapped = mtmp->mtrapped;
 
                             mtmp->mtrapped = 1;
@@ -357,9 +382,9 @@ do_pit:             chasm = maketrap(x, y, PIT);
                             if (!DEADMONSTER(mtmp)) {
                                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
                                 if (DEADMONSTER(mtmp)) {
-                                    if(!cansee(x, y))
+                                    if (!cansee(x, y)) {
                                         pline("It is destroyed!");
-                                    else {
+                                    } else {
                                         You("destroy %s!", mtmp->mtame ?
                                             x_monnam(mtmp, ARTICLE_THE, "poor",
                                                 has_mgivenname(mtmp)? SUPPRESS_SADDLE : 0, FALSE) :
@@ -422,12 +447,18 @@ do_pit:             chasm = maketrap(x, y, PIT);
 
                 case DOOR: /* Make the door collapse */
                     /* ALI - artifact doors */
-                    if (artifact_door(x, y)) break;
-                    if (levl[x][y].doormask == D_NODOOR) goto do_pit;
-                    if (cansee(x, y))
+                    if (artifact_door(x, y)) {
+                        break;
+                    }
+                    if (levl[x][y].doormask == D_NODOOR) {
+                        goto do_pit;
+                    }
+                    if (cansee(x, y)) {
                         pline_The("door collapses.");
-                    if (*in_rooms(x, y, SHOPBASE))
+                    }
+                    if (*in_rooms(x, y, SHOPBASE)) {
                         add_damage(x, y, 0L);
+                    }
                     levl[x][y].doormask = D_NODOOR;
                     unblock_point(x, y);
                     newsym(x, y);
@@ -471,8 +502,9 @@ do_improvisation(struct obj *instr)
     amii_speaker(&itmp, "Cw", AMII_OKAY_VOLUME);
 # endif
 # ifdef VPIX_MUSIC
-    if (sco_flag_console)
+    if (sco_flag_console) {
         speaker(&itmp, "C");
+    }
 # endif
 #ifdef PCMUSIC
     pc_speaker ( &itmp, "C");
@@ -566,7 +598,9 @@ do_improvisation(struct obj *instr)
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
-        if (do_spec) charm_snakes(u.ulevel * 3);
+        if (do_spec) {
+            charm_snakes(u.ulevel * 3);
+        }
         exercise(A_DEX, TRUE);
         break;
 
@@ -615,7 +649,9 @@ do_improvisation(struct obj *instr)
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         pline("%s %s.", Yname2(instr),
                 do_spec ? "produces a lilting melody" : "twangs");
-        if (do_spec) calm_nymphs(u.ulevel * 3);
+        if (do_spec) {
+            calm_nymphs(u.ulevel * 3);
+        }
         exercise(A_DEX, TRUE);
         break;
 
@@ -668,7 +704,7 @@ do_play_instrument(struct obj *instr)
 
     if (Underwater) {
         You_cant("play music underwater!");
-        return(0);
+        return 0;
     }
     if ((instr->otyp == WOODEN_FLUTE ||
          instr->otyp == MAGIC_FLUTE ||
@@ -707,20 +743,26 @@ do_play_instrument(struct obj *instr)
                 *s = highc(*s);
 #else
                 /* The AMIGA supports two octaves of notes */
-                if (*s == 'h') *s = 'b';
+                if (*s == 'h') {
+                    *s = 'b';
+                }
 #endif
-                if (*s == 'H') *s = 'B';
+                if (*s == 'H') {
+                    *s = 'B';
+                }
             }
         }
         You("extract a strange sound from %s!", the(xname(instr)));
 #ifdef UNIX386MUSIC
         /* if user is at the console, play through the console speaker */
-        if (atconsole())
+        if (atconsole()) {
             speaker(instr, buf);
+        }
 #endif
 #ifdef VPIX_MUSIC
-        if (sco_flag_console)
+        if (sco_flag_console) {
             speaker(instr, buf);
+        }
 #endif
 #ifdef MAC
         mac_speaker ( instr, buf );
@@ -730,14 +772,13 @@ do_play_instrument(struct obj *instr)
 #endif
 #ifdef AMIGA
         {
-            char nbuf[ 20 ];
+            char nbuf[20];
             int i;
-            for( i = 0; buf[i] && i < 5; ++i )
-            {
+            for (i = 0; buf[i] && i < 5; ++i) {
                 nbuf[ i*2 ] = buf[ i ];
                 nbuf[ (i*2)+1 ] = 'h';
             }
-            nbuf[ i*2 ] = 0;
+            nbuf[i*2] = 0;
             amii_speaker ( instr, nbuf, AMII_OKAY_VOLUME );
         }
 #endif
@@ -748,72 +789,90 @@ do_play_instrument(struct obj *instr)
             exercise(A_WIS, TRUE);  /* just for trying */
             if (!strcmp(buf, tune)) {
                 /* Search for the drawbridge */
-                for(y=u.uy-1; y<=u.uy+1; y++)
-                    for(x=u.ux-1; x<=u.ux+1; x++)
-                        if(isok(x, y))
+                for (y=u.uy-1; y<=u.uy+1; y++) {
+                    for (x=u.ux-1; x<=u.ux+1; x++) {
+                        if (isok(x, y)) {
                             if (find_drawbridge(&x, &y)) {
                                 u.uevent.uheard_tune = 2; /* tune now fully known */
-                                if(levl[x][y].typ == DRAWBRIDGE_DOWN)
+                                if (levl[x][y].typ == DRAWBRIDGE_DOWN) {
                                     close_drawbridge(x, y);
-                                else
+                                } else {
                                     open_drawbridge(x, y);
+                                }
                                 return 1;
                             }
+                        }
+                    }
+                }
             } else if (!Deaf) {
-                if (u.uevent.uheard_tune < 1) u.uevent.uheard_tune = 1;
+                if (u.uevent.uheard_tune < 1) {
+                    u.uevent.uheard_tune = 1;
+                }
                 /* Okay, it wasn't the right tune, but perhaps
                  * we can give the player some hints like in the
                  * Mastermind game */
                 ok = FALSE;
-                for(y = u.uy-1; y <= u.uy+1 && !ok; y++)
-                    for(x = u.ux-1; x <= u.ux+1 && !ok; x++)
-                        if(isok(x, y))
-                            if(IS_DRAWBRIDGE(levl[x][y].typ) ||
-                               is_drawbridge_wall(x, y) >= 0)
+                for (y = u.uy-1; y <= u.uy+1 && !ok; y++) {
+                    for (x = u.ux-1; x <= u.ux+1 && !ok; x++) {
+                        if (isok(x, y)) {
+                            if (IS_DRAWBRIDGE(levl[x][y].typ) ||
+                                 is_drawbridge_wall(x, y) >= 0) {
                                 ok = TRUE;
-                if(ok) { /* There is a drawbridge near */
+                            }
+                        }
+                    }
+                }
+                if (ok) { /* There is a drawbridge near */
                     int tumblers, gears;
                     boolean matched[5];
 
                     tumblers = gears = 0;
-                    for(x=0; x < 5; x++)
+                    for (x=0; x < 5; x++) {
                         matched[x] = FALSE;
+                    }
 
-                    for(x=0; x < (int)strlen(buf); x++)
-                        if(x < 5) {
-                            if(buf[x] == tune[x]) {
+                    for (x=0; x < (int)strlen(buf); x++) {
+                        if (x < 5) {
+                            if (buf[x] == tune[x]) {
                                 gears++;
                                 matched[x] = TRUE;
-                            } else
-                                for(y=0; y < 5; y++)
-                                    if(!matched[y] &&
-                                       buf[x] == tune[y] &&
-                                       buf[y] != tune[y]) {
+                            } else {
+                                for (y=0; y < 5; y++) {
+                                    if (!matched[y] &&
+                                         buf[x] == tune[y] &&
+                                         buf[y] != tune[y]) {
                                         tumblers++;
                                         matched[y] = TRUE;
                                         break;
                                     }
+                                }
+                            }
                         }
-                    if(tumblers)
-                        if(gears)
+                    }
+                    if (tumblers) {
+                        if (gears) {
                             You_hear("%d tumbler%s click and %d gear%s turn.",
                                      tumblers, plur(tumblers), gears, plur(gears));
-                        else
+                        } else {
                             You_hear("%d tumbler%s click.",
                                      tumblers, plur(tumblers));
-                    else if(gears) {
+                        }
+                    } else if (gears) {
                         You_hear("%d gear%s turn.", gears, plur(gears));
                         /* could only get `gears == 5' by playing five
                            correct notes followed by excess; otherwise,
                            tune would have matched above */
-                        if (gears == 5) u.uevent.uheard_tune = 2;
+                        if (gears == 5) {
+                            u.uevent.uheard_tune = 2;
+                        }
                     }
                 }
             }
         }
         return 1;
-    } else
+    } else {
         return do_improvisation(instr);
+    }
 
  nevermind:
     pline("%s", Never_mind);
@@ -840,7 +899,7 @@ atconsole()
      */
     char    *termtype = nh_getenv("TERM");
 
-    return(!strcmp(termtype, "AT386") || !strcmp(termtype, "xterm"));
+    return !strcmp(termtype, "AT386") || !strcmp(termtype, "xterm");
 }
 
 static void
@@ -856,8 +915,7 @@ char    *buf;
      */
     int fd;
 
-    if ((fd = open("/dev/speaker", 1)) != -1)
-    {
+    if ((fd = open("/dev/speaker", 1)) != -1) {
         /* send a prefix to modify instrumental `timbre' */
         switch (instr->otyp)
         {

@@ -86,11 +86,13 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     maxwidth = term_cols - 2;
 
     if (iflags.window_inited) {
-        if (!iflags.wc_popup_dialog)
+        if (!iflags.wc_popup_dialog) {
             return curses_message_win_getline(prompt, answer, buffer);
+        }
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
-        if ((prompt_width + 2) > map_width)
+        if ((prompt_width + 2) > map_width) {
             maxwidth = map_width - 2;
+        }
     }
 
     if (prompt_width > maxwidth) {
@@ -330,7 +332,9 @@ curses_ext_cmd(void)
         getbegyx(extwin2,y0,x0);
         getmaxyx(extwin2,h,w);
         extwin = newwin(1, w-2, y0+1, x0+1);
-        if (w - 4 < maxlen) maxlen = w - 4;
+        if (w - 4 < maxlen) {
+            maxlen = w - 4;
+        }
         nhUse(h); /* needed only to give getmaxyx three arguments */
     } else {
         curses_get_window_xy(MESSAGE_WIN, &winx, &winy);
@@ -343,7 +347,9 @@ curses_ext_cmd(void)
 
         winy += messageh - 1;
         extwin = newwin(1, messagew-2, winy, winx);
-        if (messagew - 4 < maxlen) maxlen = messagew - 4;
+        if (messagew - 4 < maxlen) {
+            maxlen = messagew - 4;
+        }
         pline("#");
     }
 
@@ -432,7 +438,9 @@ curses_ext_cmd(void)
     }
 
     curses_destroy_win(extwin);
-    if (extwin2) curses_destroy_win(extwin2);
+    if (extwin2) {
+        curses_destroy_win(extwin2);
+    }
     return ret;
 }
 
@@ -1271,8 +1279,9 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
                     if (how == PICK_ONE) {
                         menu_clear_selections(menu);
                         menu_select_deselect(win, menu_item_ptr, SELECT);
-                        if (count)
+                        if (count) {
                             menu_item_ptr->count = count;
+                        }
                         num_selected = 1;
                         dismiss = TRUE;
                         break;

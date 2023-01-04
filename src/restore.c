@@ -74,8 +74,11 @@ find_lev_obj(void)
     struct obj *otmp;
     int x, y;
 
-    for(x=0; x<COLNO; x++) for(y=0; y<ROWNO; y++)
+    for (x=0; x<COLNO; x++) {
+        for (y=0; y<ROWNO; y++) {
             level.objects[x][y] = (struct obj *)0;
+        }
+    }
 
     /*
      * Reverse the entire fobj chain, which is necessary so that we can
@@ -108,7 +111,9 @@ inven_inuse(boolean quietly)
     for (otmp = invent; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->in_use) {
-            if (!quietly) pline("Finishing off %s...", xname(otmp));
+            if (!quietly) {
+                pline("Finishing off %s...", xname(otmp));
+            }
             useup(otmp);
         }
     }
@@ -122,14 +127,15 @@ restlevchn(int fd)
 
     sp_levchn = (s_level *) 0;
     mread(fd, (genericptr_t) &cnt, sizeof(int));
-    for(; cnt > 0; cnt--) {
-
+    for (; cnt > 0; cnt--) {
         tmplev = (s_level *)alloc(sizeof(s_level));
         mread(fd, (genericptr_t) tmplev, sizeof(s_level));
-        if(!sp_levchn) sp_levchn = tmplev;
-        else {
-
-            for(x = sp_levchn; x->next; x = x->next);
+        if (!sp_levchn) {
+            sp_levchn = tmplev;
+        } else {
+            for (x = sp_levchn; x->next; x = x->next) {
+                ;
+            }
             x->next = tmplev;
         }
         tmplev->next = (s_level *)0;
@@ -143,15 +149,17 @@ restdamage(int fd, boolean ghostly)
     struct damage *tmp_dam;
 
     mread(fd, (genericptr_t) &counter, sizeof(counter));
-    if (!counter)
+    if (!counter) {
         return;
+    }
     tmp_dam = (struct damage *)alloc(sizeof(struct damage));
     while (--counter >= 0) {
         char damaged_shops[5], *shp = (char *)0;
 
         mread(fd, (genericptr_t) tmp_dam, sizeof(*tmp_dam));
-        if (ghostly)
+        if (ghostly) {
             tmp_dam->when += (monstermoves - omoves);
+        }
         Strcpy(damaged_shops,
                in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
         if (u.uz.dlevel) {
@@ -294,29 +302,33 @@ restobjchn(int fd, boolean ghostly, boolean frozen)
 
     while (1) {
         mread(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen == -1)
+        if (buflen == -1) {
             break;
+        }
 
         otmp = newobj();
         restobj(fd, otmp);
-        if (!first)
+        if (!first) {
             first = otmp;
-        else
+        } else {
             otmp2->nobj = otmp;
+        }
 
         if (ghostly) {
             unsigned nid = flags.ident++;
             add_id_mapping(otmp->o_id, nid);
             otmp->o_id = nid;
         }
-        if (ghostly && otmp->otyp == SLIME_MOLD)
+        if (ghostly && otmp->otyp == SLIME_MOLD) {
             ghostfruit(otmp);
+        }
         /* Ghost levels get object age shifted from old player's clock
          * to new player's clock.  Assumption: new player arrived
          * immediately after old player died.
          */
-        if (ghostly && !frozen && !age_is_relative(otmp))
+        if (ghostly && !frozen && !age_is_relative(otmp)) {
             otmp->age = monstermoves - omoves + otmp->age;
+        }
 
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
@@ -324,8 +336,9 @@ restobjchn(int fd, boolean ghostly, boolean frozen)
 
             otmp->cobj = restobjchn(fd, ghostly, Is_IceBox(otmp));
             /* restore container back pointers */
-            for (otmp3 = otmp->cobj; otmp3; otmp3 = otmp3->nobj)
+            for (otmp3 = otmp->cobj; otmp3; otmp3 = otmp3->nobj) {
                 otmp3->ocontainer = otmp;
+            }
         } else if (SchroedingersBox(otmp)) {
             struct obj *catcorpse;
 
@@ -348,8 +361,9 @@ restobjchn(int fd, boolean ghostly, boolean frozen)
                 otmp->owt = weight(otmp);
             }
         }
-        if (otmp->bypass)
+        if (otmp->bypass) {
             otmp->bypass = 0;
+        }
         if (!ghostly) {
             /* fix the pointers */
 #ifdef NEXT_VERSION
@@ -439,15 +453,17 @@ restmonchn(int fd, boolean ghostly)
 
     while (1) {
         mread(fd, (genericptr_t) &buflen, sizeof(buflen));
-        if (buflen == -1)
+        if (buflen == -1) {
             break;
+        }
 
         mtmp = newmonst();
         restmon(fd, mtmp);
-        if (!first)
+        if (!first) {
             first = mtmp;
-        else
+        } else {
             mtmp2->nmon = mtmp;
+        }
 
         if (ghostly) {
             unsigned nid = flags.ident++;
@@ -467,27 +483,32 @@ restmonchn(int fd, boolean ghostly)
             struct obj *obj;
             mtmp->minvent = restobjchn(fd, ghostly, FALSE);
             /* restore monster back pointer */
-            for (obj = mtmp->minvent; obj; obj = obj->nobj)
+            for (obj = mtmp->minvent; obj; obj = obj->nobj) {
                 obj->ocarry = mtmp;
+            }
         }
         if (mtmp->mw) {
             struct obj *obj;
 
-            for (obj = mtmp->minvent; obj; obj = obj->nobj)
-                if (obj->owornmask & W_WEP)
+            for (obj = mtmp->minvent; obj; obj = obj->nobj) {
+                if (obj->owornmask & W_WEP) {
                     break;
-            if (obj)
+                }
+            }
+            if (obj) {
                 mtmp->mw = obj;
-            else {
+            } else {
                 MON_NOWEP(mtmp);
                 impossible("bad monster weapon restore");
             }
         }
 
-        if (mtmp->isshk)
+        if (mtmp->isshk) {
             restshk(mtmp, ghostly);
-        if (mtmp->ispriest)
+        }
+        if (mtmp->ispriest) {
             restpriest(mtmp, ghostly);
+        }
 
         if (!ghostly) {
             if (mtmp->m_id == polearm.m_id) {
@@ -536,11 +557,17 @@ ghostfruit(struct obj *otmp)
 {
     struct fruit *oldf;
 
-    for (oldf = oldfruit; oldf; oldf = oldf->nextf)
-        if (oldf->fid == otmp->spe) break;
+    for (oldf = oldfruit; oldf; oldf = oldf->nextf) {
+        if (oldf->fid == otmp->spe) {
+            break;
+        }
+    }
 
-    if (!oldf) impossible("no old fruit?");
-    else otmp->spe = fruitadd(oldf->fname);
+    if (!oldf) {
+        impossible("no old fruit?");
+    } else {
+        otmp->spe = fruitadd(oldf->fname);
+    }
 }
 
 static boolean
@@ -557,14 +584,17 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
            as an attempt to cheat and refuse to restore this file */
         pline("Saved game was not yours.");
 #ifdef WIZARD
-        if (!wizard)
+        if (!wizard) {
 #endif
         return FALSE;
+        }
     }
 
     mread(fd, (genericptr_t) &flags, sizeof(struct flag));
     flags.bypasses = 0; /* never use the saved value of bypasses */
-    if (remember_discover) discover = remember_discover;
+    if (remember_discover) {
+        discover = remember_discover;
+    }
 
     role_init();    /* Reset the initial role, race, gender, and alignment */
 #ifdef AMII_GRAPHICS
@@ -575,7 +605,7 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
 #ifdef CLIPPING
     cliparound(u.ux, u.uy);
 #endif
-    if(u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
+    if (u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
         u.ux = u.uy = 0;    /* affects pline() [hence You()] */
         You("were not healthy enough to survive restoration.");
         /* wiz1_level.dlevel is used by mklev.c to see if lots of stuff is
@@ -584,7 +614,7 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
         wiz1_level.dlevel = 0;
         u.uz.dnum = 0;
         u.uz.dlevel = 1;
-        return(FALSE);
+        return FALSE;
     }
 
     /* this stuff comes after potential aborted restore attempts */
@@ -614,11 +644,13 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
           sizeof(struct spell) * (MAXSPELL + 1));
     restore_artifacts(fd);
     restore_oracles(fd);
-    if (u.ustuck)
+    if (u.ustuck) {
         mread(fd, (genericptr_t) stuckid, sizeof (*stuckid));
+    }
 
-    if (u.usteed)
+    if (u.usteed) {
         mread(fd, (genericptr_t) steedid, sizeof (*steedid));
+    }
 
     mread(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
     mread(fd, (genericptr_t) pl_character, sizeof pl_character);
@@ -644,7 +676,7 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
 #ifdef WHEREIS_FILE
     touch_whereis();
 #endif
-    return(TRUE);
+    return TRUE;
 }
 
 /* update game state pointers to those valid for the current level (so we
@@ -656,16 +688,26 @@ restlevelstate(unsigned int stuckid, unsigned int steedid)
     struct monst *mtmp;
 
     if (stuckid) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == stuckid) break;
-        if (!mtmp) panic("Cannot find the monster ustuck.");
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->m_id == stuckid) {
+                break;
+            }
+        }
+        if (!mtmp) {
+            panic("Cannot find the monster ustuck.");
+        }
         u.ustuck = mtmp;
     }
 
     if (steedid) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == steedid) break;
-        if (!mtmp) panic("Cannot find the monster usteed.");
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->m_id == steedid) {
+                break;
+            }
+        }
+        if (!mtmp) {
+            panic("Cannot find the monster usteed.");
+        }
         u.usteed = mtmp;
         remove_monster(mtmp->mx, mtmp->my);
     }
@@ -732,7 +774,7 @@ restlevelfile(
     bufon(nfd);
     savelev(nfd, ltmp, WRITE_SAVE | FREE_SAVE);
     bclose(nfd);
-    return(2);
+    return 2;
 }
 
 int
@@ -755,14 +797,16 @@ dorecover(int fd)
         (void) close(fd);
         (void) delete_savefile();
         restoring = FALSE;
-        return(0);
+        return 0;
     }
     restlevelstate(stuckid, steedid);
 #ifdef INSURANCE
     savestateinlock();
 #endif
     rtmp = restlevelfile(fd, ledger_no(&u.uz));
-    if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
+    if (rtmp < 2) {
+        return rtmp;  /* dorecover called recursively */
+    }
 
     /* these pointers won't be valid while we're processing the
      * other levels, but they'll be reset again by restlevelstate()
@@ -776,7 +820,7 @@ dorecover(int fd)
 # ifdef AMII_GRAPHICS
     {
         extern struct window_procs amii_procs;
-        if(windowprocs.win_init_nhwindows== amii_procs.win_init_nhwindows) {
+        if (windowprocs.win_init_nhwindows== amii_procs.win_init_nhwindows) {
             extern winid WIN_BASE;
             clear_nhwindow(WIN_BASE); /* hack until there's a hook for this */
         }
@@ -792,16 +836,18 @@ dorecover(int fd)
     curs(WIN_MAP, 1, 1);
     dotcnt = 0;
     dotrow = 2;
-    if (strncmpi("X11", windowprocs.name, 3))
+    if (strncmpi("X11", windowprocs.name, 3)) {
         putstr(WIN_MAP, 0, "Restoring:");
+    }
 #endif
-    while(1) {
+    while (1) {
 #ifdef ZEROCOMP
-        if(mread(fd, (genericptr_t) &ltmp, sizeof ltmp) < 0)
+        if (mread(fd, (genericptr_t) &ltmp, sizeof ltmp) < 0) {
 #else
-        if(read(fd, (genericptr_t) &ltmp, sizeof ltmp) != sizeof ltmp)
+        if (read(fd, (genericptr_t) &ltmp, sizeof ltmp) != sizeof ltmp) {
 #endif
             break;
+        }
         getlev(fd, 0, ltmp, FALSE);
 #ifdef MICRO
         curs(WIN_MAP, 1+dotcnt++, dotrow);
@@ -815,7 +861,9 @@ dorecover(int fd)
         mark_synch();
 #endif
         rtmp = restlevelfile(fd, ltmp);
-        if (rtmp < 2) return(rtmp);  /* dorecover called recursively */
+        if (rtmp < 2) {
+            return rtmp;  /* dorecover called recursively */
+        }
     }
 
 #ifdef BSD
@@ -830,12 +878,17 @@ dorecover(int fd)
     getlev(fd, 0, (xint8)0, FALSE);
     (void) close(fd);
 
-    if (!wizard && !discover)
+    if (!wizard && !discover) {
         (void) delete_savefile();
+    }
 #ifdef REINCARNATION
-    if (Is_rogue_level(&u.uz)) assign_rogue_graphics(TRUE);
+    if (Is_rogue_level(&u.uz)) {
+        assign_rogue_graphics(TRUE);
+    }
 #endif
-    if (Is_moria_level(&u.uz)) { assign_moria_graphics(TRUE); }
+    if (Is_moria_level(&u.uz)) {
+        assign_moria_graphics(TRUE);
+    }
 #ifdef USE_TILES
     substitute_tiles(&u.uz);
 #endif
@@ -846,9 +899,11 @@ dorecover(int fd)
     max_rank_sz(); /* to recompute mrank_sz (botl.c) */
 
     /* this comes after inventory has been loaded */
-    for(otmp = invent; otmp; otmp = otmp->nobj)
-        if(otmp->owornmask)
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (otmp->owornmask) {
             setworn(otmp, otmp->owornmask);
+        }
+    }
 
     /* reset weapon so that player will get a reminder about "bashing"
        during next fight when bare-handed or wielding an unconventional
@@ -857,13 +912,16 @@ dorecover(int fd)
     otmp = uwep;    /* `uwep' usually init'd by setworn() in loop above */
     uwep = 0;   /* clear it and have setuwep() reinit */
     setuwep(otmp);  /* (don't need any null check here) */
-    if (!uwep || uwep->otyp == PICK_AXE || uwep->otyp == GRAPPLING_HOOK)
+    if (!uwep || uwep->otyp == PICK_AXE || uwep->otyp == GRAPPLING_HOOK) {
         unweapon = TRUE;
+    }
 
     /* take care of iron ball & chain */
-    for(otmp = fobj; otmp; otmp = otmp->nobj)
-        if(otmp->owornmask)
+    for (otmp = fobj; otmp; otmp = otmp->nobj) {
+        if (otmp->owornmask) {
             setworn(otmp, otmp->owornmask);
+        }
+    }
 
     /* in_use processing must be after:
      *    + The inventory has been read so that freeinv() works.
@@ -892,7 +950,7 @@ dorecover(int fd)
 
     /* Success! */
     welcome(FALSE);
-    return(1);
+    return 1;
 }
 
 void
@@ -938,8 +996,9 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
     short tlev;
 #endif
 
-    if (ghostly)
+    if (ghostly) {
         clear_id_mapping();
+    }
 
 #if defined(MSDOS) || defined(OS2)
     setmode(fd, O_BINARY);
@@ -947,7 +1006,9 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
     /* Load the old fruit info.  We have to do it first, so the
      * information is available when restoring the objects.
      */
-    if (ghostly) oldfruit = loadfruitchn(fd);
+    if (ghostly) {
+        oldfruit = loadfruitchn(fd);
+    }
 
     /* First some sanity checks */
     mread(fd, (genericptr_t) &hpid, sizeof(hpid));
@@ -961,13 +1022,16 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
     if ((pid && pid != hpid) || (lev && dlvl != lev)) {
         char trickbuf[BUFSZ];
 
-        if (pid && pid != hpid)
+        if (pid && pid != hpid) {
             Sprintf(trickbuf, "PID (%d) doesn't match saved PID (%d)!",
                     hpid, pid);
-        else
+        } else {
             Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
+        }
 #ifdef WIZARD
-        if (wizard) pline("%s", trickbuf);
+        if (wizard) {
+            pline("%s", trickbuf);
+        }
 #endif
         trickery(trickbuf);
     }
@@ -985,9 +1049,9 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
         (void) memset((genericptr_t) &r, 0, sizeof(r));
 #endif
         i = 0; j = 0; len = 0;
-        while(i < ROWNO) {
-            while(j < COLNO) {
-                if(len > 0) {
+        while (i < ROWNO) {
+            while (j < COLNO) {
+                if (len > 0) {
                     levl[j][i] = r;
                     len -= 1;
                     j += 1;
@@ -1015,10 +1079,11 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
     mread(fd, (genericptr_t)&level.flags, sizeof(level.flags));
     mread(fd, (genericptr_t)doors, sizeof(doors));
     rest_rooms(fd);     /* No joke :-) */
-    if (nroom)
+    if (nroom) {
         doorindex = rooms[nroom - 1].fdoor + rooms[nroom - 1].doorct;
-    else
+    } else {
         doorindex = 0;
+    }
 
     restore_timers(fd, RANGE_LEVEL, ghostly, monstermoves - omoves);
     restore_light_sources(fd);
@@ -1039,12 +1104,14 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
             mtmp2 = mtmp->nmon;
             if (ghostly) {
                 /* reset peaceful/malign relative to new character */
-                if(!mtmp->isshk)
+                if (!mtmp->isshk) {
                     /* shopkeepers will reset based on name */
                     mtmp->mpeaceful = peace_minded(mtmp->data);
+                }
                 set_malign(mtmp);
-            } else if (monstermoves > omoves)
+            } else if (monstermoves > omoves) {
                 mon_catchup_elapsed_time(mtmp, monstermoves - omoves);
+            }
 
             /* update shape-changers in case protection against
                them is different now than when the level was saved */
@@ -1072,12 +1139,15 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
     rest_engravings(fd);
 
     /* reset level.monsters for new level */
-    for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
+    for (x = 0; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
             level.monsters[x][y] = (struct monst *) 0;
+        }
+    }
     for (mtmp = level.monlist; mtmp; mtmp = mtmp->nmon) {
-        if (mtmp->isshk)
+        if (mtmp->isshk) {
             set_residency(mtmp, FALSE);
+        }
         place_monster(mtmp, mtmp->mx, mtmp->my);
         if (mtmp->wormno) {
             place_wsegs(mtmp, NULL);
@@ -1104,12 +1174,13 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
         if (br && u.uz.dlevel == 1) {
             d_level ltmp;
 
-            if (on_level(&u.uz, &br->end1))
+            if (on_level(&u.uz, &br->end1)) {
                 assign_level(&ltmp, &br->end2);
-            else
+            } else {
                 assign_level(&ltmp, &br->end1);
+            }
 
-            switch(br->type) {
+            switch (br->type) {
             case BR_STAIR:
             case BR_NO_END1:
             case BR_NO_END2: /* OK to assign to sstairs if it's not used */
@@ -1118,10 +1189,14 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
             case BR_PORTAL: /* max of 1 portal per level */
             {
                 struct trap *ttmp;
-                for(ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
-                    if (ttmp->ttyp == MAGIC_PORTAL)
+                for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
+                    if (ttmp->ttyp == MAGIC_PORTAL) {
                         break;
-                if (!ttmp) panic("getlev: need portal but none found");
+                    }
+                }
+                if (!ttmp) {
+                    panic("getlev: need portal but none found");
+                }
                 assign_level(&ttmp->dst, &ltmp);
             }
             break;
@@ -1129,11 +1204,12 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
         } else if (!br) {
             /* Remove any dangling portals. */
             struct trap *ttmp;
-            for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
+            for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {
                 if (ttmp->ttyp == MAGIC_PORTAL) {
                     deltrap(ttmp);
                     break; /* max of 1 portal/level */
                 }
+            }
         }
     }
 
@@ -1142,10 +1218,13 @@ getlev(int fd, int pid, xint8 lev, boolean ghostly)
     relink_light_sources(ghostly);
     reset_oattached_mids(ghostly);
 #ifdef DUNGEON_GROWTH
-    if (!ghostly) catchup_dgn_growths((monstermoves - omoves) / 5);
+    if (!ghostly) {
+        catchup_dgn_growths((monstermoves - omoves) / 5);
+    }
 #endif
-    if (ghostly)
+    if (ghostly) {
         clear_id_mapping();
+    }
 }
 
 
@@ -1193,21 +1272,26 @@ lookup_id_mapping(unsigned int gid, unsigned int *nidp)
     int i;
     struct bucket *curr;
 
-    if (n_ids_mapped)
+    if (n_ids_mapped) {
         for (curr = id_map; curr; curr = curr->next) {
             /* first bucket might not be totally full */
             if (curr == id_map) {
                 i = n_ids_mapped % N_PER_BUCKET;
-                if (i == 0) i = N_PER_BUCKET;
-            } else
+                if (i == 0) {
+                    i = N_PER_BUCKET;
+                }
+            } else {
                 i = N_PER_BUCKET;
+            }
 
-            while (--i >= 0)
+            while (--i >= 0) {
                 if (gid == curr->map[i].gid) {
                     *nidp = curr->map[i].nid;
                     return TRUE;
                 }
+            }
         }
+    }
 
     return FALSE;
 }
@@ -1255,8 +1339,9 @@ mgetc()
     if (inbufp >= inbufsz) {
         inbufsz = read(mreadfd, (genericptr_t)inbuf, sizeof inbuf);
         if (!inbufsz) {
-            if (inbufp > sizeof inbuf)
+            if (inbufp > sizeof inbuf) {
                 error("EOF on file #%d.\n", mreadfd);
+            }
             inbufp = 1 + sizeof inbuf; /* exactly one warning :-) */
             return -1;
         }
@@ -1280,7 +1365,9 @@ genericptr_t buf;
 register unsigned len;
 {
     /*register int readlen = 0;*/
-    if (fd < 0) error("Restore error; mread attempting to read file %d.", fd);
+    if (fd < 0) {
+        error("Restore error; mread attempting to read file %d.", fd);
+    }
     mreadfd = fd;
     while (len--) {
         if (inrunlength > 0) {
@@ -1288,7 +1375,9 @@ register unsigned len;
             *(*((char **)&buf))++ = '\0';
         } else {
             short ch = mgetc();
-            if (ch < 0) return -1; /*readlen;*/
+            if (ch < 0) {
+                return -1; /*readlen;*/
+            }
             if ((*(*(char **)&buf)++ = (char)ch) == RLESC) {
                 inrunlength = mgetc();
             }
@@ -1313,13 +1402,13 @@ mread(int fd, genericptr_t buf, unsigned int len)
 
 #if defined(BSD) || defined(ULTRIX)
     rlen = read(fd, buf, (int) len);
-    if(rlen != len) {
+    if (rlen != len) {
 #else /* e.g. SYSV, __TURBOC__ */
     rlen = read(fd, buf, (unsigned) len);
-    if((unsigned)rlen != len) {
+    if ((unsigned)rlen != len) {
 #endif
         pline("Read %d instead of %u bytes.", rlen, len);
-        if(restoring) {
+        if (restoring) {
             (void) close(fd);
             (void) delete_savefile();
             error("Error restoring old game.");

@@ -96,7 +96,7 @@ free_maildata(void)
 void
 getmailstatus(void)
 {
-    if(!mailbox && !(mailbox = nh_getenv("MAIL"))) {
+    if (!mailbox && !(mailbox = nh_getenv("MAIL"))) {
 #  ifdef MAILPATH
 #   ifdef AMS
         struct passwd ppasswd;
@@ -107,8 +107,9 @@ getmailstatus(void)
             mailbox = (char *) alloc((unsigned) strlen(ppasswd.pw_dir)+sizeof(AMS_MAILBOX));
             Strcpy(mailbox, ppasswd.pw_dir);
             Strcat(mailbox, AMS_MAILBOX);
-        } else
+        } else {
             return;
+        }
 #   else
         const char *pw_name = getpwuid(getuid())->pw_name;
         /* note: 'sizeof "LITERAL"' includes +1 for terminating '\0' */
@@ -149,8 +150,9 @@ md_start(coord *startp)
      * the hero is not going to see it anyway.  So pick a nearby position.
      */
     if (Blind && !Blind_telepat) {
-        if (!enexto(startp, u.ux, u.uy, (struct permonst *) 0))
+        if (!enexto(startp, u.ux, u.uy, (struct permonst *) 0)) {
             return FALSE; /* no good positions */
+        }
         return TRUE;
     }
 
@@ -242,9 +244,11 @@ md_stop(
 {
     int x, y, distance, min_distance = -1;
 
-    for (x = u.ux-1; x <= u.ux+1; x++)
+    for (x = u.ux-1; x <= u.ux+1; x++) {
         for (y = u.uy-1; y <= u.uy+1; y++) {
-            if (!isok(x, y) || (x == u.ux && y == u.uy)) continue;
+            if (!isok(x, y) || (x == u.ux && y == u.uy)) {
+                continue;
+            }
 
             if (accessible(x, y) && !MON_AT(x, y)) {
                 distance = dist2(x, y, startp->x, startp->y);
@@ -256,6 +260,7 @@ md_stop(
                 }
             }
         }
+    }
 
     /* If we didn't find a good spot, try enexto(). */
     if (min_distance < 0 &&
@@ -307,7 +312,8 @@ md_rush(
     while (1) {
         /* Find a good location next to (fx,fy) closest to (tx,ty). */
         d1 = dist2(fx, fy, tx, ty);
-        for (dx = -1; dx <= 1; dx++) for(dy = -1; dy <= 1; dy++)
+        for (dx = -1; dx <= 1; dx++) {
+            for (dy = -1; dy <= 1; dy++) {
                 if ((dx || dy) && isok(fx+dx, fy+dy) &&
                     !IS_STWALL(levl[fx+dx][fy+dy].typ)) {
                     d2 = dist2(fx+dx, fy+dy, tx, ty);
@@ -317,20 +323,27 @@ md_rush(
                         nfy = fy+dy;
                     }
                 }
+            }
+        }
 
         /* Break if the md couldn't find a new position. */
-        if (nfx == fx && nfy == fy) break;
+        if (nfx == fx && nfy == fy) {
+            break;
+        }
 
         fx = nfx;       /* this is our new position */
         fy = nfy;
 
         /* Break if the md reaches its destination. */
-        if (fx == tx && fy == ty) break;
+        if (fx == tx && fy == ty) {
+            break;
+        }
 
-        if ((mon = m_at(fx, fy)) != 0) /* save monster at this position */
+        if ((mon = m_at(fx, fy)) != 0) { /* save monster at this position */
             verbalize("%s", md_exclamations());
-        else if (fx == u.ux && fy == u.uy)
+        } else if (fx == u.ux && fy == u.uy) {
             verbalize("Excuse me.");
+        }
 
         if (mon) {
             remove_monster(fx, fy);
@@ -343,10 +356,11 @@ md_rush(
         /* Remove md from the dungeon.  Restore original mon, if necessary. */
         remove_monster(fx, fy);
         if (mon) {
-            if ((mon->mx != fx) || (mon->my != fy))
+            if ((mon->mx != fx) || (mon->my != fy)) {
                 place_worm_seg(mon, fx, fy);
-            else
+            } else {
                 place_monster(mon, fx, fy);
+            }
         }
         newsym(fx, fy);
     }
@@ -362,10 +376,11 @@ md_rush(
         verbalize("This place's too crowded.  I'm outta here.");
         remove_monster(fx, fy);
 
-        if ((mon->mx != fx) || (mon->my != fy)) /* put mon back */
+        if ((mon->mx != fx) || (mon->my != fy)) { /* put mon back */
             place_worm_seg(mon, fx, fy);
-        else
+        } else {
             place_monster(mon, fx, fy);
+        }
 
         newsym(fx, fy);
         return FALSE;
@@ -389,12 +404,17 @@ newmail(struct mail_info *info)
     boolean message_seen = FALSE;
 
     /* Try to find good starting and stopping places. */
-    if (!md_start(&start) || !md_stop(&stop, &start)) goto give_up;
+    if (!md_start(&start) || !md_stop(&stop, &start)) {
+        goto give_up;
+    }
 
     /* Make the daemon.  Have it rush towards the hero. */
-    if (!(md = makemon(&mons[PM_MAIL_DAEMON], start.x, start.y, NO_MM_FLAGS)))
+    if (!(md = makemon(&mons[PM_MAIL_DAEMON], start.x, start.y, NO_MM_FLAGS))) {
         goto give_up;
-    if (!md_rush(md, stop.x, stop.y)) goto go_back;
+    }
+    if (!md_rush(md, stop.x, stop.y)) {
+        goto go_back;
+    }
 
     message_seen = TRUE;
     verbalize("%s, %s!  %s.", Hello(md), plname, info->display_txt);
@@ -428,8 +448,9 @@ go_back:
     mongone(md);
     /* deliver some classes of messages even if no daemon ever shows up */
 give_up:
-    if (!message_seen && info->message_typ == MSG_OTHER)
+    if (!message_seen && info->message_typ == MSG_OTHER) {
         pline("Hark!  \"%s.\"", info->display_txt);
+    }
 }
 
 # if !defined(UNIX) && !defined(VMS) && !defined(LAN_MAIL)
@@ -437,7 +458,9 @@ give_up:
 void
 ckmailstatus()
 {
-    if (u.uswallow || !flags.biff) return;
+    if (u.uswallow || !flags.biff) {
+        return;
+    }
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
         mustgetmail=(moves<2000) ? (100+rn2(2000)) : (2000+rn2(3000));
@@ -482,8 +505,9 @@ struct obj *otmp;
 
     if (Blind) {
         pline("Unfortunately you cannot see what it says.");
-    } else
+    } else {
         pline("It reads:  \"%s\"", junk[rn2(SIZE(junk))]);
+    }
 
 }
 
@@ -495,25 +519,26 @@ void
 ckmailstatus(void)
 {
 #ifdef SIMPLE_MAIL
-    if (mailckfreq == 0)
+    if (mailckfreq == 0) {
         mailckfreq = (iflags.simplemail ? 5 : 10);
+    }
 #else
     mailckfreq = 10;
 #endif
 
-    if(!mailbox || u.uswallow || !flags.biff
+    if (!mailbox || u.uswallow || !flags.biff
        || moves < laststattime + mailckfreq)
         return;
 
     laststattime = moves;
-    if(stat(mailbox, &nmstat)) {
+    if (stat(mailbox, &nmstat)) {
 #  ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
         free_maildata();
 #  else
         nmstat.st_mtime = 0;
 #  endif
-    } else if(nmstat.st_mtime > omstat.st_mtime) {
+    } else if (nmstat.st_mtime > omstat.st_mtime) {
         if (nmstat.st_size) {
             static struct mail_info deliver = {
 #  ifndef NO_MAILREADER
@@ -542,8 +567,7 @@ readmail(struct obj *otmp)
     }
 #endif /* DEF_MAILREADER */
 #ifdef SIMPLE_MAIL
-    if (iflags.simplemail)
-    {
+    if (iflags.simplemail) {
         FILE* mb = fopen(mailbox, "r");
         char curline[102], *msg;
         boolean seen_one_already = FALSE;
@@ -554,12 +578,14 @@ readmail(struct obj *otmp)
         fl.l_start = 0;
         fl.l_len = 0;
 
-        if (!mb)
+        if (!mb) {
             goto bail;
+        }
 
         /* Allow this call to block. */
-        if (fcntl (fileno (mb), F_SETLKW, &fl) == -1)
+        if (fcntl (fileno (mb), F_SETLKW, &fl) == -1) {
             goto bail;
+        }
 
         errno = 0;
 
@@ -573,8 +599,9 @@ readmail(struct obj *otmp)
 
             msg = strchr(curline, ':');
 
-            if (!msg)
+            if (!msg) {
                 goto bail;
+            }
 
             *msg = '\0';
             msg++;
@@ -601,10 +628,11 @@ readmail(struct obj *otmp)
 # endif /* SIMPLE_MAIL */
 # ifdef DEF_MAILREADER          /* This implies that UNIX is defined */
     display_nhwindow(WIN_MESSAGE, FALSE);
-    if(!(mr = nh_getenv("MAILREADER")))
+    if (!(mr = nh_getenv("MAILREADER"))) {
         mr = DEF_MAILREADER;
+    }
 
-    if(child(1)) {
+    if (child(1)) {
         (void) execl(mr, mr, (char *)0);
         nh_terminate(EXIT_FAILURE);
     }
@@ -641,7 +669,9 @@ ckmailstatus()
     if (iflags.debug_fuzzer) {
         return;
     }
-    if (u.uswallow || !flags.biff) return;
+    if (u.uswallow || !flags.biff) {
+        return;
+    }
 
     while (broadcasts > 0) {    /* process all trapped broadcasts [until] */
         broadcasts--;
@@ -667,16 +697,24 @@ struct obj *otmp;
     if (has_omailcmd(otmp)) {
         cmd = OMAILCMD(otmp);
     }
-    if (!cmd || !*cmd) cmd = "SPAWN";
+    if (!cmd || !*cmd) {
+        cmd = "SPAWN";
+    }
 
     Sprintf(qbuf, "System command (%s)", cmd);
     getlin(qbuf, buf);
     if (*buf != '\033') {
-        for (p = eos(buf); p > buf; *p = '\0')
-            if (*--p != ' ') break; /* strip trailing spaces */
-        if (*buf) cmd = buf;    /* use user entered command */
-        if (!strcmpi(cmd, "SPAWN") || !strcmp(cmd, "!"))
+        for (p = eos(buf); p > buf; *p = '\0') {
+            if (*--p != ' ') {
+                break; /* strip trailing spaces */
+            }
+        }
+        if (*buf) {
+            cmd = buf; /* use user entered command */
+        }
+        if (!strcmpi(cmd, "SPAWN") || !strcmp(cmd, "!")) {
             cmd = (char *) 0;   /* interactive escape */
+        }
 
         vms_doshell(cmd, TRUE);
         (void) sleep(1);
@@ -693,7 +731,7 @@ ckmailstatus()
 {
     static int laststattime = 0;
 
-    if(u.uswallow || !flags.biff
+    if (u.uswallow || !flags.biff
        || moves < laststattime + mailckfreq)
         return;
 
@@ -723,7 +761,7 @@ struct obj *otmp;
 # endif /* LAN_MAIL */
 
 const char *
-get_hint()
+get_hint(void)
 {
     /* TODO: option for beginner, general changes, public server hints? */
     static const char *hint[] = {
@@ -760,7 +798,9 @@ read_hint(struct obj *otmp UNUSED)
 void
 maybe_hint(void)
 {
-    if (u.uswallow || !flags.biff || !flags.hint) return;
+    if (u.uswallow || !flags.biff || !flags.hint) {
+        return;
+    }
 
     /* initialize gethint */
     if (gethint < 0) {

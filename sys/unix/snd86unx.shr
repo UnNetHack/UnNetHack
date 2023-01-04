@@ -171,7 +171,7 @@ Xcontinuous sequence; this array must be terminated by a final member with
 Xa zero duration.
 X.PP
 XThe play-string language is modelled on the PLAY statement conventions of
-XIBM BASIC 2.0. The MB, MF and X primitives of PLAY are not useful in a UNIX 
+XIBM BASIC 2.0. The MB, MF and X primitives of PLAY are not useful in a UNIX
 Xenvironment and are omitted. The `octave-tracking' feature is also new.
 X.PP
 XThere are 84 accessible notes numbered 1-83 in 7 octaves, each running from
@@ -216,22 +216,22 @@ X
 X.TS
 Xa a a.
 X        	Tempo    	Beats Per Minute
-Xvery slow	Larghissimo	
+Xvery slow	Larghissimo
 X        	Largo    	40-60
 X         	Larghetto    	60-66
-X        	Grave       	
-X        	Lento       	
+X        	Grave
+X        	Lento
 X        	Adagio       	66-76
-Xslow    	Adagietto    	
+Xslow    	Adagietto
 X        	Andante   	76-108
-Xmedium   	Andantino	
+Xmedium   	Andantino
 X        	Moderato	108-120
-Xfast    	Allegretto	
+Xfast    	Allegretto
 X        	Allegro   	120-168
-X        	Vivace    	
-X        	Veloce    	
+X        	Vivace
+X        	Veloce
 X        	Presto    	168-208
-Xvery fast	Prestissimo	
+Xvery fast	Prestissimo
 X.TE
 X.PP
 XM[LNS] -- set articulation. MN (N for normal) is the default; the last 1/8th of
@@ -241,7 +241,7 @@ X.PP
 XNotes (that is, CDEFGAB or N command character groups) may be followed by
 Xsustain dots. Each dot causes the note's value to be lengthened by one-half
 Xfor each one. Thus, a note dotted once is held for 3/2 of its undotted value;
-Xdotted twice, it is held 9/4, and three times would give 27/8. 
+Xdotted twice, it is held 9/4, and three times would give 27/8.
 X.PP
 XWhitespace in play strings is simply skipped and may be used to separate
 Xmelody sections.
@@ -278,7 +278,7 @@ X
 Xclean:
 X	rm -f Driver.o *~ speaker.shar
 X
-XDSP =  Files Install Master Name Node Remove Size System 
+XDSP =  Files Install Master Name Node Remove Size System
 Xshar:
 X	shar READ.ME install.bsd spkr.7 Makefile spkr.[ch] \
 X		interp.c $(DSP) playtest >speaker.shar
@@ -314,7 +314,7 @@ X#include <sys/signal.h>
 X#include <sys/errno.h>
 X#include <sys/ioctl.h>
 X#include <sys/user.h>
-X#include <sys/sysmacros.h> 
+X#include <sys/sysmacros.h>
 X#include <limits.h>
 X
 X#define CADDR char *
@@ -351,7 +351,7 @@ X * |  1    0  |  1    1  |  0    1    1  |  0  |
 X * | SC1  SC0 | RW1  RW0 | M2   M1   M0  | BCD |
 X * +----------+----------+---------------+-----+
 X *   Counter     Write        Mode 3      Binary
-X *  Channel 2  LSB first,  (Square Wave) Encoding 
+X *  Channel 2  LSB first,  (Square Wave) Encoding
 X *             MSB second
 X */
 X#define PPI		0x61	/* port of Programmable Peripheral Interface */
@@ -361,7 +361,7 @@ X#define PIT_COUNT	0x42	/* PIT count address */
 X#define PIT_MODE	0xB6	/* set timer mode for sound generation */
 X
 X/*
-X * Magic numbers for timer control. 
+X * Magic numbers for timer control.
 X */
 X#define TIMER_CLK	1193180L	/* corresponds to 18.2 MHz tick rate */
 X

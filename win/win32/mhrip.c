@@ -105,7 +105,7 @@ void mswin_display_RIP_window (HWND hWnd)
 	    clientrect.bottom - textrect.bottom - RIP_OFFSET_Y, textrect.right, textrect.bottom, TRUE);
 	ShowWindow(hWnd, SW_SHOW);
 
-	while( IsWindow(hWnd) &&
+	while (IsWindow(hWnd) &&
 		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
 		if( !IsDialogMessage(hWnd, &msg) ) {
 			TranslateMessage(&msg);

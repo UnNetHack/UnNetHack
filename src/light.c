@@ -155,10 +155,11 @@ do_light_sources(char **cs_rows)
         /* minor optimization: don't bother with duplicate light sources */
         /* at hero */
         if (ls->x == u.ux && ls->y == u.uy) {
-            if (at_hero_range >= ls->range)
+            if (at_hero_range >= ls->range) {
                 ls->flags &= ~LSF_SHOW;
-            else
+            } else {
                 at_hero_range = ls->range;
+            }
         }
 
         if (ls->flags & LSF_SHOW) {
@@ -170,13 +171,21 @@ do_light_sources(char **cs_rows)
              * method is faster for radius <= 3 (or so).
              */
             limits = circle_ptr(ls->range);
-            if ((max_y = (ls->y + ls->range)) >= ROWNO) max_y = ROWNO-1;
-            if ((y = (ls->y - ls->range)) < 0) y = 0;
+            if ((max_y = (ls->y + ls->range)) >= ROWNO) {
+                max_y = ROWNO-1;
+            }
+            if ((y = (ls->y - ls->range)) < 0) {
+                y = 0;
+            }
             for (; y <= max_y; y++) {
                 row = cs_rows[y];
                 offset = limits[abs(y - ls->y)];
-                if ((min_x = (ls->x - offset)) < 0) min_x = 0;
-                if ((max_x = (ls->x + offset)) >= COLNO) max_x = COLNO-1;
+                if ((min_x = (ls->x - offset)) < 0) {
+                    min_x = 0;
+                }
+                if ((max_x = (ls->x + offset)) >= COLNO) {
+                    max_x = COLNO-1;
+                }
 
                 if (ls->x == u.ux && ls->y == u.uy) {
                     /*
@@ -190,14 +199,18 @@ do_light_sources(char **cs_rows)
                      * make things look "correct".  The vision system
                      * does this.
                      */
-                    for (x = min_x; x <= max_x; x++)
-                        if (row[x] & COULD_SEE)
+                    for (x = min_x; x <= max_x; x++) {
+                        if (row[x] & COULD_SEE) {
                             row[x] |= TEMP_LIT;
+                        }
+                    }
                 } else {
-                    for (x = min_x; x <= max_x; x++)
+                    for (x = min_x; x <= max_x; x++) {
                         if ((ls->x == x && ls->y == y)
-                            || clear_path((int)ls->x, (int) ls->y, x, y))
+                            || clear_path((int)ls->x, (int) ls->y, x, y)) {
                             row[x] |= TEMP_LIT;
+                        }
+                    }
                 }
             }
         }
@@ -291,17 +304,31 @@ find_mid(unsigned int nid, unsigned int fmflags)
 {
     struct monst *mtmp;
 
-    if (!nid)
+    if (!nid) {
         return &youmonst;
-    if (fmflags & FM_FMON)
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (!DEADMONSTER(mtmp) && mtmp->m_id == nid) return mtmp;
-    if (fmflags & FM_MIGRATE)
-        for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == nid) return mtmp;
-    if (fmflags & FM_MYDOGS)
-        for (mtmp = mydogs; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == nid) return mtmp;
+    }
+    if (fmflags & FM_FMON) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (!DEADMONSTER(mtmp) && mtmp->m_id == nid) {
+                return mtmp;
+            }
+        }
+    }
+    if (fmflags & FM_MIGRATE) {
+        for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->m_id == nid) {
+                return mtmp;
+            }
+        }
+    }
+    if (fmflags & FM_MYDOGS) {
+        for (mtmp = mydogs; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->m_id == nid) {
+                return mtmp;
+            }
+        }
+    }
+
     return (struct monst *) 0;
 }
 
@@ -316,9 +343,10 @@ save_light_sources(int fd, int mode, int range)
         count = maybe_write_ls(fd, range, FALSE);
         bwrite(fd, (genericptr_t) &count, sizeof count);
         actual = maybe_write_ls(fd, range, TRUE);
-        if (actual != count)
+        if (actual != count) {
             panic("counted %d light sources, wrote %d! [range=%d]",
                   count, actual, range);
+        }
     }
 
     if (release_data(mode)) {
@@ -326,7 +354,7 @@ save_light_sources(int fd, int mode, int range)
             if (!curr->id.a_monst) {
                 impossible("save_light_sources: no id! [range=%d]", range);
                 is_global = 0;
-            } else
+            } else {
                 switch (curr->type) {
                 case LS_OBJECT:
                     is_global = !obj_is_local(curr->id.a_obj);
@@ -340,6 +368,7 @@ save_light_sources(int fd, int mode, int range)
                                curr->type, range);
                     break;
                 }
+            }
             /* if global and not doing local, or vice versa, remove it */
             if (is_global ^ (range == RANGE_LEVEL)) {
                 *prev = curr->next;
@@ -455,7 +484,9 @@ maybe_write_ls(int fd, int range, boolean write_it)
         /* if global and not doing local, or vice versa, count it */
         if (is_global ^ (range == RANGE_LEVEL)) {
             count++;
-            if (write_it) write_ls(fd, ls);
+            if (write_it) {
+                write_ls(fd, ls);
+            }
         }
     }
 
@@ -477,8 +508,9 @@ light_sources_sanity_check(void)
         if (ls->type == LS_OBJECT) {
             otmp = (struct obj *) ls->id.a_obj;
             auint = otmp->o_id;
-            if (find_oid(auint) != otmp)
+            if (find_oid(auint) != otmp) {
                 panic("insane light source: can't find obj #%u!", auint);
+            }
         } else if (ls->type == LS_MONSTER) {
             mtmp = (struct monst *) ls->id.a_monst;
             auint = mtmp->m_id;
@@ -567,7 +599,7 @@ snuff_light_source(coordxy x, coordxy y)
     light_source *ls;
     struct obj *obj;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = light_base; ls; ls = ls->next) {
         /*
            Is this position check valid??? Can I assume that the positions
            will always be correct because the objects would have been
@@ -581,7 +613,9 @@ snuff_light_source(coordxy x, coordxy y)
                  * dropped or thrown inside a monster, this won't matter anyway
                  * because it will go out when dropped.)
                  */
-                if (artifact_light(obj)) continue;
+                if (artifact_light(obj)) {
+                    continue;
+                }
                 end_burn(obj, obj->otyp != MAGIC_LAMP);
                 /*
                  * The current ls element has just been removed (and
@@ -591,6 +625,7 @@ snuff_light_source(coordxy x, coordxy y)
                 return;
             }
         }
+    }
 }
 
 /* Return TRUE if object sheds any light at all. */
@@ -615,7 +650,7 @@ obj_split_light_source(struct obj *src, struct obj *dest)
 {
     light_source *ls, *new_ls;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = light_base; ls; ls = ls->next) {
         if (ls->type == LS_OBJECT && ls->id.a_obj == src) {
             /*
              * Insert the new source at beginning of list.  This will
@@ -635,6 +670,7 @@ obj_split_light_source(struct obj *src, struct obj *dest)
             light_base = new_ls;
             dest->lamplit = 1; /* now an active light source */
         }
+    }
 }
 
 /* light source `src' has been folded into light source `dest';
@@ -645,14 +681,17 @@ obj_merge_light_sources(struct obj *src, struct obj *dest)
     light_source *ls;
 
     /* src == dest implies adding to candelabrum */
-    if (src != dest) end_burn(src, TRUE); /* extinguish candles */
+    if (src != dest) {
+        end_burn(src, TRUE); /* extinguish candles */
+    }
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = light_base; ls; ls = ls->next) {
         if (ls->type == LS_OBJECT && ls->id.a_obj == dest) {
             ls->range = candle_light_range(dest);
             vision_full_recalc = 1; /* in case range changed */
             break;
         }
+    }
 }
 
 /* light source `obj' is being made brighter or dimmer */
@@ -661,7 +700,7 @@ obj_adjust_light_radius(struct obj *obj, int new_radius)
 {
     light_source *ls;
 
-    for (ls = light_base; ls; ls = ls->next)
+    for (ls = light_base; ls; ls = ls->next) {
         if (ls->type == LS_OBJECT && ls->id.a_obj == obj) {
             if (new_radius != ls->range) {
                 vision_full_recalc = 1;
@@ -669,6 +708,7 @@ obj_adjust_light_radius(struct obj *obj, int new_radius)
             ls->range = new_radius;
             return;
         }
+    }
     impossible("obj_adjust_light_radius: can't find %s", xname(obj));
 }
 
@@ -759,7 +799,9 @@ wiz_light_sources(void)
     light_source *ls;
 
     win = create_nhwindow(NHW_MENU); /* corner text window */
-    if (win == WIN_ERR) return 0;
+    if (win == WIN_ERR) {
+        return 0;
+    }
 
     Sprintf(buf, "Mobile light sources: hero @ (%2d,%2d)", u.ux, u.uy);
     putstr(win, 0, buf);

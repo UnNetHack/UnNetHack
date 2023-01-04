@@ -64,10 +64,12 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 
 	ZeroMemory( &lgfnt, sizeof(lgfnt) );
 
-	/* try find font in the table */
-	for(font_index=0; font_index<font_table_size; font_index++)
-		if(NHFONT_CODE(win_type, attr)==font_table[font_index].code)
-			break;
+    /* try find font in the table */
+    for (font_index = 0; font_index < font_table_size; font_index++) {
+        if (NHFONT_CODE(win_type, attr) == font_table[font_index].code) {
+            break;
+        }
+    }
 
 	if( !replace && font_index<font_table_size )
 		return font_table[font_index].hFont;
@@ -182,12 +184,12 @@ UINT mswin_charset()
 {
 	CHARSETINFO cis;
 	if( iflags.IBMgraphics )
-		if( TranslateCharsetInfo((DWORD*)GetOEMCP(), &cis, TCI_SRCCODEPAGE) ) 
+		if( TranslateCharsetInfo((DWORD*)GetOEMCP(), &cis, TCI_SRCCODEPAGE) )
 			return cis.ciCharset;
 		else
 			return OEM_CHARSET;
-	else 
-		if( TranslateCharsetInfo((DWORD*)GetACP(), &cis, TCI_SRCCODEPAGE) ) 
+	else
+		if( TranslateCharsetInfo((DWORD*)GetACP(), &cis, TCI_SRCCODEPAGE) )
 			return cis.ciCharset;
 		else
 			return ANSI_CHARSET;
@@ -195,10 +197,10 @@ UINT mswin_charset()
 
 void __cdecl font_table_cleanup(void)
 {
-	int i;
-	for(i=0; i<font_table_size; i++) {
-		DeleteObject(font_table[i].hFont);
-	}
-	font_table_size = 0;
+    int i;
+    for (i = 0; i < font_table_size; i++) {
+        DeleteObject(font_table[i].hFont);
+    }
+    font_table_size = 0;
 }
 

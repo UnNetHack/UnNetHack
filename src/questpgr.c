@@ -86,7 +86,7 @@ construct_qtlist(long int hdr_offset)
     Fread((genericptr_t)msg_list, n_msgs*sizeof(struct qtmsg), 1, msg_file);
 
     msg_list[n_msgs].msgnum = -1;
-    return(msg_list);
+    return msg_list;
 }
 
 void
@@ -98,8 +98,9 @@ load_qtlist(void)
     long qt_offsets[N_HDR];
 
     msg_file = dlb_fopen_area(QTEXT_AREA, QTEXT_FILE, RDBMODE);
-    if (!msg_file)
+    if (!msg_file) {
         panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
+    }
 
     /*
      * Read in the number of classes, then the ID's & offsets for
@@ -118,18 +119,21 @@ load_qtlist(void)
     qt_list.common = qt_list.chrole = (struct qtmsg *)0;
 
     for (i = 0; i < n_classes; i++) {
-        if (!strncmp(COMMON_ID, qt_classes[i], LEN_HDR))
+        if (!strncmp(COMMON_ID, qt_classes[i], LEN_HDR)) {
             qt_list.common = construct_qtlist(qt_offsets[i]);
-        else if (!strncmp(urole.filecode, qt_classes[i], LEN_HDR))
+        } else if (!strncmp(urole.filecode, qt_classes[i], LEN_HDR)) {
             qt_list.chrole = construct_qtlist(qt_offsets[i]);
+        }
 #if 0   /* UNUSED but available */
-        else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR))
+        else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR)) {
             qt_list.chrace = construct_qtlist(qt_offsets[i]);
+        }
 #endif
     }
 
-    if (!qt_list.common || !qt_list.chrole)
+    if (!qt_list.common || !qt_list.chrole) {
         impossible("load_qtlist: cannot load quest text.");
+    }
 #ifdef DEBUG
     dump_qtlist();
 #endif
@@ -140,12 +144,15 @@ load_qtlist(void)
 void
 unload_qtlist(void)
 {
-    if (msg_file)
+    if (msg_file) {
         (void) dlb_fclose(msg_file),  msg_file = 0;
-    if (qt_list.common)
+    }
+    if (qt_list.common) {
         free((genericptr_t) qt_list.common),  qt_list.common = 0;
-    if (qt_list.chrole)
+    }
+    if (qt_list.chrole) {
         free((genericptr_t) qt_list.chrole),  qt_list.chrole = 0;
+    }
     return;
 }
 
@@ -184,7 +191,7 @@ intermed(void)
 boolean
 is_quest_artifact(struct obj *otmp)
 {
-    return((boolean)(otmp->oartifact == urole.questarti));
+    return (boolean)(otmp->oartifact == urole.questarti);
 }
 
 /** return your role nemesis' name */
@@ -205,14 +212,14 @@ guardname(void)
 {
     int i = urole.guardnum;
 
-    return(mons[i].mname);
+    return mons[i].mname;
 }
 
 /** return your role leader's location */
 static const char *
 homebase(void)
 {
-    return(urole.homebase);
+    return urole.homebase;
 }
 
 /* replace deity, leader, nemesis, or artifact name with pronoun;
@@ -259,10 +266,13 @@ msg_in(struct qtmsg *qtm_list, int msgnum)
 {
     struct qtmsg *qt_msg;
 
-    for (qt_msg = qtm_list; qt_msg->msgnum > 0; qt_msg++)
-        if (qt_msg->msgnum == msgnum) return(qt_msg);
+    for (qt_msg = qtm_list; qt_msg->msgnum > 0; qt_msg++) {
+        if (qt_msg->msgnum == msgnum) {
+            return qt_msg;
+        }
+    }
 
-    return((struct qtmsg *)0);
+    return (struct qtmsg *)0;
 }
 
 static void
@@ -348,7 +358,7 @@ convert_line(char *in_line, char *out_line)
     cc = out_line;
     for (c = xcrypt(in_line, xbuf); *c; c++) {
         *cc = 0;
-        switch(*c) {
+        switch (*c) {
         case '\r':
         case '\n':
             *(++cc) = 0;
@@ -507,9 +517,13 @@ com_pager(int msgnum)
     }
 
     (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
-    if (qt_msg->delivery == 'p') deliver_by_pline(qt_msg);
-    else if (qt_msg->delivery == 'm') deliver_by_window(qt_msg, NHW_MENU);
-    else deliver_by_window(qt_msg, NHW_TEXT);
+    if (qt_msg->delivery == 'p') {
+        deliver_by_pline(qt_msg);
+    } else if (qt_msg->delivery == 'm') {
+        deliver_by_window(qt_msg, NHW_MENU);
+    } else {
+        deliver_by_window(qt_msg, NHW_TEXT);
+    }
     return;
 }
 
@@ -524,9 +538,11 @@ qt_pager(int msgnum)
     }
 
     (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
-    if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11"))
+    if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11")) {
         deliver_by_pline(qt_msg);
-    else deliver_by_window(qt_msg, NHW_TEXT);
+    } else {
+        deliver_by_window(qt_msg, NHW_TEXT);
+    }
     return;
 }
 /** special levels can include a custom arrival message; display it */

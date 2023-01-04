@@ -345,7 +345,7 @@ update_val(attr_rec, new_value)
 		int k = 0;
 
 		Strcpy(mname, mons[u.umonnum].mname);
-		while(mname[k] != 0) {
+        while (mname[k] != 0) {
 		    if ((k == 0 || (k > 0 && mname[k-1] == ' ')) &&
 					'a' <= mname[k] && mname[k] <= 'z')
 			    mname[k] += 'A' - 'a';

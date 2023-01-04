@@ -47,10 +47,11 @@ get_rect_ind(NhRect *r)
 
     lx = r->lx; ly = r->ly;
     hx = r->hx; hy = r->hy;
-    for (i=0, rectp = &rect[0]; i<rect_cnt; i++, rectp++)
+    for (i=0, rectp = &rect[0]; i<rect_cnt; i++, rectp++) {
         if ( lx == rectp->lx && ly == rectp->ly &&
              hx == rectp->hx && hy == rectp->hy)
             return i;
+    }
     return -1;
 }
 
@@ -67,10 +68,11 @@ get_rect(NhRect *r)
 
     lx = r->lx; ly = r->ly;
     hx = r->hx; hy = r->hy;
-    for (i=0, rectp = &rect[0]; i<rect_cnt; i++, rectp++)
+    for (i=0, rectp = &rect[0]; i<rect_cnt; i++, rectp++) {
         if ( lx >= rectp->lx && ly >= rectp->ly &&
              hx <= rectp->hx && hy <= rectp->hy)
             return rectp;
+    }
     return 0;
 }
 
@@ -102,8 +104,9 @@ intersect(NhRect *r1, NhRect *r2, NhRect *r3)
     r3->hx = (r2->hx > r1->hx ? r1->hx : r2->hx);
     r3->hy = (r2->hy > r1->hy ? r1->hy : r2->hy);
 
-    if (r3->lx > r3->hx || r3->ly > r3->hy)
+    if (r3->lx > r3->hx || r3->ly > r3->hy) {
         return FALSE;
+    }
     return TRUE;
 }
 
@@ -117,8 +120,9 @@ remove_rect(NhRect *r)
     int ind;
 
     ind = get_rect_ind(r);
-    if ( ind >=0 )
+    if ( ind >=0 ) {
         rect[ind] = rect[--rect_cnt];
+    }
 }
 
 /*
@@ -130,13 +134,16 @@ add_rect(NhRect *r)
 {
     if (rect_cnt >= MAXRECT) {
 #ifdef WIZARD
-        if (wizard) pline("MAXRECT may be too small.");
+        if (wizard) {
+            pline("MAXRECT may be too small.");
+        }
 #endif
         return;
     }
     /* Check that this NhRect is not included in another one */
-    if (get_rect(r))
+    if (get_rect(r)) {
         return;
+    }
     rect[rect_cnt] = *r;
     rect_cnt++;
 }
@@ -158,9 +165,11 @@ split_rects(NhRect *r1, NhRect *r2)
     remove_rect(r1);
 
     /* Walk down since rect_cnt & rect[] will change... */
-    for (i=rect_cnt-1; i>=0; i--)
-        if (intersect(&rect[i], r2, &r))
+    for (i=rect_cnt-1; i>=0; i--) {
+        if (intersect(&rect[i], r2, &r)) {
             split_rects(&rect[i], &r);
+        }
+    }
 
     if (r2->ly - old_r.ly-1 > (old_r.hy < ROWNO - 1 ? 2*YLIM : YLIM+1)+4) {
         r = old_r;

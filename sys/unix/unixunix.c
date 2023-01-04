@@ -35,11 +35,15 @@ static struct stat buf;
 static int
 veryold(int fd)
 {
-	time_t date;
+    time_t date;
 
-	if(fstat(fd, &buf)) return(0);			/* cannot get status */
+    if (fstat(fd, &buf)) {
+        return 0; /* cannot get status */
+    }
 #ifndef INSURANCE
-	if(buf.st_size != sizeof(int)) return(0);	/* not an xlock file */
+    if (buf.st_size != sizeof(int)) {
+        return 0; /* not an xlock file */
+    }
 #endif
 #if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)(&date));
@@ -71,219 +75,247 @@ veryold(int fd)
 static int
 eraseoldlocks(void)
 {
-	register int i;
+    register int i;
 
-	/* cannot use maxledgerno() here, because we need to find a lock name
-	 * before starting everything (including the dungeon initialization
-	 * that sets astral_level, needed for maxledgerno()) up
-	 */
-	for(i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
-		/* try to remove all */
-		set_levelfile_name(lock, i);
+    /* cannot use maxledgerno() here, because we need to find a lock name
+     * before starting everything (including the dungeon initialization
+     * that sets astral_level, needed for maxledgerno()) up
+     */
+    for (i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
+        /* try to remove all */
+        set_levelfile_name(lock, i);
 #ifdef FILE_AREAS
-		(void) remove_area(FILE_AREA_LEVL, lock);
+        (void) remove_area(FILE_AREA_LEVL, lock);
 #else
-		(void) unlink(fqname(lock, LEVELPREFIX, 0));
+        (void) unlink(fqname(lock, LEVELPREFIX, 0));
 #endif
-	}
-	set_levelfile_name(lock, 0);
+    }
+    set_levelfile_name(lock, 0);
 #ifdef FILE_AREAS
-	if (remove_area(FILE_AREA_LEVL, lock))
+    if (remove_area(FILE_AREA_LEVL, lock)) {
 #else
-	if (unlink(fqname(lock, LEVELPREFIX, 0)))
+    if (unlink(fqname(lock, LEVELPREFIX, 0))) {
 #endif
-		return(0);				/* cannot remove it */
-	return(1);					/* success! */
+        return 0; /* cannot remove it */
+#ifdef FILE_AREAS
+    }
+#else
+    }
+#endif
+    return 1; /* success! */
 }
 
 void
 getlock(void)
 {
-	register int i = 0, fd, c;
+    register int i = 0, fd, c;
 #ifndef FILE_AREAS
-	const char *fq_lock;
+    const char *fq_lock;
 #endif
 
 #ifdef TTY_GRAPHICS
-	/* idea from rpick%ucqais@uccba.uc.edu
-	 * prevent automated rerolling of characters
-	 * test input (fd0) so that tee'ing output to get a screen dump still
-	 * works
-	 * also incidentally prevents development of any hack-o-matic programs
-	 */
-	/* added check for window-system type -dlc */
-	if (!strcmp(windowprocs.name, "tty"))
-	    if (!isatty(0))
-		error("You must play from a terminal.");
+    /* idea from rpick%ucqais@uccba.uc.edu
+     * prevent automated rerolling of characters
+     * test input (fd0) so that tee'ing output to get a screen dump still
+     * works
+     * also incidentally prevents development of any hack-o-matic programs
+     */
+    /* added check for window-system type -dlc */
+    if (!strcmp(windowprocs.name, "tty")) {
+        if (!isatty(0)) {
+            error("You must play from a terminal.");
+        }
+    }
 #endif
 
-	/* we ignore QUIT and INT at this point */
+    /* we ignore QUIT and INT at this point */
 #ifndef FILE_AREAS
-	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
+    if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
 #else
-	if (!lock_file_area(HLOCK_AREA, HLOCK, 10)) {
+    if (!lock_file_area(HLOCK_AREA, HLOCK, 10)) {
 #endif
-		wait_synch();
-		error("%s", "");
-	}
+        wait_synch();
+        error("%s", "");
+#ifndef FILE_AREAS
+    }
+#else
+    }
+#endif
 
-	regularize(lock);
-	set_levelfile_name(lock, 0);
+    regularize(lock);
+    set_levelfile_name(lock, 0);
 
-	if(locknum) {
-		if(locknum > 25) locknum = 25;
+    if (locknum) {
+        if (locknum > 25) {
+            locknum = 25;
+        }
 
-		do {
-			lock[0] = 'a' + i++;
+        do {
+            lock[0] = 'a' + i++;
 
 #ifndef FILE_AREAS
-			fq_lock = fqname(lock, LEVELPREFIX, 0);
-			if((fd = open(fq_lock, 0, 0)) == -1) {
+            fq_lock = fqname(lock, LEVELPREFIX, 0);
+            if ((fd = open(fq_lock, 0, 0)) == -1) {
 #else
-			if((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
+            if ((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
 #endif
-			    if(errno == ENOENT) goto gotlock; /* no such file */
+                if (errno == ENOENT) {
+                    goto gotlock; /* no such file */
+                }
 #ifndef FILE_AREAS
-			    perror(fq_lock);
-			    unlock_file(HLOCK);
-			    error("Cannot open %s", fq_lock);
+                perror(fq_lock);
+                unlock_file(HLOCK);
+                error("Cannot open %s", fq_lock);
 #else
-			    perror(lock);
-			    unlock_file_area(HLOCK_AREA, HLOCK);
-			    error("Cannot open %s", lock);
+                perror(lock);
+                unlock_file_area(HLOCK_AREA, HLOCK);
+                error("Cannot open %s", lock);
 #endif
-			}
-
-			if(veryold(fd) /* closes fd if true */
-							&& eraseoldlocks())
-				goto gotlock;
-			(void) close(fd);
-		} while(i < locknum);
-
-		unlock_file_area(HLOCK_AREA, HLOCK);
-		error("Too many hacks running now.");
-	} else {
 #ifndef FILE_AREAS
-		fq_lock = fqname(lock, LEVELPREFIX, 0);
-		if((fd = open(fq_lock, 0, 0)) == -1) {
+            }
 #else
-		if((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
+            }
 #endif
-			if(errno == ENOENT) goto gotlock;    /* no such file */
+
+            if (veryold(fd) /* closes fd if true */
+               && eraseoldlocks())
+                goto gotlock;
+            (void) close(fd);
+        } while (i < locknum);
+
+        unlock_file_area(HLOCK_AREA, HLOCK);
+        error("Too many hacks running now.");
+    } else {
 #ifndef FILE_AREAS
-			perror(fq_lock);
-			unlock_file(HLOCK);
-			error("Cannot open %s", fq_lock);
+        fq_lock = fqname(lock, LEVELPREFIX, 0);
+        if ((fd = open(fq_lock, 0, 0)) == -1) {
 #else
-			perror(lock);
-			unlock_file_area(HLOCK_AREA, HLOCK);
-			error("Cannot open %s", lock);
+        if ((fd = open_area(FILE_AREA_LEVL, lock, 0, 0)) == -1) {
 #endif
-		}
+            if (errno == ENOENT) {
+                goto gotlock; /* no such file */
+            }
+#ifndef FILE_AREAS
+            perror(fq_lock);
+            unlock_file(HLOCK);
+            error("Cannot open %s", fq_lock);
+#else
+            perror(lock);
+            unlock_file_area(HLOCK_AREA, HLOCK);
+            error("Cannot open %s", lock);
+#endif
+#ifndef FILE_AREAS
+        }
+#else
+        }
+#endif
 
-		if(veryold(fd) /* closes fd if true */ && eraseoldlocks())
-			goto gotlock;
-		(void) close(fd);
+        if (veryold(fd) /* closes fd if true */ && eraseoldlocks()) {
+            goto gotlock;
+        }
+        (void) close(fd);
 
-		if(iflags.window_inited) {
-		    c = yn("There is already a game in progress under your name.  Destroy old game?");
-		} else {
-		    (void) printf("\nThere is already a game in progress under your name.\n\n");
-		    (void) printf("Destroy old game [y], try to recover it [r] or cancel [n]? ");
-		    (void) fflush(stdout);
-		    c = getchar();
-		    (void) putchar(c);
-		    (void) fflush(stdout);
-		    while (getchar() != '\n') ; /* eat rest of line and newline */
-		}
-		if (c =='r') {
-			if (restore_savefile(lock, FILE_AREA_LEVL) == 0) {
-				const char *msg = "Automatical recovery of save file successful! "
-							"Press any key to continue ...\n";
-					fflush(stdout);
-				if (iflags.window_inited) {
-					pline("%s", msg);
-				} else {
-					printf("\n\n%s", msg);
-					fflush(stdout);
-					c = getchar();
-				}
-				goto gotlock;
-			}
-		} else if (c == 'y' || c == 'Y') {
-			if(eraseoldlocks())
-				goto gotlock;
-			else {
-				unlock_file_area(HLOCK_AREA, HLOCK);
-				error("Couldn't destroy old game.");
-			}
-		} else {
-			unlock_file_area(HLOCK_AREA, HLOCK);
-			error("%s", "");
-		}
-	}
+        if (iflags.window_inited) {
+            c = yn("There is already a game in progress under your name.  Destroy old game?");
+        } else {
+            (void) printf("\nThere is already a game in progress under your name.\n\n");
+            (void) printf("Destroy old game [y], try to recover it [r] or cancel [n]? ");
+            (void) fflush(stdout);
+            c = getchar();
+            (void) putchar(c);
+            (void) fflush(stdout);
+            while (getchar() != '\n') ; /* eat rest of line and newline */
+        }
+        if (c =='r') {
+            if (restore_savefile(lock, FILE_AREA_LEVL) == 0) {
+                const char *msg = "Automatical recovery of save file successful! "
+                    "Press any key to continue ...\n";
+                fflush(stdout);
+                if (iflags.window_inited) {
+                    pline("%s", msg);
+                } else {
+                    printf("\n\n%s", msg);
+                    fflush(stdout);
+                    c = getchar();
+                }
+                goto gotlock;
+            }
+        } else if (c == 'y' || c == 'Y') {
+            if (eraseoldlocks()) {
+                goto gotlock;
+            } else {
+                unlock_file_area(HLOCK_AREA, HLOCK);
+                error("Couldn't destroy old game.");
+            }
+        } else {
+            unlock_file_area(HLOCK_AREA, HLOCK);
+            error("%s", "");
+        }
+    }
 
 gotlock:
 #ifndef FILE_AREAS
-	fd = creat(fq_lock, FCMASK);
+    fd = creat(fq_lock, FCMASK);
 #else
-	fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
+    fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
 #endif
-	unlock_file_area(HLOCK_AREA, HLOCK);
-	if(fd == -1) {
+    unlock_file_area(HLOCK_AREA, HLOCK);
+    if (fd == -1) {
 #ifndef FILE_AREAS
-		error("cannot creat lock file (%s).", fq_lock);
+        error("cannot creat lock file (%s).", fq_lock);
 #else
-		error("cannot creat lock file (%s in %s).", lock,
-		  FILE_AREA_LEVL);
+        error("cannot creat lock file (%s in %s).", lock,
+              FILE_AREA_LEVL);
 #endif
-	} else {
-		if(write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
-		    != sizeof(hackpid)){
+    } else {
+        if (write(fd, (genericptr_t) &hackpid, sizeof(hackpid)) != sizeof(hackpid)) {
 #ifndef FILE_AREAS
-			error("cannot write lock (%s)", fq_lock);
+            error("cannot write lock (%s)", fq_lock);
 #else
-			error("cannot write lock (%s in %s)", lock,
-			  FILE_AREA_LEVL);
+            error("cannot write lock (%s in %s)", lock,
+                  FILE_AREA_LEVL);
 #endif
-		}
-		if(close(fd) == -1) {
+        }
+        if (close(fd) == -1) {
 #ifndef FILE_AREAS
-			error("cannot close lock (%s)", fq_lock);
+            error("cannot close lock (%s)", fq_lock);
 #else
-			error("cannot close lock (%s in %s)", lock,
-			  FILE_AREA_LEVL);
+            error("cannot close lock (%s in %s)", lock,
+                  FILE_AREA_LEVL);
 #endif
-		}
-	}
+        }
+    }
 }
 
 /** normalize file name - we don't like .'s, /'s, spaces */
 void
 regularize(char *s)
 {
-	register char *lp;
+    register char *lp;
 
-	while((lp=index(s, '.')) || (lp=index(s, '/')) || (lp=index(s,' ')))
-		*lp = '_';
+    while ((lp=index(s, '.')) || (lp=index(s, '/')) || (lp=index(s,' '))) {
+        *lp = '_';
+    }
 #if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) && !defined(__APPLE__)
-	/* avoid problems with 14 character file name limit */
+    /* avoid problems with 14 character file name limit */
 # ifdef COMPRESS
-	/* leave room for .e from error and .Z from compress appended to
-	 * save files */
-	{
+    /* leave room for .e from error and .Z from compress appended to
+     * save files */
+    {
 #  ifdef COMPRESS_EXTENSION
-	    int i = 12 - strlen(COMPRESS_EXTENSION);
+        int i = 12 - strlen(COMPRESS_EXTENSION);
 #  else
-	    int i = 10;		/* should never happen... */
+        int i = 10;		/* should never happen... */
 #  endif
-	    if(strlen(s) > i)
-		s[i] = '\0';
-	}
+        if (strlen(s) > i) {
+            s[i] = '\0';
+        }
+    }
 # else
-	if(strlen(s) > 11)
-		/* leave room for .nn appended to level files */
-		s[11] = '\0';
+    if (strlen(s) > 11) {
+        /* leave room for .nn appended to level files */
+        s[11] = '\0';
+    }
 # endif
 #endif
 }
@@ -293,13 +325,15 @@ regularize(char *s)
 
 void
 msleep(msec)
-unsigned msec;				/* milliseconds */
+unsigned msec; /* milliseconds */
 {
-	struct pollfd unused;
-	int msecs = msec;		/* poll API is signed */
+    struct pollfd unused;
+    int msecs = msec;		/* poll API is signed */
 
-	if (msecs < 0) msecs = 0;	/* avoid infinite sleep */
-	(void) poll(&unused, (unsigned long)0, msecs);
+    if (msecs < 0) {
+        msecs = 0; /* avoid infinite sleep */
+    }
+    (void) poll(&unused, (unsigned long)0, msecs);
 }
 #endif /* TIMED_DELAY for SYSV */
 
@@ -329,46 +363,48 @@ dosh(void)
 int
 child(int wt)
 {
-	register int f;
-	suspend_nhwindows((char *)0);	/* also calls end_screen() */
+    register int f;
+    suspend_nhwindows((char *)0);	/* also calls end_screen() */
 #ifdef _M_UNIX
-	sco_mapon();
+    sco_mapon();
 #endif
 #ifdef __linux__
-	linux_mapon();
+    linux_mapon();
 #endif
-	if((f = fork()) == 0){		/* child */
-		(void) setgid(getgid());
-		(void) setuid(getuid());
+    if ((f = fork()) == 0) { /* child */
+        (void) setgid(getgid());
+        (void) setuid(getuid());
 #ifdef CHDIR
-		(void) chdir(getenv("HOME"));
+        (void) chdir(getenv("HOME"));
 #endif
-		return(1);
-	}
-	if(f == -1) {	/* cannot fork */
-		pline("Fork failed.  Try again.");
-		return(0);
-	}
-	/* fork succeeded; wait for child to exit */
-	(void) signal(SIGINT,SIG_IGN);
-	(void) signal(SIGQUIT,SIG_IGN);
-	(void) wait( (int *) 0);
+        return 1;
+    }
+    if (f == -1) { /* cannot fork */
+        pline("Fork failed.  Try again.");
+        return 0;
+    }
+    /* fork succeeded; wait for child to exit */
+    (void) signal(SIGINT,SIG_IGN);
+    (void) signal(SIGQUIT,SIG_IGN);
+    (void) wait( (int *) 0);
 #ifdef _M_UNIX
-	sco_mapoff();
+    sco_mapoff();
 #endif
 #ifdef __linux__
-	linux_mapoff();
+    linux_mapoff();
 #endif
-	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
+    (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #ifdef WIZARD
-	if(wizard) (void) signal(SIGQUIT,SIG_DFL);
+    if (wizard) {
+        (void) signal(SIGQUIT,SIG_DFL);
+    }
 #endif
-	if(wt) {
-		raw_print("");
-		wait_synch();
-	}
-	resume_nhwindows();
-	return(0);
+    if (wt) {
+        raw_print("");
+        wait_synch();
+    }
+    resume_nhwindows();
+    return 0;
 }
 #endif
 
@@ -381,22 +417,21 @@ child(int wt)
 char *
 make_file_name(const char *filearea, const char *filename)
 {
-	char *buf;
-	int lenarea;
-	if (filearea && filename[0]!='/')
-	{
-		lenarea = strlen(filearea);
-		buf = (char *)alloc(lenarea+strlen(filename)+2);
-		strcpy(buf, filearea);
-		if (filearea[lenarea-1] != '/') strcat(buf, "/");
-		strcat(buf, filename);
-	}
-	else
-	{
-		buf = (char *)alloc(strlen(filename)+1);
-		strcpy(buf, filename);
-	}
-	return buf;
+    char *buf;
+    int lenarea;
+    if (filearea && filename[0]!='/') {
+        lenarea = strlen(filearea);
+        buf = (char *)alloc(lenarea+strlen(filename)+2);
+        strcpy(buf, filearea);
+        if (filearea[lenarea-1] != '/') {
+            strcat(buf, "/");
+        }
+        strcat(buf, filename);
+    } else {
+        buf = (char *)alloc(strlen(filename)+1);
+        strcpy(buf, filename);
+    }
+    return buf;
 }
 
 FILE *

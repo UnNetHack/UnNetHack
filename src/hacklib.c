@@ -19,28 +19,28 @@ static boolean pmatch_internal(const char *, const char *, boolean, const char *
 boolean
 digit(char c)
 {
-    return((boolean)('0' <= c && c <= '9'));
+    return (boolean)('0' <= c && c <= '9');
 }
 
 /* is 'c' a letter?  note: '@' classed as letter */
 boolean
 letter(char c)
 {
-    return((boolean)(('@' <= c && c <= 'Z') || ('a' <= c && c <= 'z')));
+    return (boolean)(('@' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
 }
 
 /* force 'c' into uppercase */
 char
 highc(char c)
 {
-    return((char)(('a' <= c && c <= 'z') ? (c & ~040) : c));
+    return (char)(('a' <= c && c <= 'z') ? (c & ~040) : c);
 }
 
 /* force 'c' into lowercase */
 char
 lowc(char c)
 {
-    return((char)(('A' <= c && c <= 'Z') ? (c | 040) : c));
+    return (char)(('A' <= c && c <= 'Z') ? (c | 040) : c);
 }
 
 /* convert a string into all lowercase */
@@ -49,8 +49,12 @@ lcase(char *s)
 {
     char *p;
 
-    for (p = s; *p; p++)
-        if ('A' <= *p && *p <= 'Z') *p |= 040;
+    for (p = s; *p; p++) {
+        if ('A' <= *p && *p <= 'Z') {
+            *p |= 040;
+        }
+    }
+
     return s;
 }
 
@@ -60,9 +64,12 @@ ucase(char *s)
 {
     char *p;
 
-    for (p = s; *p; p++)
-        if ('a' <= *p && *p <= 'z')
+    for (p = s; *p; p++) {
+        if ('a' <= *p && *p <= 'z') {
             *p &= ~040;
+        }
+    }
+
     return s;
 }
 
@@ -70,7 +77,9 @@ ucase(char *s)
 char *
 upstart(char *s)
 {
-    if (s) *s = highc(*s);
+    if (s) {
+        *s = highc(*s);
+    }
     return s;
 }
 
@@ -123,8 +132,9 @@ strip_newline(char *str)
     char *p = rindex(str, '\n');
 
     if (p) {
-        if (p > str && *(p - 1) == '\r')
+        if (p > str && *(p - 1) == '\r') {
             --p;
+        }
         *p = '\0';
     }
     return str;
@@ -144,8 +154,9 @@ str_end_is(const char *str, const char *chkstr)
 {
     int clen = (int) strlen(chkstr);
 
-    if ((int) strlen(str) >= clen)
+    if ((int) strlen(str) >= clen) {
         return (boolean) (!strncmp(eos((char *) str) - clen, chkstr, clen));
+    }
     return FALSE;
 }
 
@@ -166,8 +177,9 @@ str_lines_maxlen(const char *str)
             len = (int) strlen(s1);
             s1 = (char *) 0;
         }
-        if (len > max_len)
+        if (len > max_len) {
             max_len = len;
+        }
     }
 
     return max_len;
@@ -208,12 +220,14 @@ chrcasecpy(int oc, int nc)
 #endif
     if ('a' <= oc && oc <= 'z') {
         /* old char is lower case; if new char is upper case, downcase it */
-        if ('A' <= nc && nc <= 'Z')
+        if ('A' <= nc && nc <= 'Z') {
             nc += 'a' - 'A'; /* lowc(nc) */
+        }
     } else if ('A' <= oc && oc <= 'Z') {
         /* old char is upper case; if new char is lower case, upcase it */
-        if ('a' <= nc && nc <= 'z')
+        if ('a' <= nc && nc <= 'z') {
             nc += 'A' - 'a'; /* highc(nc) */
+        }
     }
     return (char) nc;
 }
@@ -233,8 +247,9 @@ strcasecpy(char *dst, const char *src)
        remaining src; if dst starts empty, it must be a pointer to the
        tail of some other string because we examine the char at dst[-1] */
     while ((ic = (int) *src++) != '\0') {
-        if (!dst_exhausted && !*dst)
+        if (!dst_exhausted && !*dst) {
             dst_exhausted = 1;
+        }
         oc = (int) *(dst - dst_exhausted);
         *dst++ = chrcasecpy(oc, ic);
     }
@@ -246,9 +261,13 @@ strcasecpy(char *dst, const char *src)
 void
 sanitizestr(char *s)
 {
-    if (!s) return;
+    if (!s) {
+        return;
+    }
     while (*s) {
-        if (*s <= ' ') *s = ' ';
+        if (*s <= ' ') {
+            *s = ' ';
+        }
         s++;
     }
 }
@@ -261,13 +280,13 @@ s_suffix(const char *s)
     Static char buf[BUFSZ];
 
     Strcpy(buf, s);
-    if (!strcmpi(buf, "it")) /* it -> its */
+    if (!strcmpi(buf, "it")) { /* it -> its */
         Strcat(buf, "s");
-    else if (!strcmpi(buf, "you")) /* you -> your */
+    } else if (!strcmpi(buf, "you")) { /* you -> your */
         Strcat(buf, "r");
-    else if (*(eos(buf) - 1) == 's') /* Xs -> Xs' */
+    } else if (*(eos(buf) - 1) == 's') { /* Xs -> Xs' */
         Strcat(buf, "'");
-    else /* X -> X's */
+    } else /* X -> X's */
         Strcat(buf, "'s");
     return buf;
 }
@@ -299,11 +318,13 @@ ing_suffix(const char *s)
     } else if (p >= &buf[2] && !strcmpi(p - 2, "ie")) { /* vie -> vy + ing */
         *(p - 2) = 'y';
         *(p - 1) = '\0';
-    } else if (p >= &buf[1] && *(p - 1) == 'e') /* grease -> greas + ing */
+    } else if (p >= &buf[1] && *(p - 1) == 'e') { /* grease -> greas + ing */
         *(p - 1) = '\0';
+    }
     Strcat(buf, "ing");
-    if (onoff[0])
+    if (onoff[0]) {
         Strcat(buf, onoff);
+    }
     return buf;
 }
 /* trivial text encryption routine (see makedefs) */
@@ -316,8 +337,12 @@ xcrypt(const char *str, char *buf)
 
     for (bitmask = 1, p = str, q = buf; *p; q++) {
         *q = *p++;
-        if (*q & (32|64)) *q ^= bitmask;
-        if ((bitmask <<= 1) >= 32) bitmask = 1;
+        if (*q & (32|64)) {
+            *q ^= bitmask;
+        }
+        if ((bitmask <<= 1) >= 32) {
+            bitmask = 1;
+        }
     }
     *q = '\0';
     return buf;
@@ -327,8 +352,12 @@ xcrypt(const char *str, char *buf)
 boolean
 onlyspace(const char *s)
 {
-    for (; *s; s++)
-        if (*s != ' ' && *s != '\t') return FALSE;
+    for (; *s; s++) {
+        if (*s != ' ' && *s != '\t') {
+            return FALSE;
+        }
+    }
+
     return TRUE;
 }
 
@@ -340,16 +369,19 @@ tabexpand(char *sbuf)
     char *bp, *s = sbuf;
     int idx;
 
-    if (!*s) return sbuf;
+    if (!*s) {
+        return sbuf;
+    }
 
     /* warning: no bounds checking performed */
-    for (bp = buf, idx = 0; *s; s++)
+    for (bp = buf, idx = 0; *s; s++) {
         if (*s == '\t') {
             do *bp++ = ' '; while (++idx % 8);
         } else {
             *bp++ = *s;
             idx++;
         }
+    }
     *bp = 0;
     return strcpy(sbuf, buf);
 }
@@ -401,8 +433,9 @@ stripchars(char *bp, const char *stuff_to_strip, const char *orig)
             orig++;
         }
         *s = '\0';
-    } else
+    } else {
         impossible("no output buf in stripchars");
+    }
     return bp;
 }
 
@@ -412,9 +445,11 @@ stripdigits(char *s)
 {
     char *s1, *s2;
 
-    for (s1 = s2 = s; *s1; s1++)
-        if (*s1 < '0' || *s1 > '9')
+    for (s1 = s2 = s; *s1; s1++) {
+        if (*s1 < '0' || *s1 > '9') {
             *s2++ = *s1;
+        }
+    }
     *s2 = '\0';
 
     return s;
@@ -458,8 +493,9 @@ strNsubst(
     for (bp = inoutbuf, op = workbuf; *bp && op < &workbuf[BUFSZ - 1]; ) {
         if ((!len || !strncmp(bp, orig, len)) && (++ocount == n || n == 0)) {
             /* Nth match found */
-            for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; )
+            for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; ) {
                 *op++ = *rp++;
+            }
             ++rcount;
             if (len) {
                 bp += len; /* skip 'orig' */
@@ -474,8 +510,9 @@ strNsubst(
            insert in front of terminator (in other words, append);
            [when orig=="", ocount will have been incremented once for
            each input char] */
-        for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; )
+        for (rp = replacement; *rp && op < &workbuf[BUFSZ - 1]; ) {
             *op++ = *rp++;
+        }
         ++rcount;
     }
     if (rcount) {
@@ -519,9 +556,9 @@ rounddiv(long x, int y)
     int r, m;
     int divsgn = 1;
 
-    if (y == 0)
+    if (y == 0) {
         panic("division by zero in rounddiv");
-    else if (y < 0) {
+    } else if (y < 0) {
         divsgn = -divsgn;  y = -y;
     }
     if (x < 0) {
@@ -529,7 +566,9 @@ rounddiv(long x, int y)
     }
     r = x / y;
     m = x % y;
-    if (2*m >= y) r++;
+    if (2*m >= y) {
+        r++;
+    }
 
     return divsgn * r;
 }
@@ -540,8 +579,12 @@ distmin(int x0, int y0, int x1, int y1) /* distance between two points, in moves
 
 {
     int dx = x0 - x1, dy = y0 - y1;
-    if (dx < 0) dx = -dx;
-    if (dy < 0) dy = -dy;
+    if (dx < 0) {
+        dx = -dx;
+    }
+    if (dy < 0) {
+        dy = -dy;
+    }
     /*  The minimum number of moves to get from (x0,y0) to (x1,y1) is the
        :  larger of the [absolute value of the] two deltas.
      */
@@ -570,7 +613,7 @@ isqrt(int val)
      *   large, so the performance difference is negligible;
      * + isqrt() is used in only few places, which are not bottle-necks.
      */
-    while(val >= odd) {
+    while (val >= odd) {
         val = val-odd;
         odd = odd+2;
         rt = rt + 1;
@@ -605,7 +648,7 @@ online2(int x0, int y0, int x1, int y1)
     /*  If either delta is zero then they're on an orthogonal line,
      *  else if the deltas are equal (signs ignored) they're on a diagonal.
      */
-    return((boolean)(!dy || !dx || (dy == dx) || (dy + dx == 0)));  /* (dy == -dx) */
+    return (boolean)(!dy || !dx || (dy == dx) || (dy + dx == 0));  /* (dy == -dx) */
 }
 
 /* guts of pmatch(), pmatchi(), and pmatchz();
@@ -635,19 +678,20 @@ pmatch_top:
             p = *patrn++;
         } while (index(sk, p));
     }
-    if (!p)                           /* end of pattern */
+    if (!p) {                         /* end of pattern */
         return (boolean) (s == '\0'); /* matches iff end of string too */
-    else if (p == '*')                /* wildcard reached */
+    } else if (p == '*') {            /* wildcard reached */
         return (boolean) ((!*patrn
                            || pmatch_internal(patrn, strng - 1, ci, sk))
                           ? TRUE
                           : s ? pmatch_internal(patrn - 1, strng, ci, sk)
                               : FALSE);
-    else if ((ci ? lowc(p) != lowc(s) : p != s) /* check single character */
-             && (p != '?' || !s))               /* & single-char wildcard */
-        return FALSE;                           /* doesn't match */
-    else                 /* return pmatch_internal(patrn, strng, ci, sk); */
+    } else if ((ci ? lowc(p) != lowc(s) : p != s) /* check single character */
+               && (p != '?' || !s)) {             /* & single-char wildcard */
+        return FALSE;                             /* doesn't match */
+    } else { /* return pmatch_internal(patrn, strng, ci, sk); */
         goto pmatch_top; /* optimize tail recursion */
+    }
 }
 
 /* case-sensitive wildcard match */
@@ -686,13 +730,18 @@ strncmpi(
     char t1, t2;
 
     while (n--) {
-        if (!*s2) return (*s1 != 0); /* s1 >= s2 */
-        else if (!*s1) return -1; /* s1  < s2 */
+        if (!*s2) {
+            return (*s1 != 0); /* s1 >= s2 */
+        } else if (!*s1) {
+            return -1; /* s1  < s2 */
+        }
         t1 = lowc(*s1++);
         t2 = lowc(*s2++);
-        if (t1 != t2) return (t1 > t2) ? 1 : -1;
+        if (t1 != t2) {
+            return (t1 > t2) ? 1 : -1;
+        }
     }
-    return 0;               /* s1 == s2 */
+    return 0; /* s1 == s2 */
 }
 #endif  /* STRNCMPI */
 
@@ -701,8 +750,6 @@ strncmpi(
 /* case insensitive substring search */
 char *
 strstri(const char *str, const char *sub)   /* case insensitive substring search */
-
-
 {
     const char *s1, *s2;
     int i, k;
@@ -714,24 +761,39 @@ strstri(const char *str, const char *sub)   /* case insensitive substring search
 # endif
 
     /* special case: empty substring */
-    if (!*sub) return (char *) str;
+    if (!*sub) {
+        return (char *) str;
+    }
 
     /* do some useful work while determining relative lengths */
-    for (i = 0; i < TABSIZ; i++) tstr[i] = tsub[i] = 0;     /* init */
-    for (k = 0, s1 = str; *s1; k++) tstr[*s1++ & (TABSIZ-1)]++;
-    for (   s2 = sub; *s2; --k) tsub[*s2++ & (TABSIZ-1)]++;
+    for (i = 0; i < TABSIZ; i++) {
+        tstr[i] = tsub[i] = 0; /* init */
+    }
+    for (k = 0, s1 = str; *s1; k++) {
+        tstr[*s1++ & (TABSIZ-1)]++;
+    }
+    for (s2 = sub; *s2; --k) {
+        tsub[*s2++ & (TABSIZ-1)]++;
+    }
 
     /* evaluate the info we've collected */
-    if (k < 0) return (char *) 0;   /* sub longer than str, so can't match */
-    for (i = 0; i < TABSIZ; i++)    /* does sub have more 'x's than str? */
-        if (tsub[i] > tstr[i]) return (char *) 0; /* match not possible */
+    if (k < 0) {
+        return (char *) 0; /* sub longer than str, so can't match */
+    }
+    for (i = 0; i < TABSIZ; i++) { /* does sub have more 'x's than str? */
+        if (tsub[i] > tstr[i]) {
+            return (char *) 0; /* match not possible */
+        }
+    }
 
     /* now actually compare the substring repeatedly to parts of the string */
     for (i = 0; i <= k; i++) {
         s1 = &str[i];
         s2 = sub;
         while (lowc(*s1++) == lowc(*s2++))
-            if (!*s2) return (char *) &str[i];  /* full match */
+            if (!*s2) {
+                return (char *) &str[i]; /* full match */
+            }
     }
     return (char *) 0;  /* not found */
 }
@@ -747,7 +809,9 @@ fuzzymatch(const char *s1, const char *s2, const char *ignore_chars, boolean cas
     do {
         while ((c1 = *s1++) != '\0' && index(ignore_chars, c1) != 0) continue;
         while ((c2 = *s2++) != '\0' && index(ignore_chars, c2) != 0) continue;
-        if (!c1 || !c2) break; /* stop when end of either string is reached */
+        if (!c1 || !c2) {
+            break; /* stop when end of either string is reached */
+        }
 
         if (caseblind) {
             c1 = lowc(c1);
@@ -832,30 +896,30 @@ getlt(void)
     time_t date = current_epoch();
 
 #if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) || (defined(BSD) && !defined(POSIX_TYPES))
-    return(localtime((long *)(&date)));
+    return localtime((long *)(&date));
 #else
-    return(localtime(&date));
+    return localtime(&date);
 #endif
 }
 
 int
 getyear(void)
 {
-    return(1900 + getlt()->tm_year);
+    return 1900 + getlt()->tm_year;
 }
 
 /** Returns current month (1-12, 1 = January) */
 int
 getmonth(void)
 {
-    return(1 + getlt()->tm_mon);
+    return 1 + getlt()->tm_mon;
 }
 
 /** Returns current day of month (1-31) */
 int
 getmday(void)
 {
-    return(getlt()->tm_mday);
+    return getlt()->tm_mday;
 }
 
 
@@ -938,28 +1002,34 @@ time_from_yyyymmddhhmmss(char *buf)
     if (buf && strlen(buf) == 14) {
         d = buf;
         p = y; /* year */
-        for (k = 0; k < 4; ++k)
+        for (k = 0; k < 4; ++k) {
             *p++ = *d++;
+        }
         *p = '\0';
         p = mo; /* month */
-        for (k = 0; k < 2; ++k)
+        for (k = 0; k < 2; ++k) {
             *p++ = *d++;
+        }
         *p = '\0';
         p = md; /* day */
-        for (k = 0; k < 2; ++k)
+        for (k = 0; k < 2; ++k) {
             *p++ = *d++;
+        }
         *p = '\0';
         p = h; /* hour */
-        for (k = 0; k < 2; ++k)
+        for (k = 0; k < 2; ++k) {
             *p++ = *d++;
+        }
         *p = '\0';
         p = mi; /* minutes */
-        for (k = 0; k < 2; ++k)
+        for (k = 0; k < 2; ++k) {
             *p++ = *d++;
+        }
         *p = '\0';
         p = s; /* seconds */
-        for (k = 0; k < 2; ++k)
+        for (k = 0; k < 2; ++k) {
             *p++ = *d++;
+        }
         *p = '\0';
         lt = getlt();
         if (lt) {
@@ -1004,10 +1074,11 @@ phase_of_the_moon(void) /* 0-7, with 0: new, 4: full */
     diy = lt->tm_yday;
     goldn = (lt->tm_year % 19) + 1;
     epact = (11 * goldn + 18) % 30;
-    if ((epact == 25 && goldn > 11) || epact == 24)
+    if ((epact == 25 && goldn > 11) || epact == 24) {
         epact++;
+    }
 
-    return( (((((diy + epact) * 6) + 11) % 177) / 22) & 7 );
+    return (((((diy + epact) * 6) + 11) % 177) / 22) & 7;
 }
 
 boolean
@@ -1023,7 +1094,7 @@ friday_13th(void)
 {
     struct tm *lt = getlt();
 
-    return((boolean)(lt->tm_wday == 5 /* friday */ && lt->tm_mday == 13));
+    return (boolean)(lt->tm_wday == 5 /* friday */ && lt->tm_mday == 13);
 }
 
 int
@@ -1031,13 +1102,13 @@ night(void)
 {
     int hour = getlt()->tm_hour;
 
-    return(hour < 6 || hour > 21);
+    return hour < 6 || hour > 21;
 }
 
 int
 midnight(void)
 {
-    return(getlt()->tm_hour == 0);
+    return getlt()->tm_hour == 0;
 }
 
 boolean
@@ -1191,8 +1262,9 @@ strbuf_reserve(strbuf_t *strbuf, int len)
         strbuf->len = len + (int) sizeof strbuf->buf;
         strbuf->str = (char *) alloc(strbuf->len);
         Strcpy(strbuf->str, oldbuf);
-        if (oldbuf != strbuf->buf)
+        if (oldbuf != strbuf->buf) {
             free((genericptr_t) oldbuf);
+        }
     }
 }
 
@@ -1200,8 +1272,9 @@ strbuf_reserve(strbuf_t *strbuf, int len)
 void
 strbuf_empty(strbuf_t *strbuf)
 {
-    if (strbuf->str != NULL && strbuf->str != strbuf->buf)
+    if (strbuf->str != NULL && strbuf->str != strbuf->buf) {
         free((genericptr_t) strbuf->str);
+    }
     strbuf_init(strbuf);
 }
 
@@ -1215,15 +1288,17 @@ strbuf_nl_to_crlf(strbuf_t *strbuf)
         char *cp = strbuf->str;
 
         while (*cp)
-            if (*cp++ == '\n')
+            if (*cp++ == '\n') {
                 count++;
+            }
         if (count) {
             strbuf_reserve(strbuf, len + count + 1);
-            for (cp = strbuf->str + len + count; count; --cp)
+            for (cp = strbuf->str + len + count; count; --cp) {
                 if ((*cp = cp[-count]) == '\n') {
                     *--cp = '\r';
                     --count;
                 }
+            }
         }
     }
 }

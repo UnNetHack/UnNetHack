@@ -81,7 +81,7 @@ main(int argc, char **argv)
 	    if (fatal_error > 0)
 		errors_encountered = TRUE;
 	} else {		/* Otherwise every argument is a filename */
-	    for(i=1; i<argc; i++) {
+        for (i = 1; i < argc; i++) {
 		fname = strcpy(infile, argv[i]);
 		/* the input file had better be a .pdf file */
 		len = strlen(fname) - 4;	/* length excluding suffix */

@@ -355,7 +355,7 @@ tparam(ctl, buf, buflen, row, col, row2, col2)
 	     case 'd':	fmt = "%d";	break;
 	     case '2':	fmt = "%02d";	break;
 	     case '3':	fmt = "%03d";	break;
-	     case '+':	/*FALLTHRU*/
+         case '+':	/* fall through */
 	     case '.':	*r = (char)av[ac++];
 			if (c == '+')  *r += *ctl++;
 			if (!*r) {

@@ -39,7 +39,7 @@ HWND mswin_init_main_window () {
 		register_main_window_class( );
 		run_once = 1;
 	}
-	
+
 	/* create the main window */
 	ret = CreateWindow(
 			szMainWindowClass,		/* registered class name */
@@ -57,7 +57,7 @@ HWND mswin_init_main_window () {
 
 	if( !ret ) panic("Cannot create main window");
 
-    
+
     if (GetNHApp()->regMainMinX != CW_USEDEFAULT)
     {
         wp.length = sizeof(wp);
@@ -85,7 +85,7 @@ HWND mswin_init_main_window () {
 void register_main_window_class()
 {
 	WNDCLASS wcex;
-	
+
 	ZeroMemory(&wcex, sizeof(wcex));
 	wcex.style			= CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc	= (WNDPROC)MainWndProc;
@@ -130,7 +130,7 @@ keypad[KEY_LAST][3] = {
 	{'n', 'N', C('n')}, /* 3 */
 	{'i', 'I', C('i')}, /* Ins */
 	{'.', ':', ':'} /* Del */
-}, 
+},
 numpad[KEY_LAST][3] = {
 	{'7', M('7'), '7'}, /* 7 */
 	{'8', M('8'), '8'}, /* 8 */
@@ -155,7 +155,7 @@ numpad[KEY_LAST][3] = {
 /* map mode macros */
 #define IS_MAP_FIT_TO_SCREEN(mode) ((mode)==MAP_MODE_ASCII_FIT_TO_SCREEN || \
 							  (mode)==MAP_MODE_TILES_FIT_TO_SCREEN )
-  
+
 #define IS_MAP_ASCII(mode) ((mode)!=MAP_MODE_TILES && (mode)!=MAP_MODE_TILES_FIT_TO_SCREEN)
 
 static const char *extendedlist = "acdefijlmnopqrstuvw?2";
@@ -177,7 +177,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 {
 	PNHMainWindow data;
 
-	switch (message) 
+	switch (message)
 	{
 		case WM_CREATE:
 			/* set window data */
@@ -194,13 +194,13 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			onMSNHCommand(hWnd, wParam, lParam);
 		break;
 
-        case WM_KEYDOWN: 
+        case WM_KEYDOWN:
 		{
 			data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
 			/* translate arrow keys into nethack commands */
-            switch (wParam) 
-            { 
+            switch (wParam)
+            {
 			case VK_LEFT:
 				if( STATEON(VK_CONTROL) ) {
 					/* scroll map window one line left */
@@ -351,7 +351,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			case VK_F4:
 				if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
 					mswin_select_map_mode(
-						IS_MAP_ASCII(iflags.wc_map_mode)? 
+						IS_MAP_ASCII(iflags.wc_map_mode)?
 							data->mapAcsiiModeSave :
 							MAP_MODE_TILES
 					);
@@ -403,7 +403,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         {
             /*
               If not nethackmode, don't handle Alt-keys here.
-              If no Alt-key pressed it can never be an extended command 
+              If no Alt-key pressed it can never be an extended command
             */
 	    if (GetNHApp()->regNetHackMode && ((lParam & 1<<29) != 0))
             {
@@ -418,7 +418,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		return 0;
             }
             return DefWindowProc(hWnd, message, wParam, lParam);
-        } 
+        }
         break;
 
 		case WM_COMMAND:
@@ -434,10 +434,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
             WINDOWPLACEMENT wp;
 
 			mswin_layout_main_window(NULL);
-            
+
             wp.length = sizeof(wp);
             if (GetWindowPlacement(hWnd, &wp)) {
-                GetNHApp()->regMainShowState = (wp.showCmd == SW_SHOWMAXIMIZED 
+                GetNHApp()->regMainShowState = (wp.showCmd == SW_SHOWMAXIMIZED
 		    ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
 
                 GetNHApp()->regMainMinX = wp.ptMinPosition.x;
@@ -461,7 +461,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			break;
 
-		case WM_CLOSE: 
+		case WM_CLOSE:
 		{
 			/* exit gracefully */
 			if (program_state.gameover)
@@ -489,16 +489,16 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		} return 0;
 
 		case WM_DESTROY:
-			/* apparently we never get here 
+			/* apparently we never get here
 			   TODO: work on exit routines - need to send
-			   WM_QUIT somehow */  
+			   WM_QUIT somehow */
 
 			/* clean up */
 			free( (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA) );
 			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 
 			// PostQuitMessage(0);
-			exit(1); 
+			exit(1);
 			break;
 
 		default:
@@ -518,7 +518,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 		if( GetNHApp()->windowlist[msg_param->wid].type == NHW_MAP )
 			mswin_select_map_mode(iflags.wc_map_mode);
-		
+
 		child = GetNHApp()->windowlist[msg_param->wid].win;
 		if( child ) mswin_layout_main_window(child);
 	} break;
@@ -526,7 +526,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-/* adjust windows to fit main window layout 
+/* adjust windows to fit main window layout
    ---------------------------
    |        Status           |
    +-------------------------+
@@ -559,14 +559,14 @@ void mswin_layout_main_window(HWND changed_child)
 
 	/* get sizes of child windows */
 	wnd_status = mswin_hwnd_from_winid(WIN_STATUS);
-	if( IsWindow(wnd_status) ) { 
+	if( IsWindow(wnd_status) ) {
 		mswin_status_window_size(wnd_status, &status_size);
 	} else {
 		status_size.cx = status_size.cy = 0;
 	}
 
 	wnd_msg = mswin_hwnd_from_winid(WIN_MESSAGE);
-	if( IsWindow(wnd_msg) ) { 
+	if( IsWindow(wnd_msg) ) {
 		mswin_message_window_size(wnd_msg, &msg_size);
 	} else {
 		msg_size.cx = msg_size.cy = 0;
@@ -583,15 +583,15 @@ void mswin_layout_main_window(HWND changed_child)
 		wnd_rect.left += status_size.cx;
 		break;
 
-	case ALIGN_RIGHT:  
-		status_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
+	case ALIGN_RIGHT:
+		status_size.cx = (wnd_rect.right-wnd_rect.left)/4;
 		status_size.cy = (wnd_rect.bottom-wnd_rect.top); // that won't look good
 		status_org.x = wnd_rect.right - status_size.cx;
 		status_org.y = wnd_rect.top;
 		wnd_rect.right -= status_size.cx;
 		break;
 
-	case ALIGN_TOP:    
+	case ALIGN_TOP:
 		status_size.cx = (wnd_rect.right-wnd_rect.left);
 		status_org.x = wnd_rect.left;
 		status_org.y = wnd_rect.top;
@@ -610,21 +610,21 @@ void mswin_layout_main_window(HWND changed_child)
 	switch(iflags.wc_align_message) {
 	case ALIGN_LEFT:
 		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
-		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
+		msg_size.cy = (wnd_rect.bottom-wnd_rect.top);
 		msg_org.x = wnd_rect.left;
 		msg_org.y = wnd_rect.top;
 		wnd_rect.left += msg_size.cx;
 		break;
 
-	case ALIGN_RIGHT:  
-		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4; 
-		msg_size.cy = (wnd_rect.bottom-wnd_rect.top); 
+	case ALIGN_RIGHT:
+		msg_size.cx = (wnd_rect.right-wnd_rect.left)/4;
+		msg_size.cy = (wnd_rect.bottom-wnd_rect.top);
 		msg_org.x = wnd_rect.right - msg_size.cx;
 		msg_org.y = wnd_rect.top;
 		wnd_rect.right -= msg_size.cx;
 		break;
 
-	case ALIGN_TOP:    
+	case ALIGN_TOP:
 		msg_size.cx = (wnd_rect.right-wnd_rect.left);
 		msg_org.x = wnd_rect.left;
 		msg_org.y = wnd_rect.top;
@@ -646,34 +646,34 @@ void mswin_layout_main_window(HWND changed_child)
 	map_size.cy = wnd_rect.bottom - wnd_rect.top;
 
 	/* go through the windows list and adjust sizes */
-	for( i=0; i<MAXWINDOWS; i++ ) {
+    for (i = 0; i < MAXWINDOWS; i++) {
 		if(GetNHApp()->windowlist[i].win && !GetNHApp()->windowlist[i].dead) {
 			switch( GetNHApp()->windowlist[i].type ) {
 			case NHW_STATUS:
-				MoveWindow(GetNHApp()->windowlist[i].win, 
+				MoveWindow(GetNHApp()->windowlist[i].win,
 					       status_org.x,
 						   status_org.y,
-						   status_size.cx, 
-						   status_size.cy, 
+						   status_size.cx,
+						   status_size.cy,
 						   TRUE );
 				break;
 
 			case NHW_TEXT: // same as the map window
 			case NHW_MAP:
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       map_org.x, 
+				MoveWindow(GetNHApp()->windowlist[i].win,
+					       map_org.x,
 						   map_org.y,
-						   map_size.cx, 
-						   map_size.cy, 
+						   map_size.cx,
+						   map_size.cy,
 						   TRUE );
 				break;
 
 			case NHW_MESSAGE:
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-					       msg_org.x, 
+				MoveWindow(GetNHApp()->windowlist[i].win,
+					       msg_org.x,
 						   msg_org.y,
-						   msg_size.cx, 
-						   msg_size.cy, 
+						   msg_size.cx,
+						   msg_size.cy,
 						   TRUE );
 				break;
 
@@ -683,11 +683,11 @@ void mswin_layout_main_window(HWND changed_child)
 
 				pt.x = map_org.x + max(0, (int)(map_size.cx-menu_size.cx));
 				pt.y = map_org.y;
-				MoveWindow(GetNHApp()->windowlist[i].win, 
-						   pt.x, 
+				MoveWindow(GetNHApp()->windowlist[i].win,
+						   pt.x,
 						   pt.y,
-						   min(menu_size.cx, map_size.cx), 
-						   map_size.cy, 
+						   min(menu_size.cx, map_size.cx),
+						   map_size.cy,
 						   TRUE );
 				break;
 			}
@@ -702,8 +702,8 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMainWindow  data;
 
 	data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	wmId    = LOWORD(wParam); 
-	wmEvent = HIWORD(wParam); 
+	wmId    = LOWORD(wParam);
+	wmEvent = HIWORD(wParam);
 
 	// Parse the menu selections:
 	switch (wmId)
@@ -737,7 +737,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		case IDM_MAP_FIT_TO_SCREEN:
 			if( IS_MAP_FIT_TO_SCREEN(iflags.wc_map_mode) ) {
 				mswin_select_map_mode(
-					IS_MAP_ASCII(iflags.wc_map_mode)? 
+					IS_MAP_ASCII(iflags.wc_map_mode)?
 						data->mapAcsiiModeSave :
 						MAP_MODE_TILES
 				);
@@ -760,49 +760,49 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         {
             mswin_destroy_reg();
             /* Notify the user that windows settings will not be saved this time. */
-            NHMessageBox(GetNHApp()->hMainWnd, 
-                "Your Windows Settings will not be stored when you exit this time.", 
+            NHMessageBox(GetNHApp()->hMainWnd,
+                "Your Windows Settings will not be stored when you exit this time.",
                 MB_OK | MB_ICONINFORMATION);
             break;
         }
-		case IDM_HELP_LONG:	
-			display_file(HELP, TRUE);  
+		case IDM_HELP_LONG:
+			display_file(HELP, TRUE);
 			break;
-		
-		case IDM_HELP_COMMANDS:	
-			display_file(SHELP, TRUE);  
+
+		case IDM_HELP_COMMANDS:
+			display_file(SHELP, TRUE);
 			break;
-		
+
 		case IDM_HELP_HISTORY:
-			(void) dohistory();  
+			(void) dohistory();
 			break;
-		
+
 		case IDM_HELP_INFO_CHAR:
-			(void) dowhatis();  
+			(void) dowhatis();
 			break;
-		
+
 		case IDM_HELP_INFO_KEY:
-			(void) dowhatdoes();  
+			(void) dowhatdoes();
 			break;
-		
+
 		case IDM_HELP_OPTIONS:
-			option_help();  
+			option_help();
 			break;
-		
+
 		case IDM_HELP_OPTIONS_LONG:
-			display_file(OPTIONFILE, TRUE);  
+			display_file(OPTIONFILE, TRUE);
 			break;
-		
+
 		case IDM_HELP_EXTCMD:
-			(void) doextlist();  
+			(void) doextlist();
 			break;
-		
+
 		case IDM_HELP_LICENSE:
-			display_file(LICENSE, TRUE);  
+			display_file(LICENSE, TRUE);
 			break;
 
 		case IDM_HELP_PORTHELP:
-			display_file(PORT_HELP, TRUE);  
+			display_file(PORT_HELP, TRUE);
 			break;
 
 		default:
@@ -833,7 +833,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 								wbuf,
 								BUFSZ
 							) );
-						          
+
 
 				/* center dialog in the main window */
 				GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
@@ -855,7 +855,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				return TRUE;
 
 		case WM_COMMAND:
-			if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) 
+			if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
 			{
 				EndDialog(hDlg, LOWORD(wParam));
 				return TRUE;
@@ -892,17 +892,17 @@ void mswin_select_map_mode(int mode)
 	/* set map mode menu mark */
 	if( IS_MAP_ASCII(mode) ) {
 		CheckMenuRadioItem(
-			GetMenu(GetNHApp()->hMainWnd), 
-			IDM_MAP_TILES, 
-			IDM_MAP_ASCII10X18, 
-			mapmode2menuid( IS_MAP_FIT_TO_SCREEN(mode)? data->mapAcsiiModeSave : mode ), 
+			GetMenu(GetNHApp()->hMainWnd),
+			IDM_MAP_TILES,
+			IDM_MAP_ASCII10X18,
+			mapmode2menuid( IS_MAP_FIT_TO_SCREEN(mode)? data->mapAcsiiModeSave : mode ),
 			MF_BYCOMMAND);
 	} else {
 		CheckMenuRadioItem(
-			GetMenu(GetNHApp()->hMainWnd), 
-			IDM_MAP_TILES, 
-			IDM_MAP_ASCII10X18, 
-			mapmode2menuid( MAP_MODE_TILES ), 
+			GetMenu(GetNHApp()->hMainWnd),
+			IDM_MAP_TILES,
+			IDM_MAP_ASCII10X18,
+			mapmode2menuid( MAP_MODE_TILES ),
 			MF_BYCOMMAND);
 	}
 
@@ -910,7 +910,7 @@ void mswin_select_map_mode(int mode)
 	CheckMenuItem(
 		GetMenu(GetNHApp()->hMainWnd),
 		IDM_MAP_FIT_TO_SCREEN,
-		MF_BYCOMMAND | 
+		MF_BYCOMMAND |
 		(IS_MAP_FIT_TO_SCREEN(mode)? MF_CHECKED : MF_UNCHECKED)
 	);
 
@@ -919,12 +919,12 @@ void mswin_select_map_mode(int mode)
 	}
 
 	iflags.wc_map_mode = mode;
-	
-	/* 
+
+	/*
 	** first, check if WIN_MAP has been inialized.
 	** If not - attempt to retrieve it by type, then check it again
 	*/
-	if( map_id==WIN_ERR ) 
+	if( map_id==WIN_ERR )
 		map_id = mswin_winid_from_type(NHW_MAP);
 	if( map_id!=WIN_ERR )
 		mswin_map_mode(mswin_hwnd_from_winid(map_id), mode);
@@ -933,7 +933,7 @@ void mswin_select_map_mode(int mode)
 static struct t_menu2mapmode {
 	int menuID;
 	int mapMode;
-} _menu2mapmode[] = 
+} _menu2mapmode[] =
 {
 	{ IDM_MAP_TILES, MAP_MODE_TILES },
 	{ IDM_MAP_ASCII4X6, MAP_MODE_ASCII4x6 },
@@ -952,15 +952,23 @@ static struct t_menu2mapmode {
 int	menuid2mapmode(int menuid)
 {
 	struct t_menu2mapmode* p;
-	for( p = _menu2mapmode; p->mapMode!=-1; p++ ) 
-		if(p->menuID==menuid ) return p->mapMode;
-	return -1;
+    for (p = _menu2mapmode; p->mapMode != -1; p++) {
+        if (p->menuID==menuid ) {
+             return p->mapMode;
+        }
+    }
+
+    return -1;
 }
 
 int	mapmode2menuid(int map_mode)
 {
-	struct t_menu2mapmode* p;
-	for( p = _menu2mapmode; p->mapMode!=-1; p++ ) 
-		if(p->mapMode==map_mode ) return p->menuID;
-	return -1;
+    struct t_menu2mapmode* p;
+    for (p = _menu2mapmode; p->mapMode != -1; p++) {
+        if (p->mapMode == map_mode) {
+            return p->menuID;
+        }
+    }
+
+    return -1;
 }

@@ -66,13 +66,13 @@ enermod(int en)
     switch (Role_switch) {
     case PM_PRIEST:
     case PM_WIZARD:
-        return(2 * en);
+        return 2 * en;
     case PM_HEALER:
     case PM_KNIGHT:
-        return((3 * en) / 2);
+        return (3 * en) / 2;
     case PM_BARBARIAN:
     case PM_VALKYRIE:
-        return((3 * en) / 4);
+        return (3 * en) / 4;
     default:
         return (en);
     }
@@ -122,55 +122,72 @@ experience(struct monst *mtmp, int nk UNUSED)
     tmp = 1 + mtmp->m_lev * mtmp->m_lev;
 
 /*  For higher ac values, give extra experience */
-    if ((i = find_mac(mtmp)) < 3) tmp += (7 - i) * ((i < 0) ? 2 : 1);
+    if ((i = find_mac(mtmp)) < 3) {
+        tmp += (7 - i) * ((i < 0) ? 2 : 1);
+    }
 
 /*  For very fast monsters, give extra experience */
-    if (ptr->mmove > NORMAL_SPEED)
+    if (ptr->mmove > NORMAL_SPEED) {
         tmp += (ptr->mmove > (3*NORMAL_SPEED/2)) ? 5 : 3;
+    }
 
 /*  For each "special" attack type give extra experience */
-    for(i = 0; i < NATTK; i++) {
-
+    for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].aatyp;
-        if(tmp2 > AT_BUTT) {
-
-            if(tmp2 == AT_WEAP) tmp += 5;
-            else if(tmp2 == AT_MAGC) tmp += 10;
-            else tmp += 3;
+        if (tmp2 > AT_BUTT) {
+            if (tmp2 == AT_WEAP) {
+                tmp += 5;
+            } else if (tmp2 == AT_MAGC) {
+                tmp += 10;
+            } else {
+                tmp += 3;
+            }
         }
     }
 
 /*  For each "special" damage type give extra experience */
-    for(i = 0; i < NATTK; i++) {
+    for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].adtyp;
-        if(tmp2 > AD_PHYS && tmp2 < AD_BLND) tmp += 2*mtmp->m_lev;
-        else if((tmp2 == AD_DRLI) || (tmp2 == AD_STON) ||
-                (tmp2 == AD_SLIM)) tmp += 50;
-        else if (tmp2 != AD_PHYS) {
+        if (tmp2 > AD_PHYS && tmp2 < AD_BLND) {
+            tmp += 2*mtmp->m_lev;
+        } else if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) ||
+                   (tmp2 == AD_SLIM)) {
+            tmp += 50;
+        } else if (tmp2 != AD_PHYS) {
             tmp += mtmp->m_lev;
         }
         /* extra heavy damage bonus */
-        if((int)(ptr->mattk[i].damd * ptr->mattk[i].damn) > 23)
+        if ((int)(ptr->mattk[i].damd * ptr->mattk[i].damn) > 23) {
             tmp += mtmp->m_lev;
-        if (tmp2 == AD_WRAP && ptr->mlet == S_EEL && !Amphibious)
+        }
+        if (tmp2 == AD_WRAP && ptr->mlet == S_EEL && !Amphibious) {
             tmp += 1000;
+        }
     }
 
 /*  For certain "extra nasty" monsters, give even more */
-    if (extra_nasty(ptr)) tmp += (7 * mtmp->m_lev);
+    if (extra_nasty(ptr)) {
+        tmp += (7 * mtmp->m_lev);
+    }
 
 /*  For higher level monsters, an additional bonus is given */
-    if(mtmp->m_lev > 8) tmp += 50;
+    if (mtmp->m_lev > 8) {
+        tmp += 50;
+    }
 
 /*  Dungeon fern spores give no experience */
-    if(is_fern_spore(mtmp->data)) tmp = 0;
+    if (is_fern_spore(mtmp->data)) {
+        tmp = 0;
+    }
 
 #ifdef MAIL
     /* Mail daemons put up no fight. */
-    if(mtmp->data == &mons[PM_MAIL_DAEMON]) tmp = 1;
+    if (mtmp->data == &mons[PM_MAIL_DAEMON]) {
+        tmp = 1;
+    }
 #endif
 
-    return(tmp);
+    return tmp;
 }
 
 /**
@@ -194,14 +211,15 @@ more_experienced(int exp, int score, int rexp)
         u.urscore = LONG_MAX;
     }
 
-    if(exp
+    if (exp
 #ifdef SCORE_ON_BOTL
        || flags.showscore
 #endif
        ) flags.botl = 1;
 
-    if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000))
+    if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000)) {
         flags.beginner = 0;
+    }
 }
 
 /* e.g., hit by drain life attack */
@@ -213,11 +231,13 @@ losexp(const char *drainer) /**< cause of death, if drain should be fatal */
 #ifdef WIZARD
     /* override life-drain resistance when handling an explicit
        wizard mode request to reduce level; never fatal though */
-    if (drainer && !strcmp(drainer, "#levelchange"))
+    if (drainer && !strcmp(drainer, "#levelchange")) {
         drainer = 0;
-    else
+    } else
 #endif
-    if (resists_drli(&youmonst)) return;
+    if (resists_drli(&youmonst)) {
+        return;
+    }
 
     if (u.ulevel > 1) {
         pline("%s level %d.", Goodbye(), u.ulevel--);
@@ -238,20 +258,31 @@ losexp(const char *drainer) /**< cause of death, if drain should be fatal */
     num = newhp();
     u.uhpmax -= num;
     check_uhpmax();
-    if (u.uhpmax < 1) u.uhpmax = 1;
+    if (u.uhpmax < 1) {
+        u.uhpmax = 1;
+    }
     u.uhp -= num;
-    if (u.uhp < 1) u.uhp = 1;
-    else if (u.uhp > u.uhpmax) u.uhp = u.uhpmax;
+    if (u.uhp < 1) {
+        u.uhp = 1;
+    } else if (u.uhp > u.uhpmax) {
+        u.uhp = u.uhpmax;
+    }
 
     num = enermod(num);     /* M. Stephenson */
     u.uenmax -= num;
-    if (u.uenmax < 0) u.uenmax = 0;
+    if (u.uenmax < 0) {
+        u.uenmax = 0;
+    }
     u.uen -= num;
-    if (u.uen < 0) u.uen = 0;
-    else if (u.uen > u.uenmax) u.uen = u.uenmax;
+    if (u.uen < 0) {
+        u.uen = 0;
+    } else if (u.uen > u.uenmax) {
+        u.uen = u.uenmax;
+    }
 
-    if (u.uexp > 0)
+    if (u.uexp > 0) {
         u.uexp = newuexp(u.ulevel) - 1;
+    }
 
     if (Upolyd) {
         num = monhp_per_lvl(&youmonst);
@@ -274,8 +305,9 @@ losexp(const char *drainer) /**< cause of death, if drain should be fatal */
 void
 newexplevel(void)
 {
-    if (u.ulevel < MAXULEV && u.uexp >= newuexp(u.ulevel))
+    if (u.ulevel < MAXULEV && u.uexp >= newuexp(u.ulevel)) {
         pluslvl(TRUE);
+    }
 }
 
 void
@@ -284,7 +316,9 @@ pluslvl(boolean incr)
 {       /*  (false for potion of gain level)      */
     int num;
 
-    if (!incr) You_feel("more experienced.");
+    if (!incr) {
+        You_feel("more experienced.");
+    }
     num = newhp();
     if (!marathon_mode) {
         u.uhpmax += num;
@@ -296,12 +330,13 @@ pluslvl(boolean incr)
         }
     }
     check_uhpmax();
-    if (u.ulevel < urole.xlev)
+    if (u.ulevel < urole.xlev) {
         num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.lornd + urace.enadv.lornd,
                   urole.enadv.lofix + urace.enadv.lofix);
-    else
+    } else {
         num = rn1((int)ACURR(A_WIS)/2 + urole.enadv.hirnd + urace.enadv.hirnd,
                   urole.enadv.hifix + urace.enadv.hifix);
+    }
     num = enermod(num); /* M. Stephenson */
 
     /* Tourists have no innate magic abilities,
@@ -318,7 +353,9 @@ pluslvl(boolean incr)
         /* increase experience points to reflect new level */
         if (incr) {
             long tmp = newuexp(u.ulevel + 1);
-            if (u.uexp >= tmp) u.uexp = tmp - 1;
+            if (u.uexp >= tmp) {
+                u.uexp = tmp - 1;
+            }
         } else {
             u.uexp = newuexp(u.ulevel);
         }
@@ -326,7 +363,9 @@ pluslvl(boolean incr)
         pline("Welcome %sto experience level %d.",
               (u.ulevelmax < u.ulevel) ? "" : "back ",
               u.ulevel);
-        if (u.ulevelmax < u.ulevel) u.ulevelmax = u.ulevel;
+        if (u.ulevelmax < u.ulevel) {
+            u.ulevelmax = u.ulevel;
+        }
         adjabil(u.ulevel - 1, u.ulevel);    /* give new intrinsics */
         reset_rndmonst(NON_PM);     /* new monster selection */
     }
@@ -355,7 +394,9 @@ rndexp(boolean gaining) /**< gaining XP via potion vs setting XP for polyself */
     if (u.ulevel == MAXULEV && gaining) {
         result += (u.uexp - minexp);
         /* avoid wrapping (over 400 blessed potions needed for that...) */
-        if (result < u.uexp) result = u.uexp;
+        if (result < u.uexp) {
+            result = u.uexp;
+        }
     }
     return result;
 }

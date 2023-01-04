@@ -109,10 +109,11 @@ curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff)
     }
     curses_color = color + 1;
     if (COLORS < 16) {
-        if (curses_color > 8 && curses_color < 17)
+        if (curses_color > 8 && curses_color < 17) {
             curses_color -= 8;
-        else if (curses_color > (17 + 16))
+        } else if (curses_color > (17 + 16)) {
             curses_color -= 16;
+        }
     }
     if (onoff == ON) {          /* Turn on color/attributes */
         if (color != NONE) {
@@ -230,8 +231,9 @@ curses_get_wid(int type)
 char *
 curses_copy_of(const char *s)
 {
-    if (!s)
+    if (!s) {
         s = "";
+    }
     return dupstr(s);
 }
 
@@ -254,8 +256,9 @@ curses_num_lines(const char *str, int width)
         last_space = 0;
 
         for (count = 0; count <= width; count++) {
-            if (substr[count] == ' ')
+            if (substr[count] == ' ') {
                 last_space = count;
+            }
 
         }
         if (last_space == 0) {  /* No spaces found */
@@ -594,14 +597,19 @@ curses_rtrim(char *str)
 {
     char *s;
 
-    for (s = str; *s != '\0'; ++s);
-    if (s > str) {
-        for (--s; isspace(*s) && s > str; --s);
+    for (s = str; *s != '\0'; ++s) {
+        ;
     }
-    if (s == str)
+    if (s > str) {
+        for (--s; isspace(*s) && s > str; --s) {
+            ;
+        }
+    }
+    if (s == str) {
         *s = '\0';
-    else
+    } else {
         *(++s) = '\0';
+    }
 }
 
 

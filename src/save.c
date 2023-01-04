@@ -72,16 +72,18 @@ dosave(void)
         return 0;
     }
     clear_nhwindow(WIN_MESSAGE);
-    if(yn("Really save?") == 'n') {
+    if (yn("Really save?") == 'n') {
         clear_nhwindow(WIN_MESSAGE);
-        if(multi > 0) nomul(0, 0);
+        if (multi > 0) {
+            nomul(0, 0);
+        }
     } else {
         clear_nhwindow(WIN_MESSAGE);
         pline("Saving...");
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
         program_state.done_hup = 0;
 #endif
-        if(dosave0()) {
+        if (dosave0()) {
 #ifdef LIVELOGFILE
             livelog_game_action("saved");
 #endif
@@ -91,7 +93,9 @@ dosave(void)
             display_nhwindow(WIN_MESSAGE, TRUE);
             exit_nhwindows("Be seeing you...");
             nh_terminate(EXIT_SUCCESS);
-        } else (void)doredraw();
+        } else {
+            (void)doredraw();
+        }
     }
     return 0;
 }
@@ -112,12 +116,13 @@ hangup(
 #  endif
 # else  /* SAVEONHANGUP */
     if (!program_state.done_hup++) {
-        if (program_state.something_worth_saving)
+        if (program_state.something_worth_saving) {
             (void) dosave0();
+        }
 #  ifdef VMS
         /* don't call exit when already within an exit handler;
            that would cancel any other pending user-mode handlers */
-        if (!program_state.exiting)
+        if (!program_state.exiting) {
 #  endif
         {
             clearlocks();
@@ -159,8 +164,9 @@ dosave0(void)
         iflags.save_uburied = 0;
     }
 
-    if (!SAVEF[0])
+    if (!SAVEF[0]) {
         return 0;
+    }
     fq_save = fqname(SAVEF, SAVEPREFIX, 1); /* level files take 0 */
 
 #if defined(UNIX) || defined(VMS)
@@ -171,7 +177,9 @@ dosave0(void)
 #endif
 
 #if defined(MICRO) && defined(MFLOPPY)
-    if (!saveDiskPrompt(0)) return 0;
+    if (!saveDiskPrompt(0)) {
+        return 0;
+    }
 #endif
 
     HUP if (iflags.window_inited) {
@@ -191,29 +199,33 @@ dosave0(void)
     HUP mark_synch();   /* flush any buffered screen output */
 
     fd = create_savefile();
-    if(fd < 0) {
+    if (fd < 0) {
         HUP pline("Cannot open save file.");
         (void) delete_savefile();   /* ab@unido */
-        return(0);
+        return 0;
     }
 
     vision_recalc(2);   /* shut down vision to prevent problems
                            in the event of an impossible() call */
 
     /* undo date-dependent luck adjustments made at startup time */
-    if(flags.moonphase == FULL_MOON)    /* ut-sally!fletcher */
+    if (flags.moonphase == FULL_MOON) { /* ut-sally!fletcher */
         change_luck(-1);        /* and unido!ab */
-    if(flags.friday13)
+    }
+    if (flags.friday13) {
         change_luck(1);
-    if(iflags.window_inited)
+    }
+    if (iflags.window_inited) {
         HUP clear_nhwindow(WIN_MESSAGE);
+    }
 
 #ifdef MICRO
     dotcnt = 0;
     dotrow = 2;
     curs(WIN_MAP, 1, 1);
-    if (strncmpi("X11", windowprocs.name, 3))
+    if (strncmpi("X11", windowprocs.name, 3)) {
         putstr(WIN_MAP, 0, "Saving:");
+    }
 #endif
 #ifdef MFLOPPY
     /* make sure there is enough disk space */
@@ -224,9 +236,11 @@ dosave0(void)
         savegamestate(fd, COUNT_SAVE);
         needed = bytes_counted;
 
-        for (ltmp = 1; ltmp <= maxledgerno(); ltmp++)
-            if (ltmp != ledger_no(&u.uz) && level_info[ltmp].where)
+        for (ltmp = 1; ltmp <= maxledgerno(); ltmp++) {
+            if (ltmp != ledger_no(&u.uz) && level_info[ltmp].where) {
                 needed += level_info[ltmp].size + (sizeof ltmp);
+            }
+        }
         fds = freediskspace(fq_save);
         if (needed > fds) {
             HUP {
@@ -267,8 +281,12 @@ dosave0(void)
     u.usteed = (struct monst *)0;
 
     for (ltmp = (xint8)1; ltmp <= maxledgerno(); ltmp++) {
-        if (ltmp == ledger_no(&uz_save)) continue;
-        if (!(level_info[ltmp].flags & LFILE_EXISTS)) continue;
+        if (ltmp == ledger_no(&uz_save)) {
+            continue;
+        }
+        if (!(level_info[ltmp].flags & LFILE_EXISTS)) {
+            continue;
+        }
 #ifdef MICRO
         curs(WIN_MAP, 1 + dotcnt++, dotrow);
         if (dotcnt >= (COLNO - 1)) {
@@ -287,7 +305,7 @@ dosave0(void)
             (void) delete_savefile();
             HUP Strcpy(killer.name, whynot);
             HUP done(TRICKED);
-            return(0);
+            return 0;
         }
         minit();    /* ZEROCOMP */
         getlev(ofd, hackpid, ltmp, FALSE);
@@ -304,7 +322,7 @@ dosave0(void)
     delete_levelfile(ledger_no(&u.uz));
     delete_levelfile(0);
     compress_area(FILE_AREA_SAVE, fq_save);
-    return(1);
+    return 1;
 }
 
 static void
@@ -349,10 +367,12 @@ savegamestate(int fd, int mode)
            sizeof(struct spell) * (MAXSPELL + 1));
     save_artifacts(fd);
     save_oracles(fd, mode);
-    if(ustuck_id)
+    if (ustuck_id) {
         bwrite(fd, (genericptr_t) &ustuck_id, sizeof ustuck_id);
-    if(usteed_id)
+    }
+    if (usteed_id) {
         bwrite(fd, (genericptr_t) &usteed_id, sizeof usteed_id);
+    }
 
     bwrite(fd, (genericptr_t) pl_tutorial, sizeof pl_tutorial);
     bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
@@ -461,8 +481,9 @@ int mode;
          * leave it out of checkspace just in case */
         if (iflags.checkspace) {
             while (bytes_counted > freediskspace(levels))
-                if (!swapout_oldest())
+                if (!swapout_oldest()) {
                     return FALSE;
+                }
         }
     }
     if (mode & (WRITE_SAVE | FREE_SAVE)) {
@@ -643,7 +664,9 @@ skip_lots:
     save_engravings(fd, mode);
     savedamage(fd, mode);
     save_regions(fd, mode);
-    if (mode != FREE_SAVE) bflush(fd);
+    if (mode != FREE_SAVE) {
+        bflush(fd);
+    }
 }
 
 #ifdef ZEROCOMP
@@ -678,8 +701,9 @@ int c;
 {
 #ifdef MFLOPPY
     bytes_counted++;
-    if (count_only)
+    if (count_only) {
         return;
+    }
 #endif
     if (outbufp >= sizeof outbuf) {
         (void) write(bwritefd, outbuf, sizeof outbuf);
@@ -720,15 +744,17 @@ register int fd;
         flushoutrun(outrunlength);
     }
 #ifdef MFLOPPY
-    if (count_only) outbufp = 0;
+    if (count_only) {
+        outbufp = 0;
+    }
 #endif
 
     if (outbufp) {
         if (write(fd, outbuf, outbufp) != outbufp) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-            if (program_state.done_hup)
+            if (program_state.done_hup) {
                 nh_terminate(EXIT_FAILURE);
-            else
+            } else
 #endif
             bclose(fd); /* panic (outbufp != 0) */
         }
@@ -747,13 +773,15 @@ register unsigned num;
     if (!compressing) {
 #ifdef MFLOPPY
         bytes_counted += num;
-        if (count_only) return;
+        if (count_only) {
+            return;
+        }
 #endif
         if ((unsigned) write(fd, loc, num) != num) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-            if (program_state.done_hup)
+            if (program_state.done_hup) {
                 nh_terminate(EXIT_FAILURE);
-            else
+            } else
 #endif
             panic("cannot write %u bytes to file #%d", num, fd);
         }
@@ -793,11 +821,13 @@ void
 bufon(int fd)
 {
 #ifdef UNIX
-    if(bw_fd >= 0)
+    if (bw_fd >= 0) {
         panic("double buffering unexpected");
+    }
     bw_fd = fd;
-    if((bw_FILE = fdopen(fd, "w")) == 0)
+    if ((bw_FILE = fdopen(fd, "w")) == 0) {
         panic("buffering of file %d failed", fd);
+    }
 #endif
     buffering = TRUE;
 }
@@ -813,9 +843,10 @@ void
 bflush(int fd)
 {
 #ifdef UNIX
-    if(fd == bw_fd) {
-        if(fflush(bw_FILE) == EOF)
+    if (fd == bw_fd) {
+        if (fflush(bw_FILE) == EOF) {
             panic("flush of savefile failed!");
+        }
     }
 #endif
     return;
@@ -828,13 +859,16 @@ bwrite(int fd, genericptr_t loc, unsigned int num)
 
 #ifdef MFLOPPY
     bytes_counted += num;
-    if (count_only) return;
+    if (count_only) {
+        return;
+    }
 #endif
 
 #ifdef UNIX
     if (buffering) {
-        if(fd != bw_fd)
+        if (fd != bw_fd) {
             panic("unbuffered write to fd %d (!= %d)", fd, bw_fd);
+        }
 
         failed = (fwrite(loc, (int)num, 1, bw_FILE) != 1);
     } else
@@ -850,9 +884,9 @@ bwrite(int fd, genericptr_t loc, unsigned int num)
 
     if (failed) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-        if (program_state.done_hup)
+        if (program_state.done_hup) {
             nh_terminate(EXIT_FAILURE);
-        else
+        } else
 #endif
         panic("cannot write %u bytes to file #%d", num, fd);
     }
@@ -880,19 +914,25 @@ savelevchn(int fd, int mode)
     s_level *tmplev, *tmplev2;
     int cnt = 0;
 
-    for (tmplev = sp_levchn; tmplev; tmplev = tmplev->next) cnt++;
-    if (perform_bwrite(mode))
+    for (tmplev = sp_levchn; tmplev; tmplev = tmplev->next) {
+        cnt++;
+    }
+    if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &cnt, sizeof(int));
+    }
 
     for (tmplev = sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev->next;
-        if (perform_bwrite(mode))
+        if (perform_bwrite(mode)) {
             bwrite(fd, tmplev, sizeof(s_level));
-        if (release_data(mode))
+        }
+        if (release_data(mode)) {
             free(tmplev);
+        }
     }
-    if (release_data(mode))
+    if (release_data(mode)) {
         sp_levchn = 0;
+    }
 }
 
 /* used when saving a level and also when saving dungeon overview data */
@@ -928,21 +968,26 @@ savedamage(int fd, int mode)
     unsigned int xl = 0;
 
     damageptr = level.damagelist;
-    for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam->next)
+    for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam->next) {
         xl++;
-    if (perform_bwrite(mode))
+    }
+    if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &xl, sizeof(xl));
+    }
 
     while (xl--) {
-        if (perform_bwrite(mode))
+        if (perform_bwrite(mode)) {
             bwrite(fd, (genericptr_t) damageptr, sizeof(*damageptr));
+        }
         tmp_dam = damageptr;
         damageptr = damageptr->next;
-        if (release_data(mode))
+        if (release_data(mode)) {
             free((genericptr_t)tmp_dam);
+        }
     }
-    if (release_data(mode))
+    if (release_data(mode)) {
         level.damagelist = 0;
+    }
 }
 
 void
@@ -970,11 +1015,13 @@ save_mongen_override(int fd, struct mon_gen_override *or, int mode)
             }
             prev = mt;
             mt = mt->next;
-            if (release_data(mode))
+            if (release_data(mode)) {
                 free(prev);
+            }
         }
-        if (release_data(mode))
+        if (release_data(mode)) {
             or->gen_chances = NULL;
+        }
     }
 }
 
@@ -1004,8 +1051,9 @@ save_lvl_sounds(int fd, struct lvl_sounds *or, int mode)
             }
         }
         if (release_data(mode)) {
-            for (i = 0; i < or->n_sounds; i++)
+            for (i = 0; i < or->n_sounds; i++) {
                 free(or->sounds[i].msg);
+            }
             free(or->sounds);
             or->sounds = NULL;
             or->n_sounds = 0;
@@ -1024,30 +1072,35 @@ saveobj(int fd, struct obj *otmp)
     if (otmp->oextra) {
         buflen = ONAME(otmp) ? (int) strlen(ONAME(otmp)) + 1 : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
+        if (buflen > 0) {
             bwrite(fd, (genericptr_t) ONAME(otmp), buflen);
+        }
 
         /* defer to savemon() for this one */
-        if (OMONST(otmp))
+        if (OMONST(otmp)) {
             savemon(fd, OMONST(otmp));
-        else
+        } else {
             bwrite(fd, (genericptr_t) &zerobuf, sizeof zerobuf);
+        }
 
         buflen = OMID(otmp) ? (int) sizeof (unsigned) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
+        if (buflen > 0) {
             bwrite(fd, (genericptr_t) OMID(otmp), buflen);
+        }
 
         /* TODO: post 3.6.x, get rid of this */
         buflen = OLONG(otmp) ? (int) sizeof (long) : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
+        if (buflen > 0) {
             bwrite(fd, (genericptr_t) OLONG(otmp), buflen);
+        }
 
         buflen = OMAILCMD(otmp) ? (int) strlen(OMAILCMD(otmp)) + 1 : 0;
         bwrite(fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0)
+        if (buflen > 0) {
             bwrite(fd, (genericptr_t) OMAILCMD(otmp), buflen);
+        }
     }
 }
 
@@ -1062,8 +1115,9 @@ saveobjchn(int fd, struct obj *otmp, int mode)
         if (perform_bwrite(mode)) {
             saveobj(fd, otmp);
         }
-        if (Has_contents(otmp))
+        if (Has_contents(otmp)) {
             saveobjchn(fd, otmp->cobj, mode);
+        }
         if (release_data(mode)) {
             /*
              * If these are on the floor, the discarding could be
@@ -1094,8 +1148,9 @@ saveobjchn(int fd, struct obj *otmp, int mode)
         }
         otmp = otmp2;
     }
-    if (perform_bwrite(mode))
+    if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &minusone, sizeof (int));
+    }
 }
 
 static void
@@ -1155,12 +1210,14 @@ savemonchn(int fd, struct monst *mtmp, int mode)
         mtmp2 = mtmp->nmon;
         if (perform_bwrite(mode)) {
             mtmp->mnum = monsndx(mtmp->data);
-            if (mtmp->ispriest)
+            if (mtmp->ispriest) {
                 forget_temple_entry(mtmp); /* EPRI() */
+            }
             savemon(fd, mtmp);
         }
-        if (mtmp->minvent)
+        if (mtmp->minvent) {
             saveobjchn(fd, mtmp->minvent, mode);
+        }
         if (release_data(mode)) {
             if (mtmp == polearm.hitmon) {
                 polearm.m_id = mtmp->m_id;
@@ -1171,8 +1228,9 @@ savemonchn(int fd, struct monst *mtmp, int mode)
         }
         mtmp = mtmp2;
     }
-    if (perform_bwrite(mode))
+    if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &minusone, sizeof (int));
+    }
 }
 
 static void
@@ -1183,14 +1241,17 @@ savetrapchn(int fd, struct trap *trap, int mode)
 
     while (trap) {
         trap2 = trap->ntrap;
-        if (perform_bwrite(mode))
+        if (perform_bwrite(mode)) {
             bwrite(fd, trap, sizeof *trap);
-        if (release_data(mode))
+        }
+        if (release_data(mode)) {
             dealloc_trap(trap);
+        }
         trap = trap2;
     }
-    if (perform_bwrite(mode))
+    if (perform_bwrite(mode)) {
         bwrite(fd, &zerotrap, sizeof zerotrap);
+    }
 }
 
 /* save all the fruit names and ID's; this is used only in saving whole games
@@ -1207,16 +1268,20 @@ savefruitchn(int fd, int mode)
     f1 = ffruit;
     while (f1) {
         f2 = f1->nextf;
-        if (f1->fid >= 0 && perform_bwrite(mode))
+        if (f1->fid >= 0 && perform_bwrite(mode)) {
             bwrite(fd, f1, sizeof *f1);
-        if (release_data(mode))
+        }
+        if (release_data(mode)) {
             dealloc_fruit(f1);
+        }
         f1 = f2;
     }
-    if (perform_bwrite(mode))
+    if (perform_bwrite(mode)) {
         bwrite(fd, &zerofruit, sizeof zerofruit);
-    if (release_data(mode))
+    }
+    if (release_data(mode)) {
         ffruit = 0;
+    }
 }
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -1224,7 +1289,9 @@ savefruitchn(int fd, int mode)
 void
 free_percent_color_options(const struct percent_color_option *list_head)
 {
-    if (list_head == NULL) return;
+    if (list_head == NULL) {
+        return;
+    }
     free_percent_color_options(list_head->next);
     free((genericptr_t)list_head);
 }
@@ -1232,7 +1299,9 @@ free_percent_color_options(const struct percent_color_option *list_head)
 void
 free_text_color_options(const struct text_color_option *list_head)
 {
-    if (list_head == NULL) return;
+    if (list_head == NULL) {
+        return;
+    }
     free_text_color_options(list_head->next);
     free((genericptr_t)list_head->text);
     free((genericptr_t)list_head);
@@ -1318,12 +1387,24 @@ freedynamicdata(void)
     free_dungeons();
 
     /* some pointers in iflags */
-    if (iflags.wc_font_map) free(iflags.wc_font_map);
-    if (iflags.wc_font_message) free(iflags.wc_font_message);
-    if (iflags.wc_font_text) free(iflags.wc_font_text);
-    if (iflags.wc_font_menu) free(iflags.wc_font_menu);
-    if (iflags.wc_font_status) free(iflags.wc_font_status);
-    if (iflags.wc_tile_file) free(iflags.wc_tile_file);
+    if (iflags.wc_font_map) {
+        free(iflags.wc_font_map);
+    }
+    if (iflags.wc_font_message) {
+        free(iflags.wc_font_message);
+    }
+    if (iflags.wc_font_text) {
+        free(iflags.wc_font_text);
+    }
+    if (iflags.wc_font_menu) {
+        free(iflags.wc_font_menu);
+    }
+    if (iflags.wc_font_status) {
+        free(iflags.wc_font_status);
+    }
+    if (iflags.wc_tile_file) {
+        free(iflags.wc_tile_file);
+    }
 #ifdef AUTOPICKUP_EXCEPTIONS
     free_autopickup_exceptions();
 #endif
@@ -1345,8 +1426,9 @@ int lev;
     set_levelfile_name(to, lev);
     if (iflags.checkspace) {
         while (level_info[lev].size > freediskspace(to))
-            if (!swapout_oldest())
+            if (!swapout_oldest()) {
                 return FALSE;
+            }
     }
 # ifdef WIZARD
     if (wizard) {
@@ -1366,16 +1448,19 @@ swapout_oldest() {
     int i, oldest;
     long oldtime;
 
-    if (!ramdisk)
+    if (!ramdisk) {
         return FALSE;
-    for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++)
+    }
+    for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++) {
         if (level_info[i].where == ACTIVE
             && (!oldtime || level_info[i].time < oldtime)) {
             oldest = i;
             oldtime = level_info[i].time;
         }
-    if (!oldest)
+    }
+    if (!oldest) {
         return FALSE;
+    }
     Sprintf(from, "%s%s", levels, alllevels);
     Sprintf(to, "%s%s", permbones, alllevels);
     set_levelfile_name(from, oldest);
@@ -1398,22 +1483,26 @@ char *from, *to;
 {
 # ifdef TOS
 
-    if (_copyfile(from, to))
+    if (_copyfile(from, to)) {
         panic("Can't copy %s to %s", from, to);
+    }
 # else
     char buf[BUFSIZ];   /* this is system interaction, therefore
                          * BUFSIZ instead of NetHack's BUFSZ */
     int nfrom, nto, fdfrom, fdto;
 
-    if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0)
+    if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0) {
         panic("Can't copy from %s !?", from);
-    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0)
+    }
+    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0) {
         panic("Can't copy to %s", to);
+    }
     do {
         nfrom = read(fdfrom, buf, BUFSIZ);
         nto = write(fdto, buf, nfrom);
-        if (nto != nfrom)
+        if (nto != nfrom) {
             panic("Copyfile failed!");
+        }
     } while (nfrom == BUFSIZ);
     (void) close(fdfrom);
     (void) close(fdto);

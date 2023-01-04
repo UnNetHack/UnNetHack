@@ -170,7 +170,7 @@ void dummy_resume_nhwindows(void)
 static const char*
 winid2str(int type)
 {
-    switch(type) {
+    switch (type) {
         case NHW_MESSAGE: return "NHW_MESSAGE";
         case NHW_STATUS: return "NHW_STATUS";
         case NHW_MAP: return "NHW_MAP";

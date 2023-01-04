@@ -654,7 +654,7 @@ extern dlevel_t level;  /* structure describing the current level */
         if (level.monsters[x][y] && level.monsters[x][y] != m)  \
             impossible("place_worm_seg over mon");              \
         level.monsters[x][y] = m;                               \
-    } while(0)
+    } while (0)
 #else
 #define place_worm_seg(m, x, y)   (level.monsters[x][y] = m)
 #endif
