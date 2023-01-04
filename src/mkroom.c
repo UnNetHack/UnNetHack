@@ -1082,6 +1082,11 @@ cmap_to_type(int sym)
 boolean
 is_rainbow_shop(struct mkroom *sroom)
 {
+    if (flags.rainbow_shops > 0) {
+        /* for gameplay reasons, allow only a single rainbow shop in the dungeon */
+        return FALSE;
+    }
+
     if (!is_june() || sroom->irregular) {
         return FALSE;
     }

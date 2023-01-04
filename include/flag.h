@@ -199,6 +199,8 @@ struct flag {
     boolean marathon;   /* cannot heal, fixed high max hp */
 
     boolean goldX;      /* for BUCX filtering, whether gold is X or U */
+
+    int rainbow_shops; /* count generated rainbow shops */
 };
 
 #define marathon_mode flags.marathon

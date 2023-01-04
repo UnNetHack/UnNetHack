@@ -713,6 +713,9 @@ stock_room(int shp_indx, struct mkroom *sroom)
     };
 
     boolean rainbow_shop = is_rainbow_shop(sroom);
+    if (rainbow_shop) {
+        flags.rainbow_shops++;
+    }
 
     for (sx = sroom->lx; sx <= sroom->hx; sx++)
         for (sy = sroom->ly; sy <= sroom->hy; sy++) {
