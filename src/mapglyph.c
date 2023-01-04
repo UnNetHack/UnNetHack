@@ -87,6 +87,20 @@ get_objsym(int glyph)
     }
 }
 
+/* Given an x and y space, return the type of the room there.
+ * Uses orig_rtyp, so ignores things like the room type being cleared
+ * after the player first enters it. */
+static int
+getroomtype(coordxy x, coordxy y)
+{
+    int rno = levl[x][y].roomno;
+    if (rno >= ROOMOFFSET) {
+        return rooms[rno - ROOMOFFSET].orig_rtype;
+    }
+    /* not a room */
+    return OROOM;
+}
+
 /*ARGSUSED*/
 void
 mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy x, coordxy y,
@@ -178,6 +192,52 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
                  (offset == S_upstair || offset == S_dnstair) &&
                  (x == sstairs.sx && y == sstairs.sy)) {
             color = CLR_YELLOW;
+
+        } else if (iflags.use_color && offset >= S_vwall && offset <= S_trwall) {
+            /* Colored Walls and Floors Patch */
+            if (In_W_tower(x, y, &u.uz)) {
+                color = CLR_MAGENTA;
+            } else if (In_V_tower(&u.uz)) {
+                /* Vlad's tower */
+                color = CLR_ORANGE;
+            } else if (In_sokoban(&u.uz)) {
+                color = CLR_CYAN;
+            } else if (Is_valley(&u.uz)) {
+                color = CLR_BLACK;
+            } else if (In_hell(&u.uz)) {
+                color = CLR_RED;
+            } else if (In_mines(&u.uz)) {
+                /* no in_rooms check */
+                color = CLR_BROWN;
+            } else if (Is_astralevel(&u.uz)) {
+                color = CLR_WHITE;
+            } else {
+                int roomtype = getroomtype(x, y);
+                if (roomtype == DELPHI) {
+                    color = CLR_BRIGHT_BLUE;
+                } else if (roomtype == BEEHIVE) {
+                    color = CLR_YELLOW;
+                } else if (roomtype == GARDEN) {
+                    color = CLR_GREEN;
+                } else if (roomtype == COCKNEST) {
+                    color = CLR_GREEN;
+                } else if (roomtype == ANTHOLE) {
+                    color = CLR_BROWN;
+                } else if (roomtype == SWAMP) {
+                    color = CLR_GREEN;
+                } else if (roomtype == LEPREHALL) {
+                    color = CLR_BRIGHT_GREEN;
+                } else if (roomtype == VAULT) {
+                    color = HI_METAL;
+                } else if (roomtype == ARMORY) {
+                    color = HI_METAL;
+                } else if (roomtype == LEMUREPIT) {
+                    color = CLR_RED;
+                } else {
+                    cmap_color(offset);
+                }
+            }
+
         } else if (offset == S_altar && iflags.use_color) {
             int amsk = altarmask_at(x, y); /* might be a mimic */
 
