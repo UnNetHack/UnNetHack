@@ -2536,8 +2536,10 @@ dip(struct obj *potion, struct obj *obj)
 
         short mixed_otyp;
         if ((mixture = mixtype(obj, potion)) != 0) {
+            /* mixable potions */
             mixed_otyp = mixture;
         } else {
+            /* unmixable potions, do something else */
             switch (obj->odiluted ? 1 : rnd(8)) {
             case 1:
                 mixed_otyp = POT_WATER;
@@ -2550,6 +2552,7 @@ dip(struct obj *potion, struct obj *obj)
 
             case 4:
             {
+                /* random potion */
                 struct obj *otmp;
                 otmp = mkobj(POTION_CLASS, FALSE);
                 mixed_otyp = otmp->otyp;
@@ -2588,6 +2591,8 @@ dip(struct obj *potion, struct obj *obj)
         } else {
             mixed_potion = potion;
         }
+        costly_alteration(mixed_potion, COST_TRANSFORM);
+
         /* the mixed potions don't get lost */
         mixed_potion->quan = count * 2;
         mixed_potion->owt = weight(mixed_potion);
@@ -2598,11 +2603,10 @@ dip(struct obj *potion, struct obj *obj)
             mixed_potion->odiluted = (obj->odiluted || potion->odiluted);
         }
 
-        if (count >= obj->quan) {
-            useupall(obj);
-        } else {
-            useupall(splitobj(obj, count));
-        }
+        /* remove the dissolved potion */
+        struct obj *dissolved_potion = (count >= obj->quan) ? obj : splitobj(obj, count);
+        costly_alteration(dissolved_potion, COST_TRANSFORM);
+        useupall(dissolved_potion);
 
         return(1);
     }
