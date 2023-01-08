@@ -4827,14 +4827,19 @@ find_remembered_stairs(boolean upstairs, coord *cc)
     int found_stairs = 0;
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            if (glyph_to_cmap(level.locations[x][y].glyph) == stair ||
-                glyph_to_cmap(level.locations[x][y].glyph) == ladder ||
-                glyph_to_cmap(level.locations[x][y].glyph) == branch) {
-                if (found_stairs == 0) {
-                    cc->x = x;
-                    cc->y = y;
+            if (levl[x][y].seenv) {
+                int k = back_to_glyph(x, y);
+
+                if (glyph_is_cmap(k) &&
+                    (glyph_to_cmap(k) == stair ||
+                     glyph_to_cmap(k) == ladder ||
+                     glyph_to_cmap(k) == branch)) {
+                    if (found_stairs == 0) {
+                        cc->x = x;
+                        cc->y = y;
+                    }
+                    found_stairs++;
                 }
-                found_stairs++;
             }
         }
     }
