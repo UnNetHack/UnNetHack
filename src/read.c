@@ -3019,7 +3019,6 @@ create_particular_creation(char *str, struct _create_particular_data *d)
         firstchoice = d->which;
         if (cant_revive(&d->which, FALSE, (struct obj *) 0) && firstchoice != PM_LONG_WORM_TAIL) {
             /* wizard mode can override handling of special monsters */
-            char buf[BUFSZ];
             /* if str contains shapechanger name, create shapeshanger */
             if (!strstri(str, mons[d->which].mname)) {
                 /* otherwise overwrite with firstchoice */

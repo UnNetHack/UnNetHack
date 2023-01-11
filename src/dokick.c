@@ -385,7 +385,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
                 verbalize("Thanks, scum!");
             }
         } else if (mtmp->isgd) {
-            int umoney = money_cnt(invent);
+            long umoney = money_cnt(invent);
             /* Some of these are iffy, because a hostile guard
                won't become peaceful and resume leading hero
                out of the vault.  If he did do that, player
@@ -426,8 +426,8 @@ ghitm(struct monst *mtmp, struct obj *gold)
 
                 if (goldreqd) {
                     long umoney = money_cnt(invent);
-                    if (value > goldreqd +
-                        (money_cnt(invent) + u.ulevel*rn2(5))/ACURR(A_CHA)) {
+                    goldreqd += (umoney + u.ulevel * rn2(5)) / ACURR(A_CHA);
+                    if (value > goldreqd) {
                         mtmp->mpeaceful = TRUE;
                     }
                 }
@@ -872,7 +872,7 @@ dokick(void)
 {
     coordxy x, y;
     int avrg_attrib;
-    int dmg = 0, glyph, oldglyph = -1;
+    int glyph, oldglyph = -1;
     struct monst *mtmp;
     boolean no_kick = FALSE;
     char buf[BUFSZ], kickobjnam[BUFSZ];

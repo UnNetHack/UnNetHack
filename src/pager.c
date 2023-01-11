@@ -1393,10 +1393,7 @@ checkfile(struct obj *obj, char *inp, struct permonst *pm, boolean user_typed_na
 {
     dlb *fp;
     char newstr[BUFSZ];
-    char *ep, *dbase_str;
-    int chk_skip;
-    boolean found_in_file = FALSE, skipping_entry = FALSE;
-    boolean lookat_mon = (pm != (struct permonst *) 0);
+    char *dbase_str;
 
     fp = dlb_fopen_area(NH_DATAAREA, DATAFILE, "r");
     if (!fp) {

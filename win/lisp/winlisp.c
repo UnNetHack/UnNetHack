@@ -41,7 +41,6 @@ static char lisp_current_accelerator;
 
 /* Helper structures to map menu id's to nethack anything's */
 static lisp_menu_item_t lisp_menu_item_list[1000];
-static int lisp_menu_list_size = 1000;
 static int lisp_menu_list_num;
 
 extern char *enc_stat[];

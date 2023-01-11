@@ -665,7 +665,6 @@ cprefx(int pm)
     case PM_DEATH:
     case PM_PESTILENCE:
     case PM_FAMINE:
-    { char buf[BUFSZ];
       pline("Eating that is instantly fatal.");
       Sprintf(killer.name, "unwisely ate the brain of %s", mons[pm].mname);
       killer.format = NO_KILLER_PREFIX;
@@ -679,7 +678,8 @@ cprefx(int pm)
           victual.piece = (struct obj *)0;
           victual.o_id = 0;
       }
-      return;}
+      return;
+
     case PM_GREEN_SLIME:
         if (!Slimed && !Unchanging && !slimeproof(youmonst.data)) {
             You("don't feel very well.");
@@ -1434,10 +1434,6 @@ tin_variety(struct obj *obj,
 static int
 opentin(void)
 {
-    int r;
-    const char *what;
-    int which;
-
     /* perhaps it was stolen (although that should cause interruption) */
     if (!carried(tin.tin) &&
         (!obj_here(tin.tin, u.ux, u.uy) || !can_reach_floor(TRUE))) {

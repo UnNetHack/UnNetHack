@@ -480,7 +480,6 @@ handle_varstring_method(void)
 {
   struct lc_vardefs *vd;
   char *idx = index(yytext, '.');
-  long r;
 
   if (!idx) return handle_varstring_check();
   *idx = '\0';
@@ -489,7 +488,7 @@ handle_varstring_method(void)
   if ((vd = vardef_defined(variable_definitions, yytext, 1))) {
      long mth;
      long l = vd->var_type;
-     long a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
+     /*long a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);*/
      long rval;
      if ((rval = method_defined(idx, l, &mth))) {
           yylval.meth.varstr = strdup(yytext);

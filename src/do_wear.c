@@ -1837,7 +1837,6 @@ int
 dotakeoff(void)
 {
     struct obj *otmp = (struct obj *)0;
-    int armorpieces = 0;
 
     count_worn_stuff(&otmp, FALSE);
     if (!Narmorpieces && !Naccessories) {

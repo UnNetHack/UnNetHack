@@ -407,7 +407,6 @@ int
 dofire(void)
 {
     int shotlimit;
-    struct obj *obj;
 
     /*
      * Same as dothrow(), except we use quivered missile instead
@@ -1191,7 +1190,7 @@ throwit(
 {
     struct monst *mon;
     int range, urange;
-    boolean crossbowing, clear_thrownobj = FALSE;
+    boolean clear_thrownobj = FALSE;
     boolean impaired = (Confusion || Stunned || Blind ||
                         Hallucination || Fumbling);
     boolean tethered_weapon = (obj->otyp == AKLYS && (wep_mask & W_WEP) != 0);

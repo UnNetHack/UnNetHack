@@ -670,7 +670,6 @@ use_defensive(struct monst *mtmp)
     int i, fleetim, how = 0;
     struct obj *otmp = m.defensive;
     boolean vis, vismon, oseen;
-    const char *mcsa = "%s can see again.";
 
     if ((i = precheck(mtmp, otmp)) != 0) {
         return i;

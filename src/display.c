@@ -1341,7 +1341,9 @@ void
 see_monsters(void)
 {
     struct monst *mon;
+#if NEXT_VERSION
     int new_warn_obj_cnt = 0;
+#endif
 
     if (defer_see_monsters) {
         return;

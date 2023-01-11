@@ -719,7 +719,6 @@ doopen_indir(coordxy x, coordxy y)
     struct rm *door;
     boolean portcullis;
     int res = 0;
-    struct monst *mtmp;
 
     if (nohands(youmonst.data)) {
         You_cant("open anything -- you have no hands!");
@@ -865,7 +864,6 @@ doclose(void)
 {
     int x, y;
     struct rm *door;
-    struct monst *mtmp;
     boolean portcullis;
     int res = 0;
 

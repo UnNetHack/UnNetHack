@@ -813,7 +813,7 @@ stock_blkmar(const struct shclass *shp UNUSED, struct mkroom *sroom, int sh)
      * door get objects).
      */
     /* [max] removed int cl,  char buf[bufsz] */
-    int i, sx, sy, first = 0, next = 0, total, partial;
+    int sx, sy, first = 0, next = 0, total, partial;
     /* int blkmar_gen[NUM_OBJECTS+2]; */
     int *clp, *lastclp;
     int goodcl[12];
@@ -879,7 +879,7 @@ stock_blkmar(const struct shclass *shp UNUSED, struct mkroom *sroom, int sh)
     }
 
     /* Placement of the Sunstone */
-    i = 0;
+    int i = 0;
     do {
         sx = sroom->lx + rn2(sroom->hx - sroom->lx + 1);
         sy = sroom->ly + rn2(sroom->hy - sroom->ly + 1);

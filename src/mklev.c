@@ -878,10 +878,9 @@ mk_knox_vault(coordxy x, coordxy y, int w, int h)
 static void
 fill_ordinary_room(struct mkroom *croom)
 {
-    int trycnt = 0;
     coord pos;
     struct monst *tmonst; /* always put a web with a spider */
-    coordxy x, y;
+    coordxy x;
 
     if (croom->rtype != OROOM && croom->rtype != RNDVAULT) {
         return;
@@ -1029,10 +1028,8 @@ makelevel(void)
 {
     struct mkroom *croom, *troom;
     int tryct;
-    int i;
-    struct monst *tmonst;   /* always put a web with a spider */
     branch *branchp;
-    int room_threshold, boxtype;
+    int room_threshold;
     coord pos;
 
     if (wiz1_level.dlevel == 0) {

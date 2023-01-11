@@ -993,7 +993,6 @@ static char *
 doname_base(struct obj *obj, boolean with_price)
 {
     boolean ispoisoned = FALSE;
-    boolean weightshown = FALSE;
     boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX];
@@ -1561,9 +1560,7 @@ ring:
     if (iflags.suppress_price || restoring) {
         ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
     } else if (obj->unpaid) {
-        coordxy ox, oy;
         long quotedprice = unpaid_cost(obj, TRUE);
-        struct monst *shkp = (struct monst *)0;
 
         Sprintf(eos(bp), " (unpaid, %ld %s)",
                 quotedprice, currency(quotedprice));
@@ -3074,8 +3071,10 @@ wishymatch(
     const char *o_str,      /**< from objects[], so is in canonical form */
     boolean retry_inverted) /**< optional extra "of" handling */
 {
+#if 0
     static NEARDATA const char detect_SP[] = "detect ",
                                SP_detection[] = " detection";
+#endif
     char *p, buf[BUFSZ];
 
     /* ignore spaces & hyphens and upper/lower case when comparing */
@@ -3399,8 +3398,8 @@ readobjnam(char *bp, struct obj *no_wish)
 #endif
     int halfeaten, halfdrained, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
-    int tmp, tinv, tvariety;
-    int wetness, gsize = 0;
+    int tvariety;
+    int wetness;
     boolean zombifying;
     struct fruit *f;
     int ftype = current_fruit;
@@ -4178,7 +4177,6 @@ srch:
      */
 wiztrap:
     if (wizard && !program_state.wizkit_wishing) {
-        struct rm *lev;
         boolean madeterrain = FALSE;
         int trap, x = u.ux, y = u.uy;
 

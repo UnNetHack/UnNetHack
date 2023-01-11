@@ -211,7 +211,6 @@ void
 done_in_by(struct monst *mtmp)
 {
     char buf[BUFSZ];
-    struct permonst *mptr = mtmp->data;
     boolean distorted = (boolean)(Hallucination && canspotmon(mtmp));
 
     You("die...");
@@ -580,15 +579,14 @@ sort_valuables(
 
 /* called twice; first to calculate total, then to list relevant items */
 static void
-artifact_score(struct obj *list, boolean counting, winid endwin)
-
-                    /* true => add up points; false => display them */
-
+artifact_score(
+    struct obj *list,
+    boolean counting, /**< true => add up points; false => display them */
+    winid endwin)
 {
     char pbuf[BUFSZ];
     struct obj *otmp;
     long value, points;
-    short dummy;    /* object type returned by artifact_name() */
 
     for (otmp = list; otmp; otmp = otmp->nobj) {
         if (otmp->oartifact ||

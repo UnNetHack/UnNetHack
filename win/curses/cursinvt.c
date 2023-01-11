@@ -63,7 +63,7 @@ curses_add_inv(
                          * or class header text */
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
-    int x, width, height, available_width;
+    int x, width, height;
     int border = curses_window_has_border(INV_WIN) ? 1 : 0;
 
     x = border; /* same for every line; 1 if border, 0 otherwise */

@@ -624,7 +624,7 @@ domonnoise(struct monst *mtmp)
     }
 
     /* Make sure its your role's quest quardian; adjust if not */
-    if (ptr->msound == MS_GUARDIAN && ptr != &mons[urole.guardnum]) {
+    if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum]) {
         int mndx = monsndx(ptr);
         ptr = &mons[genus(mndx, 1)];
     }
@@ -636,7 +636,7 @@ domonnoise(struct monst *mtmp)
         map_invisible(mtmp->mx, mtmp->my);
     }
 
-    switch (ptr->msound) {
+    switch (msound) {
     case MS_ORACLE:
         return doconsult(mtmp);
     case MS_PRIEST:

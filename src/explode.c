@@ -358,8 +358,6 @@ explode(coordxy x, coordxy y, int type, int dam, char olet, int expltype)
                 }
 
                 if (u.uswallow && mtmp == u.ustuck) {
-                    const char *adj = (char *) 0;
-
                     if (is_animal(u.ustuck->data)) {
                         pline("%s gets %s!",
                               Monnam(u.ustuck),

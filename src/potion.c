@@ -1785,7 +1785,6 @@ void
 potionbreathe(struct obj *obj)
 {
     int i, ii, kn = 0;
-    boolean cureblind = FALSE;
 
     /* potion of unholy water might be wielded; prevent
        you_were() -> drop_weapon() from dropping it so that it
@@ -2492,10 +2491,8 @@ dodip(void)
 {
     static const char Dip_[] = "Dip ";
     struct obj *potion, *obj;
-    struct obj *singlepotion;
     uchar here;
     char allowall[2];
-    short mixture;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
 

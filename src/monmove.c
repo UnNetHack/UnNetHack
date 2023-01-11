@@ -342,7 +342,7 @@ static void
 distfleeck(struct monst *mtmp, int *inrange, int *nearby, int *scared)
 {
     int seescaryx, seescaryy;
-    boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
+    boolean bravegremlin = (rn2(5) == 0);
 
     *inrange = (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <=
                 (BOLT_LIM * BOLT_LIM));

@@ -346,7 +346,6 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     struct permonst *mdat = mtmp->data;
     int num;
     struct obj *obj = (struct obj *)0;
-    struct obj *otmp = (struct obj *) 0;
     int x = mtmp->mx, y = mtmp->my;
     int mndx = monsndx(mdat);
     unsigned corpstatflags = corpseflags;
@@ -1038,10 +1037,9 @@ meatobj(struct monst *mtmp)       /* for gelatinous cubes */
 
 {
     struct obj *otmp, *otmp2;
-    struct permonst *ptr, *original_ptr = mtmp->data;
-    int poly, grow, heal, eyes, count = 0, ecount = 0;
+    struct permonst *ptr;
+    int poly, grow, heal, count = 0, ecount = 0;
     char buf[BUFSZ];
-
 
     buf[0] = '\0';
     /* If a pet, eating is handled separately, in dog.c */
@@ -1150,7 +1148,7 @@ mpickgold(struct monst *mtmp)
 boolean
 mpickstuff(struct monst *mtmp, const char *str)
 {
-    struct obj *otmp, *otmp2, *otmp3;
+    struct obj *otmp, *otmp2;
 
     /* let angry 1ES pick up stuff so she can smash boulders */
     if ((mtmp->data != &mons[PM_BLACK_MARKETEER]) && (!mtmp->mpeaceful))  {
@@ -2718,7 +2716,9 @@ xkilled(
     mtmp->mhp = 0; /* caller will usually have already done this */
 
     /* KMH, conduct */
-    violated(CONDUCT_PACIFISM);
+    if (!noconduct) { /* KMH, conduct */
+        violated(CONDUCT_PACIFISM);
+    }
 
     if (!nomsg) {
         boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
@@ -3282,7 +3282,7 @@ poisoned(const char *reason,  /**< controls what messages we display */
          const char *pkiller, /**< for score+log file if fatal */
          int fatal)           /**< if fatal is 0, limit damage to adjattrib */
 {
-    int i, loss, plural, kprefix = KILLED_BY_AN;
+    int i, loss, kprefix = KILLED_BY_AN;
     boolean thrown_weapon = (fatal < 0);
     int how;
     boolean blast = !strcmp(reason, "blast");
@@ -4138,7 +4138,7 @@ newcham(
     boolean polyspot, /**< change is the result of wand or spell of polymorph */
     boolean msg) /**< "The oldmon turns into a newmon!" */
 {
-    int mhp, hpn, hpd;
+    int hpn, hpd;
     int mndx, tryct;
     struct permonst *olddata = mtmp->data;
     char *p, oldname[BUFSZ], l_oldname[BUFSZ], newname[BUFSZ];

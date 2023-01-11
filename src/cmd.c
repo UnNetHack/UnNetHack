@@ -199,7 +199,9 @@ static char last_cmd_char='\0';
 /* for rejecting attempts to use wizard mode commands */
 static const char unavailcmd[] = "Unavailable command '%s'.";
 /* for rejecting #if !SHELL, !SUSPEND */
+#if 0
 static const char cmdnotavail[] = "'%s' command not available.";
+#endif
 
 static char here_cmd_menu(boolean);
 static char there_cmd_menu(boolean, coordxy, coordxy);
@@ -1816,9 +1818,10 @@ const char *
 key2extcmddesc(uchar key)
 {
     static char key2cmdbuf[48];
-    const struct movcmd *mov;
-    int k, c;
+    int k;
+#if 0
     uchar M_5 = (uchar) M('5'), M_0 = (uchar) M('0');
+#endif
 
     /* need to check for movement commands before checking the extended
        commands table because it contains entries for number_pad commands
@@ -2146,7 +2149,6 @@ misc_stats(winid win, long int *total_count, long int *total_size)
     Sprintf(buf, template, hdrbuf, count, size);
     putstr(win, 0, buf);
 
-#if NEXT_VERSION
     count = size = 0L;
     light_stats("light sources, size %ld", hdrbuf, &count, &size);
     if (count || size) {
@@ -2179,6 +2181,7 @@ misc_stats(winid win, long int *total_count, long int *total_size)
         putstr(win, 0, buf);
     }
 
+#if NEXT_VERSION
     count = size = 0L;
     region_stats("regions, size %ld+%ld*rect+N", hdrbuf, &count, &size);
     if (count || size) {
@@ -2187,6 +2190,7 @@ misc_stats(winid win, long int *total_count, long int *total_size)
         Sprintf(buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
+#endif
 
     count = size = 0L;
     for (k = killer.next; k; k = k->next) {
@@ -2215,7 +2219,6 @@ misc_stats(winid win, long int *total_count, long int *total_size)
         Sprintf(buf, template, hdrbuf, count, size);
         putstr(win, 0, buf);
     }
-#endif
 
     count = size = 0L;
     for (idx = 0; idx < NUM_OBJECTS; ++idx) {
@@ -2745,7 +2748,6 @@ accept_menu_prefix(int (*cmd_func) (void))
 char
 randomkey(void)
 {
-    static unsigned i = 0;
     char c;
 
     switch (rn2(16)) {
@@ -3938,7 +3940,6 @@ parse(void)
     static char in_line[COLNO];
 #endif
     int foo;
-    boolean prezero = FALSE;
 
     multi = 0;
     flags.move = 1;
@@ -4344,7 +4345,7 @@ wiz_port_debug()
 char
 yn_function(const char *query, const char *resp, char def)
 {
-    char res, qbuf[QBUFSZ];
+    char qbuf[QBUFSZ];
 
     iflags.last_msg = PLNMSG_UNKNOWN; /* most recent pline is clobbered */
 

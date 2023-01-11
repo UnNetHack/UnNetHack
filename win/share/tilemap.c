@@ -117,8 +117,7 @@ struct substitute {
  * entry is the position of the tile within the monsters/objects/other set
  */
 const char *
-tilename(set, entry)
-int set, entry;
+tilename(int set, int entry)
 {
     int i, j, condnum, tilenum;
     static char buf[BUFSZ];
@@ -547,6 +546,7 @@ int main(void)
     register int i;
     char filename[30];
     FILE *ofp;
+    include_obj_class = FALSE;
 
     init_tilemap();
 

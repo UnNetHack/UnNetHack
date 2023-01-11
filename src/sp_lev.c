@@ -4737,7 +4737,7 @@ selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
 void
 selection_do_grow(struct opvar *ov, int dir)
 {
-    int x, y, c;
+    int x, y;
     char tmp[COLNO][ROWNO];
 
     if (ov->spovartyp != SPOVAR_SEL) {
@@ -4858,7 +4858,6 @@ selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
     int idx = 0;
     coordxy dx[SEL_FLOOD_STACK];
     coordxy dy[SEL_FLOOD_STACK];
-    schar under = levl[x][y].typ;
 
     if (selection_flood_check_func == (int (*) (coordxy, coordxy)) 0) {
         opvar_free(tmp);

@@ -575,7 +575,6 @@ restgamestate(int fd, unsigned int *stuckid, unsigned int *steedid)
 {
     /* discover is actually flags.explore */
     boolean remember_discover = discover;
-    struct obj *otmp;
     int uid;
 
     mread(fd, (genericptr_t) &uid, sizeof uid);

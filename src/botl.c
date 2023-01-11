@@ -402,6 +402,9 @@ bot1()
         Sprintf(nb = eos(nb), " S:%ld", botl_score());
     }
 #endif
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+    flags.botlx = save_botlx;
+#endif
 #ifdef DUMP_LOG
 }
 static void
@@ -627,6 +630,9 @@ void bot2str(char *newbot2)
             botl_text(1, "Elbereth", newbot2, 1);
         }
     }
+#if defined(STATUS_COLORS) && defined(TEXTCOLOR)
+    flags.botlx = save_botlx;
+#endif
 #ifdef DUMP_LOG
 }
 static void

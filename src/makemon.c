@@ -184,7 +184,6 @@ m_initweap(struct monst *mtmp)
     struct permonst *ptr = mtmp->data;
     int mm = monsndx(ptr);
     struct obj *otmp;
-    int bias, w1, w2;
 
 #ifdef REINCARNATION
     if (Is_rogue_level(&u.uz)) {
@@ -427,8 +426,6 @@ m_initweap(struct monst *mtmp)
                     (void)mongets(mtmp, AMULET_OF_REFLECTION);
                 }
             } else {
-                int spe2;
-
                 /* create minion stuff; can't use mongets */
                 otmp = mksobj(LONG_SWORD, FALSE, FALSE);
 
@@ -1294,7 +1291,7 @@ struct monst *
 _makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
 {
     struct monst *mtmp;
-    int mndx, mcham, ct, mitem, xlth, mhitdie;
+    int mndx, mcham, ct, mitem;
     boolean anymon = (!ptr);
     boolean byyou = u_at(x, y);
     boolean allow_minvent = ((mmflags & NO_MINVENT) == 0);

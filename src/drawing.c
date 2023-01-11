@@ -930,6 +930,7 @@ restore_syms(void)
 
 #ifdef REINCARNATION
 
+# ifdef ASCIIGRAPH
 static const glyph_t r_oc_syms[MAXOCLASSES] = {
 /* 0*/ '\0',
     ILLOBJ_SYM,
@@ -951,7 +952,6 @@ static const glyph_t r_oc_syms[MAXOCLASSES] = {
     VENOM_SYM
 };
 
-# ifdef ASCIIGRAPH
 /* Rogue level graphics.  Under IBM graphics mode, use the symbols that were
  * used for Rogue on the IBM PC.  Unfortunately, this can't be completely
  * done because some of these are control characters--armor and rings under

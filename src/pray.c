@@ -144,7 +144,7 @@ int
 in_trouble(void)
 {
     struct obj *otmp;
-    int i, j, count=0;
+    int i;
 
     /*
      * major troubles

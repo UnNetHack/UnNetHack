@@ -1950,7 +1950,6 @@ print_branch(winid win, int dnum, int lower_bound, int upper_bound, boolean byme
 {
     branch *br;
     char buf[BUFSZ];
-    anything any;
 
     /* This assumes that end1 is the "parent". */
     for (br = branches; br; br = br->next) {
@@ -2167,7 +2166,6 @@ donamelevel(void)
     mapseen *mptr;
     char qbuf[QBUFSZ];  /* Buffer for query text */
     char nbuf[BUFSZ];   /* Buffer for response */
-    int len;
 
     if (!(mptr = find_mapseen(&u.uz))) {
         return 0;
@@ -2532,10 +2530,9 @@ void
 recalc_mapseen(void)
 {
     mapseen *mptr;
-    struct monst *shkp;
     struct cemetery *bp, **bonesaddr;
     unsigned i, ridx;
-    int x, y, ltyp, count, atmp;
+    int x, y, count;
 
     /* Should not happen in general, but possible if in the process
      * of being booted from the quest.  The mapseen object gets

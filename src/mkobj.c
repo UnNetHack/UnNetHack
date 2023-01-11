@@ -1815,7 +1815,7 @@ mk_tt_object(int objtype, coordxy x, coordxy y)
              /* CORPSE or STATUE */
 
 {
-    struct obj *otmp, *otmp2;
+    struct obj *otmp;
     boolean initialize_it;
 
     /* player statues never contain books */
@@ -1834,14 +1834,11 @@ mk_tt_object(int objtype, coordxy x, coordxy y)
 struct obj *
 mk_named_object(int objtype, struct permonst *ptr, coordxy x, coordxy y, const char *nm)
              /* CORPSE or STATUE */
-
-
-
 {
     struct obj *otmp;
     unsigned corpstatflags = (objtype != STATUE) ? CORPSTAT_INIT : CORPSTAT_NONE;
 
-    otmp = mkcorpstat(objtype, (struct monst *)0, ptr, x, y, (boolean)(objtype != STATUE));
+    otmp = mkcorpstat(objtype, (struct monst *)0, ptr, x, y, corpstatflags);
     if (nm) {
         otmp = oname(otmp, nm);
     }

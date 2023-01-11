@@ -1923,7 +1923,7 @@ do_loot_cont(
 int
 doloot(void)
 {
-    struct obj *cobj, *nobj, *otmp;
+    struct obj *cobj, *nobj;
     int c = -1;
     int timepassed = 0;
     coord cc;
@@ -2806,13 +2806,11 @@ use_container(
     boolean more_containers) /**< TRUE iff #loot multiple and this isn't last one */
 {
     struct obj *otmp, *obj = *objp;
-    boolean one_by_one, allflag, quantum_cat = FALSE,
+    boolean quantum_cat = FALSE,
             loot_out = FALSE, loot_in = FALSE;
-    char select[MAXOCLASSES+1];
     char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
     long loss = 0L;
-    int cnt = 0, used = 0,
-        menu_on_request;
+    int cnt = 0, used = 0;
 
     abort_looting = FALSE;
     emptymsg[0] = '\0';

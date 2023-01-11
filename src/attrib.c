@@ -647,8 +647,14 @@ adjabil(int oldlevel, int newlevel)
     case PM_ELF:            rabil = elf_abil;   break;
     case PM_ORC:            rabil = orc_abil;   break;
     case PM_HUMAN:
+                            rabil = hum_abil;
+                            break;
     case PM_DWARF:
+                            rabil = dwa_abil;
+                            break;
     case PM_GNOME:
+                            rabil = gno_abil;
+                            break;
     case PM_VAMPIRE:
     default:                rabil = 0;      break;
     }

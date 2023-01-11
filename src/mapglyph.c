@@ -428,7 +428,7 @@ decode_mixed(char *buf, const char *str)
     while (*str) {
         if (*str == '\\') {
             glyph_t ch = 0;
-            int rndchk, dcount, so, gv, oc = 0;
+            int rndchk, dcount, gv, oc = 0;
             unsigned os = 0;
             const char *dp, *save_str;
 

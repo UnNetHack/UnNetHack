@@ -622,7 +622,6 @@ engrave(const char *engraving, boolean fingers)
     xint16 oetype = 0;  /* will be set to type of current engraving */
     char buf[BUFSZ];    /* Buffer for final/poly engraving text */
     char ebuf[BUFSZ];   /* Buffer for initial engraving text */
-    char fbuf[BUFSZ];   /* Buffer for "your fingers" */
     char qbuf[QBUFSZ];  /* Buffer for query text */
     char post_engr_text[BUFSZ]; /* Text displayed after engraving prompt */
     const char *eword;  /* What to engrave */

@@ -81,7 +81,6 @@ float_vs_flight(void)
 {
     boolean stuck_in_floor = (u.utrap && u.utraptype != TT_PIT);
 
-#if 0 // TODO
     /* floating overrides flight; so does being trapped in the floor */
     if ((HLevitation || ELevitation) || ((HFlying || EFlying) && stuck_in_floor)) {
         BFlying |= I_SPECIAL;
@@ -97,7 +96,6 @@ float_vs_flight(void)
         BLevitation &= ~I_SPECIAL;
     }
     flags.botl = TRUE;
-#endif
 }
 
 /** Returns true if the player monster is genocided. */

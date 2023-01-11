@@ -19,8 +19,6 @@ static void nohandglow(struct monst *);
 static boolean shade_aware(struct obj *);
 
 extern boolean notonhead;   /* for long worms */
-/* The below might become a parameter instead if we use it a lot */
-static int dieroll;
 /* Used to flag attacks caused by Stormbringer's maliciousness. */
 static boolean override_confirmation = FALSE;
 
@@ -32,7 +30,6 @@ void
 hurtmarmor(struct monst *mdef, int attk)
 {
     int hurt;
-    struct obj *target;
 
     switch (attk) {
         /* 0 is burning, which we should never be called with */
@@ -772,7 +769,6 @@ hmon_hitmon(struct monst *mon, struct obj *obj, int thrown, int dieroll)
     long silverhit = 0L;
     int wtype;
     struct obj *monwep;
-    char yourbuf[BUFSZ];
     char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
     char saved_oname[BUFSZ];
     int saved_mhp = mon->mhp;
@@ -1952,7 +1948,6 @@ damageum(
     struct permonst *pd = mdef->data;
     int tmp = d((int)mattk->damn, (int)mattk->damd);
     boolean negated;
-    struct obj *mongold;
     boolean mon_vorpal_wield = (MON_WEP(mdef) &&
                                 MON_WEP(mdef)->oartifact == ART_VORPAL_BLADE);
 
@@ -2567,7 +2562,6 @@ gulpum(struct monst *mdef, struct attack *mattk)
     int tmp;
     int dam = d((int)mattk->damn, (int)mattk->damd);
     struct obj *otmp;
-    struct permonst *pd = mdef->data;
     /* Not totally the same as for real monsters.  Specifically, these
      * don't take multiple moves.  (It's just too hard, for too little
      * result, to program monsters which attack from inside you, which

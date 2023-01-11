@@ -248,7 +248,9 @@ charm_monsters(int distance)
 void
 do_earthquake(int force)
 {
+#if 0
     static const char into_a_chasm[] = " into a chasm";
+#endif
     coordxy x, y;
     struct monst *mtmp;
     struct obj *otmp;

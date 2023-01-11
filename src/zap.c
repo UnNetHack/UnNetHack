@@ -2067,9 +2067,6 @@ int
 bhito(struct obj *obj, struct obj *otmp)
 {
     int res = 1; /* affected object by default */
-    coordxy refresh_x, refresh_y;
-
-    boolean learn_it = FALSE, maybelearnit;
 
     /* fundamental: a wand effect hitting itself doesn't do anything;
        otherwise we need to guard against accessing otmp after something
@@ -2501,7 +2498,6 @@ zapyourself(struct obj *obj, boolean ordinary)
 {
     boolean learn_it = FALSE;
     int damage = 0;
-    char buf[BUFSZ];
 
     switch (obj->otyp) {
     case WAN_STRIKING:
@@ -4806,7 +4802,6 @@ buzzmonst:
         if (!ZAP_POS(lev->typ) || (closed_door(sx, sy) && (range >= 0))) {
             int bounce, bchance;
             uchar rmn;
-            boolean fireball;
 
 make_bounce:
             if (isok(sx, sy)) {
@@ -4947,7 +4942,6 @@ zap_over_floor(coordxy x, coordxy y, int type, boolean *shopdamage, short int ex
 {
     const char *zapverb;
     struct monst *mon;
-    struct trap *t;
     int abstype = abs(type) % 10;
     struct rm *lev = &levl[x][y];
     boolean see_it = cansee(x, y);
@@ -5584,7 +5578,7 @@ destroy_item(int osym, int dmgtyp)
 int
 destroy_mitem(struct monst *mtmp, int osym, int dmgtyp)
 {
-    struct obj *obj, *obj2;
+    struct obj *obj;
     int skip, tmp = 0;
     long i, cnt, quan;
     int dindx;

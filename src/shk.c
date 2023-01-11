@@ -3879,10 +3879,9 @@ static void
 remove_damage(struct monst *shkp, boolean croaked)
 {
     struct damage *tmp_dam, *tmp2_dam;
-    struct obj *shk_inv = shkp->minvent;
     boolean did_repair = FALSE, saw_door = FALSE;
     boolean saw_floor = FALSE, stop_picking = FALSE;
-    boolean doorway_trap = FALSE, skip_msg = FALSE;
+    boolean doorway_trap = FALSE;
     int saw_walls = 0, saw_untrap = 0;
     char trapmsg[BUFSZ];
 

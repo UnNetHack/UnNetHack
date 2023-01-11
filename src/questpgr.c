@@ -448,7 +448,6 @@ static void
 deliver_by_pline(struct qtmsg *qt_msg)
 {
     long size;
-    char xbuf[BUFSZ];
 
     for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
         (void) dlb_fgets(in_line, sizeof in_line, msg_file);
@@ -492,7 +491,6 @@ void
 qt_com_firstline(int msgnum, char *msgbuf)
 {
     struct qtmsg *qt_msg;
-    char xbuf[BUFSZ];
 
     if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
         impossible("qt_com_firstline: message %d not found.", msgnum);

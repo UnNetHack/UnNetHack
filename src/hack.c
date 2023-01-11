@@ -1999,7 +1999,6 @@ domove(void)
     boolean cause_delay = FALSE;    /* dragging ball will skip a move */
     boolean known_wwalking = FALSE; /* player is aware of wearing water walking boots */
     boolean known_lwalking = FALSE; /* player knows water walking boots are fireproof */
-    boolean u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
     const char *predicament;
 
     u_wipe_engr(rnd(5));
@@ -2375,10 +2374,7 @@ pull_free:
     if (flags.forcefight ||
          /* remembered an 'I' && didn't use a move command */
          (glyph_is_invisible(levl[x][y].glyph) && !flags.nopick)) {
-        struct obj *boulder = 0;
         boolean expl = (Upolyd && attacktype(youmonst.data, AT_EXPL));
-        boolean solid = !accessible(x, y);
-        int glyph = glyph_at(x, y); /* might be monster */
         char buf[BUFSZ];
 
         Sprintf(buf, "a vacant spot on the %s", surface(x, y));

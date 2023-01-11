@@ -378,7 +378,7 @@ void
 tty_player_selection(void)
 {
     int i, k, n, choice, nextpick;
-    char pick4u = 'n', thisch, lastch = 0;
+    char pick4u = 'n';
     boolean tutorial = FALSE;
     boolean conducts = FALSE;
     char pbuf[QBUFSZ], plbuf[QBUFSZ];
@@ -1763,7 +1763,6 @@ boolean
 get_menu_coloring(const char *line, int *color, int *attr)
 {
     struct menucoloring *tmpmc;
-    boolean foundcolor = FALSE, foundattr = FALSE;
     char str[BUFSZ];
 
     strcpy(str, line);

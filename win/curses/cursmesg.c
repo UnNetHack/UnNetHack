@@ -54,7 +54,6 @@ curses_message_win_puts(const char *message, boolean recursed)
     boolean border = curses_window_has_border(MESSAGE_WIN);
     int message_length = strlen(message);
     int border_space = 0;
-    static long suppress_turn = -1;
 
     if (strncmp("Count:", message, 6) == 0) {
         curses_count_window(message);

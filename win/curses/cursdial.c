@@ -863,7 +863,7 @@ menu_determine_pages(nhmenu *menu)
 static void
 menu_win_size(nhmenu *menu)
 {
-    int width, height, maxwidth, maxheight, curentrywidth, lastline;
+    int maxwidth, maxheight, curentrywidth, lastline;
     int maxentrywidth = 0;
     int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr;
@@ -1431,7 +1431,6 @@ boolean
 curses_get_menu_coloring(const char *line, int *color, attr_t*attr)
 {
     struct menucoloring *tmpmc;
-    boolean foundcolor = FALSE, foundattr = FALSE;
     char str[BUFSZ];
 
     strcpy(str, line);

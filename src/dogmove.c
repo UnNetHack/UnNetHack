@@ -1293,7 +1293,6 @@ newdogpos:
     omy = mtmp->my;
 
     if (nix != omx || niy != omy) {
-        struct obj *mw_tmp;
         boolean wasseen;
 
         if (info[chi] & ALLOW_U) {

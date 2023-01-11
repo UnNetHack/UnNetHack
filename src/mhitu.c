@@ -1076,7 +1076,6 @@ hitmu(struct monst *mtmp, struct attack *mattk)
 
             if (mattk->aatyp == AT_WEAP && otmp) {
                 struct obj *marmg;
-                int tmp;
 
                 if (otmp->otyp == CORPSE
                     && touch_petrifies(&mons[otmp->corpsenm])) {
@@ -2934,7 +2933,6 @@ could_seduce(
     struct permonst *pagr;
     boolean agrinvis, defperc;
     xint16 genagr, gendef;
-    int adtyp;
 
     if (is_animal(magr->data)) {
         return 0;

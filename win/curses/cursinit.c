@@ -989,7 +989,7 @@ curses_init_options(void)
 void
 curses_display_splash_window(void)
 {
-    int i, x_start, y_start;
+    int x_start, y_start;
     int which_variant = NETHACK_CURSES; /* Default to NetHack */
     curses_get_window_xy(MAP_WIN, &x_start, &y_start);
 
@@ -1128,12 +1128,11 @@ curses_cleanup(void)
 int
 curses_debug_show_colors(void)
 {
-    int i,c;
+    int c;
     winid tmpwin;
     char buf[BUFSZ];
 
     tmpwin = create_nhwindow(NHW_TEXT);
-    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     putstr(tmpwin, ATR_INVERSE, "Colors");
     char *colorterm = getenv("COLORTERM");
     int colors = tgetnum("Co");

@@ -960,8 +960,6 @@ getobj(const char *let, const char *word)
     boolean useboulder = FALSE;
     coordxy foox = 0;
     long cnt;
-    boolean msggiven = FALSE;
-    boolean oneloop = FALSE;
     boolean prezero = FALSE;
     long dummymask;
 
@@ -1652,7 +1650,7 @@ askchain(struct obj **objchn, const char *olets, int allflag, int (*fn) (struct 
                           /* olets is an Obj Class char array */
 
 {
-    struct obj *otmp, *otmp2, *otmpo;
+    struct obj *otmp, *otmpo;
     char sym, ilet;
     int cnt = 0, dud = 0, tmp;
     boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
@@ -2650,7 +2648,6 @@ display_pickinv(const char *lets, const char *xtra_choice, const char *query, bo
     char *invlet = flags.inv_order;
     int n, classcount;
     winid win = WIN_ERR;            /* windows being used */
-    static winid local_win = WIN_ERR;   /* window for partial menus */
     anything any;
     menu_item *selected;
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;

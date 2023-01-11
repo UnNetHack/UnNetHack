@@ -1498,7 +1498,7 @@ build_plselection_prompt(char *buf, int buflen, int rolenum, int racenum, int ge
 {
     const char *defprompt = "Shall I pick a character for you? [yntq] ";
     int num_post_attribs = 0;
-    char tmpbuf[BUFSZ], *p;
+    char tmpbuf[BUFSZ];
 
     if (buflen < QBUFSZ) {
         return (char *)defprompt;

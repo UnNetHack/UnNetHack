@@ -50,7 +50,7 @@ static void
 missmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     const char *fmt;
-    char buf[BUFSZ], mdef_name[BUFSZ];
+    char buf[BUFSZ];
     boolean showit = FALSE;
 
     /* unhiding or unmimicking happens even if hero can't see it
@@ -630,7 +630,7 @@ hitmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 
     if (vis) {
         int compat;
-        char buf[BUFSZ], mdef_name[BUFSZ];
+        char buf[BUFSZ];
 
         if (!canspotmon(magr)) {
             map_invisible(magr->mx, magr->my);
