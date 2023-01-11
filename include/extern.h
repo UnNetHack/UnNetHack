@@ -61,7 +61,7 @@ extern void save_artifacts(int);
 extern void restore_artifacts(int);
 extern const char *artiname(int);
 extern struct obj *mk_artifact(struct obj *, aligntyp);
-extern const char *artifact_name(const char *, short *);
+extern const char *artifact_name(const char *, short *, boolean);
 extern boolean exist_artifact(int, const char *);
 extern void artifact_exists(struct obj *, const char *, boolean);
 extern int nartifact_exist(void);

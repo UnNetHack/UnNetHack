@@ -4006,7 +4006,7 @@ srch:
         short objtyp;
 
         /* Perhaps it's an artifact specified by name, not type */
-        name = artifact_name(actualn, &objtyp);
+        name = artifact_name(actualn, &objtyp, TRUE);
         if (name) {
             typ = objtyp;
             goto typfnd;
@@ -4514,7 +4514,7 @@ typfnd:
         short objtyp;
 
         /* an artifact name might need capitalization fixing */
-        aname = artifact_name(name, &objtyp);
+        aname = artifact_name(name, &objtyp, TRUE);
         if (aname && objtyp == otmp->otyp) name = aname;
 
         otmp = oname(otmp, name);

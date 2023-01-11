@@ -161,23 +161,33 @@ make_artif: if (by_align) otmp = mksobj((int)a->otyp, TRUE, FALSE);
  * is non-NULL.
  */
 const char*
-artifact_name(const char *name, short int *otyp)
+artifact_name(
+    const char *name, /**< string from player that might be an artifact name */
+    short *otyp_p,    /**< secondary output */
+    boolean fuzzy)    /**< whether to allow extra or omitted spaces or dashes */
 {
     const struct artifact *a;
     const char *aname;
 
-    if(!strncmpi(name, "the ", 4)) name += 4;
+    if (!strncmpi(name, "the ", 4)) {
+        name += 4;
+    }
 
-    for (a = artilist+1; a->otyp; a++) {
+    for (a = artilist + 1; a->otyp; a++) {
         aname = a->name;
-        if(!strncmpi(aname, "the ", 4)) aname += 4;
-        if(!strcmpi(name, aname)) {
-            *otyp = a->otyp;
+        if (!strncmpi(aname, "the ", 4)) {
+            aname += 4;
+        }
+        if (!fuzzy ? !strcmpi(name, aname) : fuzzymatch(name, aname, " -", TRUE)) {
+            if (otyp_p) {
+                *otyp_p = a->otyp;
+            }
+
             return a->name;
         }
     }
 
-    return (char *)0;
+    return (char *) 0;
 }
 
 boolean
@@ -418,7 +428,6 @@ void
 set_artifact_intrinsic(struct obj *otmp, boolean on, long int wp_mask)
 {
     long *mask = 0;
-    const struct artifact *art;
     const struct artifact *oart = get_artifact(otmp);
     uchar dtyp;
     long spfx;

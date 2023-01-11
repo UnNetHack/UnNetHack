@@ -1282,23 +1282,46 @@ do_oname(struct obj *obj)
      * Orcrist, clearly being literate (no pun intended...).
      */
 
-    /* relax restrictions over proper capitalization for artifacts */
-    if ((aname = artifact_name(buf, &objtyp)) != 0 && objtyp == obj->otyp)
-        Strcpy(buf, aname);
-
     if (obj->oartifact) {
-        pline_The("artifact seems to resist the attempt.");
+        /* this used to give "The artifact seems to resist the attempt."
+           but resisting is definite, no "seems to" about it */
+        pline("%s resists the attempt.",
+              /* any artifact should always pass the has_oname() test
+                 but be careful just in case */
+              has_oname(obj) ? ONAME(obj) : "The artifact");
         return;
-    } else if (restrict_name(obj, buf, FALSE) || exist_artifact(obj->otyp, buf)) {
-        int n = rn2((int)strlen(buf));
-        char c1, c2;
+    }
 
-        c1 = lowc(buf[n]);
-        do c2 = 'a' + rn2('z'-'a'); while (c1 == c2);
-        buf[n] = (buf[n] == c1) ? c2 : highc(c2);  /* keep same case */
-        pline("While engraving your %s slips.", body_part(HAND));
+    /* relax restrictions over proper capitalization for artifacts */
+    if ((aname = artifact_name(buf, &objtyp, TRUE)) != 0 &&
+        (restrict_name(obj, aname, FALSE) || exist_artifact(obj->otyp, aname))) {
+        /* substitute canonical spelling before slippage */
+        Strcpy(buf, aname);
+        /* Change one letter, substitute a value of 'a' through 'z'
+           and then force that to upper case if such was the case of
+           the input. */
+        Strcpy(bufcpy, buf);
+
+        /* for "the Foo of Bar", only scuff "Foo of Bar" part */
+        bufp = !strncmpi(buf, "the ", 4) ? (buf + 4) : buf;
+        do {
+            int n = rn2((int)strlen(buf));
+            char c1, c2;
+
+            c1 = lowc(buf[n]);
+            do {
+                c2 = 'a' + rn2('z'-'a' + 1);
+            } while (c1 == c2);
+            bufp[n] = (bufp[n] == c1) ? c2 : highc(c2); /* keep same case */
+        } while (!strcmp(buf, bufcpy));
+        pline("While engraving, your %s slips.", body_part(HAND));
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("engrave: \"%s\".", buf);
+    } else if (obj->otyp == objtyp) {
+        /* artifact_name() found a match and restrict_name() didn't reject
+           it; since 'obj' is the right type, naming will change it into an
+           artifact so use canonical capitalization (Sting or Orcrist) */
+        Strcpy(buf, aname);
     }
     ++via_naming; /* This ought to be an argument rather than a static... */
     obj = oname(obj, buf);
@@ -1571,7 +1594,6 @@ namefloorobj(void)
     use_plural = (obj->quan > 1L);
     if (Hallucination) {
         const char *unames[6];
-        char tmpbuf[BUFSZ];
 
         /* straight role name */
         unames[0] = ((Upolyd ? u.mfemale : flags.female) && urole.name.f) ? urole.name.f : urole.name.m;
@@ -1643,7 +1665,6 @@ rndghostname(void)
 char *
 x_monnam(struct monst *mtmp, int article, const char *adjective, int suppress, boolean called)
 
-
 /* ARTICLE_NONE, ARTICLE_THE, ARTICLE_A: obvious
  * ARTICLE_YOUR: "your" on pets, "the" on everything else
  *
@@ -1651,7 +1672,6 @@ x_monnam(struct monst *mtmp, int article, const char *adjective, int suppress, b
  * _and_ there is no adjective, "invisible", "saddled", etc., override this
  * and always use no article.
  */
-
 
 /* SUPPRESS_IT, SUPPRESS_INVISIBLE, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE.
  * EXACT_NAME: combination of all the above
@@ -2286,17 +2306,13 @@ static const char * const bogusmons[] = {
     "techno ant",
     "drum stint reluctance",
     "tackle deice",
-    
+
     /* from Caves of Qud */
-    "Argyve the Tinkerer", 
+    "Argyve the Tinkerer",
     "Barathrum the Old",
     "Oozing bloody gooey acidic lush salty tarry heptasludge",
     "Saad Amus, the Sky-Bear",
-    
-
-
 };
-
 
 /* Return a random monster name, for hallucination.
  * KNOWN BUG: May be a proper name (Godzilla, Barney), may not
