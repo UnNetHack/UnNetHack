@@ -442,9 +442,7 @@ extern const char *rndmonnam(void);
 extern const char *hcolor(const char *);
 extern const char *rndcolor(void);
 extern const char *hliquid(const char *);
-#ifdef REINCARNATION
 extern const char *roguename(void);
-#endif
 extern struct obj *realloc_obj(struct obj *, int, genericptr_t, int, const char *);
 extern char *coyotename(struct monst *, char *);
 extern char *rndorcname(char *);

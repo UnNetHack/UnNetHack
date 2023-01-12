@@ -224,9 +224,6 @@
 /* Redo last command */
 #undef REDO
 
-/* Special Rogue-like levels */
-#undef REINCARNATION
-
 /* Show score on bottom line */
 #undef SCORE_ON_BOTL
 

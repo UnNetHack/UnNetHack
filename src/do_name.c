@@ -2342,7 +2342,6 @@ bogon_is_pname(char code)
     return index("-+=", code) ? TRUE : FALSE;
 }
 
-#ifdef REINCARNATION
 /* Name of a Rogue player */
 const char *
 roguename(void)
@@ -2361,7 +2360,6 @@ roguename(void)
     return rn2(3) ? (rn2(2) ? "Michael Toy" : "Kenneth Arnold")
            : "Glenn Wichman";
 }
-#endif /* REINCARNATION */
 
 static NEARDATA const char * const hcolors[] = {
     "ultraviolet", "infrared", "bluish-orange",

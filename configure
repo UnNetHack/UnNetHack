@@ -782,7 +782,6 @@ with_compression
 enable_data_librarian
 enable_sinks
 enable_wallified_maze
-enable_reincarnation
 enable_blackmarket
 enable_kops
 enable_seduce
@@ -1483,7 +1482,6 @@ Optional Features:
   --enable-data-librarian Data librarian (default=auto)
   --enable-sinks          Kitchen sinks (default=yes)
   --enable-wallified-maze Fancy mazes (default=yes)
-  --enable-reincarnation  Special Rogue-like levels (default=yes)
   --enable-blackmarket    Blackmarket (default=yes)
   --enable-kops           Keystone Kops (default=yes)
   --enable-seduce         Succubi/incubi seduction (default=yes)
@@ -6815,24 +6813,6 @@ printf "%s\n" "$enable_wallified_maze" >&6; }
    if test "$enable_wallified_maze" != "no" ; then
 
 printf "%s\n" "#define WALLIFIED_MAZE /**/" >>confdefs.h
-
-   fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to enable reincarnation" >&5
-printf %s "checking whether to enable reincarnation... " >&6; }
-   # Check whether --enable-reincarnation was given.
-if test ${enable_reincarnation+y}
-then :
-  enableval=$enable_reincarnation;
-else $as_nop
-  enable_reincarnation="yes"
-fi
-
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_reincarnation" >&5
-printf "%s\n" "$enable_reincarnation" >&6; }
-   if test "$enable_reincarnation" != "no" ; then
-
-printf "%s\n" "#define REINCARNATION /**/" >>confdefs.h
 
    fi
 

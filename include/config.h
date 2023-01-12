@@ -357,12 +357,13 @@ typedef long glyph_t;
  * complexity of the game but also to the size of the load module.
  */
 
+#define REINCARNATION /* Special Rogue-like levels */
+
 #ifndef AUTOCONF
 /* dungeon features */
 #define SINKS       /* Kitchen sinks - Janet Walz */
 /* dungeon levels */
 #define WALLIFIED_MAZE  /* Fancy mazes - Jean-Christophe Collet */
-#define REINCARNATION   /* Special Rogue-like levels */
 /* monsters & objects */
 #define KOPS        /* Keystone Kops by Scott R. Turner */
 #define SEDUCE      /* Succubi/incubi seduction, by KAA, suggested by IM */

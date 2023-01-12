@@ -363,7 +363,6 @@ NETHACK_ARG(data-librarian,[Data librarian],DLB,auto,
 NETHACK_ARG(sinks,[Kitchen sinks],SINKS,yes)
 # NETHACK_ARG(light-src-spell,[Spells are light sources],LIGHT_SRC_SPELL,yes)
 NETHACK_ARG(wallified-maze,[Fancy mazes],WALLIFIED_MAZE,yes)
-NETHACK_ARG(reincarnation,[Special Rogue-like levels],REINCARNATION,yes)
 NETHACK_ARG(blackmarket,[Blackmarket],BLACKMARKET,yes)
 NETHACK_ARG(kops,[Keystone Kops],KOPS,yes)
 NETHACK_ARG(seduce,[Succubi/incubi seduction],SEDUCE,yes)
