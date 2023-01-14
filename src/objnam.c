@@ -40,7 +40,7 @@ struct Jitem {
                            typ != EMERALD &&                        \
                            typ != OPAL)))
 
-static struct Jitem Japanese_items[] = {
+static const struct Jitem Japanese_items[] = {
     { SHORT_SWORD, "wakizashi" },
     { BROADSWORD, "ninja-to" },
     { FLAIL, "nunchaku" },
@@ -102,9 +102,15 @@ obj_typename(int otyp)
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp)) {
-        actualn = Japanese_item_name(otyp);
+    if (Role_if(PM_SAMURAI)) {
+        actualn = Japanese_item_name(otyp, actualn);
     }
+    /* generic items don't have an actual-name; we shouldn't ever be called
+       for those; pacify static analyzer without resorting to impossible() */
+    if (!actualn) {
+        actualn = (otyp > 0 && otyp < MAXOCLASSES) ? "generic" : "object?";
+    }
+
     switch (ocl->oc_class) {
     case COIN_CLASS:
         Strcpy(buf, "coin");
@@ -450,9 +456,14 @@ xname_flags(
     boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
     boolean known, dknown, bknown;
 
-    buf = nextobuf();
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(typ)) {
-        actualn = Japanese_item_name(typ);
+    buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
+    if (Role_if(PM_SAMURAI)) {
+        actualn = Japanese_item_name(typ, actualn);
+    }
+    /* generic items don't have an actual-name; we shouldn't ever be called
+       for those; pacify static analyzer without resorting to impossible() */
+    if (!actualn) {
+        actualn = (typ > 0 && typ < MAXOCLASSES) ? "generic" : "object?";
     }
 
     /* As of 3.6.2: this used to be part of 'dn's initialization, but it
@@ -1035,7 +1046,7 @@ doname_base(struct obj *obj, boolean with_price)
 
     else if (do_ID || do_dknown) {
         char *cp = nextobuf();
-        if (Role_if(PM_SAMURAI) && (tmp = (char*)Japanese_item_name(obj->otyp))) {
+        if (Role_if(PM_SAMURAI) && (tmp = (char*)Japanese_item_name(obj->otyp, (const char *) 0))) {
             Strcpy(cp, tmp);
         } else if (obj->otyp == POT_WATER && (obj->blessed || obj->cursed)) {
             Sprintf(cp, "%sholy water", obj->blessed ? "" : "un");
@@ -3293,7 +3304,7 @@ rnd_otyp_by_namedesc(
         return STRANGE_OBJECT;
     }
 
-    memset(validobjs, 0, sizeof validobjs);
+    (void) memset((genericptr_t) validobjs, 0, sizeof validobjs);
 
     /* FIXME:
      * When this spans classes (the !oclass case), the item
@@ -4121,10 +4132,10 @@ srch:
     typ = 0;
 
     if (actualn) {
-        struct Jitem *j = Japanese_items;
+        const struct Jitem *j = Japanese_items;
 
         while (j->item) {
-            if (actualn && !strcmpi(actualn, j->name)) {
+            if (!strcmpi(actualn, j->name)) {
                 typ = j->item;
                 goto typfnd;
             }
@@ -4852,9 +4863,9 @@ rnd_class(int first, int last)
 }
 
 const char *
-Japanese_item_name(int i)
+Japanese_item_name(int i, const char *ordinaryname)
 {
-    struct Jitem *j = Japanese_items;
+    const struct Jitem *j = Japanese_items;
 
     while (j->item) {
         if (i == j->item) {
@@ -4862,7 +4873,44 @@ Japanese_item_name(int i)
         }
         j++;
     }
-    return (const char *)0;
+
+    return ordinaryname;
+}
+
+const char *
+armor_simple_name(struct obj *armor)
+{
+    const char *result = 0;
+    unsigned armcat = objects[armor->otyp].oc_armcat;
+
+    switch (armcat) {
+    case ARM_SUIT:
+        result = suit_simple_name(armor);
+        break;
+    case ARM_CLOAK:
+        result = cloak_simple_name(armor);
+        break;
+    case ARM_HELM:
+        result = helm_simple_name(armor);
+        break;
+    case ARM_GLOVES:
+        result = gloves_simple_name(armor);
+        break;
+    case ARM_BOOTS:
+        result = boots_simple_name(armor);
+        break;
+    case ARM_SHIELD:
+        result = shield_simple_name(armor);
+        break;
+    case ARM_SHIRT:
+        result = shirt_simple_name(armor);
+        break;
+    default:
+        result = simpleonames(armor);
+        impossible("unknown armor category (%s => %u)", result, armcat);
+        break;
+    }
+    return result;
 }
 
 const char *

@@ -417,7 +417,8 @@ discover_object(int oindx, boolean mark_as_known, boolean mark_as_encountered,
 
     if ((!objects[oindx].oc_name_known && mark_as_known)
         || (!objects[oindx].oc_encountered && mark_as_encountered)
-        || (Role_if(PM_SAMURAI) && Japanese_item_name(oindx))) {
+        || (Role_if(PM_SAMURAI)
+            && Japanese_item_name(oindx, (const char *) 0))) {
         int dindx, acls = objects[oindx].oc_class;
 
         /* Loop thru disco[] 'til we find the target (which may have been
@@ -520,7 +521,10 @@ makeknown_msg(int otyp, boolean past_tense)
 static boolean
 interesting_to_discover(int i)
 {
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(i)) {
+    /* most players who don't speak Japanese manage to figure out what
+       gunyoki, osaku, and so forth mean, but treat them as pre-discovered
+       to be disclosed by '\' */
+    if (Role_if(PM_SAMURAI) && Japanese_item_name(i, (const char *) 0)) {
         return TRUE;
     }
 

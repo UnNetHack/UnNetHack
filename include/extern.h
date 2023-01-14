@@ -1932,7 +1932,9 @@ extern char *makesingular(const char *);
 extern short name_to_otyp(const char *);
 extern struct obj *readobjnam(char *, struct obj *);
 extern int rnd_class(int, int);
-extern const char *Japanese_item_name(int);
+/* discover_object() passes NULL arg2 to Japanese_item_name(),
+ * preventing NONNULLARG2 */
+extern const char *Japanese_item_name(int, const char *) NO_NNARGS;
 extern const char *suit_simple_name(struct obj *);
 extern const char *cloak_simple_name(struct obj *);
 extern const char *helm_simple_name(struct obj *);
