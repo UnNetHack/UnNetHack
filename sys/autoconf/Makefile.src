@@ -187,6 +187,7 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/eat.c $(srcdir)/end.c $(srcdir)/engrave.c $(srcdir)/exper.c \
 	$(srcdir)/explode.c $(srcdir)/extralev.c $(srcdir)/files.c \
 	$(srcdir)/fountain.c $(srcdir)/hack.c $(srcdir)/hacklib.c \
+	$(srcdir)/insight.c \
 	$(srcdir)/invent.c $(srcdir)/light.c $(srcdir)/lock.c $(srcdir)/mail.c \
 	$(srcdir)/makemon.c $(srcdir)/mapglyph.c $(srcdir)/mcastu.c \
 	$(srcdir)/mhitm.c $(srcdir)/mhitu.c $(srcdir)/minion.c \
@@ -265,7 +266,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
 	drawing.o dump.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o invent.o light.o \
+	extralev.o files.o fountain.o hack.o hacklib.o insight.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mksheol.o mon.o mondata.o monmove.o monstr.o \
@@ -779,6 +780,7 @@ files.o: $(srcdir)/files.c $(HACK_H) ../include/dlb.h
 fountain.o: $(srcdir)/fountain.c $(HACK_H)
 hack.o: $(srcdir)/hack.c $(HACK_H)
 hacklib.o: $(srcdir)/hacklib.c $(HACK_H)
+insight.o: $(srcdir)/insight.c $(HACK_H)
 invent.o: $(srcdir)/invent.c $(HACK_H)
 light.o: $(srcdir)/light.c $(HACK_H) ../include/lev.h
 livelog.o: $(srcdir)/livelog.c $(HACK_H)

@@ -1020,6 +1020,13 @@ extern void strip_brackets(char *);
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...);
 
+/* ### insight.c ### */
+
+extern int doattributes(void);
+extern void enlightenment(int, boolean);
+extern int doconduct(void);
+extern void show_conduct(int, boolean);
+
 /* ### invent.c ### */
 
 extern void assigninvlet(struct obj *);
