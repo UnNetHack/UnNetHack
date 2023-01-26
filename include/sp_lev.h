@@ -276,8 +276,8 @@ enum corefuncs {
 #define NO_LOC_WARN  0x20 /* no complaints and set x & y to -1, if no loc */
 #define SPACELOC     0x40 /* like DRY, but accepts furniture too */
 
-#define SP_COORD_X(l)   (l & 0xff)
-#define SP_COORD_Y(l)   ((l >> 16) & 0xff)
+#define SP_COORD_X(l)   ((int8_t)(l & 0xff))
+#define SP_COORD_Y(l)   ((int8_t)((l >> 16) & 0xff))
 #define SP_COORD_PACK(x, y) ((( x ) & 0xff) + ((( y ) & 0xff) << 16))
 #define SP_COORD_PACK_RANDOM(f) (SP_COORD_IS_RANDOM | (f))
 

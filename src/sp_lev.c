@@ -225,7 +225,7 @@ splev_stack_reverse(struct splevstack *st)
 
 
 struct opvar *
-opvar_new_str(char *s)
+opvar_new_str(const char *s)
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
     if (!tmpov) panic("could not alloc opvar struct");
@@ -1090,7 +1090,7 @@ rndtrap(void)
  *  The "humidity" flag is used to insure that engravings aren't
  *  created underwater, or eels on dry land.
  */
-static boolean is_ok_location(schar, schar, int);
+static boolean is_ok_location(coordxy, coordxy, int);
 
 static void
 get_location(
@@ -1159,7 +1159,7 @@ found_it:;
 }
 
 static boolean
-is_ok_location(schar x, schar y, int humidity)
+is_ok_location(coordxy x, coordxy y, int humidity)
 {
     int typ;
 
@@ -4229,7 +4229,7 @@ selection_filter_percent(struct opvar *ov, int percent)
 }
 
 static int
-selection_rndcoord(struct opvar *ov, schar *x, schar *y, boolean removeit)
+selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
 {
     int idx = 0;
     int c;
@@ -4525,7 +4525,7 @@ selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, lon
 
 /* bresenham line algo */
 void
-selection_do_line(schar x1, schar y1, schar x2, schar y2, struct opvar *ov)
+selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
 {
     int d, dx, dy, ai, bi, xi, yi;
 
@@ -4575,7 +4575,7 @@ selection_do_line(schar x1, schar y1, schar x2, schar y2, struct opvar *ov)
 }
 
 void
-selection_do_randline(schar x1, schar y1, schar x2, schar y2, schar rough, schar rec, struct opvar *ov)
+selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2, schar rough, schar rec, struct opvar *ov)
 {
     int mx, my;
     int dx, dy;
@@ -4768,7 +4768,7 @@ generate_way_out_method(int nx, int ny, struct opvar *ov)
         RIN_TELEPORTATION
     };
     struct opvar *ov2 = selection_opvar((char *) 0), *ov3;
-    schar x, y;
+    coordxy x, y;
     boolean res = TRUE;
 
     selection_floodfill(ov2, nx, ny, TRUE);
@@ -6174,7 +6174,7 @@ sp_level_coder(sp_lev *lvl)
         case SPO_SEL_RNDCOORD:
         {
             struct opvar *pt;
-            schar x, y;
+            coordxy x, y;
             if (!OV_pop_typ(pt, SPOVAR_SEL)) panic("no selection for rndcoord");
             if (selection_rndcoord(pt, &x, &y, FALSE)) {
                 x -= xstart;
