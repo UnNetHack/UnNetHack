@@ -66,7 +66,7 @@ void reassign() {}
 boolean Can_fall_thru(d_level *l) { return FALSE; }
 const char *align_str(aligntyp alignment) { return "unknown"; }
 
-const char* artifact_name(const char *name, short *typ) { return NULL; }
+const char* artifact_name(const char *name, short *typ, boolean fuzzy) { return NULL; }
 void attach_egg_hatch_timeout(struct obj *obj, long i) {}
 void block_point(coordxy x, coordxy y) {}
 void unblock_point(coordxy x, coordxy y) {}
