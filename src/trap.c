@@ -3373,7 +3373,7 @@ doicetrap(struct obj *box) /**< at the moment only for floor traps */
         return;
     }
 
-    pline("A freezing cloud shoots from %s!", surface(u.ux, u.uy));
+    pline("A freezing cloud shoots up from the %s!", surface(u.ux, u.uy));
     if (Cold_resistance) {
         shieldeff(u.ux, u.uy);
         num = 0;
