@@ -797,7 +797,7 @@ u_entered_shop(char *enterstring)
             verbalize("Back again, %s?  I've got my %s on you.",
                       plname, mbodypart(shkp, EYE));
         } else {
-            pline_The("atmosphere at %s %s seems unwelcomin",
+            pline_The("atmosphere at %s %s seems unwelcoming.",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         }
     } else if (eshkp->robbed) {
