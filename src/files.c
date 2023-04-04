@@ -2680,8 +2680,7 @@ fopen_wizkit_file(void)
     }
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r")) {
-        != (FILE *)0) {
+    if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r")) != (FILE *)0) {
         return fp;
     }
 #else
@@ -2953,17 +2952,14 @@ recover_savefile()
         (void)close(gfd);
         return FALSE;
     }
-    if (read(gfd, (genericptr_t) &savelev, sizeof(savelev)) {
-        != sizeof(savelev)) {
+    if (read(gfd, (genericptr_t) &savelev, sizeof(savelev)) != sizeof(savelev)) {
         raw_printf("\nCheckpointing was not in effect for %s -- recovery impossible.\n",
                    lock);
         (void)close(gfd);
         return FALSE;
     }
-    if ((read(gfd, (genericptr_t) savename, sizeof savename) {
-         != sizeof savename) ||
-        (read(gfd, (genericptr_t) &version_data, sizeof version_data) {
-         != sizeof version_data)) {
+    if ((read(gfd, (genericptr_t) savename, sizeof savename) != sizeof savename) ||
+        (read(gfd, (genericptr_t) &version_data, sizeof version_data) != sizeof version_data)) {
         raw_printf("\nError reading %s -- can't recover.\n", lock);
         (void)close(gfd);
         return FALSE;
@@ -2992,8 +2988,7 @@ recover_savefile()
         return FALSE;
     }
 
-    if (write(sfd, (genericptr_t) &version_data, sizeof version_data) {
-        != sizeof version_data) {
+    if (write(sfd, (genericptr_t) &version_data, sizeof version_data) != sizeof version_data) {
         raw_printf("\nError writing %s; recovery failed.", SAVEF);
         (void)close(gfd);
         (void)close(sfd);
