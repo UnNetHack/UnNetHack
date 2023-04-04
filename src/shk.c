@@ -82,12 +82,12 @@ static const char *angrytexts[] = { "quite upset", "ticked off", "furious" };
 
 /*
     Transfer money from inventory to monster when paying
-    shopkeepers, priests, oracle, succubus, & other demons.
+    shopkeepers, priests, oracle, succubus, and other demons.
     Simple with only gold coins.
     This routine will handle money changing when multiple
     coin types is implemented, only appropriate
     monsters will pay change.  (Peaceful shopkeepers, priests
-    & the oracle try to maintain goodwill while selling
+    and the oracle try to maintain goodwill while selling
     their wares or services.  Angry monsters and all demons
     will keep anything they get their hands on.
     Returns the amount actually paid, so we can know
@@ -103,7 +103,7 @@ money2mon(struct monst *mon, long int amount)
         return 0L;
     }
     if (!ygold || ygold->quan < amount) {
-        warning("Paying without %s money?", ygold ? "enough" : "");
+        warning("Paying without %s gold?", ygold ? "enough" : "");
         return 0L;
     }
 
@@ -134,7 +134,7 @@ money2u(struct monst *mon, long int amount)
         return;
     }
     if (!mongold || mongold->quan < amount) {
-        warning("%s paying without %s money?", a_monnam(mon),
+        warning("%s paying without %s gold?", a_monnam(mon),
                 mongold ? "enough" : "");
         return;
     }
@@ -145,7 +145,7 @@ money2u(struct monst *mon, long int amount)
     obj_extract_self(mongold);
 
     if (!merge_choice(invent, mongold) && inv_cnt(FALSE) >= 52) {
-        You("have no room for the money!");
+        You("have no room for the gold!");
         dropy(mongold);
     } else {
         addinv(mongold);
@@ -1032,7 +1032,7 @@ shopper_financial_report(void)
                 You("owe %s %ld %s.",
                     shkname(shkp), amt, currency(amt));
             } else if (shkp == this_shkp) {
-                You("don't owe any money here.");
+                You("don't owe any gold here.");
             }
         }
     }
@@ -1466,7 +1466,7 @@ make_angry_shk(struct monst *shkp, coordxy ox UNUSED, coordxy oy UNUSED)
     hot_pursuit(shkp);
 }
 
-static const char no_money[] = "Moreover, you%s have no money.";
+static const char no_money[] = "Moreover, you%s have no gold.";
 static const char not_enough_money[] =
     "Besides, you don't have enough to interest %s.";
 
@@ -1620,7 +1620,7 @@ proceed:
         if (!ltmp) {
             You("do not owe %s anything.", shkname(shkp));
         } else if (!umoney) {
-            You("%shave no money.", stashed_gold ? "seem to " : "");
+            You("%shave no gold.", stashed_gold ? "seem to " : "");
             if (stashed_gold) {
                 pline("But you have some gold stashed away.");
             }
@@ -1656,7 +1656,7 @@ proceed:
                 pline(no_money, stashed_gold ? " seem to" : "");
             }
         } else if (ltmp) {
-            pline("%s is after blood, not money!", shkname(shkp));
+            pline("%s is after blood, not gold!", shkname(shkp));
             if (umoney < ltmp/2L ||
                (umoney < ltmp && stashed_gold)) {
                 if (!umoney) {
@@ -1683,7 +1683,7 @@ proceed:
 #endif
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
-            pline("%s is after your hide, not your money!",
+            pline("%s is after your hide, not your gold!",
                   Shknam(shkp));
             if (umoney < peace_offering) {
                 if (!umoney) {
@@ -1768,13 +1768,13 @@ proceed:
 
         umoney = money_cnt(invent);
         if (!umoney && !eshkp->credit) {
-            You("%shave no money or credit%s.",
+            You("%shave no gold or credit%s.",
                 stashed_gold ? "seem to " : "",
                 paid ? " left" : "");
             return 0;
         }
         if ((umoney + eshkp->credit) < cheapest_item(shkp)) {
-            You("don't have enough money to buy%s the item%s you picked.",
+            You("don't have enough gold to buy%s the item%s you picked.",
                 eshkp->billct > 1 ? " any of" : "", plur(eshkp->billct));
             if (stashed_gold) {
                 pline("Maybe you have some gold stashed away?");
@@ -1892,7 +1892,7 @@ dopayobj(struct monst *shkp, struct bill_x *bp, struct obj **obj_p, int which, b
         return PAY_BUY;
     }
     if (itemize && umoney + ESHK(shkp)->credit == 0L) {
-        You("%shave no money or credit left.",
+        You("%shave no gold or credit left.",
             stashed_gold ? "seem to " : "");
         return PAY_BROKE;
     }
