@@ -1055,8 +1055,10 @@ mksobj(int otyp, boolean init, boolean artif)
 #ifdef MAIL
             if (otmp->otyp != SCR_MAIL) {
 #endif
-            blessorcurse(otmp, 4);
+                blessorcurse(otmp, 4);
+#ifdef MAIL
             }
+#endif
             break;
         case SPBOOK_CLASS:
             otmp->spestudied = 0;
