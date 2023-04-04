@@ -528,7 +528,7 @@ tos.o: $(srcdir)/../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/atari/tos.c
 bemain.o: $(srcdir)/../sys/be/bemain.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/be/bemain.c
-unixmain.o: $(srcdir)/../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h
+unixmain.o: $(srcdir)/../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h ../include/date.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/unix/unixmain.c
 unixunix.o: $(srcdir)/../sys/unix/unixunix.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/unix/unixunix.c
