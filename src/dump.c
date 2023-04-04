@@ -266,8 +266,12 @@ dump_object(const char c, const struct obj *obj, const char *str)
         } else {
 #  endif
 # endif
-        fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s%s<br />\n", c, link, starting_inventory);
+            fprintf(html_dump_fp, "<span class=\"nh_item_letter\">%c</span> - %s%s<br />\n", c, link, starting_inventory);
+# ifdef TTY_GRAPHICS
+#  ifdef MENU_COLOR
         }
+#  endif
+# endif
     }
 #endif
 }
@@ -346,8 +350,12 @@ dump_list_item_object(struct obj *obj)
         } else {
 #  endif
 # endif
-        fprintf(html_dump_fp, "<li>%s</li>\n", link);
+            fprintf(html_dump_fp, "<li>%s</li>\n", link);
+# ifdef TTY_GRAPHICS
+#  ifdef MENU_COLOR
         }
+#  endif
+# endif
     }
 #endif
 }
