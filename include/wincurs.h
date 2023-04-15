@@ -41,7 +41,6 @@ extern boolean counting;                        /* Count window is active */
 # endif
 #endif
 
-
 typedef enum orient_type
 {
     CENTER,
@@ -52,142 +51,79 @@ typedef enum orient_type
     UNDEFINED
 } orient;
 
-
 /* cursmain.c */
-
 extern struct window_procs curses_procs;
-
 extern void curses_init_nhwindows(int* argcp, char** argv);
-
 extern void curses_player_selection(void);
-
 extern void curses_askname(void);
-
 extern void curses_get_nh_event(void);
-
 extern void curses_exit_nhwindows(const char *str);
-
 extern void curses_suspend_nhwindows(const char *str);
-
 extern void curses_resume_nhwindows(void);
-
 extern winid curses_create_nhwindow(int type);
-
 extern void curses_clear_nhwindow(winid wid);
-
 extern void curses_display_nhwindow(winid wid, boolean block);
-
 extern void curses_destroy_nhwindow(winid wid);
-
 extern void curses_curs(winid wid, int x, int y);
-
 extern void curses_putstr(winid wid, int attr, const char *text);
-
 #ifdef FILE_AREAS
 extern void curses_display_file(const char *filearea, const char *filename, boolean must_exist);
 #else
 extern void curses_display_file(const char *filename, boolean must_exist);
 #endif
-
 extern void curses_start_menu(winid wid);
-
 extern void curses_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
                             char accelerator, char group_accel, int attr,
                             const char *str, unsigned int presel);
-
 extern void curses_end_menu(winid wid, const char *prompt);
-
 extern int curses_select_menu(winid wid, int how, MENU_ITEM_P **selected);
-
 extern void curses_update_inventory(void);
-
 extern void curses_mark_synch(void);
-
 extern void curses_wait_synch(void);
-
 extern void curses_cliparound(int x, int y);
-
 extern void curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph, int bg_glyph);
-
 extern void curses_raw_print(const char *str);
-
 extern void curses_raw_print_bold(const char *str);
-
 extern int curses_nhgetch(void);
-
 extern int curses_nh_poskey(coordxy *x, coordxy *y, int *mod);
-
 extern void curses_nhbell(void);
-
 extern int curses_doprev_message(void);
-
 extern char curses_yn_function(const char *question, const char *choices, char def);
-
 extern void curses_getlin(const char *question, char *input);
-
 extern int curses_get_ext_cmd(void);
-
 extern void curses_number_pad(int state);
-
 extern void curses_delay_output(void);
-
 extern void curses_start_screen(void);
-
 extern void curses_end_screen(void);
-
 extern void curses_outrip(winid wid, int how);
-
 extern void genl_outrip(winid tmpwin, int how);
-
 extern void curses_preference_update(const char *pref);
 
-
 /* curswins.c */
-
 extern WINDOW *curses_create_window(int width, int height, orient orientation);
-
 extern void curses_destroy_win(WINDOW *win);
-
 extern WINDOW *curses_get_nhwin(winid wid);
-
 extern void curses_add_nhwin(winid wid, int height, int width, int y,
                              int x, orient orientation, boolean border);
-
 extern void curses_add_wid(winid wid);
-
 extern void curses_refresh_nhwin(winid wid);
-
 extern void curses_refresh_nethack_windows(void);
-
 extern void curses_del_nhwin(winid wid);
-
 extern void curses_del_wid(winid wid);
-
+extern void curs_destroy_all_wins(void);
 extern void curses_putch(winid wid, int x, int y, int ch, int color, int attrs);
-
 extern void curses_get_window_size(winid wid, int *height, int *width);
-
 extern boolean curses_window_has_border(winid wid);
-
 extern boolean curses_window_exists(winid wid);
-
 extern int curses_get_window_orientation(winid wid);
-
 extern void curses_get_window_xy(winid wid, int *x, int *y);
-
 extern void curses_puts(winid wid, int attr, const char *text);
-
 extern void curses_clear_nhwin(winid wid);
-
 extern void curses_alert_win_border(winid wid, boolean onoff);
-
 extern void curses_alert_main_borders(boolean onoff);
-
 extern void curses_draw_map(int sx, int sy, int ex, int ey);
-
 extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
                                   int ux, int uy);
-
 
 /* cursmisc.c */
 

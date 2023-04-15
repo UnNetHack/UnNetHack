@@ -170,8 +170,11 @@ curses_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     getmaxyx(base_term, term_rows, term_cols);
     counting = FALSE;
     curses_init_options();
-    if ((term_rows < 15) || (term_cols < 40)) {
-        panic("Terminal too small.  Must be minumum 40 width and 15 height");
+    if (term_rows < 15 || term_cols < 40) {
+        panic("Terminal is too small; must have at least %s%s%s.",
+              (term_rows < 15) ? "15 rows" : "",
+              (term_rows < 15 && term_cols < 40) ? " and " : "",
+              (term_cols < 40) ? "40 columns" : "");
     }
 
     curses_create_main_windows();
@@ -228,15 +231,33 @@ curses_get_nh_event(void)
 #endif
 }
 
+/* restore terminal state; extracted from curses_exit_nhwindows() */
+void
+curses_uncurse_terminal(void)
+{
+   /* also called by panictrace_handler(), a signal handler, so somewhat
+      iffy in that situation; but without this, newlines behave as raw
+      line feeds so subseqent backtrace gets scrawled all over the screen
+      and is nearly useless */
+    curses_cleanup();
+    curs_set(orig_cursor);
+    endwin();
+}
+
 /* Exits the window system.  This should dismiss all windows,
    except the "window" used for raw_print().  str is printed if possible.
 */
 void
 curses_exit_nhwindows(const char *str)
 {
-    curses_cleanup();
-    curs_set(orig_cursor);
-    endwin();
+    curses_destroy_nhwindow(INV_WIN);
+    curses_destroy_nhwindow(MAP_WIN);
+    curses_destroy_nhwindow(STATUS_WIN);
+    curses_destroy_nhwindow(MESSAGE_WIN);
+    curs_destroy_all_wins();
+
+    curses_uncurse_terminal();
+
     iflags.window_inited = 0;
     if (str != NULL) {
         raw_print(str);
@@ -301,16 +322,22 @@ void
 curses_display_nhwindow(winid wid, boolean block)
 {
     menu_item *selected = NULL;
+
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         curses_end_menu(wid, "");
-        curses_select_menu(wid, PICK_NONE, &selected);
+        (void) curses_select_menu(wid, PICK_NONE, &selected);
         return;
     }
 
-    /* actually display the window */
-    wnoutrefresh(curses_get_nhwin(wid));
-    /* flush pending writes from other windows too */
-    doupdate();
+    /* don't overwrite the splash screen first time through */
+    if (!iflags.window_inited && wid == MAP_WIN) {
+        iflags.window_inited = TRUE;
+    } else {
+        /* actually display the window */
+        wnoutrefresh(curses_get_nhwin(wid));
+        /* flush pending writes from other windows too */
+        doupdate();
+    }
     if ((wid == MAP_WIN) && block) {
         (void) curses_more();
     }
@@ -324,7 +351,6 @@ curses_display_nhwindow(winid wid, boolean block)
             (void) curses_more();
     }
 }
-
 
 /* Destroy will dismiss the window if the window has not
  * already been dismissed.

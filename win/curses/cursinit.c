@@ -367,7 +367,7 @@ curses_create_main_windows(void)
     refresh();
 
     curses_refresh_nethack_windows();
-
+    /*
     if (iflags.window_inited) {
         curses_update_stats();
         if (iflags.perm_invent) {
@@ -376,6 +376,7 @@ curses_create_main_windows(void)
     } else {
         iflags.window_inited = TRUE;
     }
+    */
 }
 
 
@@ -973,13 +974,12 @@ curses_init_options(void)
 void
 curses_display_splash_window(void)
 {
-    int x_start;
-    int y_start;
+    int i, x_start, y_start;
     int which_variant = NETHACK_CURSES; /* Default to NetHack */
     curses_get_window_xy(MAP_WIN, &x_start, &y_start);
 
     if ((term_cols < 70) || (term_rows < 20)) {
-        iflags.wc_splash_screen = FALSE;        /* No room for s.s. */
+        iflags.wc_splash_screen = FALSE; /* No room for s.s. */
     }
 #ifdef DEF_GAME_NAME
     if (strcmp(DEF_GAME_NAME, "SlashEM") == 0) {
@@ -1005,9 +1005,11 @@ curses_display_splash_window(void)
         which_variant = DNETHACK_CURSES;
     }
 
-
-    curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
     if (iflags.wc_splash_screen) {
+        if (iflags.wc2_guicolor) {
+            curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
+        }
+
         switch (which_variant) {
         case NETHACK_CURSES:
             mvaddstr(y_start, x_start, NETHACK_SPLASH_A);
@@ -1068,9 +1070,11 @@ curses_display_splash_window(void)
         default:
             impossible("which_variant number %d out of range", which_variant);
         }
-    }
 
-    curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, OFF);
+        if (iflags.wc2_guicolor) {
+            curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, OFF);
+        }
+    }
 
 #ifdef COPYRIGHT_BANNER_A
     mvaddstr(y_start, x_start, COPYRIGHT_BANNER_A);
@@ -1091,6 +1095,7 @@ curses_display_splash_window(void)
     mvaddstr(y_start, x_start, COPYRIGHT_BANNER_D);
     y_start++;
 #endif
+
     refresh();
 }
 

@@ -343,6 +343,16 @@ curses_del_wid(winid wid)
     }
 }
 
+/* called by destroy_nhwindows() prior to exit */
+void
+curs_destroy_all_wins(void)
+{
+    curses_count_window((char *) 0); /* clean up orphan */
+
+    while (nhwids) {
+        curses_del_wid(nhwids->nhwid);
+    }
+}
 
 /* Print a single character in the given window at the given coordinates */
 
