@@ -2250,4 +2250,95 @@ failed_cdt(int cdt)
     return (intended_cdt(cdt) && !successful_cdt(cdt));
 }
 
+/* Dialog code and variables when starting the game */
+const char *str_tutorial_prompt = "New? Press T to enter a tutorial.";
+const char *str_conduct_tracking_prompt = "Press C for selecting conduct tracking.";
+
+boolean
+show_conduct_selection_dialog(void)
+{
+    int i;
+    anything any;
+    winid win = create_nhwindow(NHW_MENU);
+
+    start_menu(win);
+
+    int pick_cnt, pick_idx, opt_idx;
+    menu_item *conduct_category_pick = (menu_item *)0;
+
+    static const char *conduct_names[] = {
+        "ascet", "atheist", "blindfolded", "hallucinating",
+        "illiterate", "nudist", "pacifist", "vegan",
+        "vegetarian", "death dropless",
+        "Elberethless",
+        "Heaven or Hell", "Quit"
+    };
+#define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
+    static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
+    int idx = 0;
+    conduct_bools[idx++] = &flags.ascet;
+    conduct_bools[idx++] = &flags.atheist;
+    conduct_bools[idx++] = &flags.blindfolded;
+    conduct_bools[idx++] = &flags.perma_hallu;
+    conduct_bools[idx++] = &flags.illiterate;
+    conduct_bools[idx++] = &flags.nudist;
+    conduct_bools[idx++] = &flags.pacifist;
+    conduct_bools[idx++] = &flags.vegan;
+    conduct_bools[idx++] = &flags.vegetarian;
+    conduct_bools[idx++] = &flags.deathdropless;
+    conduct_bools[idx++] = &flags.elberethignore;
+    conduct_bools[idx++] = &flags.heaven_or_hell;
+    conduct_bools[idx++] = 0;
+
+    int conduct_settings[NUM_CONDUCT_OPTIONS];
+
+    winid tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    for (i = 0; i < NUM_CONDUCT_OPTIONS; i++) {
+        any.a_int = i + 1;
+        /* use uppercase character if previous option has the same
+         * starting character */
+        char selection_char = conduct_names[i][0];
+        if (i > 0 && conduct_names[i-1][0] == conduct_names[i][0]) {
+            selection_char = highc(selection_char);
+        }
+        add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, selection_char, 0,
+                 ATR_NONE, conduct_names[i],
+                 !conduct_bools[i] ? MENU_UNSELECTED :
+                 (*conduct_bools[i] ? MENU_SELECTED : MENU_UNSELECTED));
+        conduct_settings[i] = 0;
+    }
+    end_menu(tmpwin, "Change which conduct settings:");
+
+    if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &conduct_category_pick)) > 0) {
+        for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+            opt_idx = conduct_category_pick[pick_idx].item.a_int - 1;
+            conduct_settings[opt_idx] = 1;
+        }
+        free((genericptr_t)conduct_category_pick);
+        conduct_category_pick = (menu_item *)0;
+    }
+    destroy_nhwindow(tmpwin);
+    /* has Quit been selected? */
+    if (conduct_settings[NUM_CONDUCT_OPTIONS-1]) {
+        return FALSE;
+    }
+
+    idx = 0;
+    flags.ascet          = conduct_settings[idx++];
+    flags.atheist        = conduct_settings[idx++];
+    flags.blindfolded    = conduct_settings[idx++];
+    flags.perma_hallu    = conduct_settings[idx++];
+    flags.illiterate     = conduct_settings[idx++];
+    flags.nudist         = conduct_settings[idx++];
+    flags.pacifist       = conduct_settings[idx++];
+    flags.vegan          = conduct_settings[idx++];
+    flags.vegetarian     = conduct_settings[idx++];
+    flags.deathdropless  = conduct_settings[idx++];
+    flags.elberethignore = conduct_settings[idx++];
+    flags.heaven_or_hell = conduct_settings[idx++];
+
+    return TRUE;
+}
+
 /* role.c */

@@ -431,9 +431,9 @@ tty_player_selection(void)
            a - like 'y', but skips confirmation and starts game;
            q - quit
          */
-        tty_putstr(BASE_WINDOW, 0, "New? Press T to enter a tutorial.");
+        tty_putstr(BASE_WINDOW, 0, str_tutorial_prompt);
         tty_putstr(BASE_WINDOW, 0, "");
-        tty_putstr(BASE_WINDOW, 0, "Press C for selecting conduct tracking.");
+        tty_putstr(BASE_WINDOW, 0, str_conduct_tracking_prompt);
         tty_putstr(BASE_WINDOW, 0, "");
         echoline = wins[BASE_WINDOW]->cury;
         tty_putstr(BASE_WINDOW, 0, prompt);
@@ -522,81 +522,11 @@ tty_player_selection(void)
     if (conducts) {
         tty_clear_nhwindow(BASE_WINDOW);
         tty_putstr(BASE_WINDOW, 0, "Choose conducts");
-        win = create_nhwindow(NHW_MENU);
-        start_menu(win);
 
-        int pick_cnt, pick_idx, opt_idx;
-        menu_item *conduct_category_pick = (menu_item *)0;
-
-        static const char *conduct_names[] = {
-            "ascet", "atheist", "blindfolded", "hallucinating",
-            "illiterate", "nudist", "pacifist", "vegan",
-            "vegetarian", "death dropless",
-            "Elberethless",
-            "Heaven or Hell", "Quit"
-        };
-#define NUM_CONDUCT_OPTIONS SIZE(conduct_names)
-        static boolean *conduct_bools[NUM_CONDUCT_OPTIONS];
-        conduct_bools[0] = &flags.ascet;
-        conduct_bools[1] = &flags.atheist;
-        conduct_bools[2] = &flags.blindfolded;
-        conduct_bools[3] = &flags.perma_hallu;
-        conduct_bools[4] = &flags.illiterate;
-        conduct_bools[5] = &flags.pacifist;
-        conduct_bools[6] = &flags.nudist;
-        conduct_bools[7] = &flags.vegan;
-        conduct_bools[8] = &flags.vegetarian;
-        conduct_bools[9] = &flags.deathdropless;
-        conduct_bools[10] = &flags.elberethignore;
-        conduct_bools[11] = &flags.heaven_or_hell;
-        conduct_bools[12] = 0;
-
-        int conduct_settings[NUM_CONDUCT_OPTIONS];
-
-        winid tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin);
-        for (i = 0; i < NUM_CONDUCT_OPTIONS; i++) {
-            any.a_int = i + 1;
-            /* use uppercase character if previous option has the same
-             * starting character */
-            char selection_char = conduct_names[i][0];
-            if (i > 0 && conduct_names[i-1][0] == conduct_names[i][0]) {
-                selection_char = highc(selection_char);
-            }
-            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, selection_char, 0,
-                     ATR_NONE, conduct_names[i],
-                     !conduct_bools[i] ? MENU_UNSELECTED :
-                     (*conduct_bools[i] ? MENU_SELECTED : MENU_UNSELECTED));
-            conduct_settings[i] = 0;
-        }
-        end_menu(tmpwin, "Change which conduct settings:");
-
-        if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &conduct_category_pick)) > 0) {
-            for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
-                opt_idx = conduct_category_pick[pick_idx].item.a_int - 1;
-                conduct_settings[opt_idx] = 1;
-            }
-            free((genericptr_t)conduct_category_pick);
-            conduct_category_pick = (menu_item *)0;
-        }
-        destroy_nhwindow(tmpwin);
         /* has Quit been selected? */
-        if (conduct_settings[NUM_CONDUCT_OPTIONS-1]) {
+        if (!show_conduct_selection_dialog()) {
             goto give_up;
         }
-
-        flags.ascet          = conduct_settings[0];
-        flags.atheist        = conduct_settings[1];
-        flags.blindfolded    = conduct_settings[2];
-        flags.perma_hallu    = conduct_settings[3];
-        flags.illiterate     = conduct_settings[4];
-        flags.pacifist       = conduct_settings[5];
-        flags.nudist         = conduct_settings[6];
-        flags.vegan          = conduct_settings[7];
-        flags.vegetarian     = conduct_settings[8];
-        flags.deathdropless  = conduct_settings[9];
-        flags.elberethignore = conduct_settings[10];
-        flags.heaven_or_hell = conduct_settings[11];
     }
 
  makepicks:

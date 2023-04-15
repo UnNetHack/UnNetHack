@@ -2284,6 +2284,9 @@ extern boolean successful_cdt(int);
 extern boolean intended_cdt(int);
 extern boolean superfluous_cdt(int);
 extern boolean failed_cdt(int);
+extern const char *str_tutorial_prompt;
+extern const char *str_conduct_tracking_prompt;
+extern boolean show_conduct_selection_dialog(void);
 
 /* ### rumors.c ### */
 

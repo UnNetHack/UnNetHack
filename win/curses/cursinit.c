@@ -463,6 +463,7 @@ curses_choose_character(void)
     char pbuf[QBUFSZ];
     char choice[QBUFSZ];
     char tmpchoice[QBUFSZ];
+    boolean conducts = FALSE;
 
 #ifdef TUTORIAL_MODE
     winid win;
@@ -500,15 +501,13 @@ curses_choose_character(void)
 
     prompt[count_off] = '\0';
     Snprintf(choice, sizeof(choice), "%s%c", tmpchoice, '\033');
-    if (strchr(tmpchoice, 't')) {       /* Tutorial mode */
-        mvaddstr(0, 1, "New? Press t to enter a tutorial.");
-    }
 
     /* Add capital letters as choices that aren't displayed */
-
     for (count = 0; tmpchoice[count]; count++) {
         tmpchoice[count] = toupper(tmpchoice[count]);
     }
+    /* Add letters for conducts */
+    strcat(tmpchoice, "cC");
 
     strcat(choice, tmpchoice);
 
@@ -526,6 +525,10 @@ curses_choose_character(void)
     if (pick4u == 'q') {        /* Quit or cancelled */
         clearlocks();
         curses_bail(0);
+    }
+
+    if (pick4u == 'c') {
+        pick4u = 'n'; conducts = TRUE;
     }
 
     if (pick4u == 'y') {
@@ -588,6 +591,18 @@ curses_choose_character(void)
         flags.tutorial = 1;
     }
 #endif
+
+    if (conducts) {
+        clear();
+        mvaddstr(0, 1, "Choose conducts");
+        refresh();
+
+        /* has Quit been selected? */
+        if (!show_conduct_selection_dialog()) {
+            clearlocks();
+            curses_bail(0);
+        }
+    }
 
     clear();
     refresh();
@@ -1096,6 +1111,9 @@ curses_display_splash_window(void)
     y_start++;
 #endif
 
+    mvaddstr(y_start + 1, x_start, str_tutorial_prompt);
+    mvaddstr(y_start + 3, x_start, str_conduct_tracking_prompt);
+
     refresh();
 }
 
@@ -1105,7 +1123,6 @@ void
 curses_cleanup(void)
 {
 }
-
 
 /** Show all available colors with names. */
 int
