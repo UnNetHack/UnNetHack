@@ -475,6 +475,7 @@ Helmet_on(void)
             change_luck(lucky_fedora());
         }
         break;
+
     case HELMET:
     case DENTED_POT:
     case ELVEN_LEATHER_HELM:
@@ -482,6 +483,10 @@ Helmet_on(void)
     case ORCISH_HELM:
     case HELM_OF_TELEPATHY:
     case TINFOIL_HAT:
+        break;
+
+    case HELM_OF_CAUTION:
+        see_monsters();
         break;
 
     case HELM_OF_BRILLIANCE:
@@ -580,6 +585,7 @@ Helmet_off(void)
         break;
 
     case HELM_OF_TELEPATHY:
+    case HELM_OF_CAUTION:
         /* need to update ability before calling see_monsters() */
         setworn((struct obj *)0, W_ARMH);
         see_monsters();
@@ -2264,7 +2270,7 @@ accessory_or_armor_on(struct obj *obj)
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
             flags.botl = 1; /* for AC after zeroing u.ublessed */
-            return 1;
+            return ECMD_TIME;
         }
     } else {
         /* accessory */

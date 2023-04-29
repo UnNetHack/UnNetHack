@@ -1376,7 +1376,7 @@ percent_success(int spell)
      */
     int chance, splcaster, special, statused;
     int difficulty;
-    int skill;
+    int skill, skilltype = spell_skilltype(spellid(spell));
 
     /* Calculate intrinsic ability (splcaster) */
 
@@ -1395,7 +1395,7 @@ percent_success(int spell)
         splcaster += urole.spelshld;
     }
 
-    if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE) {
+    if (uarmh && is_metallic(uarmh)) { /* && otyp != HELM_OF_BRILLIANCE */
         splcaster += uarmhbon;
     }
     if (uarmh && uarmh->otyp == TINFOIL_HAT) {
@@ -1432,7 +1432,7 @@ percent_success(int spell)
      * The difficulty is based on the hero's level and their skill level
      * in that spell type.
      */
-    skill = P_SKILL(spell_skilltype(spellid(spell)));
+    skill = P_SKILL(skilltype);
     skill = max(skill, P_UNSKILLED) - 1; /* unskilled => 0 */
     difficulty= (spellev(spell)-1) * 4 - ((skill * 6) + (u.ulevel/3) + 1);
 

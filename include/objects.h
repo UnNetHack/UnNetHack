@@ -304,11 +304,15 @@
          1, 0,  0,   1, 0, 10,   8, 9, 0, IRON, CLR_BLACK),
     HELM("tinfoil hat", (char *)0,
          1, 0,  0,   1, 0,  0,   1, 10, 0, METAL, HI_METAL),
+    HELM("helm of brilliance", "crystal helmet",
+         0, 1,  0,   6, 1, 40,  50,  9, 0, GLASS, CLR_WHITE),
+        /* used to be iron and shuffled as "etched helmet" but required
+           special case for the effect of iron armor on spell casting */
 /* With shuffled appearances... */
     HELM("helmet", "plumed helmet",
          0, 0,  0,      10, 1, 30,  10, 9, 0, IRON, HI_METAL),
-    HELM("helm of brilliance", "etched helmet",
-         0, 1,  0,   6, 1, 50,  50, 9, 0, IRON, CLR_GREEN),
+    HELM("helm of caution", "etched helmet",
+         0, 1,  WARNING,  6, 1, 50, 50,  9, 0, IRON, CLR_GREEN),
     HELM("helm of opposite alignment", "crested helmet",
          0, 1,  0,   6, 1, 50,  50, 9, 0, IRON, HI_METAL),
     HELM("helm of telepathy", "visored helmet",
