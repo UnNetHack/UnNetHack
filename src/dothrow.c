@@ -2380,7 +2380,15 @@ breakobj(struct obj *obj, coordxy x, coordxy y, boolean hero_caused, boolean fro
 boolean
 breaktest(struct obj *obj)
 {
-    if (obj_resists(obj, 1, 99)) {
+    int nonbreakchance = 1; /* chance for non-artifacts to resist */
+
+    /* this may need to be changed if actual glass armor gets added someday;
+       for now, it affects crystal plate mail and helm of brilliance */
+    if (obj->oclass == ARMOR_CLASS) {
+        nonbreakchance = 95;
+    }
+
+    if (obj_resists(obj, nonbreakchance, 99)) {
         return 0;
     }
     if (objects[obj->otyp].oc_material == GLASS && !obj->oartifact &&
@@ -2408,12 +2416,13 @@ breakmsg(struct obj *obj, boolean in_view)
 
     to_pieces = "";
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
-    default:     /* glass or crystal wand */
+    default: /* glass or crystal wand */
         if (obj->oclass != WAND_CLASS &&
             obj->oclass != RING_CLASS)
-            warning("breaking odd object?");
+            warning("breaking odd object (%d)?", obj->otyp);
         /* fall through */
     case CRYSTAL_PLATE_MAIL:
+    case HELM_OF_BRILLIANCE:
     case LENSES:
     case MIRROR:
     case CRYSTAL_BALL:
