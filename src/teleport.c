@@ -1210,7 +1210,7 @@ random_levtport:
         }
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = llimit + newlev;
-        schedule_goto(&newlevel, FALSE, FALSE, 0, (char *)0, (char *)0);
+        schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
         return;
     }
 #endif
@@ -1323,7 +1323,8 @@ random_levtport:
         }
 #endif
     }
-    schedule_goto(&newlevel, FALSE, FALSE, 0, (char *)0, (char *)0);
+    schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
+                  flags.verbose ? "You materialize on a different level!" : (char *) 0);
     /* in case player just read a scroll and is about to be asked to
        call it something, we can't defer until the end of the turn */
     if (u.utotype && !flags.mon_moving) {
@@ -1370,9 +1371,9 @@ domagicportal(struct trap *ttmp)
     }
 
     target_level = ttmp->dst;
-    schedule_goto(&target_level, FALSE, FALSE, 1,
+    schedule_goto(&target_level, UTOTYPE_PORTAL,
                   "You feel dizzy for a moment, but the sensation passes.",
-                  (char *)0);
+                  (char *) 0);
 }
 
 void

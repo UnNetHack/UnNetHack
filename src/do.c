@@ -2016,26 +2016,13 @@ final_level(void)
 static char *dfr_pre_msg = 0,   /* pline() before level change */
             *dfr_post_msg = 0; /* pline() after level change */
 
-/* change levels at the end of this turn, after monsters finish moving */
+/** change levels at the end of this turn, after monsters finish moving */
 void
-schedule_goto(d_level *tolev, boolean at_stairs, boolean falling, int portal_flag, const char *pre_msg, const char *post_msg)
+schedule_goto(d_level *tolev, int utotype_flags,
+              const char *pre_msg, const char *post_msg)
 {
-    int typmask = 0100;     /* non-zero triggers `deferred_goto' */
-
-    /* destination flags (`goto_level' args) */
-    if (at_stairs) {
-        typmask |= 1;
-    }
-    if (falling) {
-        typmask |= 2;
-    }
-    if (portal_flag) {
-        typmask |= 4;
-    }
-    if (portal_flag < 0) {
-        typmask |= 0200; /* flag for portal removal */
-    }
-    u.utotype = typmask;
+    /* UTOTYPE_DEFERRED is used, so UTOTYPE_NONE can trigger deferred_goto() */
+    u.utotype = utotype_flags | UTOTYPE_DEFERRED;
     /* destination level */
     assign_level(&u.utolev, tolev);
 

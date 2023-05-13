@@ -392,7 +392,7 @@ extern int doup(void);
 extern void save_currentstate(void);
 #endif
 extern void goto_level(d_level *, boolean, boolean, boolean);
-extern void schedule_goto(d_level *, boolean, boolean, int, const char *, const char *);
+extern void schedule_goto(d_level *, int, const char *, const char *);
 extern void deferred_goto(void);
 extern boolean revive_corpse(struct obj *);
 extern void revive_mon(ANY_P *, long);

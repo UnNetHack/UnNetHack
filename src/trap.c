@@ -554,8 +554,8 @@ fall_through(boolean td, unsigned int ftflags)
                 ceiling(u.ux, u.uy));
     }
 
-    schedule_goto(&dtmp, FALSE, TRUE, 0,
-                  (char *)0, !td ? msgbuf : (char *)0);
+    schedule_goto(&dtmp, !Flying ? UTOTYPE_FALLING : UTOTYPE_NONE, (char *) 0,
+                  !td ? msgbuf : (char *) 0);
 }
 
 /*

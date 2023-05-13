@@ -297,7 +297,7 @@ struct Align {
 extern const struct Align aligns[]; /* table of available alignments */
 
 enum utraptypes {
-    TT_BEARTRAP   = 0,
+    TT_BEARTRAP = 0,
     TT_PIT,
     TT_WEB,
     TT_LAVA,
@@ -305,6 +305,15 @@ enum utraptypes {
     TT_BURIEDBALL,
     TT_SWAMP,
     TT_ICE,
+};
+
+enum utotypes {
+    UTOTYPE_NONE     = 0x00,
+    UTOTYPE_ATSTAIRS = 0x01,
+    UTOTYPE_FALLING  = 0x02,
+    UTOTYPE_PORTAL   = 0x04,
+    UTOTYPE_RMPORTAL = 0x10, /* remove portal */
+    UTOTYPE_DEFERRED = 0x20  /* deferred_goto */
 };
 
 /*
