@@ -1012,6 +1012,7 @@ extern void strbuf_reserve(strbuf_t *, int);
 extern void strbuf_empty(strbuf_t *);
 extern void strbuf_nl_to_crlf(strbuf_t *);
 extern int swapbits(int, int, int);
+extern void shuffle_int_array(int *, int);
 extern void strip_brackets(char *);
 /* note: the snprintf CPP wrapper includes the "fmt" argument in "..."
    (__VA_ARGS__) to allow for zero arguments after fmt */

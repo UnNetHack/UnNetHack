@@ -1312,6 +1312,22 @@ swapbits(int val, int bita, int bitb)
     return (val ^ ((tmp << bita) | (tmp << bitb)));
 }
 
+/** Randomize the given list of numbers  0 <= i < count */
+void
+shuffle_int_array(int *indices, int count)
+{
+    int i, iswap, temp;
+
+    for (i = count - 1; i > 0; i--) {
+        if ((iswap = rn2(i + 1)) == i) {
+            continue;
+        }
+        temp = indices[i];
+        indices[i] = indices[iswap];
+        indices[iswap] = temp;
+    }
+}
+
 /** Strip [] from strings like "a [cursed] rusty iron wand" so
  * menucolors regexp can apply.
  * Completely hacky. */

@@ -27,7 +27,6 @@ static void do_class_genocide();
 static void stripspe(struct obj *);
 static void p_glow1(struct obj *);
 static void p_glow2(struct obj *, const char *);
-static void randomize(int *, int);
 static void forget_single_object(int);
 #if 0
 static void forget(int);
@@ -993,24 +992,6 @@ int oclass;
 }
 #endif
 
-
-/* randomize the given list of numbers  0 <= i < count */
-static void
-randomize(int *indices, int count)
-{
-    int i, iswap, temp;
-
-    for (i = count - 1; i > 0; i--) {
-        if ((iswap = rn2(i + 1)) == i) {
-            continue;
-        }
-        temp = indices[i];
-        indices[i] = indices[iswap];
-        indices[iswap] = temp;
-    }
-}
-
-
 /* Forget % of known objects. */
 void
 forget_objects(int percent)
@@ -1035,7 +1016,7 @@ forget_objects(int percent)
     }
 
     if (count > 0) {
-        randomize(indices, count);
+        shuffle_int_array(indices, count);
 
         /* forget first % of randomized indices */
         count = ((count * percent) + rn2(100)) / 100;
@@ -1133,7 +1114,7 @@ forget_levels(int percent)
     }
 
     if (count > 0) {
-        randomize(indices, count);
+        shuffle_int_array(indices, count);
 
         /* forget first % of randomized indices */
         count = ((count * percent) + 50) / 100;

@@ -64,3 +64,5 @@ void reset_commands(boolean b) {}
 char txt2key(char *txt) { return ' '; }
 boolean bind_key(uchar key, const char *command) { return FALSE; }
 boolean bind_specialkey(uchar key, const char *command) { return FALSE; }
+
+int rn2(int r) { return 0; }
