@@ -308,12 +308,13 @@ enum utraptypes {
 };
 
 enum utotypes {
-    UTOTYPE_NONE     = 0x00,
-    UTOTYPE_ATSTAIRS = 0x01,
-    UTOTYPE_FALLING  = 0x02,
-    UTOTYPE_PORTAL   = 0x04,
-    UTOTYPE_RMPORTAL = 0x10, /* remove portal */
-    UTOTYPE_DEFERRED = 0x20  /* deferred_goto */
+    UTOTYPE_NONE         = 0x00,
+    UTOTYPE_ATSTAIRS     = 0x01,
+    UTOTYPE_FALLING      = 0x02,
+    UTOTYPE_PORTAL       = 0x04,
+    UTOTYPE_RMPORTAL     = 0x10, /* remove portal */
+    UTOTYPE_DEFERRED     = 0x20, /* deferred_goto */
+    UTOTYPE_PORTAL_STONE = 0x40
 };
 
 /*
@@ -512,5 +513,11 @@ struct you {
 };  /* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)
+#define Ugender ((Upolyd ? u.mfemale : flags.female) ? 1 : 0)
+
+/* point px,py is adjacent to (or same location as) hero */
+#define next2u(px,py) (distu((px),(py)) <= 2)
+/* hero at (x,y)? */
+#define u_at(x,y) ((x) == u.ux && (y) == u.uy)
 
 #endif  /* YOU_H */

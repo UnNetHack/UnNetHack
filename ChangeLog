@@ -38,6 +38,9 @@
 	  - Support changing key bindings with BIND
 	  - Menucolors management in options menu
 
+	* new items:
+	  - Portal stones
+
 	* item changes:
 	  - Candle light radius is square root, not logarithmic anymore (from NetHack 3.7)
 	  - Wielding Demonbane makes demons angry (from NetHack 3.6)

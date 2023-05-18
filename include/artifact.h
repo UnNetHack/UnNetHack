@@ -85,7 +85,8 @@ enum invoke_prop_types {
     ENLIGHTENING,
     PHASING,
     SMOKE_CLOUD,
-    CREATE_AMMO
+    CREATE_AMMO,
+    BIDIRECTIONAL_PORTAL,
 };
 
 #endif /* ARTIFACT_H */

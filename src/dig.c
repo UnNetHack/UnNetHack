@@ -1065,9 +1065,15 @@ dig_up_grave(coord *cc, enum grave_type type)
             otmp->age -= 100; /* old corpse */
             otmp->corpsenm = PM_DWARF_LORD;
             oname(otmp, "Balin");
+
             /* Durin's Axe */
             otmp = mksobj_at(BATTLE_AXE, dig_x, dig_y, FALSE, FALSE);
             curse(otmp);
+
+            /* the Earthstone */
+            struct obj *obj = mksobj_at(SAPPHIRE, dig_x, dig_y, FALSE, FALSE);
+            oname(obj, artiname(ART_EARTHSTONE));
+
             You("unearth a corpse.");
         }
         break;

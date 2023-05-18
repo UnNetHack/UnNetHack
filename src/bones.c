@@ -69,8 +69,9 @@ resetobjs(struct obj *ochain, boolean restore)
             /* artifact bookkeeping needs to be done during
                restore; other fixups are done while saving */
             if (otmp->oartifact) {
-                if (exist_artifact(otmp->otyp, safe_oname(otmp))
-                    || is_quest_artifact(otmp)) {
+                if (exist_artifact(otmp->otyp, safe_oname(otmp)) ||
+                     is_portal_stone(otmp) ||
+                     is_quest_artifact(otmp)) {
                     /* prevent duplicate--revert to ordinary obj */
                     otmp->oartifact = 0;
                     if (has_oname(otmp)) {

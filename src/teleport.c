@@ -1025,6 +1025,29 @@ dotele(boolean break_the_rules) /**< TRUE: wizard mode ^T */
     return 1;
 }
 
+/** Return a d_level or NULL if no other portal stone portal exists. */
+static d_level *
+random_portal_stone_destination(void)
+{
+    int shuffled[NUM_PORTAL_STONE_TYPE] = { 0, 1, 2 };
+    shuffle_int_array(shuffled, NUM_PORTAL_STONE_TYPE);
+
+    int idx = -1;
+    for (int i = 0; i < NUM_PORTAL_STONE_TYPE; i++) {
+        if ((flags.portal_stone_location[shuffled[i]].dnum != -1) &&
+            (ledger_no(&flags.portal_stone_location[shuffled[i]]) != ledger_no(&u.uz))) {
+            idx = shuffled[i];
+            break;
+        }
+    }
+
+    if (idx >= 0) {
+        return &flags.portal_stone_location[idx];
+    }
+
+    return NULL;
+}
+
 void
 level_tele(void)
 {
@@ -1370,8 +1393,25 @@ domagicportal(struct trap *ttmp)
         return;
     }
 
+    int utotype = UTOTYPE_PORTAL;
     target_level = ttmp->dst;
-    schedule_goto(&target_level, UTOTYPE_PORTAL,
+
+    /* choose a random portal stone destination */
+    boolean portal_stone_portal = ((ttmp->dst.dnum == -1) && (ttmp->dst.dlevel == -1));
+    if (portal_stone_portal) {
+        d_level *dest = random_portal_stone_destination();
+
+        if (dest) {
+            assign_level(&target_level, dest);
+            utotype |= UTOTYPE_PORTAL_STONE;
+        } else {
+            pline("The magic portal is malfunctioning!");
+            tele();
+            return;
+        }
+    }
+
+    schedule_goto(&target_level, utotype,
                   "You feel dizzy for a moment, but the sensation passes.",
                   (char *) 0);
 }
@@ -1693,6 +1733,7 @@ mlevel_tele_trap(struct monst *mtmp, struct trap *trap, boolean force_it, int in
                 get_level(&tolevel, depth(&u.uz) + 1);
             }
         } else if (tt == MAGIC_PORTAL) {
+            boolean portal_stone_portal = ((trap->dst.dnum == -1) && (trap->dst.dlevel == -1));
             if (In_endgame(&u.uz) &&
                 (mon_has_amulet(mtmp) || is_home_elemental(mptr) || rn2(7))) {
                 if (in_sight && mptr->mlet != S_ELEMENTAL) {
@@ -1714,6 +1755,16 @@ mlevel_tele_trap(struct monst *mtmp, struct trap *trap, boolean force_it, int in
                        mtmp->data == &mons[PM_ONE_EYED_SAM]) {
                 return 0;
 #endif /* BLACKMARKET */
+            } else if (portal_stone_portal) {
+                d_level *dst = random_portal_stone_destination();
+
+                if (dst) {
+                    assign_level(&tolevel, dst);
+                    migrate_typ = MIGR_PORTAL;
+                } else {
+                    pline("%s seems to shimmer for a moment.", Monnam(mtmp));
+                    return 0;
+                }
             } else {
                 assign_level(&tolevel, &trap->dst);
                 migrate_typ = MIGR_PORTAL;

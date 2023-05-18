@@ -1388,6 +1388,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
+    boolean portal_stone = (u.utotype & UTOTYPE_PORTAL_STONE);
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel)) {
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1576,10 +1577,18 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
 
         for (ttrap = ftrap; ttrap; ttrap = ttrap->ntrap) {
             /* find the portal with the right destination level */
-            if (ttrap->ttyp == MAGIC_PORTAL &&
-                 u.uz0.dnum == ttrap->dst.dnum &&
-                 u.uz0.dlevel == ttrap->dst.dlevel) {
-                break;
+            if (ttrap->ttyp == MAGIC_PORTAL) {
+                if (u.uz0.dnum == ttrap->dst.dnum &&
+                     u.uz0.dlevel == ttrap->dst.dlevel) {
+                    break;
+                }
+
+                /* finding portal stone portal */
+                if (portal_stone &&
+                     ttrap->dst.dnum == -1 &&
+                     ttrap->dst.dlevel == -1) {
+                    break;
+                }
             }
         }
 

@@ -11,6 +11,14 @@
 
 #include "color.h"
 
+enum portal_stone_type {
+    PORTAL_STONE_EARTH = 0,
+    PORTAL_STONE_MOON,
+    PORTAL_STONE_SUN,
+
+    NUM_PORTAL_STONE_TYPE
+};
+
 /*
  * Persistent flags that are saved and restored with the game.
  *
@@ -201,6 +209,9 @@ struct flag {
     boolean goldX;      /* for BUCX filtering, whether gold is X or U */
 
     int rainbow_shops; /* count generated rainbow shops */
+
+    /* portal stone destinations */
+    d_level portal_stone_location[NUM_PORTAL_STONE_TYPE];
 };
 
 #define marathon_mode flags.marathon

@@ -39,6 +39,7 @@ REGION:(37,08,46,11),lit,"throne"
 MONSTER:('@',"Croesus"),(43,10),hostile {
   OBJECT:(')',"two-handed sword")
   OBJECT:'['
+  OBJECT:('*',"black opal"),blessed,1,name:"The Moonstone"
 }
 #   The Vault
 #   Using unfilled morgue for
@@ -145,6 +146,7 @@ REGION:(57,06,66,09),lit,"throne"
 MONSTER:('@',"Croesus"),(63,08),hostile {
   OBJECT:(')',"two-handed sword")
   OBJECT:'['
+  OBJECT:('*',"black opal"),blessed,1,name:"The Moonstone"
 }
 #   The Vault
 #   Using unfilled morgue for
@@ -257,6 +259,7 @@ REGION:(62,12,75,15),lit,"throne"
 MONSTER:('@',"Croesus"),(66,14),hostile {
   OBJECT:(')',"two-handed sword")
   OBJECT:'['
+  OBJECT:('*',"black opal"),blessed,1,name:"The Moonstone"
 }
 #   The Vault
 #   Using unfilled morgue for

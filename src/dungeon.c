@@ -1093,6 +1093,11 @@ init_dungeons(void)
            so that it's hidden from <ctrl/O> feedback. */
     }
 
+    /* init portal stones location */
+    flags.portal_stone_location[PORTAL_STONE_EARTH] = (d_level) { -1, -1 };
+    flags.portal_stone_location[PORTAL_STONE_MOON]  = (d_level) { -1, -1 };
+    flags.portal_stone_location[PORTAL_STONE_SUN]   = (d_level) { -1, -1 };
+
 #ifdef RANDOMIZED_PLANES
     shuffle_planes();
 #endif
@@ -3176,6 +3181,28 @@ print_mapseen(
         if (mptr->br->end1_up && !In_endgame(&(mptr->br->end2))) {
             Sprintf(eos(buf), ", level %d", depth(&(mptr->br->end2)));
         }
+        if (!dump) {
+            putstr(win, 0, buf);
+        } else {
+#ifdef DUMP_LOG
+            dump_definition_list_dd(buf);
+#endif
+        }
+    }
+
+    int ledger = ledger_no(&mptr->lev);
+    buf[0] = '\0';
+    if ((flags.portal_stone_location[PORTAL_STONE_EARTH].dnum != -1) &&
+         ledger == ledger_no(&flags.portal_stone_location[PORTAL_STONE_EARTH])) {
+        Sprintf(buf, PREFIX "%s", "Earthstone Portal");
+    } else if ((flags.portal_stone_location[PORTAL_STONE_MOON].dnum != -1) &&
+               ledger == ledger_no(&flags.portal_stone_location[PORTAL_STONE_MOON])) {
+        Sprintf(buf, PREFIX "%s", "Moonstone Portal");
+    } else if ((flags.portal_stone_location[PORTAL_STONE_SUN].dnum != -1) &&
+               ledger == ledger_no(&flags.portal_stone_location[PORTAL_STONE_SUN])) {
+        Sprintf(buf, PREFIX "%s", "Sunstone Portal");
+    }
+    if (*buf) {
         if (!dump) {
             putstr(win, 0, buf);
         } else {

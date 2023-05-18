@@ -878,6 +878,18 @@ stock_blkmar(const struct shclass *shp UNUSED, struct mkroom *sroom, int sh)
         }
     }
 
+    /* Placement of the Sunstone */
+    i = 0;
+    do {
+        sx = sroom->lx + rn2(sroom->hx - sroom->lx + 1);
+        sy = sroom->ly + rn2(sroom->hy - sroom->ly + 1);
+        if (isok(sx, sy) && !OBJ_AT(sx, sy)) {
+            struct obj *obj = mksobj_at(DIAMOND, sx, sy, FALSE, FALSE);
+            oname(obj, artiname(ART_SUNSTONE));
+            break;
+        }
+    } while (i++ < 1000);
+
     /*
      * Special monster placements (if any) should go here: that way,
      * monsters will sit on top of objects and not the other way around.

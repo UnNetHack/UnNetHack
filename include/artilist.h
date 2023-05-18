@@ -15,15 +15,16 @@ static const char *artifact_names[] = {
      typ, nam, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, cost,clr        \
  }
 
-#define     NO_ATTK {0, 0, 0, 0}       /* no attack */
-#define     NO_CARY {0, 0, 0, 0}       /* no carry effects */
-#define     CARY(c) {0, c, 0, 0}
-#define     PHYS(a, b)   {0, AD_PHYS, a, b}     /* physical */
-#define     DRLI(a, b)   {0, AD_DRLI, a, b}     /* life drain */
-#define     COLD(a, b)   {0, AD_COLD, a, b}
-#define     FIRE(a, b)   {0, AD_FIRE, a, b}
-#define     ELEC(a, b)   {0, AD_ELEC, a, b}     /* electrical shock */
-#define     STUN(a, b)   {0, AD_STUN, a, b}     /* magical attack */
+#define NO_ATTK    { 0, 0, 0, 0 } /* no attack */
+#define NO_DFNS    { 0, 0, 0, 0 } /* no defense */
+#define NO_CARY    { 0, 0, 0, 0 } /* no carry effects */
+#define CARY(c)    { 0, c, 0, 0 }
+#define PHYS(a, b) { 0, AD_PHYS, a, b } /* physical */
+#define DRLI(a, b) { 0, AD_DRLI, a, b } /* life drain */
+#define COLD(a, b) { 0, AD_COLD, a, b }
+#define FIRE(a, b) { 0, AD_FIRE, a, b }
+#define ELEC(a, b) { 0, AD_ELEC, a, b } /* electrical shock */
+#define STUN(a, b) { 0, AD_STUN, a, b } /* magical attack */
 
 static NEARDATA struct artifact artilist[] = {
 #endif /* MAKEDEFS_C || MDLIB_C */
@@ -285,6 +286,27 @@ static NEARDATA struct artifact artilist[] = {
             (SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL),
             (SPFX_EREGEN | SPFX_HSPDAM), 0, NO_ATTK, SPDF_NONE, CARY(AD_MAGM), CREATE_PORTAL, A_NEUTRAL, PM_WIZARD, NON_PM,
             4000L, NO_COLOR),
+
+    A("The Earthstone", SAPPHIRE,
+            (SPFX_NOGEN),
+            0, 0,
+            NO_ATTK, SPDF_NONE, NO_CARY,
+            BIDIRECTIONAL_PORTAL, A_NEUTRAL, NON_PM, NON_PM,
+            7000L, NO_COLOR),
+
+    A("The Moonstone", BLACK_OPAL,
+            (SPFX_NOGEN),
+            0, 0,
+            NO_ATTK, SPDF_NONE, NO_CARY,
+            BIDIRECTIONAL_PORTAL, A_CHAOTIC, NON_PM, NON_PM,
+            8000L, NO_COLOR),
+
+    A("The Sunstone", DIAMOND,
+            (SPFX_NOGEN),
+            0, 0,
+            NO_ATTK, SPDF_NONE, NO_CARY,
+            BIDIRECTIONAL_PORTAL, A_LAWFUL, NON_PM, NON_PM,
+            9000L, NO_COLOR),
 
     /*
      *  terminator; otyp must be zero

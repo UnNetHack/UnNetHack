@@ -1732,6 +1732,41 @@ doinvoke(void)
     return arti_invoke(obj);
 }
 
+static boolean
+find_portal_location(coordxy *portal_x, coordxy *portal_y)
+{
+    /* collect all suitable locations for magic portal placement */
+    coordxy x, y;
+    coord locations[9] = { 0 };
+    int i = 0;
+    for (x = u.ux - 1; x <= u.ux + 1; x++) {
+        for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            if (!isok(x, y) || u_at(x, y)) {
+                continue;
+            }
+            if (levl[x][y].typ != ROOM && levl[x][y].typ != CORR) {
+                continue;
+            }
+            if (t_at(x, y)) {
+                continue;
+            }
+            locations[i++] = (coord) { x, y };
+        }
+    }
+
+    /* no suitable locations */
+    if (i == 0) {
+        return FALSE;
+    }
+
+    /* choose a random location */
+    int idx = rn2(i);
+    *portal_x = locations[idx].x;
+    *portal_y = locations[idx].y;
+
+    return TRUE;
+}
+
 static int
 arti_invoke(struct obj *obj)
 {
@@ -2000,6 +2035,46 @@ arti_invoke(struct obj *obj)
             incr_itimeout(&Phasing, (50 + rnd(100)));
             obj->age += Phasing; /* Time begins after phasing ends */
             break;
+
+        case BIDIRECTIONAL_PORTAL:
+            if (level.flags.noteleport) {
+                /* no portal on noteleport levels */
+                pline("%s", nothing_happens);
+                break;
+            }
+
+            coordxy portal_x, portal_y;
+            if (!find_portal_location(&portal_x, &portal_y)) {
+                /* if no location found, get hot and player has to drop it.*/
+                pline("%s %s hot!", Ysimple_name2(obj), otense(obj, "grow"));
+                You("drop %s.", ysimple_name(obj));
+                obj_extract_self(obj);
+                dropz(obj, TRUE);
+            } else {
+                if (Blind) {
+                    pline("%s starts throbbing!", Ysimple_name2(obj));
+                } else {
+                    pline("%s starts pulsating and transforms into a magic portal!",
+                          Ysimple_name2(obj));
+                }
+
+                /* set portal info */
+                int idx = obj->oartifact - ART_EARTHSTONE;
+                flags.portal_stone_location[idx].dnum   = u.uz.dnum;
+                flags.portal_stone_location[idx].dlevel = u.uz.dlevel;
+#if 0
+                /* extract portal stone and bury it under the portal */
+                obj_extract_self(obj);
+                obj->ox = portal_x; obj->oy = portal_y;
+                add_to_buried(obj);
+#else
+                useup(obj);
+#endif
+                /* create portal */
+                mkportal(portal_x, portal_y, -1, -1);
+                struct trap *portal = t_at(portal_x, portal_y);
+                seetrap(portal);
+            }
         }
     } else {
         long eprop = (u.uprops[oart->inv_prop].extrinsic ^= W_ARTI),

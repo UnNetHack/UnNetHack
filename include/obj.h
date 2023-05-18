@@ -210,6 +210,9 @@ struct obj {
 
 /* 'is_quest_artifact()' only applies to the current role's artifact */
 #define any_quest_artifact(o) ((o)->oartifact >= ART_ITLACHIAYAQUE)
+#define is_portal_stone(o) ((o)->oartifact == ART_EARTHSTONE && \
+                            (o)->oartifact == ART_MOONSTONE && \
+                            (o)->oartifact == ART_SUNSTONE)
 
 /* Armor */
 #define is_shield(otmp) (otmp->oclass == ARMOR_CLASS && \

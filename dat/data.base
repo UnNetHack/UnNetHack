@@ -1,4 +1,3 @@
-#	SCCS Id: @(#)data.base	3.4	2003/07/23
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	Copyright (c) 2002 by the Slash'EM Development Team
@@ -4202,6 +4201,15 @@ pony
 	continent and to and from our own world.  The precise manner
 	of their working is a Management secret.
 	[ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+portal stone*
+earthstone
+moonstone
+sunstone
+	Portal stones are enigmatic magical artifacts of unknown ancient origins.
+	When invoked, these mystical devices unleash a powerful surge of magic
+	capable of tearing through the fabric of space-time, thereby creating
+	gateways leading to other realms, dimensions, or locations linked to
+	previously activated portal stones.
 poseido*n
 	Poseido(o)n, lord of the seas and father of rivers and
 	fountains, was the son of Chronos and Rhea, brother of Zeus,
