@@ -1,86 +1,99 @@
+# NetHack may be freely redistributed.  See license for details.
 #
 # Nymph level
 #
-
 LEVEL: "nymph"
-ROOM: "ordinary", unlit, random, random, (12,7)
-{
-TRAP:"board",random
-TRAP:"board",random
-[10%]: TERRAIN: random, 'T'
-[50%]: TERRAIN: random, 'T'
-OBJECT:('(',"chest"),random
-OBJECT:('(',"chest"),random
-OBJECT:('(',"chest"),random
-OBJECT:('(',"chest"),random
+FLAGS: noflip
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+MAP
+----------------M}}}}}}}}}}}}}----------------------------------------------
+|..............|M}}}}}}}}}}}}--...-------.......----....------.....---.-----
+|..............|M}}}}}}}}}}---.....---.....................--..........-----
+|..............|M}}}}}}}}---.............................................---
+---+------------M}}}}}}---.................................................-
+   #           }}}}}}}--..................................................--
+   #          }}}}}----...................................................--
+   #         }}}}}}-......................................................--
+   #         }}}}}--..................................................T.T..-
+   ##       }}}}}--....................................................T...-
+    #      }}}}}}-.......................................................{.-
+    #   #########......................................................T...-
+    #####  }}}}}}-....................................................T.T..-
+    #       }}}}}-.........................................................-
+    #        }}}}--.......................................................--
+    #        }}}}}-.......................................................--
+----+---------M}}}--......................................................--
+|............|M}}}}-........................................------........--
+|............|M}}}}--...................----..............---------.....----
+|............|M}}}}}------.....-----...------------......----------....-----
+--------------M}}}}}}}}-----------------------------------------------------
+ENDMAP
+
+# two rooms that allow the player to almost completely avoid the nymphs
+REGION:(01,01,15,03),random,"ordinary",irregular,filled
+STAIR:levregion(01,00,15,04),(0,0,0,0),up
+DOOR: random, (03,04)
+
+REGION:(01,17,13,20),random,"ordinary",irregular,filled
+STAIR:levregion(01,17,13,20),(0,0,0,0),down
+DOOR: random, (04,16)
+
+# some variation for the waterline
+REPLACE_TERRAIN:(11,05,11,15),'}','M',60%
+REPLACE_TERRAIN:(12,05,12,15),'}','M',60%
+REPLACE_TERRAIN:(13,05,13,15),'}','M',20%
+REPLACE_TERRAIN:(14,05,14,15),'}','M',40%
+
+# swamps right of the two rooms
+REPLACE_TERRAIN:(16,00,16,04),'M','}',30%
+REPLACE_TERRAIN:(14,16,14,21),'M','}',30%
+
+# Aphrodite and her throne
+REGION:(71,10,71,10),lit,"throne"
+MONSTER:('n',"Aphrodite"), (71,10), hostile
+# some of Aphrodite's followers can be outside of the cavern
+LOOP [4] {
+  MONSTER: 'n', random, hostile
+}
+
+# spread some trees and swamps around
+REPLACE_TERRAIN:(18,00,74,19),'.','T',3%
+REPLACE_TERRAIN:(18,00,74,19),'.','M',2%
+
+# squeaky board at the entrance of the cavern
+TRAP:"board",(17,11)
+LOOP [1d6 + 10] {
+  OBJECT:'*', random
+}
 OBJECT:'=', random
-OBJECT:'=', random
-OBJECT:'=', random
-OBJECT:'=', random
-OBJECT:'*', random
-OBJECT:'*', random
-OBJECT:'*', random
-OBJECT:'*', random
-OBJECT:'*', random
+OBJECT:('(',"chest"),random
 OBJECT:random, random
-OBJECT:random, random
-OBJECT:random, random
-OBJECT:random, random
-MONSTER: 'n', random, hostile
-MONSTER: 'n', random, hostile
-MONSTER: 'n', random, hostile
-MONSTER: 'n', random, hostile
-MONSTER: 'n', random, hostile
-MONSTER:('n',"Aphrodite"), random, hostile
-}
-
-ROOM: "ordinary", random, random, random, random
-{
-STAIR: random, up
+TRAP:random, random
 TRAP:"board",random
-OBJECT:random,random
-MONSTER: 'n', random, hostile
-TERRAIN: random, 'T'
-[50%]: TERRAIN: random, 'T'
-}
+OBJECT:"apple",random
 
-ROOM: "ordinary", random, random, random, random
-{
-STAIR: random, down
-TRAP:"board",random
-OBJECT:random, random
-TRAP: random, random
-MONSTER: 'n', random, hostile
-[30%]: TERRAIN: random, 'T'
-[50%]: TERRAIN: random, 'T'
+# Aphrodite's cavern
+REGION:(50,10,50,10),lit,"ordinary",filled,irregular {
+  # Aphrodite's followers
+  LOOP [16] {
+    MONSTER: 'n', random, hostile
+  }
+  LOOP [1d3 + 3] {
+    FOUNTAIN: random
+  }
+  LOOP [1d4 + 2] {
+    OBJECT:'=', random
+    OBJECT:('(',"chest"),random
+  }
+  LOOP [1d4 + 8] {
+    OBJECT:random, random
+  }
+  LOOP [1d4 + 4] {
+    TRAP:random, random
+  }
+  LOOP [1d4 + 10] {
+    TRAP:"board",random
+    OBJECT:"apple",random
+  }
 }
-
-ROOM: "ordinary", random, random, random, random
-{
-TRAP:"board",random
-OBJECT:random, random
-OBJECT:random, random
-MONSTER: 'n', random, hostile
-[20%]: TERRAIN: random, 'T'
-[50%]: TERRAIN: random, 'T'
-}
-
-ROOM: "ordinary", random, random, random, random
-{
-TRAP:"board",random
-OBJECT:random, random
-TRAP: random, random
-MONSTER: 'n', random, hostile
-[50%]: TERRAIN: random, 'T'
-[5%]: TERRAIN: random, 't'
-}
-
-ROOM: "ordinary", random, random, random, random
-{
-TRAP:"board",random
-OBJECT:random, random
-TRAP: random, random
-MONSTER: 'n', random, hostile
-}
-
-RANDOM_CORRIDORS
