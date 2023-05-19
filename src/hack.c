@@ -4196,7 +4196,7 @@ weight_cap(void)
         float_vs_flight();
     }
 
-    return (int) carrcap;
+    return (int) carrcap * 2;
 }
 
 static int wc;  /* current weight_cap(); valid after call to inv_weight() */
