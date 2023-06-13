@@ -246,7 +246,7 @@ map_trap(struct trap *trap, int show)
 void
 map_object(struct obj *obj, int show)
 {
-    int x = obj->ox, y = obj->oy;
+    coordxy x = obj->ox, y = obj->oy;
     int glyph = obj_to_glyph(obj);
 
     assert_valid_coordinates(x, y);
