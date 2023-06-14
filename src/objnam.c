@@ -955,7 +955,9 @@ add_erosion_words(struct obj *obj, char *prefix, boolean in_final_dump)
         case 2: Strcat(prefix, "very "); break;
         case 3: Strcat(prefix, "thoroughly "); break;
         }
-        Strcat(prefix, is_rustprone(obj) ? "rusty " : "burnt ");
+        Strcat(prefix, is_rustprone(obj) ? "rusty " :
+               is_crackable(obj) ? "cracked " :
+               "burnt ");
     }
     if (obj->oeroded2 && !iscrys) {
         switch (obj->oeroded2) {
@@ -965,13 +967,18 @@ add_erosion_words(struct obj *obj, char *prefix, boolean in_final_dump)
         Strcat(prefix, is_corrodeable(obj) ? "corroded " :
                "rotted ");
     }
+
+    /* note: it is possible for an item to be both eroded and erodeproof
+       (cursed scroll of destroy armor read while confused erodeproofs an
+       item of armor without repairing existing erosion) */
     if (obj->oerodeproof && (in_final_dump || rknown)) {
         Sprintf(eos(prefix), "%s%s%s ",
                 rknown ? "" : "[",
                 iscrys ? "fixed" :
                 is_rustprone(obj) ? "rustproof" :
                 is_corrodeable(obj) ? "corrodeproof" : /* "stainless"? */
-                is_flammable(obj) ? "fireproof" : "",
+                is_flammable(obj) ? "fireproof" :
+                is_crackable(obj) ? "tempered" : "", /* hardened */
                 rknown ? "" : "]");
     }
 }
@@ -1709,12 +1716,11 @@ not_fully_identified(struct obj *otmp)
     if (otmp->rknown || (otmp->oclass != ARMOR_CLASS &&
                          otmp->oclass != WEAPON_CLASS &&
                          !is_weptool(otmp) && /* (redunant) */
-                         otmp->oclass != BALL_CLASS)) /* (useless) */
+                         otmp->oclass != BALL_CLASS)) { /* (useless) */
         return FALSE;
-    else    /* lack of `rknown' only matters for vulnerable objects */
-        return (boolean)(is_rustprone(otmp) ||
-                         is_corrodeable(otmp) ||
-                         is_flammable(otmp));
+    } else { /* lack of `rknown' only matters for vulnerable objects */
+        return (boolean) is_damageable(otmp);
+    }
 }
 
 /** format a corpse name (xname() omits monster type; doname() calls us);
@@ -3563,8 +3569,8 @@ readobjnam(char *bp, struct obj *no_wish)
                 bp++;
             }
             l = 0;
-        } else if (!strncmpi(bp, "blessed ", l=8) ||
-                   !strncmpi(bp, "holy ", l=5)) {
+        } else if (!strncmpi(bp, "blessed ", l = 8) ||
+                   !strncmpi(bp, "holy ", l = 5)) {
             blessed = 1;
         } else if (!strncmpi(bp, "moist ", l = 6) ||
                    !strncmpi(bp, "wet ", l = 4)) {
@@ -3582,12 +3588,14 @@ readobjnam(char *bp, struct obj *no_wish)
         } else if (!strncmpi(bp, "invisible ", l=10)) {
             isinvisible = 1;
 #endif
-        } else if (!strncmpi(bp, "rustproof ", l=10) ||
-                   !strncmpi(bp, "erodeproof ", l=11) ||
-                   !strncmpi(bp, "corrodeproof ", l=13) ||
-                   !strncmpi(bp, "fixed ", l=6) ||
-                   !strncmpi(bp, "fireproof ", l=10) ||
-                   !strncmpi(bp, "rotproof ", l=9)) {
+        } else if (!strncmpi(bp, "rustproof ", l = 10) ||
+                   !strncmpi(bp, "erodeproof ", l = 11) ||
+                   !strncmpi(bp, "corrodeproof ", l = 13) ||
+                   !strncmpi(bp, "fixed ", l = 6) ||
+                   !strncmpi(bp, "fireproof ", l = 10) ||
+                   !strncmpi(bp, "rotproof ", l = 9) ||
+                   !strncmpi(bp, "tempered ", l = 9) ||
+                   !strncmpi(bp, "crackproof ", l = 11)) {
             erodeproof = 1;
         } else if (!strncmpi(bp, "lit ", l=4) ||
                    !strncmpi(bp, "burning ", l=8)) {
@@ -3633,10 +3641,11 @@ readobjnam(char *bp, struct obj *no_wish)
             very = 1;
         } else if (!strncmpi(bp, "thoroughly ", l=11)) {
             very = 2;
-        } else if (!strncmpi(bp, "rusty ", l=6) ||
-                   !strncmpi(bp, "rusted ", l=7) ||
-                   !strncmpi(bp, "burnt ", l=6) ||
-                   !strncmpi(bp, "burned ", l=7)) {
+        } else if (!strncmpi(bp, "rusty ", l = 6) ||
+                   !strncmpi(bp, "rusted ", l = 7) ||
+                   !strncmpi(bp, "burnt ", l = 6) ||
+                   !strncmpi(bp, "burned ", l = 7) ||
+                   !strncmpi(bp, "cracked ", l = 8)) {
             eroded = 1 + very;
             very = 0;
         } else if (!strncmpi(bp, "corroded ", l=9) ||
@@ -4694,7 +4703,10 @@ typfnd:
 
     /* set eroded and erodeproof */
     if (erosion_matters(otmp)) {
-        if (eroded && (is_flammable(otmp) || is_rustprone(otmp))) {
+        /* wished-for item shouldn't be eroded unless specified */
+        otmp->oeroded = otmp->oeroded2 = 0;
+        if (eroded && (is_flammable(otmp) || is_rustprone(otmp) ||
+                        is_crackable(otmp))) {
             otmp->oeroded = eroded;
         }
         if (eroded2 && (is_corrodeable(otmp) || is_rottable(otmp))) {

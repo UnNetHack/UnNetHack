@@ -595,7 +595,7 @@ extern int omon_adj(struct monst *, struct obj *, boolean);
 extern int thitmonst(struct monst *, struct obj *);
 extern int hero_breaks(struct obj *, coordxy, coordxy, boolean);
 extern int breaks(struct obj *, coordxy, coordxy);
-extern void breakobj(struct obj *, coordxy, coordxy, boolean, boolean);
+extern int breakobj(struct obj *, coordxy, coordxy, boolean, boolean) NONNULLARG1;
 extern boolean breaktest(struct obj *);
 extern boolean walk_path(coord *, coord *, boolean (*)(genericptr_t, coordxy, coordxy), genericptr_t);
 extern boolean hurtle_jump(void *, coordxy, coordxy);
@@ -1936,6 +1936,7 @@ extern int rnd_class(int, int);
 /* discover_object() passes NULL arg2 to Japanese_item_name(),
  * preventing NONNULLARG2 */
 extern const char *Japanese_item_name(int, const char *) NO_NNARGS;
+extern const char *armor_simple_name(struct obj *) NONNULL NONNULLARG1;
 extern const char *suit_simple_name(struct obj *);
 extern const char *cloak_simple_name(struct obj *);
 extern const char *helm_simple_name(struct obj *);

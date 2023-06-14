@@ -72,12 +72,18 @@ struct objclass {
 /* primary damage: fire/rust/--- */
 /* is_flammable(otmp), is_rottable(otmp) in mkobj.c */
 #define is_rustprone(otmp)  (objects[otmp->otyp].oc_material == IRON)
+#define is_crackable(otmp) \
+    (objects[(otmp)->otyp].oc_material == GLASS         \
+     && (otmp)->oclass == ARMOR_CLASS) /* erosion_matters() */
 
 /* secondary damage: rot/acid/acid */
 #define is_corrodeable(otmp)    (objects[otmp->otyp].oc_material == COPPER || objects[otmp->otyp].oc_material == IRON)
 
-#define is_damageable(otmp) (is_rustprone(otmp) || is_flammable(otmp) || \
-                             is_rottable(otmp) || is_corrodeable(otmp))
+/* subject to any damage */
+#define is_damageable(otmp) \
+    (is_rustprone(otmp) || is_flammable(otmp)           \
+     || is_rottable(otmp) || is_corrodeable(otmp)       \
+     || is_crackable(otmp))
 
     schar oc_subtyp;
 #define oc_skill    oc_subtyp   /* Skills of weapons, spellbooks, tools, gems */

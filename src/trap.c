@@ -134,9 +134,9 @@ burnarmor(struct monst *victim)
 int
 erode_obj(struct obj *otmp, const char *ostr, int type, int ef_flags)
 {
-    static NEARDATA const char *const action[] = { "smoulder", "rust", "rot", "corrode" };
-    static NEARDATA const char *const msg[] =    { "burnt", "rusted", "rotten", "corroded" };
-    static NEARDATA const char *const bythe[] =  { "heat", "oxidation", "decay", "corrosion" };
+    static const char *const action[] = { "smoulder", "rust", "rot", "corrode", "crack" };
+    static const char *const msg[] =    { "burnt", "rusted", "rotten", "corroded", "cracked" };
+    static const char *const bythe[] =  { "heat", "oxidation", "decay", "corrosion", "impact" };
     boolean vulnerable = FALSE, is_primary = TRUE;
     boolean check_grease = (ef_flags & EF_GREASE);
     boolean print = (ef_flags & EF_VERBOSE);
@@ -174,6 +174,11 @@ erode_obj(struct obj *otmp, const char *ostr, int type, int ef_flags)
         vulnerable = is_corrodeable(otmp);
         is_primary = FALSE;
         cost_type = COST_CORRODE;
+        break;
+    case ERODE_CRACK: /* crystal armor */
+        vulnerable = is_crackable(otmp);
+        is_primary = TRUE;
+        cost_type = COST_CRACK;
         break;
     default:
         impossible("Invalid erosion type in erode_obj");
@@ -253,12 +258,19 @@ erode_obj(struct obj *otmp, const char *ostr, int type, int ef_flags)
 
     } else if (ef_flags & EF_DESTROY) {
         if (uvictim || vismon || visobj) {
-            pline("%s %s %s away!",
-                  uvictim ? "Your" :
-                  !vismon ? "The" : s_suffix(Monnam(victim)),
-                  ostr, vtense(ostr, action[type]));
-        }
+            char actbuf[BUFSZ];
 
+            if (cost_type != COST_CRACK) {
+                Sprintf(actbuf, "%s away", vtense(ostr, action[type]));
+            } else {
+                Sprintf(actbuf, "shatters");
+            }
+            pline("%s %s %s!",
+                  uvictim ? "Your" :
+                  !vismon ? "The" : /* visobj */
+                   s_suffix(Monnam(victim)),
+                  ostr, actbuf);
+        }
         if (ef_flags & EF_PAY) {
             costly_alteration(otmp, cost_type);
         }

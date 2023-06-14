@@ -721,7 +721,7 @@ bill_dummy_object(struct obj *otmp)
 static const char *const alteration_verbs[] = {
     "cancel", "drain", "uncharge", "unbless", "uncurse", "disenchant",
     "degrade", "dilute", "erase", "burn", "neutralize", "destroy", "splatter",
-    "bite", "open", "break the lock on", "rust", "rot", "tarnish",
+    "bite", "open", "break the lock on", "rust", "rot", "tarnish", "crack",
     "dissolve", "transform"
 };
 

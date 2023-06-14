@@ -120,8 +120,9 @@ enum cost_alteration_types {
     COST_RUST      = 16, /* rust damage */
     COST_ROT       = 17, /* rotting attack */
     COST_CORRODE   = 18, /* acid damage */
-    COST_DISSOLVE  = 19, /* dissolved in acid */
-    COST_TRANSFORM = 20, /* transformed in some way */
+    COST_CRACK     = 19, /* damage to crystal armor */
+    COST_DISSOLVE  = 20, /* dissolved in acid */
+    COST_TRANSFORM = 21, /* transformed in some way */
 };
 
 /* used by unpaid_cost(shk.h) */

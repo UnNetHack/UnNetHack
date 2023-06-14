@@ -2896,8 +2896,8 @@ dip(struct obj *potion, struct obj *obj)
         } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {
             /* the following cases apply only to weapons */
             goto more_dips;
-            /* Oil removes rust and corrosion, but doesn't unburn.
-             * Arrows, etc are classed as metallic due to arrowhead
+            /* Oil removes rust and corrosion, but doesn't unburn or repair
+             * cracks.  Arrows, etc are classed as metallic due to arrowhead
              * material, but dipping in oil shouldn't repair them.
              */
         } else if ((!is_rustprone(obj) && !is_corrodeable(obj)) ||
