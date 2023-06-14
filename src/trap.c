@@ -1061,7 +1061,7 @@ dotrap(struct trap *trap, unsigned int trflags)
                   body_part(HEAD));
 
             if (uarmh) {
-                if (is_metallic(uarmh)) {
+                if (hard_helmet(uarmh)) {
                     pline("Fortunately, you are wearing a hard helmet.");
                     dmg = 2;
                 } else if (flags.verbose) {

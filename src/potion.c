@@ -1103,7 +1103,7 @@ peffects(struct obj *otmp)
                    resulted in incrementing 'nothing' */
                 nothing = 0; /* not nothing after all */
             } else if (has_ceiling(&u.uz)) {
-                int dmg = rnd(!uarmh ? 10 : !is_metallic(uarmh) ? 6 : 3);
+                int dmg = rnd(!uarmh ? 10 : !hard_helmet(uarmh) ? 6 : 3);
 
                 You("hit your %s on the %s.", body_part(HEAD), ceiling(u.ux, u.uy));
                 losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling", KILLED_BY);

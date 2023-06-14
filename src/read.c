@@ -3216,7 +3216,7 @@ drop_boulder_on_player(
         You("are hit by %s!", doname(otmp2));
         dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
         if (uarmh && helmet_protects) {
-            if (is_metallic(uarmh)) {
+            if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 if (dmg > 2) {
                     dmg = 2;
@@ -3287,7 +3287,7 @@ drop_boulder_on_monster(
         }
         mdmg = dmgval(otmp2, mtmp2) * otmp2->quan;
         if (helmet) {
-            if (is_metallic(helmet)) {
+            if (hard_helmet(helmet)) {
                 if (canspotmon(mtmp2)) {
                     pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp2));
                 } else if (flags.soundok) {

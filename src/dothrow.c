@@ -1126,7 +1126,8 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, FALSE);
         thrownobj = 0;
     } else { /* neither potion nor other breaking object */
-        boolean less_damage = uarmh && is_metallic(uarmh), artimsg = FALSE;
+        boolean less_damage = uarmh && hard_helmet(uarmh);
+        boolean artimsg = FALSE;
         int dmg = dmgval(obj, &youmonst);
 
         if (obj->oartifact) {

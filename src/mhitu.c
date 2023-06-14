@@ -488,8 +488,9 @@ mattacku(struct monst *mtmp)
             }
 
             obj = which_armor(mtmp, WORN_HELMET);
-            if (obj && is_metallic(obj)) {
-                Your("blow glances off %s %s.", s_suffix(mon_nam(mtmp)), helm_simple_name(obj));
+            if (hard_helmet(obj)) {
+                Your("blow glances off %s %s.", s_suffix(mon_nam(mtmp)),
+                     helm_simple_name(obj));
             } else {
                 if (3 + find_mac(mtmp) <= rnd(20)) {
                     pline("%s is hit by a falling piercer (you)!",
