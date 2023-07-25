@@ -1139,6 +1139,9 @@ curses_debug_show_colors(void)
     int colors = tgetnum("Co");
     snprintf(buf, BUFSZ, "%s %d %s", getenv("TERM"), colors, colorterm ? colorterm : "");
     putstr(tmpwin, 0, buf);
+    /* output relevant env variables for setlocale */
+    snprintf(buf, BUFSZ, "%s %s %s", getenv("LC_ALL"), getenv("LC_CTYPE"), getenv("LANG"));
+    putstr(tmpwin, 0, buf);
     putstr(tmpwin, 0, "");
 
     for (c = 0; c < CLR_MAX; c++) {
