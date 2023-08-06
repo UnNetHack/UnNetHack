@@ -7,6 +7,7 @@ static boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
 static boolean teleok(coordxy, coordxy, boolean);
 static void vault_tele(void);
 static boolean rloc_pos_ok(coordxy, coordxy, struct monst *);
+static void rloc_to_core(struct monst *, coordxy, coordxy, unsigned);
 static void mvault_tele(struct monst *);
 
 /* non-null when teleporting via having read this scroll */
@@ -1468,13 +1469,13 @@ level_tele_trap(struct trap *trap, unsigned int trflags)
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
 static boolean
-rloc_pos_ok(coordxy x, coordxy y, struct monst *mtmp)
-                   /* coordinates of candidate location */
-
+rloc_pos_ok(
+    coordxy x, coordxy y, /**< coordinates of candidate location */
+    struct monst *mtmp)
 {
-    int xx, yy;
+    coordxy xx, yy;
 
-    if (!goodpos(x, y, mtmp, 0)) {
+    if (!goodpos(x, y, mtmp, GP_CHECKSCARY)) {
         return FALSE;
     }
     /*
@@ -1533,22 +1534,43 @@ rloc_pos_ok(coordxy x, coordxy y, struct monst *mtmp)
  * rloc_to()
  *
  * Pulls a monster from its current position and places a monster at
- * a new x and y.  If oldx is 0, then the monster was not in the levels.monsters
- * array.  However, if oldx is 0, oldy may still have a value because mtmp is a
- * migrating_mon.  Worm tails are always placed randomly around the head of
- * the worm.
+ * a new x and y.  If oldx is 0, then the monster was not in the
+ * levels.monsters array.  However, if oldx is 0, oldy may still have
+ * a value because mtmp is a migrating_mon.  Worm tails are always
+ * placed randomly around the head of the worm.
  */
-void
-rloc_to(struct monst *mtmp, coordxy x, coordxy y)
+static void
+rloc_to_core(
+    struct monst *mtmp,
+    coordxy x, coordxy y,
+    unsigned rlocflags)
 {
-    int oldx = mtmp->mx, oldy = mtmp->my;
+    coordxy oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
+    boolean preventmsg = (rlocflags & RLOC_NOMSG) != 0;
+    boolean vanishmsg = (rlocflags & RLOC_MSG) != 0;
+    boolean appearmsg = (mtmp->mstrategy & STRAT_APPEARMSG) != 0;
+    boolean domsg = !in_mklev && (vanishmsg || appearmsg) && !preventmsg;
+    boolean telemsg = FALSE;
 
     if (x == mtmp->mx && y == mtmp->my && m_at(x, y) == mtmp) {
         return; /* that was easy */
     }
 
     if (oldx) { /* "pick up" monster */
+        if (domsg && canspotmon(mtmp)) {
+            if (couldsee(x, y) || sensemon(mtmp)) {
+                telemsg = TRUE;
+            } else {
+                pline("%s vanishes!", Monnam(mtmp));
+            }
+            /* avoid "It suddenly appears!" for a STRAT_APPEARMSG monster
+               that has just teleported away if we won't see it after this
+               vanishing (the regular appears message will be given if we
+               do see it) */
+            appearmsg = FALSE;
+        }
+
         if (mtmp->wormno) {
             remove_worm(mtmp);
         } else {
@@ -1557,7 +1579,7 @@ rloc_to(struct monst *mtmp, coordxy x, coordxy y)
         }
     }
 
-    memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
+    mon_track_clear(mtmp);
     place_monster(mtmp, x, y); /* put monster down */
     update_monster_region(mtmp);
 
@@ -1575,8 +1597,32 @@ rloc_to(struct monst *mtmp, coordxy x, coordxy y)
         }
     }
 
+    maybe_unhide_at(x, y);
     newsym(x, y);      /* update new location */
     set_apparxy(mtmp); /* orient monster */
+
+    if (domsg && (canspotmon(mtmp) || appearmsg)) {
+        int du = distu(x, y), olddu;
+        const char *next = (du <= 2) ? " next to you" : 0, /* next2u() */
+                   *nearu = (du <= BOLT_LIM * BOLT_LIM) ? " close by" : 0;
+
+        mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
+        if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
+            pline("%s vanishes and reappears%s.",
+                  Monnam(mtmp),
+                  next ? next :
+                  nearu ? nearu :
+                  ((olddu = distu(oldx, oldy)) == du) ? "" :
+                  (du < olddu) ? " closer to you" : " farther away");
+        } else {
+            pline("%s %s%s%s!",
+                  appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
+                  appearmsg ? "suddenly " : "",
+                  !Blind ? "appears" : "arrives",
+                  next ? next :
+                  nearu ? nearu : "");
+        }
+    }
 
     /* shopkeepers will only teleport if you zap them with a wand of
        teleportation or if they've been transformed into a jumpy monster;
@@ -1584,14 +1630,58 @@ rloc_to(struct monst *mtmp, coordxy x, coordxy y)
     if (resident_shk && !inhishop(mtmp)) {
         make_angry_shk(mtmp, oldx, oldy);
     }
+
+    /* if a monster carrying shop goods teleports out of the shop, blame
+       it on the hero; chance of an unpaid item is vanishingly small, but
+       no_charge is easily possible and needs to be cleared if not in shop;
+       a for-sale item is ordinary here--shk won't notice it leaving; if
+       mtmp teleports from one shop into another, no_charge status sticks
+       and an item on the first shk's bill stays there */
+    if (mtmp->minvent && !costly_spot(x, y)) {
+        struct obj *otmp;
+        struct monst *shkp = find_objowner(mtmp->minvent, oldx, oldy);
+        boolean peaceful = !shkp || shkp->mpeaceful;
+
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
+            if (otmp->no_charge)
+                otmp->no_charge = 0;
+            else if (shkp && onshopbill(otmp, shkp, TRUE))
+                stolen_value(otmp, oldx, oldy, peaceful, FALSE);
+        }
+    }
+
+    /* if hero is busy, maybe stop occupation */
+    if (occupation) {
+        (void) dochugw(mtmp);
+    }
+
+    /* trapped monster teleported away */
+    if (mtmp->mtrapped && !mtmp->wormno) {
+        (void) mintrap(mtmp, NO_TRAP_FLAGS);
+    }
 }
 
-/* place a monster at a random location, typically due to teleport */
-/* return TRUE if successful, FALSE if not */
-boolean
-rloc(struct monst *mtmp, boolean suppress_impossible)
-                    /* mx==0 implies migrating monster arrival */
+void
+rloc_to(struct monst *mtmp, coordxy x, coordxy y)
+{
+    rloc_to_core(mtmp, x, y, RLOC_NOMSG);
+}
 
+void
+rloc_to_flag(
+    struct monst *mtmp,
+    coordxy x, coordxy y,
+    unsigned rlocflags)
+{
+    rloc_to_core(mtmp, x, y, rlocflags);
+}
+
+/* place a monster at a random location, typically due to teleport;
+   return TRUE if successful, FALSE if not; rlocflags is RLOC_foo flags */
+boolean
+rloc(
+    struct monst *mtmp, /**< mtmp->mx==0 implies migrating monster arrival */
+    unsigned rlocflags)
 {
     int x, y, trycount;
 
@@ -1636,13 +1726,13 @@ rloc(struct monst *mtmp, boolean suppress_impossible)
     }
 
     /* level either full of monsters or somehow faulty */
-    if (!suppress_impossible) {
+    if ((rlocflags & RLOC_ERR) != 0) {
         warning("rloc(): couldn't relocate monster");
     }
     return FALSE;
 
 found_xy:
-    rloc_to(mtmp, x, y);
+    rloc_to_core(mtmp, x, y, rlocflags);
     return TRUE;
 }
 
@@ -1657,7 +1747,7 @@ mvault_tele(struct monst *mtmp)
         rloc_to(mtmp, c.x, c.y);
         return;
     }
-    (void) rloc(mtmp, TRUE);
+    (void) rloc(mtmp, RLOC_NONE);
 }
 
 boolean
@@ -1692,7 +1782,7 @@ mtele_trap(struct monst *mtmp, struct trap *trap, int in_sight)
         if (trap->once) {
             mvault_tele(mtmp);
         } else {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_NONE);
         }
 
         if (in_sight) {
@@ -1979,7 +2069,7 @@ u_teleport_mon(struct monst *mtmp, boolean give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         }
         unstuck(mtmp);
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, RLOC_MSG);
 #ifdef BLACKMARKET
     } else if (((mtmp->data == &mons[PM_BLACK_MARKETEER] && rn2(5)) ||
                 (mtmp->data == &mons[PM_ONE_EYED_SAM] && rn2(13))) &&
@@ -1991,7 +2081,7 @@ u_teleport_mon(struct monst *mtmp, boolean give_feedback)
                enexto(&cc, u.ux, u.uy, mtmp->data))
         rloc_to(mtmp, cc.x, cc.y);
     else
-        (void) rloc(mtmp, TRUE);
+        (void) rloc(mtmp, RLOC_MSG);
     return TRUE;
 }
 

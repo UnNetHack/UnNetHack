@@ -42,6 +42,12 @@ mb_trapped(struct monst *mtmp)
     return FALSE;
 }
 
+void
+mon_track_clear(struct monst *mtmp)
+{
+    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+}
+
 /* check whether a monster is carrying a locking/unlocking tool */
 boolean
 mon_has_key(
@@ -451,7 +457,7 @@ dochug(struct monst *mtmp)
     /* some monsters teleport */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz &&
         !level.flags.noteleport) {
-        (void) rloc(mtmp, TRUE);
+        (void) rloc(mtmp, RLOC_MSG);
         return 0;
     }
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1)) {
@@ -564,7 +570,7 @@ dochug(struct monst *mtmp)
             if (is_demon(youmonst.data)) {
                 /* "Good hunting, brother" */
                 if (!tele_restrict(mtmp)) {
-                    (void) rloc(mtmp, TRUE);
+                    (void) rloc(mtmp, RLOC_MSG);
                 }
             } else {
                 mtmp->minvis = mtmp->perminvis = 0;
@@ -1085,9 +1091,9 @@ m_move(struct monst *mtmp, int after)
     if (ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan &&
          !tele_restrict(mtmp)) {
         if (mtmp->mhp < 7 || mtmp->mpeaceful || rn2(2)) {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         } else {
-            mnexto(mtmp);
+            mnexto(mtmp, RLOC_MSG);
         }
         mmoved = 1;
         goto postmov;
@@ -1495,7 +1501,7 @@ nxti:
         }
     } else {
         if (is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
             return 1;
         }
         if (mtmp->wormno) {
@@ -1836,6 +1842,61 @@ m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
         }
     }
     return 3;
+}
+
+/** returns TRUE if a mon can hide under the obj */
+boolean
+can_hide_under_obj(struct obj *obj)
+{
+/* uncomment '#define NO_HIDING_UNDER_STATUES' to prevent hiding under
+ * statues; that was introduced to avoid nullifying statue traps but
+ * isn't needed now that hiding at any non-pit trap site is disallowed */
+/* #define NO_HIDING_UNDER_STATUES */
+    struct trap *t;
+
+    if (!obj || obj->where != OBJ_FLOOR) {
+        return FALSE;
+    }
+    /* can't hide in/on/under traps (except pits) even when there is an
+       object here; since obj is on floor, its <ox,oy> are up to date */
+    if ((t = t_at(obj->ox, obj->oy)) != 0 && !is_pit(t->ttyp)) {
+        return FALSE;
+    }
+    /* can't hide under small amount of coins unless non-coins are also
+       present; we expect coins to be a single stack but don't assume that */
+    if (obj->oclass == COIN_CLASS) {
+        long coinquan = 0L;
+
+        do {
+            /* 10 coins is arbitrary amount considered enough to hide under */
+            if ((coinquan += obj->quan) >= 10L) {
+                break; /* fall through to other checks */
+            }
+            obj = obj->nexthere;
+            if (!obj) {
+                return FALSE; /* whole pile was less than 10 coins */
+            }
+        } while (obj->oclass == COIN_CLASS);
+    }
+#ifdef NO_HIDING_UNDER_STATUES
+    /*
+     * 'obj' might have been changed, but only if we've skipped coins that
+     * are on the top of a pile.  However, the statue loop will clobber it.
+     */
+    /* can't hide under statues regardless of pile stacking order */
+    while (obj) {
+        if (obj->otyp == STATUE) {
+            return FALSE;
+        }
+        obj = obj->nexthere;
+    }
+    /*
+     * If we reach here, 'obj' is now Null but wasn't earlier so the original
+     * 'obj' can be hidden beneath.
+     */
+#undef NO_HIDING_UNDER_STATUES
+#endif
+    return TRUE; /* can hide under the object */
 }
 
 boolean

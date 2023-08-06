@@ -644,7 +644,7 @@ dismount_steed(
                 rloc_to(mtmp, cc.x, cc.y);
             } else {
                 /* evidently no room nearby; move steed elsewhere */
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, RLOC_ERR | RLOC_NOMSG);
             }
             return;
         }

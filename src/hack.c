@@ -3165,7 +3165,7 @@ spoteffects(boolean pick)
             }
             break;
         }
-        mnexto(mtmp); /* have to move the monster */
+        mnexto(mtmp, RLOC_NOMSG); /* have to move the monster */
     }
  spotdone:
     if (!--inspoteffects) {

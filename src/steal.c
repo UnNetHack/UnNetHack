@@ -102,7 +102,7 @@ stealgold(struct monst *mtmp)
               (Levitation || Flying) ? "beneath" : "between", whose, what);
         if (!ygold || !rn2(5)) {
             if (!tele_restrict(mtmp)) {
-                (void) rloc(mtmp, TRUE);
+                (void) rloc(mtmp, RLOC_MSG);
             }
             monflee(mtmp, 0, FALSE, FALSE);
         }
@@ -120,7 +120,7 @@ stealgold(struct monst *mtmp)
         add_to_minv(mtmp, ygold);
         Your("purse feels lighter.");
         if (!tele_restrict(mtmp)) {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         }
         monflee(mtmp, 0, FALSE, FALSE);
         flags.botl = 1;
@@ -157,7 +157,7 @@ stealarm(void)
                        so we don't set mavenge bit here. */
                     monflee(mtmp, 0, FALSE, FALSE);
                     if (!tele_restrict(mtmp)) {
-                        (void) rloc(mtmp, TRUE);
+                        (void) rloc(mtmp, RLOC_MSG);
                     }
                     break;
                 }
@@ -628,7 +628,7 @@ stealamulet(struct monst *mtmp)
         (void) mpickobj(mtmp, otmp); /* could merge and free otmp but won't */
         pline("%s steals %s!", Monnam(mtmp), buf);
         if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         }
     }
 }

@@ -2124,7 +2124,7 @@ nopick:
         pline("%s", buf);
     }
     if (!tele_restrict(mon)) {
-        (void) rloc(mon, TRUE);
+        (void) rloc(mon, RLOC_MSG);
     }
     return ret;
 }

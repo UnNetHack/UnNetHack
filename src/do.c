@@ -1348,7 +1348,7 @@ u_collide_m(struct monst *mtmp)
         next2u(cc.x, cc.y)) {
         u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
     } else {
-        mnexto(mtmp);
+        mnexto(mtmp, RLOC_NOMSG);
     }
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0) {
@@ -1358,7 +1358,7 @@ u_collide_m(struct monst *mtmp)
         if (wizard) {
             pline("(monster in hero's way)");
         }
-        if (!rloc(mtmp, TRUE) || (mtmp = m_at(u.ux, u.uy)) != 0) {
+        if (!rloc(mtmp, RLOC_NOMSG) || (mtmp = m_at(u.ux, u.uy)) != 0) {
             /* no room to move it; send it away, to return later */
             m_into_limbo(mtmp);
         }
@@ -1731,7 +1731,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             distu(cc.x, cc.y) <= 2)
             u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
         else
-            mnexto(mtmp);
+            mnexto(mtmp, RLOC_NOMSG);
 
         if ((mtmp = m_at(u.ux, u.uy)) != 0) {
             /* there was an unconditional impossible("mnexto failed (do.c)")
@@ -1740,7 +1740,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             if (wizard) {
                 pline("(monster in hero's way)");
             }
-            if (!rloc(mtmp, TRUE)) {
+            if (!rloc(mtmp, RLOC_NOMSG)) {
                 /* no room to move it; send it away, to return later */
                 migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_RANDOM,
                                  (coord *) 0);

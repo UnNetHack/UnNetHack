@@ -559,7 +559,7 @@ use_magic_whistle(struct obj *obj)
                     seemimic(mtmp);
                 }
                 omx = mtmp->mx, omy = mtmp->my;
-                mnexto(mtmp);
+                mnexto(mtmp, RLOC_NONE);
                 if (mtmp->mx != omx || mtmp->my != omy) {
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
                     if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon) {
@@ -775,7 +775,7 @@ next_to_u(void)
         }
         if (mtmp->mleashed) {
             if (!next2u(mtmp->mx, mtmp->my)) {
-                mnexto(mtmp);
+                mnexto(mtmp, RLOC_NOMSG);
             }
             if (!next2u(mtmp->mx, mtmp->my)) {
                 for (otmp = invent; otmp; otmp = otmp->nobj) {
@@ -1031,7 +1031,7 @@ use_mirror(struct obj *obj)
         freeinv(obj);
         (void) mpickobj(mtmp, obj);
         if (!tele_restrict(mtmp)) {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         }
     } else if (monable && is_weeping(mtmp->data)) {
         if (vis) {

@@ -274,7 +274,7 @@ demon_talk(struct monst *mtmp)
             pline("%s says something.", Amonnam(mtmp));
         }
         if (!tele_restrict(mtmp)) {
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, RLOC_MSG);
         }
         return 1;
     }

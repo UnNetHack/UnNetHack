@@ -261,7 +261,7 @@ expels(struct monst *mtmp, struct permonst *mdat, boolean message)
         }
     }
     unstuck(mtmp); /* ball&chain returned in unstuck() */
-    mnexto(mtmp);
+    mnexto(mtmp, RLOC_NOMSG);
     newsym(u.ux, u.uy);
     spoteffects(TRUE);
     /* to cover for a case where mtmp is not in a next square */
@@ -1548,7 +1548,7 @@ do_stone:
                   "brags about the goods some dungeon explorer provided" :
                   "makes some remarks about how difficult theft is lately");
             if (!tele_restrict(mtmp)) {
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, RLOC_MSG);
             }
             return 3;
         } else if (mtmp->mcan) {
@@ -1560,7 +1560,7 @@ do_stone:
             }
             if (rn2(3)) {
                 if (!tele_restrict(mtmp)) {
-                    (void) rloc(mtmp, FALSE);
+                    (void) rloc(mtmp, RLOC_MSG);
                 }
                 return 3;
             }
@@ -1574,7 +1574,7 @@ do_stone:
             break;
         default:
             if (!is_robber && !tele_restrict(mtmp)) {
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, RLOC_MSG);
             }
             if (is_robber && *buf) {
                 if (canseemon(mtmp)) {
@@ -1755,7 +1755,7 @@ do_stone:
                 return 2;
             } else if (!rn2(33)) {
                 if (!tele_restrict(mtmp)) {
-                    (void) rloc(mtmp, FALSE);
+                    (void) rloc(mtmp, RLOC_MSG);
                 }
                 monflee(mtmp, d(3, 6), TRUE, FALSE);
                 return 3;
@@ -3158,7 +3158,7 @@ doseduce(struct monst *mon)
         /* else no regret message if can't see or hear seducer */
 
         if (!tele_restrict(mon)) {
-            (void) rloc(mon, TRUE);
+            (void) rloc(mon, RLOC_MSG);
         }
         return 1;
     }
@@ -3296,7 +3296,7 @@ doseduce(struct monst *mon)
         mon->mcan = 1; /* monster is worn out */
     }
     if (!tele_restrict(mon)) {
-        (void) rloc(mon, TRUE);
+        (void) rloc(mon, RLOC_MSG);
     }
 
     /* After all has been said and done, try switching the gender of the foocubus.

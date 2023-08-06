@@ -129,7 +129,7 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
     }
 
     if (MON_AT(x, y)) {
-        (void) rloc(m_at(x, y), FALSE); /* insurance */
+        (void) rloc(m_at(x, y), RLOC_ERR|RLOC_NOMSG); /* insurance */
     }
 
     if (!In_endgame(&u.uz)) {

@@ -741,7 +741,7 @@ mon_tele:
         if (oseen && how) {
             makeknown(how);
         }
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, RLOC_MSG);
         return 2;
     case MUSE_WAN_TELEPORTATION:
         zap_oseen = oseen;
@@ -1415,7 +1415,7 @@ mbhitm(struct monst *mtmp, struct obj *otmp)
                     seemimic(mtmp);
                 }
             } else if (!tele_restrict(mtmp)) {
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, RLOC_MSG);
             }
         }
         break;
