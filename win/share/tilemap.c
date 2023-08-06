@@ -227,20 +227,7 @@ int set, entry;
             if (*defsyms[i].explanation)
                 return defsyms[i].explanation;
             else {
-                /* if SINKS are turned off, this
-                 * string won't be there (and can't be there
-                 * to prevent symbol-identification and
-                 * special-level mimic appearances from
-                 * thinking the items exist)
-                 */
-                switch (i) {
-                    case S_sink:
-                        Sprintf(buf, "sink");
-                        break;
-                    default:
-                        Sprintf(buf, "cmap %d", tilenum);
-                        break;
-                }
+                Sprintf(buf, "cmap %d", tilenum);
                 return buf;
             }
         }

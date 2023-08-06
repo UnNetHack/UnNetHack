@@ -569,7 +569,6 @@ dipfountain(struct obj *obj)
     dryup(u.ux, u.uy, TRUE);
 }
 
-#ifdef SINKS
 void
 breaksink(coordxy x, coordxy y)
 {
@@ -720,6 +719,5 @@ drinksink(void)
             hliquid("water"));
     }
 }
-#endif /* SINKS */
 
 /*fountain.c*/

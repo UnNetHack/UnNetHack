@@ -879,10 +879,8 @@ extern void gush(int, int, genericptr_t);
 extern void dryup(coordxy, coordxy, boolean);
 extern void drinkfountain(void);
 extern void dipfountain(struct obj *);
-#ifdef SINKS
 extern void breaksink(coordxy, coordxy);
 extern void drinksink(void);
-#endif
 
 /* ### hack.c ### */
 

@@ -440,9 +440,8 @@ make_version(void)
 #ifdef REINCARNATION
 			| (1L <<  1)
 #endif
-#ifdef SINKS
+/* sinks */
 			| (1L <<  2)
-#endif
 #ifdef BLACKMARKET
 			| (1L <<  3)
 #endif
@@ -736,9 +735,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef SHELL
 		"shell command",
-#endif
-#ifdef SINKS
-		"sinks",
 #endif
 #ifdef SUSPEND
 		"suspend command",
@@ -1035,9 +1031,6 @@ h_filter(char *line)
     if (*line == '#') return TRUE;	/* ignore comment lines */
     if (sscanf(line, "----- %s", tag) == 1) {
 	skip = FALSE;
-#ifndef SINKS
-	if (!strcmp(tag, "SINKS")) skip = TRUE;
-#endif
 	if (!strcmp(tag, "ELBERETH")) skip = TRUE;
     } else if (skip && !strncmp(line, "-----", 5))
 	skip = FALSE;

@@ -240,11 +240,7 @@ struct symdef defsyms[MAXPCHARS] = {
        { '_', "altar",      C(CLR_GRAY) },   /* altar */
        { '|', "grave",      C(CLR_GRAY) },   /* grave */
        { '\\', "opulent throne", C(HI_GOLD) },    /* throne */
-#ifdef SINKS
        { '#', "sink",       C(CLR_GRAY) },   /* sink */
-#else
-       { '#', "",       C(CLR_GRAY) },   /* sink */
-#endif
        { '{', "fountain",   C(CLR_BLUE) },    /* fountain */
        { '}', "water",      C(CLR_BLUE) },   /* pool */
        { '.', "ice",        C(CLR_CYAN) },   /* ice */

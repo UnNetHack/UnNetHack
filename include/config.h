@@ -360,8 +360,6 @@ typedef long glyph_t;
 #define REINCARNATION /* Special Rogue-like levels */
 
 #ifndef AUTOCONF
-/* dungeon features */
-#define SINKS       /* Kitchen sinks - Janet Walz */
 /* dungeon levels */
 #define WALLIFIED_MAZE  /* Fancy mazes - Jean-Christophe Collet */
 /* monsters & objects */

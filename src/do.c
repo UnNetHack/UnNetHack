@@ -8,11 +8,9 @@
 
 #include <limits.h>
 
-#ifdef SINKS
 static void polymorph_sink(void);
 static boolean teleport_sink(void);
 static void dosinkring(struct obj *);
-#endif /* SINKS */
 
 static int drop(struct obj *);
 static int wipeoff(void);
@@ -392,7 +390,6 @@ doaltarobj(struct obj *obj)
     }
 }
 
-#ifdef SINKS
 /** Transforms the sink at the player's position into
  * a fountain, throne, altar or grave. */
 static void
@@ -633,7 +630,6 @@ giveback:
         useup(obj);
     }
 }
-#endif
 
 /* some common tests when trying to drop or throw items */
 boolean
@@ -719,13 +715,12 @@ drop(struct obj *obj)
                 mbodypart(u.ustuck, STOMACH));
         }
     } else {
-#ifdef SINKS
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING) &&
            IS_SINK(levl[u.ux][u.uy].typ)) {
             dosinkring(obj);
             return 1;
         }
-#endif
+
         if (!can_reach_floor(TRUE)) {
             if (flags.verbose) {
                 You("drop %s.", doname(obj));

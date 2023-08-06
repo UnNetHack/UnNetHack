@@ -131,11 +131,9 @@ in_water:
         if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS) {
             (void) water_damage(uarm, "armor", TRUE);
         }
-#ifdef SINKS
     } else if (IS_SINK(typ)) {
         You(sit_message, defsyms[S_sink].explanation);
         Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
-#endif
     } else if (IS_ALTAR(typ)) {
         You(sit_message, defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);

@@ -660,11 +660,9 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         SET_FOUNTAIN_WARNED(x, y);       /* force dryup */
         dryup(x, y, madeby_u);
         return;
-#ifdef SINKS
     } else if (IS_SINK(lev->typ)) {
         breaksink(x, y);
         return;
-#endif
     } else if (lev->typ == DRAWBRIDGE_DOWN ||
                (is_drawbridge_wall(x, y) >= 0)) {
         coordxy bx = x, by = y;

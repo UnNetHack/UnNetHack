@@ -21,9 +21,7 @@
 
 static void mkfount(int, struct mkroom *);
 static boolean find_okay_roompos(struct mkroom *, coord *);
-#ifdef SINKS
 static void mksink(struct mkroom *);
-#endif
 static void mkaltar(struct mkroom *);
 static void mkgrave(struct mkroom *);
 static void makevtele(void);
@@ -936,11 +934,9 @@ fill_ordinary_room(struct mkroom *croom)
     if (!rn2(10)) {
         mkfount(0, croom);
     }
-#ifdef SINKS
     if (!rn2(60)) {
         mksink(croom);
     }
-#endif
     if (!rn2(60)) {
         mkaltar(croom);
     }
@@ -1935,7 +1931,6 @@ find_okay_roompos(struct mkroom *croom, coord *crd)
     return TRUE;
 }
 
-#ifdef SINKS
 static void
 mksink(struct mkroom *croom)
 {
@@ -1950,8 +1945,6 @@ mksink(struct mkroom *croom)
 
     level.flags.nsinks++;
 }
-#endif /* SINKS */
-
 
 static void
 mkaltar(struct mkroom *croom)

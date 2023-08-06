@@ -4221,14 +4221,12 @@ wiztrap:
             pline("A throne.");
             madeterrain = TRUE;
         }
-# ifdef SINKS
         if (!BSTRCMP(bp, p-4, "sink")) {
             levl[u.ux][u.uy].typ = SINK;
             level.flags.nsinks++;
             pline("A sink.");
             madeterrain = TRUE;
         }
-# endif
         /* ("water" matches "potion of water" rather than terrain) */
         if (!BSTRCMP(bp, p-4, "pool")) {
             levl[u.ux][u.uy].typ = POOL;

@@ -10,9 +10,7 @@
 static void maybe_wail(void);
 static int moverock(void);
 static int still_chewing(coordxy, coordxy);
-#ifdef SINKS
 static void dosinkfall(void);
-#endif
 static boolean findtravelpath(boolean (*)(coordxy, coordxy));
 static boolean trapmove(coordxy, coordxy, struct trap *);
 static struct monst *monstinroom(struct permonst *, int);
@@ -904,7 +902,6 @@ movobj(struct obj *obj, coordxy ox, coordxy oy)
     newsym(ox, oy);
 }
 
-#ifdef SINKS
 static NEARDATA const char fell_on_sink[] = "fell onto a sink";
 
 static void
@@ -991,7 +988,6 @@ dosinkfall(void)
        through float_down(), but make sure BFlying is up to date */
     float_vs_flight();
 }
-#endif
 
 /* intended to be called only on ROCKs */
 boolean
@@ -3061,11 +3057,11 @@ spoteffects(boolean pick)
     }
 
     check_special_room(FALSE);
-#ifdef SINKS
+
     if (IS_SINK(levl[u.ux][u.uy].typ) && Levitation) {
         dosinkfall();
     }
-#endif
+
     if (!in_steed_dismounting) { /* if dismounting, we'll check again later */
         boolean pit;
 
@@ -3584,13 +3580,9 @@ pickup_checks(void)
 
         if (IS_THRONE(lev->typ)) {
             pline("It must weigh%s a ton!", lev->looted ? " almost" : "");
-        }
-#ifdef SINKS
-        else if (IS_SINK(lev->typ)) {
+        } else if (IS_SINK(lev->typ)) {
             pline_The("plumbing connects it to the floor.");
-        }
-#endif
-        else if (IS_GRAVE(lev->typ)) {
+        } else if (IS_GRAVE(lev->typ)) {
             You("don't need a gravestone.  Yet.");
         } else if (IS_FOUNTAIN(lev->typ)) {
             You("could drink the %s...", hliquid("water"));

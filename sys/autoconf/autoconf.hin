@@ -242,9 +242,6 @@
 /* simple mail dgamelaunch support */
 #undef SIMPLE_MAIL
 
-/* Kitchen sinks */
-#undef SINKS
-
 /* The size of `unsigned int', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_INT
 
