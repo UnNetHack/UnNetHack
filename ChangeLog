@@ -19,6 +19,8 @@
 	  - Foocubi switch gender after successful seduction attack
 	  - Dragons and Xorns eat hard gems
 	  - The Wizard of Yendor and Quest Nemesis steal any quest artifact
+	  - The Wizard of Yendor will never steal the quest artifact of
+	    the current role
 
 	* Race changes:
 	  - Allow player vampires to be neutral
