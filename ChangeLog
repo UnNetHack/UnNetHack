@@ -102,6 +102,7 @@
 	    skillable weapons
 	  - No paranoid prompt for safe traps when flying or levitating (reported by hackemslashem)
 	  - Show prayer stats in Attributes menu (from dNetHack)
+	  - Feedback from detect unseen and detection (from NetHack 3.7)
 
 	* skill changes:
 	  - Allow convicts to become skilled in broadsword (reported by RojjaCebolla)
