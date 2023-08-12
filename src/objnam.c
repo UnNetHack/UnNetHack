@@ -3183,6 +3183,7 @@ struct alt_spellings {
     { "crystall orb", CRYSTAL_BALL },
     { "crystal orb", CRYSTAL_BALL },
     { "crystall pick", CRYSTAL_PICK },
+    { "wand of secret door detection", WAN_SECRET_DOOR_DETECTION },
     { (const char *)0, 0 },
 };
 

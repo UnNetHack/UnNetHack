@@ -472,4 +472,6 @@ struct damage_info_t {
     const char* light_damage;
 };
 
+#define WAN_SECRET_DOOR_DETECTION WAN_DETECTION
+
 #endif /* OBJ_H */

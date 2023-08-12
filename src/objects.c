@@ -932,8 +932,7 @@ NEARDATA struct objclass objects[] = {
         OBJ(name, typ), BITS(0, 0, 1, 0, mgc, 1, 0, 0, 0, 0, dir, P_NONE, metal), 0, \
         WAND_CLASS, prob, 0, 7, cost, 0, 0, 0, 0, 30, color )
     WAND("light",          "glass",    95, 100, 1, NODIR,     GLASS,    HI_GLASS),
-    WAND("secret door detection", "balsa",
-         50, 150, 1, NODIR,     WOOD,     HI_WOOD),
+    WAND("detection", "balsa", 50, 150, 1, NODIR,     WOOD,     HI_WOOD),
     WAND("enlightenment",  "crystal",  15, 150, 1, NODIR,     GLASS,    HI_GLASS),
     WAND("create monster", "maple",    45, 200, 1, NODIR,     WOOD,     HI_WOOD),
     WAND("wishing",        "pine",      5, 500, 1, NODIR,     WOOD,     HI_WOOD),

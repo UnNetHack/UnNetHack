@@ -53,6 +53,7 @@
 	     Number of generated potions is the combined total of the involved potions
 	  - Gem alchemy (from dNetHack)
 	  - Wielding Vorpal Blade protects against decapitation attacks (from EvilHack)
+	  - Renamed wand of secret door detection to wand of detection
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts
