@@ -1263,7 +1263,7 @@ do_oname(struct obj *obj)
 {
     char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
-    short objtyp;
+    short objtyp = STRANGE_OBJECT;
 
 #ifdef SPE_NOVEL
     /* Do this now because there's no point in even asking for a name */
