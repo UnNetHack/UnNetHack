@@ -518,6 +518,7 @@ invault(void)
             } else {
                 verbalize("Please follow me.");
             }
+        } else {
             if (!umoney) {
                 if (Deaf) {
                     if (!Blind) {
