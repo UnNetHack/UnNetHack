@@ -850,6 +850,9 @@ gd_move(struct monst *grd)
                               "drop that hidden gold and " :
                               "drop that gold and ") : "");
             }
+            if (egrd->warncnt == 6 && !Deaf) {
+                verbalize("This is your final warning!  Drop any remaining gold immediately!");
+            }
             if (egrd->warncnt == 7) {
                 m = grd->mx;
                 n = grd->my;
