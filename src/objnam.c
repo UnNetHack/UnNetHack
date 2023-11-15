@@ -2046,6 +2046,7 @@ just_an(char *outbuf, const char *str)
              strncmpi(str, "uke", 3) && strncmpi(str, "ukulele", 7) &&
              strncmpi(str, "unicorn", 7) &&
              strncmpi(str, "uranium", 7) &&
+             strncmpi(str, "ukulele", 7) &&
              strncmpi(str, "useful", 6)) /* "useful tool" */ ||
                 (c0 == 'x' && !index(vowels, lowc(str[1])))) {
             Strcpy(outbuf, "an ");
