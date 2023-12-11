@@ -27,7 +27,7 @@ static void do_positionbar();
 #endif
 static void regen_pw(int);
 static void regen_hp(int);
-static void interrupt_multi(const char *, int, int);
+static void interrupt_multi(const char *);
 
 static int prev_hp_notify;
 enum monster_generation monclock;
@@ -788,59 +788,80 @@ regen_pw(int wtcap)
             u.uen = u.uenmax;
         }
         flags.botl = 1;
-        interrupt_multi("Magic energy", u.uen, u.uenmax);
+        if (u.uen == u.uenmax) {
+            interrupt_multi("Magic energy restored.");
+        }
     }
 }
+
+#define U_CAN_REGEN() (Regeneration || (Sleepy && u.usleep))
 
 static void
 regen_hp(int wtcap)
 {
+    int heal = 0;
+    boolean reached_full = FALSE,
+            encumbrance_ok = (wtcap < MOD_ENCUMBER || !u.umoved);
+
     if (marathon_mode) {
         return;
     }
 
-    if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
-        if (u.mh > 1) {
-            u.mh--;
-            flags.botl = 1;
-        } else if (u.mh < 1) {
+    if (Upolyd) {
+        if (u.mh < 1) { /* shouldn't happen... */
             rehumanize();
-        }
-    } else if (Upolyd && u.mh < u.mhmax) {
-        if (u.mh < 1) {
-            rehumanize();
-        } else if (can_regenerate() && (Regeneration ||
-                                      (wtcap < MOD_ENCUMBER && !(moves%20)))) {
-            flags.botl = 1;
-            u.mh++;
-            interrupt_multi("Hit points", u.mh, u.mhmax);
-        }
-    } else if (u.uhp < u.uhpmax && can_regenerate() &&
-               (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
-        if (u.ulevel > 9 && !(moves % 3)) {
-            int heal, Con = (int) ACURR(A_CON);
-
-            if (Con <= 12) {
+        } else if (youmonst.data->mlet == S_EEL &&
+                   !is_pool(u.ux, u.uy) &&
+                   !Is_waterlevel(&u.uz) &&
+                   !Breathless) {
+            /* eel out of water loses hp, similar to monster eels;
+               as hp gets lower, rate of further loss slows down */
+            if (u.mh > 1 &&
+                 !Regeneration &&
+                 rn2(u.mh) > rn2(8) &&
+                 (!Half_physical_damage || !(moves % 2L))) {
+                heal = -1;
+            }
+        } else if (u.mh < u.mhmax && can_regenerate()) {
+            if ((U_CAN_REGEN() || (encumbrance_ok && !(moves%20)))) {
                 heal = 1;
-            } else {
-                heal = rnd(Con);
-                if (heal > u.ulevel - 9) {
-                    heal = u.ulevel - 9;
-                }
             }
-            flags.botl = 1;
-            u.uhp += heal;
-            if (u.uhp > u.uhpmax) {
-                u.uhp = u.uhpmax;
-            }
-            interrupt_multi("Hit points", u.uhp, u.uhpmax);
-        } else if (Regeneration ||
-                   (u.ulevel <= 9 &&
-                    !(moves % ((MAXULEV + 12) / (u.ulevel + 2) + 1)))) {
-            flags.botl = 1;
-            u.uhp++;
-            interrupt_multi("Hit points", u.uhp, u.uhpmax);
         }
+        if (heal) {
+            flags.botl = TRUE;
+            u.mh += heal;
+            reached_full = (u.mh == u.mhmax);
+        }
+    /* !Upolyd */
+    } else {
+        /* [when this code was in-line within moveloop(), there was
+           no !Upolyd check here, so poly'd hero recovered lost u.uhp
+           once u.mh reached u.mhmax; that may have been convenient
+           for the player, but it didn't make sense for gameplay...] */
+        if (u.uhp < u.uhpmax && can_regenerate() && (encumbrance_ok || U_CAN_REGEN())) {
+            heal = (u.ulevel + (int)ACURR(A_CON)) > rn2(100);
+
+            if (U_CAN_REGEN()) {
+                heal += 1;
+            }
+            if (Sleepy && u.usleep) {
+                heal++;
+            }
+
+            if (heal) {
+                flags.botl = TRUE;
+                u.uhp += heal;
+                if (u.uhp > u.uhpmax) {
+                    u.uhp = u.uhpmax;
+                }
+                /* stop voluntary multi-turn activity if now fully healed */
+                reached_full = (u.uhp == u.uhpmax);
+            }
+        }
+    }
+
+    if (reached_full) {
+        interrupt_multi("Hit points restored.");
     }
 }
 
@@ -1110,15 +1131,14 @@ get_realtime(void)
 }
 #endif /* REALTIME_ON_BOTL || RECORD_REALTIME */
 
-/** Interrupt a multiturn action if current_points is equal to max_points. */
+/** Interrupt a multiturn action. */
 static void
-interrupt_multi(const char *points, int current_points, int max_points)
+interrupt_multi(const char *msg)
 {
-    if (multi > 0 &&
-        current_points == max_points) {
+    if (multi > 0) {
         nomul(0, 0);
-        if (flags.verbose) {
-            pline("%s restored.", points);
+        if (flags.verbose && msg) {
+            Norep("%s", msg);
         }
     }
 }
