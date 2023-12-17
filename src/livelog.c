@@ -347,6 +347,11 @@ livelog_genocide(const char *genocided_monster, int level_wide)
 void
 livelog_printf(unsigned int ll_type, const char *fmt, ...)
 {
+    /* Don't livelog in explore mode - prevents server spam */
+    if (discover) {
+        return;
+    }
+
     va_list args;
     va_start(args, fmt);
 
