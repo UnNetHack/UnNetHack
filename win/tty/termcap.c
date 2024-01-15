@@ -383,6 +383,10 @@ tty_startup(int *wid, int *hgt)
 }
 #  endif
 # endif
+    /* limit CO to prevent overflowing the top line */
+    if (CO >= TBUFSZ) {
+        CO = TBUFSZ - 1;
+    }
 # ifdef CLIPPING
     if (CO < COLNO || LI < ROWNO+3) {
         setclipped();
