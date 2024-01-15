@@ -435,7 +435,10 @@ tactics(struct monst *mtmp)
         }
         if (u_at(tx, ty) || where == STRAT_PLAYER) {
             /* player is standing on it (or has it) */
-            mnexto(mtmp, RLOC_MSG);
+            mx = mtmp->mx, my = mtmp->my;
+            if (!mnearto(mtmp, tx, ty, FALSE, RLOC_MSG)) {
+                rloc_to(mtmp, mx, my); /* no room? stay put */
+            }
             return 0;
         }
         if (where == STRAT_GROUND) {
