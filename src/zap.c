@@ -1989,9 +1989,9 @@ stone_to_flesh_obj(struct obj *obj)
                     }
                     if (carried(obj)) {
                         useup(obj);
-                    }
                     } else {
                         delobj(obj);
+                    }
                     if (cansee(mon->mx, mon->my)) {
                         pline_The("figurine %sanimates!", golem_xform ? "turns to flesh and " : "");
                     }
