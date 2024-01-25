@@ -213,8 +213,9 @@ doshout(void)
 
     Sprintf(qbuf, "Shout what?");
     getlin(qbuf, buf);
+    mungspaces(buf);
 
-    if (strlen(buf) == 0) {
+    if ((strlen(buf) == 0) || (buf[0] == '\033')) {
         Strcpy(buf, "*@&%!!");
         You("shout profanities into the void!");
     } else {
