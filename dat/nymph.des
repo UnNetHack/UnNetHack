@@ -17,7 +17,7 @@ MAP
    #         }}}}}}-......................................................--
    #         }}}}}--..................................................T.T..-
    ##       }}}}}--....................................................T...-
-    #      }}}}}}-.......................................................{.-
+    #      }}}}}}-.....................................................\.{.-
     #   #########......................................................T...-
     #####  }}}}}}-....................................................T.T..-
     #       }}}}}-.........................................................-
@@ -31,11 +31,11 @@ MAP
 ENDMAP
 
 # two rooms that allow the player to almost completely avoid the nymphs
-REGION:(01,01,15,03),random,"ordinary",irregular,filled
+REGION:(01,01,15,03),random,"ordinary",filled
 STAIR:levregion(01,00,15,04),(0,0,0,0),up
 DOOR: random, (03,04)
 
-REGION:(01,17,13,20),random,"ordinary",irregular,filled
+REGION:(01,17,13,20),random,"ordinary",filled
 STAIR:levregion(01,17,13,20),(0,0,0,0),down
 DOOR: random, (04,16)
 
@@ -49,8 +49,7 @@ REPLACE_TERRAIN:(14,05,14,15),'}','M',40%
 REPLACE_TERRAIN:(16,00,16,04),'M','}',30%
 REPLACE_TERRAIN:(14,16,14,21),'M','}',30%
 
-# Aphrodite and her throne
-REGION:(71,10,71,10),lit,"throne"
+# Aphrodite on her throne
 MONSTER:('n',"Aphrodite"), (71,10), hostile
 # some of Aphrodite's followers can be outside of the cavern
 LOOP [4] {
@@ -74,7 +73,7 @@ TRAP:"board",random
 OBJECT:"apple",random
 
 # Aphrodite's cavern
-REGION:(50,10,50,10),lit,"ordinary",filled,irregular {
+REGION:(28,03,72,18),lit,"ordinary",irregular,filled {
   # Aphrodite's followers
   LOOP [16] {
     MONSTER: 'n', random, hostile

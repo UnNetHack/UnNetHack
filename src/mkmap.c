@@ -34,8 +34,9 @@ init_map(schar bg_typ)
         return;
     }
 
-    for (i=1; i<COLNO; i++) {
-        for (j=0; j<ROWNO; j++) {
+    for (i = 1; i < COLNO; i++) {
+        for (j = 0; j < ROWNO; j++) {
+            levl[i][j].roomno = NO_ROOM;
             levl[i][j].typ = bg_typ;
             levl[i][j].lit = FALSE;
         }
@@ -97,10 +98,10 @@ get_map(int col, int row, schar bg_typ)
     return levl[col][row].typ;
 }
 
-static int dirs[16] = {
+static const int dirs[16] = {
     -1, -1 /**/, -1, 0 /**/, -1, 1 /**/,
-    0, -1 /**/,              0, 1 /**/,
-    1, -1 /**/,  1, 0 /**/,  1, 1
+     0, -1 /**/,              0, 1 /**/,
+     1, -1 /**/,  1, 0 /**/,  1, 1
 };
 
 static void
@@ -210,7 +211,12 @@ check_flood_anyroom(coordxy x, coordxy y, schar fg_typ, boolean anyroom)
     if (!isok(x, y)) {
         return FALSE;
     }
-    return (anyroom ? IS_ROOM(levl[x][y].typ) : levl[x][y].typ == fg_typ);
+
+    if (anyroom) {
+        return (IS_ROOM(levl[x][y].typ) || IS_TREES(levl[x][y].typ));
+    }
+
+    return levl[x][y].typ == fg_typ;
 }
 
 /*
@@ -250,12 +256,16 @@ flood_fill_rm(int sx, int sy, int rmno, boolean lit, boolean anyroom)
             for (ii= (i == sx ? i-1 : i); ii <= i+1; ii++) {
                 for (jj = sy-1; jj <= sy+1; jj++) {
                     if (isok(ii, jj) &&
-                        (IS_WALL(levl[ii][jj].typ) || IS_DOOR(levl[ii][jj].typ))) {
+                        (IS_WALL(levl[ii][jj].typ) ||
+                         IS_DOOR(levl[ii][jj].typ) ||
+                         levl[ii][jj].typ == SDOOR)) {
                         levl[ii][jj].edge = 1;
                         if (lit) {
                             levl[ii][jj].lit = lit;
                         }
-                        if ((int) levl[ii][jj].roomno != rmno) {
+                        if (levl[ii][jj].roomno == NO_ROOM) {
+                            levl[ii][jj].roomno = rmno;
+                        } else if ((int) levl[ii][jj].roomno != rmno) {
                             levl[ii][jj].roomno = SHARED;
                         }
                     }
@@ -349,6 +359,20 @@ wallify_map(void)
 }
 
 static void
+join_map_cleanup(void)
+{
+    coordxy x, y;
+
+    for (x = 1; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            levl[x][y].roomno = NO_ROOM;
+        }
+    }
+    nroom = nsubroom = 0;
+    rooms[nroom].hx = subrooms[nsubroom].hx = -1;
+}
+
+static void
 join_map(schar bg_typ, schar fg_typ)
 {
     struct mkroom *croom, *croom2;
@@ -419,6 +443,7 @@ joinm:
         }
         croom2++; /* always increment the next room */
     }
+    join_map_cleanup();
 }
 
 static void

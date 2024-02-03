@@ -1220,7 +1220,8 @@ get_location(
                 }
             }
             if (!(humidity & NO_LOC_WARN)) {
-                impossible("get_location:  can't find a place!");
+                impossible("get_location:  can't find a place!  mx: %d, my: %d, sx: %d, sy: %d",
+                           mx, my, sx, sy);
             } else {
                 *x = *y = -1;
             }
