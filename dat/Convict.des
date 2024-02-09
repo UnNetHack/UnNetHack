@@ -7,6 +7,7 @@
 LEVEL:"Con-strt"
 FLAGS:noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant beetle"), (16,'r'), (16,"soldier ant"), (4,'s')
 GEOMETRY:left,top
 #123456789012345678901234567890123456789012345678901234567890123456789012345
 MAP
@@ -83,6 +84,7 @@ NON_DIGGABLE:(00,00,75,19)
 LEVEL:"Con-loca"
 FLAGS:noteleport,hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant beetle"), (16,'r'), (16,"soldier ant"), (4,'s')
 GEOMETRY:left,top
 #123456789012345678901234567890123456789012345678901234567890123456789012345
 MAP
@@ -227,6 +229,7 @@ OBJECT:('_', "iron chain"), (11,17)
 LEVEL:"Con-goal"
 FLAGS:hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant beetle"), (16,'r'), (16,"soldier ant"), (4,'s')
 GEOMETRY:left,top
 #123456789012345678901234567890123456789012345678901234567890123456789012345
 MAP
@@ -292,6 +295,7 @@ MONSTER:('@',"Warden Arianna"),(31,10),hostile {
 LEVEL:"Con-fila"
 FLAGS:hardfloor,mazelevel
 INIT_MAP:solidfill,' '
+MON_GENERATION:86%, (64,"giant beetle"), (16,'r'), (16,"soldier ant"), (4,'s')
 GEOMETRY:left,top
 #123456789012345678901234567890123456789012345678901234567890123456789012345
 MAP
@@ -363,6 +367,7 @@ TRAP:"web",random
 LEVEL:"Con-filb"
 FLAGS:hardfloor,mazelevel
 INIT_MAP: mines, '#' , ' ', true, true, unlit, true
+MON_GENERATION:86%, (64,"giant beetle"), (16,'r'), (16,"soldier ant"), (4,'s')
 MESSAGE: "This appears to be a prison level that is still under construction"
 NOMAP
 #
