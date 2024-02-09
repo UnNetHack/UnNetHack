@@ -57,6 +57,7 @@
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts
+	  - The Tsurugi of Muramasa grants half physical damage when carried (from EvilHack)
 
 	* dungeon layout:
 	  - Disable the rogue tribute level
