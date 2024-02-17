@@ -13,11 +13,6 @@
 #include <fcntl.h>
 #endif
 
-#ifdef MFLOPPY
-long bytes_counted;
-static int count_only;
-#endif
-
 #ifdef MICRO
 int dotcnt, dotrow; /* also used in restore */
 #endif
@@ -35,11 +30,6 @@ static void savetrapchn(int, struct trap *, int);
 static void savegamestate(int, int);
 void save_mongen_override(int, struct mon_gen_override *, int);
 void save_lvl_sounds(int, struct lvl_sounds *, int);
-#ifdef MFLOPPY
-static void savelev0(int, xint8, int);
-static boolean swapout_oldest();
-static void copyfile(char *, char *);
-#endif /* MFLOPPY */
 #ifdef GCC_WARN
 static long nulls[10];
 #else
@@ -176,12 +166,6 @@ dosave0(void)
     (void) signal(SIGINT, SIG_IGN);
 #endif
 
-#if defined(MICRO) && defined(MFLOPPY)
-    if (!saveDiskPrompt(0)) {
-        return 0;
-    }
-#endif
-
     HUP if (iflags.window_inited) {
         uncompress_area(fq_save, SAVEF);
         fd = open_savefile();
@@ -227,36 +211,6 @@ dosave0(void)
         putstr(WIN_MAP, 0, "Saving:");
     }
 #endif
-#ifdef MFLOPPY
-    /* make sure there is enough disk space */
-    if (iflags.checkspace) {
-        long fds, needed;
-
-        savelev(fd, ledger_no(&u.uz), COUNT_SAVE);
-        savegamestate(fd, COUNT_SAVE);
-        needed = bytes_counted;
-
-        for (ltmp = 1; ltmp <= maxledgerno(); ltmp++) {
-            if (ltmp != ledger_no(&u.uz) && level_info[ltmp].where) {
-                needed += level_info[ltmp].size + (sizeof ltmp);
-            }
-        }
-        fds = freediskspace(fq_save);
-        if (needed > fds) {
-            HUP {
-                There("is insufficient space on SAVE disk.");
-                pline("Require %ld bytes but only have %ld.", needed, fds);
-            }
-            flushout();
-            (void) close(fd);
-            (void) delete_savefile();
-            return 0;
-        }
-
-        co_false();
-    }
-#endif /* MFLOPPY */
-
     store_version(fd);
 #ifdef STORE_PLNAME_IN_FILE
     bwrite(fd, (genericptr_t) plname, PL_NSIZ);
@@ -333,10 +287,6 @@ savegamestate(int fd, int mode)
     time_t realtime;
 #endif
 
-
-#ifdef MFLOPPY
-    count_only = (mode & COUNT_SAVE);
-#endif
     uid = getuid();
     bwrite(fd, (genericptr_t) &uid, sizeof uid);
     bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
@@ -466,47 +416,8 @@ savestateinlock(void)
 }
 #endif
 
-#ifdef MFLOPPY
-boolean
-savelev(fd, lev, mode)
-int fd;
-xint8 lev;
-int mode;
-{
-    if (mode & COUNT_SAVE) {
-        bytes_counted = 0;
-        savelev0(fd, lev, COUNT_SAVE);
-        /* probably bytes_counted will be filled in again by an
-         * immediately following WRITE_SAVE anyway, but we'll
-         * leave it out of checkspace just in case */
-        if (iflags.checkspace) {
-            while (bytes_counted > freediskspace(levels))
-                if (!swapout_oldest()) {
-                    return FALSE;
-                }
-        }
-    }
-    if (mode & (WRITE_SAVE | FREE_SAVE)) {
-        bytes_counted = 0;
-        savelev0(fd, lev, mode);
-    }
-    if (mode != FREE_SAVE) {
-        level_info[lev].where = ACTIVE;
-        level_info[lev].time = moves;
-        level_info[lev].size = bytes_counted;
-    }
-    return TRUE;
-}
-
-static void
-savelev0(fd, lev, mode)
-#else
 void
 savelev(int fd, xint8 lev, int mode)
-#endif
-
-
-
 {
 #ifdef TOS
     short tlev;
@@ -541,9 +452,6 @@ savelev(int fd, xint8 lev, int mode)
         if (fd < 0) {
             panic("Save on bad file!"); /* impossible */
         }
-#ifdef MFLOPPY
-        count_only = (mode & COUNT_SAVE);
-#endif
         if (lev >= 0 && lev <= maxledgerno()) {
             level_info[lev].flags |= VISITED;
         }
@@ -699,12 +607,6 @@ static void
 bputc(c)
 int c;
 {
-#ifdef MFLOPPY
-    bytes_counted++;
-    if (count_only) {
-        return;
-    }
-#endif
     if (outbufp >= sizeof outbuf) {
         (void) write(bwritefd, outbuf, sizeof outbuf);
         outbufp = 0;
@@ -743,11 +645,6 @@ register int fd;
     if (outrunlength >= 0) {    /* flush run */
         flushoutrun(outrunlength);
     }
-#ifdef MFLOPPY
-    if (count_only) {
-        outbufp = 0;
-    }
-#endif
 
     if (outbufp) {
         if (write(fd, outbuf, outbufp) != outbufp) {
@@ -771,12 +668,6 @@ register unsigned num;
     unsigned char *bp = (unsigned char *)loc;
 
     if (!compressing) {
-#ifdef MFLOPPY
-        bytes_counted += num;
-        if (count_only) {
-            return;
-        }
-#endif
         if ((unsigned) write(fd, loc, num) != num) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
             if (program_state.done_hup) {
@@ -856,13 +747,6 @@ void
 bwrite(int fd, genericptr_t loc, unsigned int num)
 {
     boolean failed;
-
-#ifdef MFLOPPY
-    bytes_counted += num;
-    if (count_only) {
-        return;
-    }
-#endif
 
 #ifdef UNIX
     if (buffering) {
@@ -1412,110 +1296,5 @@ freedynamicdata(void)
 #endif  /* FREE_ALL_MEMORY */
     return;
 }
-
-#ifdef MFLOPPY
-boolean
-swapin_file(lev)
-int lev;
-{
-    char to[PATHLEN], from[PATHLEN];
-
-    Sprintf(from, "%s%s", permbones, alllevels);
-    Sprintf(to, "%s%s", levels, alllevels);
-    set_levelfile_name(from, lev);
-    set_levelfile_name(to, lev);
-    if (iflags.checkspace) {
-        while (level_info[lev].size > freediskspace(to))
-            if (!swapout_oldest()) {
-                return FALSE;
-            }
-    }
-# ifdef WIZARD
-    if (wizard) {
-        pline("Swapping in `%s'.", from);
-        wait_synch();
-    }
-# endif
-    copyfile(from, to);
-    (void) unlink(from);
-    level_info[lev].where = ACTIVE;
-    return TRUE;
-}
-
-static boolean
-swapout_oldest() {
-    char to[PATHLEN], from[PATHLEN];
-    int i, oldest;
-    long oldtime;
-
-    if (!ramdisk) {
-        return FALSE;
-    }
-    for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++) {
-        if (level_info[i].where == ACTIVE
-            && (!oldtime || level_info[i].time < oldtime)) {
-            oldest = i;
-            oldtime = level_info[i].time;
-        }
-    }
-    if (!oldest) {
-        return FALSE;
-    }
-    Sprintf(from, "%s%s", levels, alllevels);
-    Sprintf(to, "%s%s", permbones, alllevels);
-    set_levelfile_name(from, oldest);
-    set_levelfile_name(to, oldest);
-# ifdef WIZARD
-    if (wizard) {
-        pline("Swapping out `%s'.", from);
-        wait_synch();
-    }
-# endif
-    copyfile(from, to);
-    (void) unlink(from);
-    level_info[oldest].where = SWAPPED;
-    return TRUE;
-}
-
-static void
-copyfile(from, to)
-char *from, *to;
-{
-# ifdef TOS
-
-    if (_copyfile(from, to)) {
-        panic("Can't copy %s to %s", from, to);
-    }
-# else
-    char buf[BUFSIZ];   /* this is system interaction, therefore
-                         * BUFSIZ instead of NetHack's BUFSZ */
-    int nfrom, nto, fdfrom, fdto;
-
-    if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0) {
-        panic("Can't copy from %s !?", from);
-    }
-    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0) {
-        panic("Can't copy to %s", to);
-    }
-    do {
-        nfrom = read(fdfrom, buf, BUFSIZ);
-        nto = write(fdto, buf, nfrom);
-        if (nto != nfrom) {
-            panic("Copyfile failed!");
-        }
-    } while (nfrom == BUFSIZ);
-    (void) close(fdfrom);
-    (void) close(fdto);
-# endif /* TOS */
-}
-
-void
-co_false() /* see comment in bones.c */
-{
-    count_only = FALSE;
-    return;
-}
-
-#endif /* MFLOPPY */
 
 /*save.c*/

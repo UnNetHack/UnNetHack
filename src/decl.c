@@ -91,15 +91,6 @@ char levels[PATHLEN];       /* where levels are */
 # endif
 #endif /* MICRO || WIN32 */
 
-
-#ifdef MFLOPPY
-char permbones[PATHLEN];    /* where permanent copy of bones go */
-int ramdisk = FALSE;        /* whether to copy bones to levels or not */
-int saveprompt = TRUE;
-const char *alllevels = "levels.*";
-const char *allbones = "bones*.*";
-#endif
-
 struct linfo level_info[MAXLINFO];
 
 NEARDATA struct sinfo program_state;

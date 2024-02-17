@@ -266,13 +266,6 @@ char *argv[];
 	toggle_mouse_support();	/* must come after process_options */
 #endif
 
-#ifdef MFLOPPY
-	set_lock_and_bones();
-# ifndef AMIGA
-	copybones(FROMPERM);
-# endif
-#endif
-
 	if (!*plname)
 		askname();
 	plnamesuffix(); 	/* strip suffix from name; calls askname() */

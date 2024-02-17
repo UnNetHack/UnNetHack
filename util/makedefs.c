@@ -651,9 +651,6 @@ static const char *build_opts[] = {
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
 #endif
-#ifdef MFLOPPY
-		"floppy drive support",
-#endif
 		"gold object in inventories",
 #ifdef INSURANCE
 		"insurance files for recovering from crashes",

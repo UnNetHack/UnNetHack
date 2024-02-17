@@ -806,18 +806,15 @@ extern FILE *fopen_datafile(const char *, const char *, int);
 #endif
 extern boolean uptodate(int, const char *);
 extern void store_version(int);
-#ifdef MFLOPPY
-extern void set_lock_and_bones(void);
-#endif
+extern void zero_nhfile(NHFILE *) NONNULLARG1;
+extern void close_nhfile(NHFILE *) NONNULLARG1;
+extern void rewind_nhfile(NHFILE *) NONNULLARG1;
 extern void set_levelfile_name(char *, int);
 extern int create_levelfile(int, char *);
 extern int open_levelfile(int, char *);
 extern void delete_levelfile(int);
 extern void clearlocks(void);
 extern int create_bonesfile(d_level*, char **, char *);
-#ifdef MFLOPPY
-extern void cancel_bonesfile(void);
-#endif
 extern void commit_bonesfile(d_level *);
 extern int open_bonesfile(d_level*, char **);
 extern int delete_bonesfile(d_level*);
@@ -1921,13 +1918,6 @@ extern void chdirx(char *, boolean);
 #if defined(MICRO) || defined(WIN32)
 extern void flushout(void);
 extern int dosh(void);
-# ifdef MFLOPPY
-extern void eraseall(const char *, const char *);
-extern void copybones(int);
-extern void playwoRAMdisk(void);
-extern int saveDiskPrompt(int);
-extern void gameDiskPrompt(void);
-# endif
 extern void append_slash(char *);
 extern void getreturn(const char *);
 # ifndef AMIGA
@@ -2309,13 +2299,7 @@ extern int dosave0(void);
 #ifdef INSURANCE
 extern void savestateinlock(void);
 #endif
-#ifdef MFLOPPY
-extern boolean savelev(int, xint8, int);
-extern boolean swapin_file(int);
-extern void co_false(void);
-#else
 extern void savelev(int, xint8, int);
-#endif
 extern void bufon(int);
 extern void bufoff(int);
 extern void bflush(int);

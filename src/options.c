@@ -70,11 +70,6 @@ static struct Bool_Opt
     {"altmeta", (boolean *)0, TRUE, DISP_IN_GAME},
 #endif
     {"ascii_map",     &iflags.wc_ascii_map, !PREFER_TILED, SET_IN_GAME},    /*WC*/
-#ifdef MFLOPPY
-    {"asksavedisk", &flags.asksavedisk, FALSE, SET_IN_GAME},
-#else
-    {"asksavedisk", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
     {"autodescribe", &iflags.autodescribe, TRUE, SET_IN_FILE },
     {"autodig", &flags.autodig, FALSE, SET_IN_GAME},
 #ifdef AUTO_OPEN
@@ -93,11 +88,6 @@ static struct Bool_Opt
     {"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_FILE},
 #else
     {"checkpoint", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
-#ifdef MFLOPPY
-    {"checkspace", &iflags.checkspace, TRUE, SET_IN_GAME},
-#else
-    {"checkspace", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef CURSES_GRAPHICS
     {"classic_status", &iflags.classic_status, TRUE, SET_IN_FILE},

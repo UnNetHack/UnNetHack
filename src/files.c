@@ -65,14 +65,10 @@ extern int errno;
 static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #endif
 
-#if !defined(MFLOPPY) && !defined(VMS) && !defined(WIN32)
+#if !defined(VMS) && !defined(WIN32)
 char bones[] = "bonesnn.xxx";
 char lock[PL_NSIZ+14] = "1lock"; /* long enough for uid+name+.99 */
 #else
-# if defined(MFLOPPY)
-char bones[FILENAME];       /* pathname of bones files */
-char lock[FILENAME];        /* pathname of level files */
-# endif
 # if defined(VMS)
 char bones[] = "bonesnn.xxx;1";
 char lock[PL_NSIZ+17] = "1lock"; /* long enough for _uid+name+.99;1 */
@@ -411,31 +407,6 @@ fopen_datafile(const char *filename, const char *mode, int prefix)
 
 /* ----------  BEGIN LEVEL FILE HANDLING ----------- */
 
-#ifdef MFLOPPY
-/* Set names for bones[] and lock[] */
-void
-set_lock_and_bones()
-{
-    if (!ramdisk) {
-        Strcpy(levels, permbones);
-        Strcpy(bones, permbones);
-    }
-    append_slash(permbones);
-    append_slash(levels);
-#ifdef AMIGA
-    strncat(levels, bbs_id, PATHLEN);
-#endif
-    append_slash(bones);
-    Strcat(bones, "bonesnn.*");
-    Strcpy(lock, levels);
-#ifndef AMIGA
-    Strcat(lock, alllevels);
-#endif
-    return;
-}
-#endif /* MFLOPPY */
-
-
 /* Construct a file name for a level-type file, which is of the form
  * something.level (with any old level stripped off).
  * This assumes there is space on the end of 'file' to append
@@ -532,12 +503,6 @@ open_levelfile(int lev, char *errbuf)
 #ifndef FILE_AREAS
     fq_lock = fqname(lock, LEVELPREFIX, 0);
 #endif
-#ifdef MFLOPPY
-    /* If not currently accessible, swap it in. */
-    if (level_info[lev].where != ACTIVE) {
-        swapin_file(lev);
-    }
-#endif
 #ifdef FILE_AREAS
     fd = open_area(FILE_AREA_LEVL, lock, O_RDONLY | O_BINARY, 0);
 #else
@@ -596,22 +561,15 @@ delete_levelfile(int lev)
 void
 clearlocks(void)
 {
-#if !defined(PC_LOCKING) && defined(MFLOPPY) && !defined(AMIGA)
-    eraseall(levels, alllevels);
-    if (ramdisk) {
-        eraseall(permbones, alllevels);
-    }
-#else
     int x;
 
-# if defined(UNIX) || defined(VMS)
+#if defined(UNIX) || defined(VMS)
     (void) signal(SIGHUP, SIG_IGN);
-# endif
+#endif
     /* can't access maxledgerno() before dungeons are created -dlc */
     for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--) {
         delete_levelfile(x);    /* not all levels need be present */
     }
-#endif
 #ifdef WHEREIS_FILE
     delete_whereis();
 #endif
@@ -900,23 +858,6 @@ create_bonesfile(d_level *lev, char **bonesid, char *errbuf)
     return fd;
 }
 
-#ifdef MFLOPPY
-/* remove partial bonesfile in process of creation */
-void
-cancel_bonesfile()
-{
-    const char *tempname;
-
-    tempname = set_bonestemp_name();
-# ifdef FILE_AREAS
-    (void) remove_area(FILE_AREA_BONES, tempname);
-# else
-    tempname = fqname(tempname, BONESPREFIX, 0);
-    (void) unlink(tempname);
-# endif
-}
-#endif /* MFLOPPY */
-
 /* move completed bones file to proper name */
 void
 commit_bonesfile(d_level *lev)
@@ -1199,11 +1140,6 @@ restore_saved_game(void)
     int fd;
 
     set_savefile_name();
-#ifdef MFLOPPY
-    if (!saveDiskPrompt(1)) {
-        return -1;
-    }
-#endif /* MFLOPPY */
 #ifndef FILE_AREAS
     fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 
@@ -1878,10 +1814,6 @@ const char *oldconfigfile =
 const char *backward_compat_configfile = "nethack.cnf";
 #endif
 
-#ifndef MFLOPPY
-#define fopenp fopen
-#endif
-
 static FILE *
 fopen_config_file(const char *filename, int src)
 {
@@ -2205,35 +2137,14 @@ parse_config_line(FILE *fp,
 # ifdef MICRO
     } else if (match_varname(buf, "HACKDIR", 4)) {
         (void) strncpy(hackdir, bufp, PATHLEN-1);
-#  ifdef MFLOPPY
-    } else if (match_varname(buf, "RAMDISK", 3)) {
-        /* The following ifdef is NOT in the wrong
-         * place.  For now, we accept and silently
-         * ignore RAMDISK */
-#   ifndef AMIGA
-        (void) strncpy(tmp_ramdisk, bufp, PATHLEN-1);
-#   endif
-#  endif
     } else if (match_varname(buf, "LEVELS", 4)) {
         (void) strncpy(tmp_levels, bufp, PATHLEN-1);
 
     } else if (match_varname(buf, "SAVE", 4)) {
-#  ifdef MFLOPPY
-        extern int saveprompt;
-#  endif
         char *ptr;
         if ((ptr = index(bufp, ';')) != 0) {
             *ptr = '\0';
-#  ifdef MFLOPPY
-            if (*(ptr+1) == 'n' || *(ptr+1) == 'N') {
-                saveprompt = FALSE;
-            }
-#  endif
         }
-# ifdef MFLOPPY
-        else
-            saveprompt = flags.asksavedisk;
-# endif
 
         (void) strncpy(SAVEP, bufp, SAVESIZE-1);
         append_slash(SAVEP);
@@ -2579,12 +2490,6 @@ read_config_file(const char *filename, int src)
 #if defined(MICRO) || defined(WIN32)
 #undef tmp_levels
     char tmp_levels[PATHLEN];
-# ifdef MFLOPPY
-#  ifndef AMIGA
-#undef tmp_ramdisk
-    char tmp_ramdisk[PATHLEN];
-#  endif
-# endif
 #endif
     char buf[4*BUFSZ];
     FILE    *fp;
@@ -2594,11 +2499,6 @@ read_config_file(const char *filename, int src)
     }
 
 #if defined(MICRO) || defined(WIN32)
-# ifdef MFLOPPY
-#  ifndef AMIGA
-    tmp_ramdisk[0] = 0;
-#  endif
-# endif
     tmp_levels[0] = 0;
 #endif
     /* begin detection of duplicate configfile options */
@@ -2617,21 +2517,6 @@ read_config_file(const char *filename, int src)
 
 #if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
     /* should be superseded by fqn_prefix[] */
-# ifdef MFLOPPY
-    Strcpy(permbones, tmp_levels);
-#  ifndef AMIGA
-    if (tmp_ramdisk[0]) {
-        Strcpy(levels, tmp_ramdisk);
-        if (strcmp(permbones, levels)) { /* if not identical */
-            ramdisk = TRUE;
-        }
-    } else {
-#  endif /* AMIGA */
-    Strcpy(levels, tmp_levels);
-    }
-
-    Strcpy(bones, levels);
-# endif /* MFLOPPY */
 #endif /* MICRO */
     return TRUE;
 }
