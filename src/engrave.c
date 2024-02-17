@@ -1470,51 +1470,59 @@ sanitize_engravings(void)
 }
 
 void
-save_engravings(int fd, int mode)
+save_engravings(NHFILE *nhfp)
 {
-    struct engr *ep = head_engr;
-    struct engr *ep2;
+    struct engr *ep, *ep2;
     unsigned no_more_engr = 0;
 
-    while (ep) {
+    for (ep = head_engr; ep; ep = ep2) {
         ep2 = ep->nxt_engr;
-        if (ep->engr_lth && ep->engr_txt[0] && perform_bwrite(mode)) {
-            bwrite(fd, (genericptr_t)&(ep->engr_lth), sizeof(ep->engr_lth));
-            bwrite(fd, (genericptr_t)ep, sizeof(struct engr) + ep->engr_lth);
+        if (ep->engr_lth && ep->engr_txt[0] && perform_bwrite(nhfp)) {
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) &(ep->engr_lth), sizeof ep->engr_lth);
+                bwrite(nhfp->fd, (genericptr_t) ep, sizeof (struct engr) + ep->engr_lth);
+            }
         }
-        if (release_data(mode)) {
+        if (release_data(nhfp)) {
             dealloc_engr(ep);
         }
-        ep = ep2;
     }
-    if (perform_bwrite(mode)) {
-        bwrite(fd, (genericptr_t)&no_more_engr, sizeof no_more_engr);
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &no_more_engr, sizeof no_more_engr);
+        }
     }
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         head_engr = 0;
     }
 }
 
 void
-rest_engravings(int fd)
+rest_engravings(NHFILE *nhfp)
 {
     struct engr *ep;
-    unsigned lth;
+    unsigned lth = 0;
 
     head_engr = 0;
     while (1) {
-        mread(fd, &lth, sizeof lth);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &lth, sizeof(unsigned));
+        }
+
         if (lth == 0) {
             return;
         }
         ep = newengr(lth);
-        mread(fd, (genericptr_t) ep, sizeof(struct engr) + lth);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) ep, sizeof(struct engr) + lth);
+        }
         ep->nxt_engr = head_engr;
         head_engr = ep;
-        ep->engr_txt = (char *) (ep + 1);   /* Andreas Bormann */
-        /* Mark as finished for bones levels -- no problem for
+
+        ep->engr_txt = (char *) (ep + 1); /* Andreas Bormann */
+        /* mark as finished for bones levels -- no problem for
          * normal levels as the player must have finished engraving
-         * to be able to move again. */
+         * to be able to move again */
         ep->engr_time = moves;
     }
 }

@@ -1759,31 +1759,35 @@ dealloc_killer(struct kinfo *kptr)
 }
 
 void
-save_killers(int fd, int mode)
+save_killers(NHFILE *nhfp)
 {
     struct kinfo *kptr;
 
-    if (perform_bwrite(mode)) {
+    if (perform_bwrite(nhfp)) {
         for (kptr = &killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
-            bwrite(fd, kptr, sizeof (struct kinfo));
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) kptr, sizeof(struct kinfo));
+            }
         }
     }
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         while (killer.next) {
             kptr = killer.next->next;
-            free(killer.next);
+            free((genericptr_t) killer.next);
             killer.next = kptr;
         }
     }
 }
 
 void
-restore_killers(int fd)
+restore_killers(NHFILE *nhfp)
 {
     struct kinfo *kptr;
 
     for (kptr = &killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
-        mread(fd, kptr, sizeof (struct kinfo));
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) kptr, sizeof(struct kinfo));
+        }
         if (kptr->next) {
             kptr->next = (struct kinfo *) alloc(sizeof (struct kinfo));
         }

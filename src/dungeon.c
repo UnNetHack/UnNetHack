@@ -61,8 +61,8 @@ static void shuffle_planes(void);
 
 mapseen *mapseenchn = (struct mapseen *)0;
 /*static void free_mapseen(mapseen *);*/
-static mapseen *load_mapseen(int);
-static void save_mapseen(int, mapseen *);
+static mapseen *load_mapseen(NHFILE *);
+static void save_mapseen(NHFILE *, mapseen *);
 static mapseen *find_mapseen(d_level *);
 static void print_mapseen(winid, mapseen *, boolean, boolean, boolean);
 static boolean interest_mapseen(mapseen *, boolean);
@@ -129,40 +129,51 @@ dumpit()
 
 /* Save the dungeon structures. */
 void
-save_dungeon(int fd, boolean perform_write, boolean free_data)
+save_dungeon(
+    NHFILE *nhfp,
+    boolean perform_write,
+    boolean free_data)
 {
+    int count;
     branch *curr, *next;
     mapseen *curr_ms, *next_ms;
-    int count;
 
     if (perform_write) {
-        bwrite(fd, (genericptr_t) &n_dgns, sizeof n_dgns);
-        bwrite(fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned)n_dgns);
-        bwrite(fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
-        bwrite(fd, (genericptr_t) tune, sizeof tune);
-
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &n_dgns, sizeof n_dgns);
+            bwrite(nhfp->fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned) n_dgns);
+            bwrite(nhfp->fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
+            bwrite(nhfp->fd, (genericptr_t) tune, sizeof tune);
+        }
         for (count = 0, curr = branches; curr; curr = curr->next) {
             count++;
         }
-        bwrite(fd, (genericptr_t) &count, sizeof(count));
-
-        for (curr = branches; curr; curr = curr->next) {
-            bwrite(fd, (genericptr_t) curr, sizeof (branch));
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
         }
 
+        for (curr = branches; curr; curr = curr->next) {
+          if (nhfp->structlevel) {
+              bwrite(nhfp->fd, (genericptr_t) curr, sizeof *curr);
+          }
+        }
         count = maxledgerno();
-        bwrite(fd, (genericptr_t) &count, sizeof count);
-        bwrite(fd, (genericptr_t) level_info,
-               (unsigned)count * sizeof (struct linfo));
-        bwrite(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
-
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
+            bwrite(nhfp->fd, (genericptr_t) level_info,
+                   (unsigned) count * sizeof (struct linfo));
+            bwrite(nhfp->fd, (genericptr_t) &inv_pos, sizeof inv_pos);
+        }
         for (count = 0, curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next) {
             count++;
         }
-        bwrite(fd, (genericptr_t) &count, sizeof(count));
+
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
+        }
 
         for (curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next) {
-            save_mapseen(fd, curr_ms);
+            save_mapseen(nhfp, curr_ms);
         }
     }
 
@@ -175,10 +186,10 @@ save_dungeon(int fd, boolean perform_write, boolean free_data)
         for (curr_ms = mapseenchn; curr_ms; curr_ms = next_ms) {
             next_ms = curr_ms->next;
             if (curr_ms->custom) {
-                free((genericptr_t)curr_ms->custom);
+                free((genericptr_t) curr_ms->custom);
             }
             if (curr_ms->final_resting_place) {
-                savecemetery(fd, FREE_SAVE, &curr_ms->final_resting_place);
+                savecemetery(nhfp, &curr_ms->final_resting_place);
             }
             free((genericptr_t) curr_ms);
         }
@@ -188,23 +199,29 @@ save_dungeon(int fd, boolean perform_write, boolean free_data)
 
 /* Restore the dungeon structures. */
 void
-restore_dungeon(int fd)
+restore_dungeon(NHFILE *nhfp)
 {
     branch *curr, *last;
+    int count = 0, i;
     mapseen *curr_ms, *last_ms;
-    int count, i;
 
-    mread(fd, (genericptr_t) &n_dgns, sizeof(n_dgns));
-    mread(fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned)n_dgns);
-    mread(fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
-    mread(fd, (genericptr_t) tune, sizeof tune);
-
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &n_dgns, sizeof n_dgns);
+        mread(nhfp->fd, (genericptr_t) dungeons, sizeof (dungeon) * (unsigned) n_dgns);
+        mread(nhfp->fd, (genericptr_t) &dungeon_topology, sizeof dungeon_topology);
+        mread(nhfp->fd, (genericptr_t) tune, sizeof tune);
+    }
     last = branches = (branch *) 0;
 
-    mread(fd, (genericptr_t) &count, sizeof(count));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
+    }
+
     for (i = 0; i < count; i++) {
-        curr = (branch *) alloc(sizeof(branch));
-        mread(fd, (genericptr_t) curr, sizeof(branch));
+        curr = (branch *) alloc(sizeof *curr);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) curr, sizeof *curr);
+        }
         curr->next = (branch *) 0;
         if (last) {
             last->next = curr;
@@ -214,17 +231,25 @@ restore_dungeon(int fd)
         last = curr;
     }
 
-    mread(fd, (genericptr_t) &count, sizeof(count));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
+    }
+
     if (count >= MAXLINFO) {
         panic("level information count larger (%d) than allocated size", count);
     }
-    mread(fd, (genericptr_t) level_info, (unsigned)count*sizeof(struct linfo));
-    mread(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) level_info, (unsigned) count * sizeof (struct linfo));
+    }
 
-    mread(fd, (genericptr_t) &count, sizeof(count));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &inv_pos, sizeof inv_pos);
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
+    }
+
     last_ms = (mapseen *) 0;
     for (i = 0; i < count; i++) {
-        curr_ms = load_mapseen(fd);
+        curr_ms = load_mapseen(nhfp);
         curr_ms->next = (mapseen *) 0;
         if (last_ms) {
             last_ms->next = curr_ms;
@@ -2287,63 +2312,78 @@ rm_mapseen(int ledger_num)
 }
 
 static void
-save_mapseen(int fd, mapseen *mptr)
+save_mapseen(NHFILE *nhfp, mapseen *mptr)
 {
     branch *curr;
-    int count;
+    int brindx;
 
-    count = 0;
-    for (curr = branches; curr; curr = curr->next) {
+    for (brindx = 0, curr = branches; curr; curr = curr->next, ++brindx) {
         if (curr == mptr->br) {
             break;
         }
-        count++;
+    }
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &brindx, sizeof brindx);
     }
 
-    bwrite(fd, (genericptr_t) &count, sizeof(int));
-    bwrite(fd, (genericptr_t) &mptr->lev, sizeof(d_level));
-    bwrite(fd, (genericptr_t) &mptr->feat, sizeof(mapseen_feat));
-    bwrite(fd, (genericptr_t) &mptr->custom_lth, sizeof(unsigned));
-    if (mptr->custom_lth) {
-        bwrite(fd, (genericptr_t) mptr->custom,
-               sizeof(char) * mptr->custom_lth);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &mptr->lev, sizeof mptr->lev);
+        bwrite(nhfp->fd, (genericptr_t) &mptr->feat, sizeof mptr->feat);
+        //bwrite(nhfp->fd, (genericptr_t) &mptr->flags, sizeof mptr->flags);
+        bwrite(nhfp->fd, (genericptr_t) &mptr->custom_lth, sizeof mptr->custom_lth);
     }
-    bwrite(fd, mptr->msrooms, sizeof(mptr->msrooms));
-    savecemetery(fd, WRITE_SAVE, &mptr->final_resting_place);
+
+    if (mptr->custom_lth) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) mptr->custom, mptr->custom_lth);
+        }
+    }
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &mptr->msrooms, sizeof mptr->msrooms);
+    }
+    savecemetery(nhfp, &mptr->final_resting_place);
 }
 
 static mapseen *
-load_mapseen(int fd)
+load_mapseen(NHFILE *nhfp)
 {
-    int branchnum, count;
+    int branchnum = 0, brindx;
     mapseen *load;
     branch *curr;
 
-    load = (mapseen *) alloc(sizeof(mapseen));
-    mread(fd, (genericptr_t) &branchnum, sizeof(int));
+    load = (mapseen *) alloc(sizeof *load);
 
-    count = 0;
-    for (curr = branches; curr; curr = curr->next) {
-        if (count == branchnum) {
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &branchnum, sizeof branchnum);
+    }
+    for (brindx = 0, curr = branches; curr; curr = curr->next, ++brindx) {
+        if (brindx == branchnum) {
             break;
         }
-        count++;
     }
     load->br = curr;
 
-    mread(fd, (genericptr_t) &load->lev, sizeof(d_level));
-    mread(fd, (genericptr_t) &load->feat, sizeof(mapseen_feat));
-    mread(fd, (genericptr_t) &load->custom_lth, sizeof(unsigned));
-    if (load->custom_lth > 0) {
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &load->lev, sizeof load->lev);
+        mread(nhfp->fd, (genericptr_t) &load->feat, sizeof load->feat);
+        //mread(nhfp->fd, (genericptr_t) &load->flags, sizeof load->flags);
+        mread(nhfp->fd, (genericptr_t) &load->custom_lth, sizeof load->custom_lth);
+    }
+
+    if (load->custom_lth) {
         /* length doesn't include terminator (which isn't saved & restored) */
-        load->custom = (char *) alloc(sizeof(char) * load->custom_lth + 1);
-        mread(fd, load->custom, sizeof(char) * load->custom_lth);
+        load->custom = (char *) alloc(load->custom_lth + 1);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) load->custom, load->custom_lth);
+        }
         load->custom[load->custom_lth] = '\0';
     } else {
-        load->custom = (char *) 0;
+        load->custom = 0;
     }
-    mread(fd, load->msrooms, sizeof load->msrooms);
-    restcemetery(fd, &load->final_resting_place);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &load->msrooms, sizeof load->msrooms);
+    }
+    restcemetery(nhfp, &load->final_resting_place);
 
     return load;
 }

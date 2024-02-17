@@ -1075,9 +1075,9 @@ clone_mon(struct monst *mon,
     m2->mextra = (struct mextra *) 0;
     m2->nmon = fmon;
     fmon = m2;
-    m2->m_id = flags.ident++;
+    m2->m_id = next_ident();
     if (!m2->m_id) {
-        m2->m_id = flags.ident++; /* ident overflowed */
+        m2->m_id = next_ident(); /* ident overflowed */
     }
     m2->mx = mm.x;
     m2->my = mm.y;
@@ -1389,9 +1389,9 @@ _makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
 
     mtmp->nmon = fmon;
     fmon = mtmp;
-    mtmp->m_id = flags.ident++;
+    mtmp->m_id = next_ident();
     if (!mtmp->m_id) {
-        mtmp->m_id = flags.ident++; /* ident overflowed */
+        mtmp->m_id = next_ident(); /* ident overflowed */
     }
     set_mon_data(mtmp, ptr);
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx) {

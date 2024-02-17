@@ -80,18 +80,22 @@ init_artifacts(void)
 }
 
 void
-save_artifacts(int fd)
+save_artifacts(NHFILE *nhfp)
 {
-    bwrite(fd, (genericptr_t) artiexist, sizeof artiexist);
-    bwrite(fd, (genericptr_t) artidisco, sizeof artidisco);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) artiexist, sizeof artiexist);
+        bwrite(nhfp->fd, (genericptr_t) artidisco, sizeof artidisco);
+    }
 }
 
 void
-restore_artifacts(int fd)
+restore_artifacts(NHFILE *nhfp)
 {
-    mread(fd, (genericptr_t) artiexist, sizeof artiexist);
-    mread(fd, (genericptr_t) artidisco, sizeof artidisco);
-    hack_artifacts();   /* redo non-saved special cases */
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) artiexist, sizeof artiexist);
+        mread(nhfp->fd, (genericptr_t) artidisco, sizeof artidisco);
+    }
+    hack_artifacts(); /* redo non-saved special cases */
 }
 
 const char *
@@ -631,7 +635,7 @@ set_artifact_intrinsic(struct obj *otmp, boolean on, long int wp_mask)
          * that can print a message--need to guard against being printed
          * when restoring a game
          */
-        (void) make_hallucinated((long)!on, restoring ? FALSE : TRUE, wp_mask);
+        (void) make_hallucinated((long) !on, program_state.restoring ? FALSE : TRUE, wp_mask);
     }
     if (spfx & SPFX_ESP) {
         if (on) {

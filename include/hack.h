@@ -129,6 +129,14 @@ enum cost_alteration_types {
 #define LOOKHERE_PICKED_SOME   1
 #define LOOKHERE_SKIP_DFEATURE 2
 
+/* game events log */
+struct gamelog_line {
+    long turn; /* turn when this happened */
+    long flags; /* LL_foo flags */
+    char *text;
+    struct gamelog_line *next;
+};
+
 /* getpos() return values */
 enum getpos_retval {
     LOOK_TRADITIONAL = 0, /* '.' -- ask about "more info?" */
@@ -204,6 +212,106 @@ enum hmon_atkmode_types {
     HMON_APPLIED = 3, /* polearm, treated as ranged */
     HMON_DRAGGED = 4  /* attached iron ball, pulled into mon */
 };
+
+struct restore_info {
+    const char *name;
+    int mread_flags;
+};
+
+enum restore_stages {
+    REST_GSTATE = 1,    /* restoring current level and game state */
+    REST_LEVELS = 2,    /* restoring remainder of dungeon */
+};
+
+/* structure for 'program_state'; not saved and restored */
+struct sinfo {
+    int gameover;               /* self explanatory? */
+    int stopprint;              /* inhibit further end of game disclosure */
+#ifdef HANGUPHANDLING
+    volatile int done_hup;      /* SIGHUP or moral equivalent received
+                                 * -- no more screen output */
+    int preserve_locks;         /* don't remove level files prior to exit */
+#endif
+    int something_worth_saving; /* in case of panic */
+    int panicking;              /* `panic' is in progress */
+    int exiting;                /* an exit handler is executing */
+    int saving;                 /* creating a save file */
+    int restoring;              /* reloading a save file */
+    int in_moveloop;            /* normal gameplay in progress */
+    int in_impossible;          /* reportig a warning */
+    int in_docrt;               /* in docrt(): redrawing the whole screen */
+    int in_self_recover;        /* processsing orphaned level files */
+    int in_checkpoint;          /* saving insurance checkpoint */
+    int in_parseoptions;        /* in parseoptions */
+    int in_role_selection;      /* role/race/&c selection menus in progress */
+    int in_getlin;              /* inside interface getlin routine */
+    int config_error_ready;     /* config_error_add is ready, available */
+    int beyond_savefile_load;   /* set when past savefile loading */
+#ifdef PANICLOG
+    int in_paniclog;            /* writing a panicloc entry */
+#endif
+    int wizkit_wishing;         /* starting wizard mode game w/ WIZKIT file */
+    /* input_state:  used in the core for the 'altmeta' option to process ESC;
+       used in the curses interface to avoid arrow keys when user is doing
+       something other than entering a command or direction and in the Qt
+       interface to suppress menu commands in similar conditions;
+       readchar() alrways resets it to 'otherInp' prior to returning */
+    int input_state; /* whether next key pressed will be entering a command */
+#ifdef TTY_GRAPHICS
+    /* resize_pending only matters when handling a SIGWINCH signal for tty;
+       getting_char is used along with that and also separately for UNIX;
+       we minimize #if conditionals for them to avoid unnecessary clutter */
+    volatile int resize_pending; /* set by signal handler */
+    volatile int getting_char;  /* referenced during signal handling */
+#endif
+};
+
+/* Flags for controlling uptodate */
+#define UTD_CHECKSIZES                 0x01
+#define UTD_CHECKFIELDCOUNTS           0x02
+#define UTD_SKIP_SANITY1               0x04
+#define UTD_SKIP_SAVEFILEINFO          0x08
+#define UTD_WITHOUT_WAITSYNCH_PERFILE  0x10
+
+/* NetHack ftypes */
+#define NHF_LEVELFILE       1
+#define NHF_SAVEFILE        2
+#define NHF_BONESFILE       3
+/* modes */
+#define READING  0x0
+#define COUNTING 0x1
+#define WRITING  0x2
+#define FREEING  0x4
+#define MAX_BMASK 4
+/* operations of the various saveXXXchn & co. routines */
+#define perform_bwrite(nhfp) ((nhfp)->mode & (COUNTING | WRITING))
+#define release_data(nhfp) ((nhfp)->mode & FREEING)
+
+/* Content types for fieldlevel files */
+struct fieldlevel_content {
+    boolean deflt;        /* individual fields */
+    boolean binary;       /* binary rather than text */
+    boolean json;         /* JSON */
+};
+
+typedef struct {
+    int fd;               /* for traditional structlevel binary writes */
+    int mode;             /* holds READING, WRITING, or FREEING modes  */
+    int ftype;            /* NHF_LEVELFILE, NHF_SAVEFILE, or NHF_BONESFILE */
+    int fnidx;            /* index of procs for fieldlevel saves */
+    long count;           /* holds current line count for default style file,
+                             field count for binary style */
+    boolean structlevel;  /* traditional structure binary saves */
+    boolean fieldlevel;   /* fieldlevel saves saves each field individually */
+    boolean addinfo;      /* if set, some additional context info from core */
+    boolean eof;          /* place to mark eof reached */
+    boolean bendian;      /* set to true if executing on big-endian machine */
+    FILE *fpdef;          /* file pointer for fieldlevel default style */
+    FILE *fpdefmap;       /* file pointer mapfile for def format */
+    FILE *fplog;          /* file pointer logfile */
+    FILE *fpdebug;        /* file pointer debug info */
+    struct fieldlevel_content style;
+} NHFILE;
 
 #include "trap.h"
 #include "flag.h"

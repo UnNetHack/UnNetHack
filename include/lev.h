@@ -7,16 +7,6 @@
 #ifndef LEV_H
 #define LEV_H
 
-#define COUNT_SAVE  0x1
-#define WRITE_SAVE  0x2
-#define FREE_SAVE   0x4
-
-#define MAX_BMASK 4
-
-/* operations of the various saveXXXchn & co. routines */
-#define perform_bwrite(mode)    ((mode) & (COUNT_SAVE|WRITE_SAVE))
-#define release_data(mode)  ((mode) & FREE_SAVE)
-
 /* The following are used in mkmaze.c */
 struct container {
     struct container *next;

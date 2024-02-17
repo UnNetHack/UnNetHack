@@ -24,8 +24,8 @@ static struct permonst * morguemon(void);
 static struct permonst * antholemon(void);
 static struct permonst * squadmon(void);
 static struct permonst * armorymon(void);
-static void save_room(int, struct mkroom *);
-static void rest_room(int, struct mkroom *);
+static void save_room(NHFILE *, struct mkroom *);
+static void rest_room(NHFILE *, struct mkroom *);
 
 #define sq(x) ((x)*(x))
 
@@ -971,7 +971,7 @@ gotone:
  */
 
 static void
-save_room(int fd, struct mkroom *r)
+save_room(NHFILE* nhfp, struct mkroom* r)
 {
     short i;
     /*
@@ -979,9 +979,11 @@ save_room(int fd, struct mkroom *r)
      * of writing the whole structure. That is I should not write
      * the subrooms pointers, but who cares ?
      */
-    bwrite(fd, (genericptr_t) r, sizeof(struct mkroom));
-    for (i=0; i<r->nsubrooms; i++) {
-        save_room(fd, r->sbrooms[i]);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) r, sizeof (struct mkroom));
+    }
+    for (i = 0; i < r->nsubrooms; i++) {
+        save_room(nhfp, r->sbrooms[i]);
     }
 }
 
@@ -990,26 +992,31 @@ save_room(int fd, struct mkroom *r)
  */
 
 void
-save_rooms(int fd)
+save_rooms(NHFILE* nhfp)
 {
     short i;
 
     /* First, write the number of rooms */
-    bwrite(fd, (genericptr_t) &nroom, sizeof(nroom));
-    for (i=0; i<nroom; i++) {
-        save_room(fd, &rooms[i]);
+    if (nhfp->structlevel) {
+        bwrite(nhfp->fd, (genericptr_t) &nroom, sizeof(nroom));
+    }
+    for (i = 0; i < nroom; i++) {
+        save_room(nhfp, &rooms[i]);
     }
 }
 
 static void
-rest_room(int fd, struct mkroom *r)
+rest_room(NHFILE* nhfp, struct mkroom* r)
 {
     short i;
 
-    mread(fd, (genericptr_t) r, sizeof(struct mkroom));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) r, sizeof(struct mkroom));
+    }
+
     for (i=0; i<r->nsubrooms; i++) {
         r->sbrooms[i] = &subrooms[nsubroom];
-        rest_room(fd, &subrooms[nsubroom]);
+        rest_room(nhfp, &subrooms[nsubroom]);
         subrooms[nsubroom++].resident = (struct monst *)0;
     }
 }
@@ -1020,14 +1027,16 @@ rest_room(int fd, struct mkroom *r)
  */
 
 void
-rest_rooms(int fd)
+rest_rooms(NHFILE* nhfp)
 {
     short i;
 
-    mread(fd, (genericptr_t) &nroom, sizeof(nroom));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &nroom, sizeof(nroom));
+    }
     nsubroom = 0;
     for (i = 0; i<nroom; i++) {
-        rest_room(fd, &rooms[i]);
+        rest_room(nhfp, &rooms[i]);
         rooms[i].resident = (struct monst *)0;
     }
     rooms[nroom].hx = -1;       /* restore ending flags */

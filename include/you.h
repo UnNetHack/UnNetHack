@@ -492,9 +492,10 @@ struct you {
     long ucleansed;          /* to record moves when player was cleansed */
     long usleep;             /* sleeping; monstermove you last started */
     int uinvault;
-    struct monst *ustuck;
-
-    struct monst *usteed;
+    struct monst *ustuck;    /* engulfer or grabber, maybe grabbee if Upolyd */
+    struct monst *usteed;    /* mount when riding */
+    unsigned ustuck_mid;     /* u.ustuck->m_id, used during save/restore */
+    unsigned usteed_mid;     /* u.usteed->m_id, used during save/restore */
     long ugallop;
     int urideturns;
 

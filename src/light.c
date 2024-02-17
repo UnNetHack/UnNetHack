@@ -44,13 +44,12 @@
 
 static light_source *light_base = 0;
 
-static void write_ls(int, light_source *);
-static int maybe_write_ls(int, int, boolean);
+static void write_ls(NHFILE *, light_source *);
+static int maybe_write_ls(NHFILE *, int, boolean);
 
 /* imported from vision.c, for small circles */
 extern coordxy circle_data[];
 extern coordxy circle_start[];
-
 
 /* Create a new light source.  */
 void
@@ -334,22 +333,24 @@ find_mid(unsigned int nid, unsigned int fmflags)
 
 /* Save all light sources of the given range. */
 void
-save_light_sources(int fd, int mode, int range)
+save_light_sources(NHFILE *nhfp, int range)
 {
     int count, actual, is_global;
     light_source **prev, *curr;
 
-    if (perform_bwrite(mode)) {
-        count = maybe_write_ls(fd, range, FALSE);
-        bwrite(fd, (genericptr_t) &count, sizeof count);
-        actual = maybe_write_ls(fd, range, TRUE);
+    if (perform_bwrite(nhfp)) {
+        count = maybe_write_ls(nhfp, range, FALSE);
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
+        }
+        actual = maybe_write_ls(nhfp, range, TRUE);
         if (actual != count) {
             panic("counted %d light sources, wrote %d! [range=%d]",
                   count, actual, range);
         }
     }
 
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         for (prev = &light_base; (curr = *prev) != 0; ) {
             if (!curr->id.a_monst) {
                 impossible("save_light_sources: no id! [range=%d]", range);
@@ -372,7 +373,7 @@ save_light_sources(int fd, int mode, int range)
             /* if global and not doing local, or vice versa, remove it */
             if (is_global ^ (range == RANGE_LEVEL)) {
                 *prev = curr->next;
-                free((genericptr_t)curr);
+                free((genericptr_t) curr);
             } else {
                 prev = &(*prev)->next;
             }
@@ -385,17 +386,21 @@ save_light_sources(int fd, int mode, int range)
  * pointers.
  */
 void
-restore_light_sources(int fd)
+restore_light_sources(NHFILE *nhfp)
 {
-    int count;
+    int count = 0;
     light_source *ls;
 
     /* restore elements */
-    mread(fd, (genericptr_t) &count, sizeof count);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
+    }
 
     while (count-- > 0) {
         ls = (light_source *) alloc(sizeof(light_source));
-        mread(fd, (genericptr_t) ls, sizeof(light_source));
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
+        }
         ls->next = light_base;
         light_base = ls;
     }
@@ -458,7 +463,7 @@ relink_light_sources(boolean ghostly)
  * the light source out.
  */
 static int
-maybe_write_ls(int fd, int range, boolean write_it)
+maybe_write_ls(NHFILE *nhfp, int range, boolean write_it)
 {
     int count = 0, is_global;
     light_source *ls;
@@ -485,7 +490,7 @@ maybe_write_ls(int fd, int range, boolean write_it)
         if (is_global ^ (range == RANGE_LEVEL)) {
             count++;
             if (write_it) {
-                write_ls(fd, ls);
+                write_ls(nhfp, ls);
             }
         }
     }
@@ -526,7 +531,7 @@ light_sources_sanity_check(void)
 
 /* Write a light source structure to disk. */
 static void
-write_ls(int fd, light_source *ls)
+write_ls(NHFILE *nhfp, light_source *ls)
 {
     anything arg_save;
     struct obj *otmp;
@@ -534,7 +539,9 @@ write_ls(int fd, light_source *ls)
 
     if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
         if (ls->flags & LSF_NEEDS_FIXUP) {
-            bwrite(fd, (genericptr_t)ls, sizeof(light_source));
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
+            }
         } else {
             /* replace object pointer with id for write, then put back */
             arg_save = ls->id;
@@ -558,7 +565,9 @@ write_ls(int fd, light_source *ls)
 #endif
             }
             ls->flags |= LSF_NEEDS_FIXUP;
-            bwrite(fd, (genericptr_t)ls, sizeof(light_source));
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) ls, sizeof(light_source));
+            }
             ls->id = arg_save;
             ls->flags &= ~LSF_NEEDS_FIXUP;
         }

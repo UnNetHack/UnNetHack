@@ -161,6 +161,23 @@ setnotworn(struct obj *obj)
     update_inventory();
 }
 
+/* called when saving with FREEING flag set has just discarded inventory */
+void
+allunworn(void)
+{
+    const struct worn *wp;
+
+    u.twoweap = 0; /* uwep and uswapwep are going away */
+    /* remove stale pointers; called after the objects have been freed
+       (without first being unworn) while saving invent during game save;
+       note: uball and uchain might not be freed yet but we clear them
+       here anyway (savegamestate() and its callers deal with them) */
+    for (wp = worn; wp->w_mask; wp++) {
+        /* object is already gone so we don't/can't update is owornmask */
+        *(wp->w_obj) = (struct obj *) 0;
+    }
+}
+
 /* return item worn in slot indiciated by wornmask; needed by poly_obj() */
 struct obj *
 wearmask_to_obj(long int wornmask)

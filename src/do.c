@@ -16,7 +16,7 @@ static int drop(struct obj *);
 static int wipeoff(void);
 
 static int menu_drop(int);
-static int currentlevel_rewrite(void);
+static NHFILE *currentlevel_rewrite(void);
 static void final_level(void);
 /* static boolean badspot(coordxy,coordxy); */
 static boolean unique_item_check(void);
@@ -1257,18 +1257,18 @@ doup(void)
 d_level save_dlevel = {0, 0};
 
 /* check that we can write out the current level */
-static int
+static NHFILE *
 currentlevel_rewrite(void)
 {
-    int fd;
+    NHFILE *nhfp;
     char whynot[BUFSZ];
 
     /* since level change might be a bit slow, flush any buffered screen
      *  output (like "you fall through a trap door") */
     mark_synch();
 
-    fd = create_levelfile(ledger_no(&u.uz), whynot);
-    if (fd < 0) {
+    nhfp = create_levelfile(ledger_no(&u.uz), whynot);
+    if (!nhfp) {
         /*
          * This is not quite impossible: e.g., we may have
          * exceeded our quota. If that is the case then we
@@ -1277,31 +1277,36 @@ currentlevel_rewrite(void)
          * writable.
          */
         pline("%s", whynot);
-        return -1;
+        return (NHFILE *) 0;
     }
 
-    return fd;
+    return nhfp;
 }
 
 #ifdef INSURANCE
 void
 save_currentstate(void)
 {
-    int fd;
+    NHFILE *nhfp;
 
+    program_state.in_checkpoint++;
     if (flags.ins_chkpt) {
         /* write out just-attained level, with pets and everything */
-        fd = currentlevel_rewrite();
-        if (fd < 0) {
+        nhfp = currentlevel_rewrite();
+        if (!nhfp) {
             return;
         }
-        bufon(fd);
-        savelev(fd, ledger_no(&u.uz), WRITE_SAVE);
-        bclose(fd);
+        if (nhfp->structlevel) {
+            bufon(nhfp->fd);
+        }
+        nhfp->mode = WRITING;
+        savelev(nhfp, ledger_no(&u.uz));
+        close_nhfile(nhfp);
     }
 
     /* write out non-level state */
     savestateinlock();
+    program_state.in_checkpoint--;
 }
 #endif
 
@@ -1363,7 +1368,8 @@ d_level new_dlevel = {0, 0};
 void
 goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal)
 {
-    int fd, l_idx;
+    int l_idx, save_mode;
+    NHFILE *nhfp;
     xint16 new_ledger;
     boolean cant_go_back,
             up = (depth(newlevel) < depth(&u.uz)),
@@ -1420,8 +1426,8 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
         buried_ball_to_punishment(); /* (before we save/leave old level) */
     }
 
-    fd = currentlevel_rewrite();
-    if (fd < 0) {
+    nhfp = currentlevel_rewrite();
+    if (!nhfp) {
         return;
     }
 
@@ -1470,12 +1476,16 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
      */
     cant_go_back = (newdungeon && In_endgame(newlevel));
     if (!cant_go_back) {
-        update_mlstmv();    /* current monsters are becoming inactive */
-        bufon(fd);      /* use buffered output */
+        update_mlstmv();/* current monsters are becoming inactive */
+        if (nhfp->structlevel) {
+            bufon(nhfp->fd); /* use buffered output */
+        }
     }
-    savelev(fd, ledger_no(&u.uz),
-            cant_go_back ? FREE_SAVE : (WRITE_SAVE | FREE_SAVE));
-    bclose(fd);
+    save_mode = nhfp->mode;
+    nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);
+    savelev(nhfp, ledger_no(&u.uz));
+    nhfp->mode = save_mode;
+    close_nhfile(nhfp);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
         for (l_idx = maxledgerno(); l_idx > 0; --l_idx) {
@@ -1539,8 +1549,8 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
         livelog_printf(LL_DEBUG, "entered new level %d, %s.", dunlev(&u.uz), dungeons[u.uz.dnum].dname);
     } else {
         /* returning to previously visited level; reload it */
-        fd = open_levelfile(new_ledger, whynot);
-        if (fd < 0) {
+        nhfp = open_levelfile(new_ledger, whynot);
+        if (tricked_fileremoved(nhfp, whynot)) {
             pline("%s", whynot);
             pline("Probably someone removed it.");
             Strcpy(killer.name, whynot);
@@ -1548,9 +1558,9 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             /* we'll reach here if running in wizard mode */
             error("Cannot continue this game.");
         }
-        minit();    /* ZEROCOMP */
-        getlev(fd, hackpid, new_ledger, FALSE);
-        (void) close(fd);
+        minit(); /* ZEROCOMP */
+        getlev(nhfp, hackpid, new_ledger);
+        close_nhfile(nhfp);
     }
     u.uinwater = 0;
     /* do this prior to level-change pline messages */

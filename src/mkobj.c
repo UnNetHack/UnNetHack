@@ -506,6 +506,35 @@ splitobj(struct obj *obj, long int num)
     return otmp;
 }
 
+/* return the value of context.ident and then increment it to be ready for
+   its next use; used to be simple += 1 so that every value from 1 to N got
+   used but now has a random increase that skips half of potential values */
+unsigned
+next_ident(void)
+{
+    unsigned res = flags.ident;
+
+    /* +rnd(2): originally just +1; changed to rnd() to avoid potential
+       exploit of player using #adjust to split an object stack in a manner
+       that makes most recent ident%2 known; since #adjust takes no time,
+       no intervening activity like random creation of a new monster will
+       take place before next user command; with former +1, o_id%2 of the
+       next object to be created was knowable and player could make a wish
+       under controlled circumstances for an item that is affected by the
+       low bits of its obj->o_id [particularly helm of opposite alignment] */
+    flags.ident += rnd(2); /* ready for next new object or monster */
+
+    /* if ident has wrapped to 0, force it to be non-zero; if/when it
+       ever wraps past 0 (unlikely, but possible on a configuration which
+       uses 16-bit 'int'), just live with that and hope no o_id conflicts
+       between objects or m_id conflicts between monsters arise */
+    if (!flags.ident) {
+        flags.ident = rnd(2);
+    }
+
+    return res;
+}
+
 /* when splitting a stack that has o_id-based shop prices, pick an
    o_id value for the new stack that will maintain the same price */
 static unsigned
@@ -703,9 +732,9 @@ bill_dummy_object(struct obj *otmp)
     *dummy = *otmp;
     dummy->oextra = (struct oextra *) 0;
     dummy->where = OBJ_FREE;
-    dummy->o_id = flags.ident++;
+    dummy->o_id = next_ident();
     if (!dummy->o_id) {
-        dummy->o_id = flags.ident++; /* ident overflowed */
+        dummy->o_id = next_ident(); /* ident overflowed */
     }
     dummy->timed = 0;
     copy_oextra(dummy, otmp);
@@ -831,9 +860,9 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp = newobj();
     *otmp = zeroobj;
     otmp->age = monstermoves;
-    otmp->o_id = flags.ident++;
+    otmp->o_id = next_ident();
     if (!otmp->o_id) {
-        otmp->o_id = flags.ident++; /* ident overflowed */
+        otmp->o_id = next_ident(); /* ident overflowed */
     }
     otmp->quan = 1L;
     otmp->oclass = let;

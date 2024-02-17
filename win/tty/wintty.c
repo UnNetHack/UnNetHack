@@ -3307,7 +3307,6 @@ setclipped(void)
 void
 tty_cliparound(int x, int y)
 {
-    extern boolean restoring;
     int oldx = clipx, oldy = clipy;
 
     if (!clipping) {
@@ -3328,7 +3327,7 @@ tty_cliparound(int x, int y)
         clipy = clipymax - (LI - 3);
     }
     if (clipx != oldx || clipy != oldy) {
-        if (on_level(&u.uz0, &u.uz) && !restoring) {
+        if (on_level(&u.uz0, &u.uz)) {
             (void) doredraw();
         }
     }

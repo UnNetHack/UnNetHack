@@ -102,6 +102,13 @@ typedef int16_t xint16;
 typedef coordxy boolean;          /* 0 or 1 */
 #endif
 
+/* Type for third parameter of read(2) */
+#if defined(BSD) || defined(ULTRIX)
+typedef int readLenType;
+#else /* e.g. SYSV, __TURBOC__ */
+typedef unsigned readLenType;
+#endif
+
 #ifndef TRUE        /* defined in some systems' native include files */
 #define TRUE    ((boolean)1)
 #define FALSE   ((boolean)0)
@@ -315,6 +322,13 @@ typedef glyph_t nhsym;
 # endif
 #endif
 
+#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
+#define HANGUPHANDLING
+#endif
+#if defined(SAFERHANGUP) \
+    && (defined(NOSAVEONHANGUP) || !defined(HANGUPHANDLING))
+#undef SAFERHANGUP
+#endif
 
 #define Sprintf  (void) sprintf
 #define Strcat   (void) strcat
@@ -354,6 +368,20 @@ struct version_info {
     unsigned long struct_sizes;     /* size of key structs */
 };
 
+struct savefile_info {
+    unsigned long sfi1; /* compression etc. */
+    unsigned long sfi2; /* miscellaneous */
+    unsigned long sfi3; /* thirdparty */
+};
+#ifdef NHSTDC
+#define SFI1_EXTERNALCOMP (1UL)
+#define SFI1_RLECOMP (1UL << 1)
+#define SFI1_ZEROCOMP (1UL << 2)
+#else
+#define SFI1_EXTERNALCOMP (1L)
+#define SFI1_RLECOMP (1L << 1)
+#define SFI1_ZEROCOMP (1L << 2)
+#endif
 
 /*
  * Configurable internal parameters.

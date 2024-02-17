@@ -575,31 +575,37 @@ detect_wsegs(struct monst *worm, boolean use_detection_glyph)
  *  of segments, including the dummy.  Called from save.c.
  */
 void
-save_worm(int fd, int mode)
+save_worm(NHFILE *nhfp)
 {
     int i;
     int count;
     struct wseg *curr, *temp;
 
-    if (perform_bwrite(mode)) {
+    if (perform_bwrite(nhfp)) {
         for (i = 1; i < MAX_NUM_WORMS; i++) {
             for (count = 0, curr = wtails[i]; curr; curr = curr->nseg) {
                 count++;
             }
             /* Save number of segments */
-            bwrite(fd, (genericptr_t) &count, sizeof(count));
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
+            }
             /* Save segment locations of the monster. */
             if (count) {
                 for (curr = wtails[i]; curr; curr = curr->nseg) {
-                    bwrite(fd, (genericptr_t) &(curr->wx), sizeof(coordxy));
-                    bwrite(fd, (genericptr_t) &(curr->wy), sizeof(coordxy));
+                    if (nhfp->structlevel) {
+                        bwrite(nhfp->fd, (genericptr_t) &(curr->wx), sizeof curr->wx);
+                        bwrite(nhfp->fd, (genericptr_t) &(curr->wy), sizeof curr->wy);
+                    }
                 }
             }
         }
-        bwrite(fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) wgrowtime, sizeof wgrowtime);
+        }
     }
 
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         /* Free the segments only.  savemonchn() will take care of the
          * monsters. */
         for (i = 1; i < MAX_NUM_WORMS; i++) {
@@ -625,23 +631,24 @@ save_worm(int fd, int mode)
  *  Restore the worm information from the save file.  Called from restore.c
  */
 void
-rest_worm(int fd)
+rest_worm(NHFILE *nhfp)
 {
-    int i, j, count;
+    int i, j, count = 0;
     struct wseg *curr, *temp;
 
     for (i = 1; i < MAX_NUM_WORMS; i++) {
-        mread(fd, (genericptr_t) &count, sizeof(count));
-        if (!count) {
-            continue; /* none */
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &count, sizeof count);
         }
 
         /* Get the segments. */
         for (curr = (struct wseg *) 0, j = 0; j < count; j++) {
             temp = newseg();
             temp->nseg = (struct wseg *) 0;
-            mread(fd, (genericptr_t) &(temp->wx), sizeof(coordxy));
-            mread(fd, (genericptr_t) &(temp->wy), sizeof(coordxy));
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) &(temp->wx), sizeof temp->wx);
+                mread(nhfp->fd, (genericptr_t) &(temp->wy), sizeof temp->wy);
+            }
             if (curr) {
                 curr->nseg = temp;
             } else {
@@ -651,7 +658,9 @@ rest_worm(int fd)
         }
         wheads[i] = curr;
     }
-    mread(fd, (genericptr_t) wgrowtime, sizeof(wgrowtime));
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) wgrowtime, sizeof wgrowtime);
+    }
 }
 
 /*

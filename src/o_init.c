@@ -315,29 +315,32 @@ oinit(void)
 }
 
 void
-savenames(int fd, int mode)
+savenames(NHFILE* nhfp)
 {
     int i;
     unsigned int len;
 
-    if (perform_bwrite(mode)) {
-        bwrite(fd, (genericptr_t)bases, sizeof bases);
-        bwrite(fd, (genericptr_t)disco, sizeof disco);
-        bwrite(fd, (genericptr_t)objects,
-               sizeof(struct objclass) * NUM_OBJECTS);
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) bases, sizeof bases);
+            bwrite(nhfp->fd, (genericptr_t) disco, sizeof disco);
+            bwrite(nhfp->fd, (genericptr_t) objects, sizeof(struct objclass) * NUM_OBJECTS);
+        }
     }
     /* as long as we use only one version of Hack we
        need not save oc_name and oc_descr, but we must save
        oc_uname for all objects */
     for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
-            if (perform_bwrite(mode)) {
+            if (perform_bwrite(nhfp)) {
                 len = strlen(objects[i].oc_uname)+1;
-                bwrite(fd, (genericptr_t)&len, sizeof len);
-                bwrite(fd, (genericptr_t)objects[i].oc_uname, len);
+                if (nhfp->structlevel) {
+                    bwrite(nhfp->fd, (genericptr_t) &len, sizeof len);
+                    bwrite(nhfp->fd, (genericptr_t) objects[i].oc_uname, len);
+                }
             }
-            if (release_data(mode)) {
-                free((genericptr_t)objects[i].oc_uname);
+            if (release_data(nhfp)) {
+                free((genericptr_t) objects[i].oc_uname);
                 objects[i].oc_uname = 0;
             }
         }
@@ -345,19 +348,25 @@ savenames(int fd, int mode)
 }
 
 void
-restnames(int fd)
+restnames(NHFILE* nhfp)
 {
     int i;
-    unsigned int len;
+    unsigned int len = 0;
 
-    mread(fd, (genericptr_t) bases, sizeof bases);
-    mread(fd, (genericptr_t) disco, sizeof disco);
-    mread(fd, (genericptr_t) objects, sizeof(struct objclass) * NUM_OBJECTS);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) bases, sizeof bases);
+        mread(nhfp->fd, (genericptr_t) disco, sizeof disco);
+        mread(nhfp->fd, (genericptr_t) objects, NUM_OBJECTS * sizeof (struct objclass));
+    }
     for (i = 0; i < NUM_OBJECTS; i++) {
         if (objects[i].oc_uname) {
-            mread(fd, (genericptr_t) &len, sizeof len);
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) &len, sizeof len);
+            }
             objects[i].oc_uname = (char *) alloc(len);
-            mread(fd, (genericptr_t)objects[i].oc_uname, len);
+            if (nhfp->structlevel) {
+                mread(nhfp->fd, (genericptr_t) objects[i].oc_uname, len);
+            }
         }
     }
 #ifdef USE_TILES

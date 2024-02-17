@@ -306,6 +306,10 @@ bot1()
     int save_botlx = flags.botlx;
 #endif
 
+    if (suppress_map_output()) {
+        return;
+    }
+
     Strcpy(newbot1, "");
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     if (flags.hitpointbar) {
@@ -639,6 +643,11 @@ static void
 bot2(void)
 {
     char newbot2[MAXCO];
+
+    if (suppress_map_output()) {
+        return;
+    }
+
     bot2str(newbot2);
     int save_botlx = flags.botlx;
 #endif
@@ -688,6 +697,10 @@ static void
 bot3(void)
 {
     char newbot3[MAXCO];
+
+    if (suppress_map_output()) {
+        return;
+    }
 
     if (iflags.statuslines >= 3) {
         int save_botlx = flags.botlx;

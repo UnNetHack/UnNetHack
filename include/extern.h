@@ -57,8 +57,8 @@ extern int unfixable_trouble_count(boolean);
 /* ### artifact.c ### */
 
 extern void init_artifacts(void);
-extern void save_artifacts(int);
-extern void restore_artifacts(int);
+extern void save_artifacts(NHFILE *);
+extern void restore_artifacts(NHFILE *);
 extern const char *artiname(int);
 extern struct obj *mk_artifact(struct obj *, aligntyp);
 extern const char *artifact_name(const char *, short *, boolean);
@@ -338,6 +338,7 @@ extern boolean unmap_invisible(coordxy, coordxy);
 extern void unmap_object(coordxy, coordxy);
 extern struct obj *vobj_at(coordxy, coordxy);
 extern void map_location(coordxy, coordxy, int);
+extern boolean suppress_map_output(void);
 extern void feel_newsym(coordxy, coordxy);
 extern void feel_location(coordxy, coordxy);
 extern void newsym(coordxy, coordxy);
@@ -612,8 +613,8 @@ extern int dumpoverview(void);
 
 /* ### dungeon.c ### */
 
-extern void save_dungeon(int, boolean, boolean);
-extern void restore_dungeon(int);
+extern void save_dungeon(NHFILE *, boolean, boolean) NONNULLARG1;
+extern void restore_dungeon(NHFILE *) NONNULLARG1;
 extern void insert_branch(branch *, boolean);
 extern void init_dungeons(void);
 extern s_level *find_level(const char *);
@@ -738,8 +739,8 @@ extern int num_genocides(void);
 extern void delayed_killer(int, int, const char *);
 extern struct kinfo *find_delayed_killer(int);
 extern void dealloc_killer(struct kinfo *);
-extern void save_killers(int, int);
-extern void restore_killers(int);
+extern void save_killers(NHFILE *) NONNULLARG1;
+extern void restore_killers(NHFILE *) NONNULLARG1;
 extern char *build_english_list(char *);
 
 /* ### engrave.c ### */
@@ -763,8 +764,8 @@ extern int freehand(void);
 extern int doengrave(void);
 extern int doengrave_elbereth(void);
 extern void sanitize_engravings(void);
-extern void save_engravings(int, int);
-extern void rest_engravings(int);
+extern void save_engravings(NHFILE *) NONNULLARG1;
+extern void rest_engravings(NHFILE *) NONNULLARG1;
 extern void engr_stats(const char *, char *, long *, long *);
 extern void del_engr(struct engr *);
 extern void rloc_engr(struct engr *);
@@ -804,32 +805,31 @@ extern const char *fqname(const char *, int, int);
 #ifndef FILE_AREAS
 extern FILE *fopen_datafile(const char *, const char *, int);
 #endif
-extern boolean uptodate(int, const char *);
-extern void store_version(int);
+extern boolean uptodate(NHFILE *, const char *, unsigned long) NONNULLARG1;
 extern void zero_nhfile(NHFILE *) NONNULLARG1;
 extern void close_nhfile(NHFILE *) NONNULLARG1;
 extern void rewind_nhfile(NHFILE *) NONNULLARG1;
 extern void set_levelfile_name(char *, int);
-extern int create_levelfile(int, char *);
-extern int open_levelfile(int, char *);
+extern NHFILE *create_levelfile(int, char *);
+extern NHFILE *open_levelfile(int, char *);
 extern void delete_levelfile(int);
 extern void clearlocks(void);
-extern int create_bonesfile(d_level*, char **, char *);
+extern NHFILE *create_bonesfile(d_level *, char **, char *) NONNULLARG12;
 extern void commit_bonesfile(d_level *);
-extern int open_bonesfile(d_level*, char **);
+extern NHFILE *open_bonesfile(d_level *, char **) NONNULLPTRS;
 extern int delete_bonesfile(d_level*);
 extern void compress_bonesfile(void);
 extern void set_savefile_name(void);
 #ifdef INSURANCE
-extern void save_savefile_name(int);
+extern void save_savefile_name(NHFILE *) NONNULLARG1;
 #endif
 #if defined(WIZARD) && !defined(MICRO)
 extern void set_error_savefile(void);
 #endif
-extern int create_savefile(void);
-extern int open_savefile(void);
+extern NHFILE *create_savefile(void);
+extern NHFILE *open_savefile(void);
 extern int delete_savefile(void);
-extern int restore_saved_game(void);
+extern NHFILE *restore_saved_game(void);
 extern void compress(const char *);
 extern void uncompress(const char *);
 extern void compress_area(const char *, const char *);
@@ -1125,8 +1125,8 @@ extern void do_light_sources(char **);
 extern void show_transient_light(struct obj *, coordxy, coordxy);
 extern void transient_light_cleanup(void);
 extern struct monst *find_mid(unsigned, unsigned);
-extern void save_light_sources(int, int, int);
-extern void restore_light_sources(int);
+extern void save_light_sources(NHFILE *, int);
+extern void restore_light_sources(NHFILE *) NONNULLARG1;
 extern void light_stats(const char *, char *, long *, long *);
 extern void relink_light_sources(boolean);
 extern void light_sources_sanity_check(void);
@@ -1373,8 +1373,8 @@ extern int place_lregion(coordxy, coordxy, coordxy, coordxy,
 extern void fixup_special(void);
 extern void movebubbles(void);
 extern void water_friction(void);
-extern void save_waterlevel(int, int);
-extern void restore_waterlevel(int);
+extern void save_waterlevel(NHFILE *) NONNULLARG1;
+extern void restore_waterlevel(NHFILE *) NONNULLARG1;
 extern const char *waterbody_name(coordxy, coordxy);
 
 #ifdef ADVENT_CALENDAR
@@ -1402,6 +1402,7 @@ extern struct obj *mkobj(char, boolean);
 extern int rndmonnum(void);
 extern boolean bogon_is_pname(char);
 extern struct obj *splitobj(struct obj *, long);
+extern unsigned next_ident(void);
 extern struct obj *unsplitobj(struct obj *);
 extern void clear_splitobjs(void);
 extern void replace_object(struct obj *, struct obj *);
@@ -1468,8 +1469,8 @@ extern boolean inside_room(struct mkroom *, coordxy, coordxy);
 extern boolean somexy(struct mkroom *, coord *);
 extern void mkundead(coord *, boolean, int);
 extern struct permonst *courtmon(void);
-extern void save_rooms(int);
-extern void rest_rooms(int);
+extern void save_rooms(NHFILE *) NONNULLARG1;
+extern void rest_rooms(NHFILE *) NONNULLARG1;
 extern struct mkroom *search_special(schar);
 extern int cmap_to_type(int);
 extern boolean is_rainbow_shop(struct mkroom *);
@@ -1537,6 +1538,7 @@ extern void restartcham(void);
 extern void restore_cham(struct monst *);
 extern void maybe_unhide_at(coordxy, coordxy);
 extern boolean hideunder(struct monst *);
+extern void hide_monst(struct monst *) NONNULLARG1;
 extern void mon_animal_list(boolean);
 extern boolean validvamp(struct monst *, int *, int);
 extern void mgender_from_permonst(struct monst *, struct permonst *);
@@ -1771,8 +1773,8 @@ extern void synch_cursor(void);
 extern void init_objects(void);
 extern int find_skates(void);
 extern void oinit(void);
-extern void savenames(int, int);
-extern void restnames(int);
+extern void savenames(NHFILE *) NONNULLARG1;
+extern void restnames(NHFILE *) NONNULLARG1;
 extern void discover_object(int, boolean, boolean);
 extern void undiscover_object(int);
 extern int dodiscovered(void);
@@ -2201,8 +2203,8 @@ extern void update_player_regions(void);
 extern void update_monster_region(struct monst *);
 extern NhRegion *visible_region_at(coordxy, coordxy);
 extern void show_region(NhRegion*, coordxy, coordxy);
-extern void save_regions(int, int);
-extern void rest_regions(int, boolean);
+extern void save_regions(NHFILE *) NONNULLARG1;
+extern void rest_regions(NHFILE *) NONNULLARG1;
 extern NhRegion* create_gas_cloud(coordxy, coordxy, int, size_t, int);
 extern NhRegion* create_cthulhu_death_cloud(coordxy, coordxy, int, size_t, int);
 extern boolean region_danger(void);
@@ -2211,17 +2213,14 @@ extern void region_safety(void);
 /* ### restore.c ### */
 
 extern void inven_inuse(boolean);
-extern int dorecover(int);
-extern void restcemetery(int, struct cemetery **);
+extern int dorecover(NHFILE *) NONNULLARG1;
+extern void restcemetery(NHFILE *, struct cemetery **) NONNULLARG12;
 extern void trickery(char *);
-extern void getlev(int, int, xint8, boolean);
+extern void getlev(NHFILE *, int, xint8) NONNULLARG1;
+extern void get_plname_from_file(NHFILE *, char *) NONNULLARG12;
 extern void minit(void);
 extern boolean lookup_id_mapping(unsigned, unsigned *);
-#ifdef ZEROCOMP
-extern int mread(int, genericptr_t, unsigned int);
-#else
-extern void mread(int, genericptr_t, unsigned int);
-#endif
+extern int validate(NHFILE *, const char *, boolean) NONNULLARG1;
 
 /* ### rip.c ### */
 
@@ -2285,8 +2284,8 @@ extern boolean show_conduct_selection_dialog(void);
 extern char *getrumor(int, char *, boolean);
 extern void outrumor(int, int);
 extern void outoracle(boolean, boolean);
-extern void save_oracles(int, int);
-extern void restore_oracles(int);
+extern void save_oracles(NHFILE *) NONNULLARG1;
+extern void restore_oracles(NHFILE *) NONNULLARG1;
 extern int doconsult(struct monst *);
 
 /* ### save.c ### */
@@ -2296,19 +2295,32 @@ extern int dosave(void);
 extern void hangup(int);
 #endif
 extern int dosave0(void);
+extern boolean tricked_fileremoved(NHFILE *, char *) NONNULLARG2;
 #ifdef INSURANCE
 extern void savestateinlock(void);
 #endif
-extern void savelev(int, xint8, int);
+extern void savelev(NHFILE *, xint8) NONNULLARG1;
+extern void savecemetery(NHFILE *, struct cemetery **) NONNULLARG12;
+extern void savefruitchn(NHFILE *) NONNULLARG1;
+extern void store_plname_in_file(NHFILE *) NONNULLARG1;
+extern void free_dungeons(void);
+extern void freedynamicdata(void);
+extern void store_savefileinfo(NHFILE *) NONNULLARG1;
+
+/* ### sfstruct.c ### */
+
+extern boolean close_check(int);
+/* extern void newread(NHFILE *, int, int, genericptr_t, unsigned); */
 extern void bufon(int);
 extern void bufoff(int);
 extern void bflush(int);
-extern void bwrite(int, genericptr_t, unsigned int);
+extern void bwrite(int, const genericptr_t, unsigned) NONNULLARG2;
+extern void mread(int, genericptr_t, unsigned) NONNULLARG2;
+extern void minit(void);
 extern void bclose(int);
-extern void savecemetery(int, int, struct cemetery **);
-extern void savefruitchn(int, int);
-extern void free_dungeons(void);
-extern void freedynamicdata(void);
+#if defined(ZEROCOMP)
+extern void zerocomp_bclose(int);
+#endif
 
 /* ### shk.c ### */
 
@@ -2561,8 +2573,8 @@ extern void spot_stop_timers(coordxy, coordxy, short);
 extern long spot_time_expires(coordxy, coordxy, short);
 extern long spot_time_left(coordxy, coordxy, short);
 extern boolean obj_is_local(struct obj *);
-extern void save_timers(int, int, int);
-extern void restore_timers(int, int, boolean, long);
+extern void save_timers(NHFILE *, int) NONNULLARG1;
+extern void restore_timers(NHFILE *, int, long) NONNULLARG1;
 extern void timer_stats(const char *, char *, long *, long *);
 extern void relink_timers(boolean);
 #ifdef WIZARD
@@ -2742,6 +2754,7 @@ extern int doextversion(void);
 extern boolean comp_times(long);
 #endif
 extern boolean check_version(struct version_info *, const char *, boolean);
+extern void store_version(NHFILE *) NONNULLARG1;
 extern unsigned long get_feature_notice_ver(char *);
 extern unsigned long get_current_feature_ver(void);
 #ifdef RUNTIME_PORT_ID
@@ -2955,8 +2968,8 @@ extern int wormhitu(struct monst *);
 extern void cutworm(struct monst *, coordxy, coordxy, boolean);
 extern void see_wsegs(struct monst *);
 extern void detect_wsegs(struct monst *, boolean);
-extern void save_worm(int, int);
-extern void rest_worm(int);
+extern void save_worm(NHFILE *) NONNULLARG1;
+extern void rest_worm(NHFILE *) NONNULLARG1;
 extern void place_wsegs(struct monst *, struct monst *);
 extern void sanity_check_worm(struct monst *);
 extern void wormno_sanity_check(void);
@@ -2973,6 +2986,7 @@ extern void flip_worm_segs_horizontal(struct monst *, int, int);
 
 extern void setworn(struct obj *, long);
 extern void setnotworn(struct obj *);
+extern void allunworn(void);
 extern struct obj *wearmask_to_obj(long);
 extern long wearslot(struct obj *);
 extern void mon_set_minvis(struct monst *);

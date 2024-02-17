@@ -220,7 +220,6 @@ char *noit_mon_nam(struct monst *m) { return NULL; }
 
 const char *glow_color(int i) { return NULL; }
 const char *glow_verb(int i, boolean b) { return NULL; }
-boolean restoring = FALSE;
 
 boolean is_pool(coordxy i1, coordxy i2) { return FALSE; }
 boolean is_lava(coordxy i1, coordxy i3) { return FALSE; }

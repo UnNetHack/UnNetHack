@@ -213,6 +213,7 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/wizard.c $(srcdir)/worm.c $(srcdir)/worn.c $(srcdir)/write.c \
 	$(srcdir)/zap.c \
 	$(srcdir)/dump.c $(srcdir)/tutorial.c \
+	$(srcdir)/sfstruct.c \
 	$(srcdir)/livelog.c
 
 # all operating-system-dependent .c (for dependencies and such)
@@ -278,7 +279,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	tutorial.o u_init.o uhitm.o unicode.o vault.o vision.o vis_tab.o weapon.o were.o \
 	wield.o windows.o wizard.o worm.o worn.o write.o zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o \
-	livelog.o
+	sfstruct.o livelog.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 $(GAME):	$(SYSTEM)
@@ -845,6 +846,7 @@ sp_lev.o: $(srcdir)/sp_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
 spell.o: $(srcdir)/spell.c $(HACK_H)
 steal.o: $(srcdir)/steal.c $(HACK_H)
 steed.o: $(srcdir)/steed.c $(HACK_H) ../include/sys.h
+sfstruct.o: sfstruct.c $(HACK_H)
 sys.o: $(srcdir)/sys.c $(HACK_H)
 teleport.o: $(srcdir)/teleport.c $(HACK_H)
 timeout.o: $(srcdir)/timeout.c $(HACK_H) ../include/lev.h

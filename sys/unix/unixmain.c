@@ -52,10 +52,10 @@ extern void check_utf8_console(void);
 int
 main(int argc, char *argv[])
 {
-    register int fd;
 #ifdef CHDIR
     register char *dir;
 #endif
+    NHFILE *nhfp;
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
 #ifdef SIMPLE_MAIL
@@ -272,7 +272,7 @@ main(int argc, char *argv[])
 
     display_gamewindows();
 
-    if ((fd = restore_saved_game()) >= 0) {
+    if (*plname && (nhfp = restore_saved_game()) != 0) {
 #ifdef WIZARD
         /* Since wizard is actually flags.debug, restoring might
          * overwrite it.
@@ -295,7 +295,7 @@ main(int argc, char *argv[])
 #endif
         pline("Restoring save file...");
         mark_synch();	/* flush output */
-        if (!dorecover(fd)) {
+        if (!dorecover(nhfp)) {
             goto not_recovered;
         }
 #ifdef WIZARD

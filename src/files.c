@@ -151,6 +151,9 @@ static int lockptr;
 extern char *sounddir;
 #endif
 
+static NHFILE *new_nhfile(void);
+static void free_nhfile(NHFILE *);
+
 extern int n_dgns;      /* from dungeon.c */
 
 static char *set_bonesfile_name(char *, d_level*);
@@ -405,6 +408,89 @@ fopen_datafile(const char *filename, const char *mode, int prefix)
     return fp;
 }
 
+/* ----------  EXTERNAL FILE SUPPORT ----------- */
+
+/* determine byte order */
+const int bei = 1;
+#define IS_BIGENDIAN() ( (*(char*)&bei) == 0 )
+
+void
+zero_nhfile(NHFILE *nhfp)
+{
+    nhfp->fd = -1;
+    nhfp->mode = COUNTING;
+    nhfp->structlevel = FALSE;
+    nhfp->fieldlevel = FALSE;
+    nhfp->addinfo = FALSE;
+    nhfp->bendian = IS_BIGENDIAN();
+    nhfp->fpdef = (FILE *) 0;
+    nhfp->fplog = (FILE *) 0;
+    nhfp->fpdebug = (FILE *) 0;
+    nhfp->count = 0;
+    nhfp->eof = FALSE;
+    nhfp->fnidx = 0;
+}
+
+static NHFILE *
+new_nhfile(void)
+{
+    NHFILE *nhfp = (NHFILE *) alloc(sizeof(NHFILE));
+
+    zero_nhfile(nhfp);
+    return nhfp;
+}
+
+static void
+free_nhfile(NHFILE *nhfp)
+{
+    if (nhfp) {
+        zero_nhfile(nhfp);
+        free(nhfp);
+    }
+}
+
+void
+close_nhfile(NHFILE *nhfp)
+{
+    if (nhfp->structlevel && nhfp->fd != -1) {
+        (void) nhclose(nhfp->fd), nhfp->fd = -1;
+    }
+    zero_nhfile(nhfp);
+    free_nhfile(nhfp);
+}
+
+void
+rewind_nhfile(NHFILE *nhfp)
+{
+    if (nhfp->structlevel) {
+#ifdef BSD
+        (void) lseek(nhfp->fd, 0L, 0);
+#else
+        (void) lseek(nhfp->fd, (off_t) 0, 0);
+#endif
+    }
+}
+
+static
+NHFILE *
+viable_nhfile(NHFILE *nhfp)
+{
+    /* perform some sanity checks before returning
+       the pointer to the nethack file descriptor */
+    if (nhfp) {
+         /* check for no open file at all,
+          * not a structlevel legacy file
+          */
+         if (nhfp->structlevel && nhfp->fd < 0) {
+            /* not viable, start the cleanup */
+            zero_nhfile(nhfp);
+            free_nhfile(nhfp);
+            nhfp = (NHFILE *) 0;
+        }
+    }
+    return nhfp;
+}
+
 /* ----------  BEGIN LEVEL FILE HANDLING ----------- */
 
 /* Construct a file name for a level-type file, which is of the form
@@ -429,13 +515,13 @@ set_levelfile_name(char *file, int lev)
     return;
 }
 
-int
-create_levelfile(int lev, char *errbuf)
+NHFILE *
+create_levelfile(int lev, char errbuf[])
 {
-    int fd;
 #ifndef FILE_AREAS
     const char *fq_lock;
 #endif
+    NHFILE *nhfp = (NHFILE *) 0;
 
     if (errbuf) {
         *errbuf = '\0';
@@ -445,56 +531,66 @@ create_levelfile(int lev, char *errbuf)
     fq_lock = fqname(lock, LEVELPREFIX, 0);
 #endif
 
+    nhfp = new_nhfile();
+    if (nhfp) {
+        nhfp->ftype = NHF_LEVELFILE;
+        nhfp->mode = WRITING;
+        nhfp->structlevel = TRUE; /* do set this TRUE for levelfiles */
+        nhfp->fieldlevel = FALSE; /* don't set this TRUE for levelfiles */
+        nhfp->addinfo = FALSE;
+        nhfp->style.deflt = FALSE;
+        nhfp->style.binary = TRUE;
+        nhfp->fd = -1;
+        nhfp->fpdef = (FILE *) 0;
 #if defined(MICRO) || defined(WIN32)
-    /* Use O_TRUNC to force the file to be shortened if it already
-     * exists and is currently longer.
-     */
+        /* Use O_TRUNC to force the file to be shortened if it already
+        * exists and is currently longer.
+        */
 # ifdef FILE_AREAS
-    fd = open_area(FILE_AREA_LEVL, lock,
-                   O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+        nhfp->fd = open_area(FILE_AREA_LEVL, lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 # else
 #  ifdef HOLD_LOCKFILE_OPEN
-    if (lev == 0) {
-        fd = open_levelfile_exclusively(fq_lock, lev,
-                                        O_WRONLY |O_CREAT | O_TRUNC | O_BINARY);
-    } else {
+        if (lev == 0) {
+            nhfp->fd = open_levelfile_exclusively(fq_lock, lev, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY);
+        } else {
 #  endif
-    fd = open(fq_lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+        nhfp->fd = open(fq_lock, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 #  ifdef HOLD_LOCKFILE_OPEN
-    }
+        }
 #  endif
 # endif
 #else   /* MICRO */
 # ifdef FILE_AREAS
-    fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
+        nhfp->fd = creat_area(FILE_AREA_LEVL, lock, FCMASK);
 # else
 # ifdef MAC
-    fd = maccreat(fq_lock, LEVL_TYPE);
+        nhfp->fd = maccreat(fq_lock, LEVL_TYPE);
 # else
-    fd = creat(fq_lock, FCMASK);
+        nhfp->fd = creat(fq_lock, FCMASK);
 # endif
 # endif /* FILE_AREAS */
 #endif /* MICRO || WIN32 */
 
-    if (fd >= 0) {
-        level_info[lev].flags |= LFILE_EXISTS;
-    } else if (errbuf) { /* failure explanation */
-        Sprintf(errbuf,
-                "Cannot create file \"%s\" for level %d (errno %d).",
-                lock, lev, errno);
+        if (nhfp->fd >= 0) {
+            level_info[lev].flags |= LFILE_EXISTS;
+        } else if (errbuf) { /* failure explanation */
+            Sprintf(errbuf,
+                    "Cannot create file \"%s\" for level %d (errno %d).",
+                    lock, lev, errno);
+        }
     }
 
-    return fd;
+    nhfp = viable_nhfile(nhfp);
+    return nhfp;
 }
 
-
-int
-open_levelfile(int lev, char *errbuf)
+NHFILE *
+open_levelfile(int lev, char errbuf[])
 {
-    int fd;
 #ifndef FILE_AREAS
     const char *fq_lock;
 #endif
+    NHFILE *nhfp = (NHFILE *) 0;
 
     if (errbuf) {
         *errbuf = '\0';
@@ -503,36 +599,49 @@ open_levelfile(int lev, char *errbuf)
 #ifndef FILE_AREAS
     fq_lock = fqname(lock, LEVELPREFIX, 0);
 #endif
+    nhfp = new_nhfile();
+    if (nhfp) {
+        nhfp->mode = READING;
+        nhfp->structlevel = TRUE; /* do set this TRUE for levelfiles */
+        nhfp->fieldlevel = FALSE; /* do not set this TRUE for levelfiles */
+        nhfp->addinfo = FALSE;
+        nhfp->style.deflt = FALSE;
+        nhfp->style.binary = TRUE;
+        nhfp->ftype = NHF_LEVELFILE;
+        nhfp->fd = -1;
+        nhfp->fpdef = (FILE *) 0;
+    }
+    if (nhfp && nhfp->structlevel) {
 #ifdef FILE_AREAS
-    fd = open_area(FILE_AREA_LEVL, lock, O_RDONLY | O_BINARY, 0);
+        nhfp->fd = open_area(FILE_AREA_LEVL, lock, O_RDONLY | O_BINARY, 0);
 #else
 # ifdef MAC
-    fd = macopen(fq_lock, O_RDONLY | O_BINARY, LEVL_TYPE);
+        nhfp->fd = macopen(fq_lock, O_RDONLY | O_BINARY, LEVL_TYPE);
 # else
 #  ifdef HOLD_LOCKFILE_OPEN
-    if (lev == 0) {
-        fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY );
-    } else {
+        if (lev == 0) {
+            nhfp->fd = open_levelfile_exclusively(fq_lock, lev, O_RDONLY | O_BINARY );
+        } else {
 #  endif
-    fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
+            nhfp->fd = open(fq_lock, O_RDONLY | O_BINARY, 0);
 #  ifdef HOLD_LOCKFILE_OPEN
-    }
+        }
 #  endif
 # endif
-#endif  /* FILE_AREAS */
+#endif /* FILE_AREAS */
+    }
 
     /* for failure, return an explanation that our caller can use;
        settle for `lock' instead of `fq_lock' because the latter
        might end up being too big for nethack's BUFSZ */
-    if (fd < 0 && errbuf) {
+    if (nhfp->fd < 0 && errbuf) {
         Sprintf(errbuf,
                 "Cannot open file \"%s\" for level %d (errno %d).",
                 lock, lev, errno);
     }
-
-    return fd;
+    nhfp = viable_nhfile(nhfp);
+    return nhfp;
 }
-
 
 void
 delete_levelfile(int lev)
@@ -640,7 +749,16 @@ int fd;
 
 int nhclose(int fd)
 {
-    return close(fd);
+    int retval = 0;
+
+    if (fd >= 0) {
+        if (close_check(fd)) {
+            bclose(fd);
+        } else {
+            retval = close(fd);
+        }
+    }
+    return retval;
 }
 
 #ifdef WHEREIS_FILE
@@ -797,11 +915,12 @@ set_bonestemp_name(void)
     return lock;
 }
 
-int
-create_bonesfile(d_level *lev, char **bonesid, char *errbuf)
+NHFILE *
+create_bonesfile(d_level *lev, char **bonesid, char errbuf[])
 {
     const char *file;
-    int fd;
+    NHFILE *nhfp = (NHFILE *) 0;
+    int failed = 0;
 
     if (errbuf) {
         *errbuf = '\0';
@@ -812,33 +931,43 @@ create_bonesfile(d_level *lev, char **bonesid, char *errbuf)
     file = fqname(file, BONESPREFIX, 0);
 #endif
 
+    nhfp = new_nhfile();
+    if (nhfp) {
+        nhfp->structlevel = TRUE;
+        nhfp->fieldlevel = FALSE;
+        nhfp->ftype = NHF_BONESFILE;
+        nhfp->mode = WRITING;
+        if (nhfp->structlevel) {
 #if defined(MICRO) || defined(WIN32)
-    /* Use O_TRUNC to force the file to be shortened if it already
-     * exists and is currently longer.
-     */
+            /* Use O_TRUNC to force the file to be shortened if it already
+             * exists and is currently longer.
+             */
 # ifdef FILE_AREAS
-    fd = open_area(FILE_AREA_BONES, file,
-                   O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+            nhfp->fd = open_area(FILE_AREA_BONES, file, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 # else
-    fd = open(file, O_WRONLY |O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+            nhfp->fd = open(file, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 # endif
 #else
 # ifdef FILE_AREAS
-    fd = creat_area(FILE_AREA_BONES, file, FCMASK);
+            nhfp->fd = creat_area(FILE_AREA_BONES, file, FCMASK);
 # else
 # ifdef MAC
-    fd = maccreat(file, BONE_TYPE);
+            nhfp->fd = maccreat(file, BONE_TYPE);
 # else
-    fd = creat(file, FCMASK);
+            nhfp->fd = creat(file, FCMASK);
 # endif
 # endif /* FILE_AREAS */
 #endif
-    if (fd < 0 && errbuf) { /* failure explanation */
-        Sprintf(errbuf,
-                "Cannot create bones \"%s\", id %s (errno %d).",
-                lock, *bonesid, errno);
+            if (nhfp->fd < 0) {
+                failed = errno;
+            }
+        }
+        if (failed && errbuf) { /* failure explanation */
+            Sprintf(errbuf,
+                    "Cannot create bones \"%s\", id %s (errno %d).",
+                    lock, *bonesid, errno);
+        }
     }
-
 # if defined(VMS) && !defined(SECURE)
     /*
        Re-protect bones file with world:read+write+execute+delete access.
@@ -855,7 +984,8 @@ create_bonesfile(d_level *lev, char **bonesid, char *errbuf)
 #  endif
 # endif /* VMS && !SECURE */
 
-    return fd;
+    nhfp = viable_nhfile(nhfp);
+    return nhfp;
 }
 
 /* move completed bones file to proper name */
@@ -904,29 +1034,39 @@ commit_bonesfile(d_level *lev)
 #endif
 }
 
-
-int
+NHFILE *
 open_bonesfile(d_level *lev, char **bonesid)
 {
 #ifndef FILE_AREAS
     const char *fq_bones;
 #endif
-    int fd;
+    NHFILE *nhfp = (NHFILE *) 0;
 
     *bonesid = set_bonesfile_name(bones, lev);
+
+    nhfp = new_nhfile();
+    if (nhfp) {
+        nhfp->structlevel = TRUE;
+        nhfp->fieldlevel = FALSE;
+        nhfp->ftype = NHF_BONESFILE;
+        nhfp->mode = READING;
+    }
+    if (nhfp->structlevel) {
 #ifdef FILE_AREAS
-    uncompress_area(FILE_AREA_BONES, bones);  /* no effect if nonexistent */
-    fd = open_area(FILE_AREA_BONES, bones, O_RDONLY | O_BINARY, 0);
+        uncompress_area(FILE_AREA_BONES, bones);  /* no effect if nonexistent */
+        nhfp->fd = open_area(FILE_AREA_BONES, bones, O_RDONLY | O_BINARY, 0);
 #else
-    fq_bones = fqname(bones, BONESPREFIX, 0);
-    uncompress(fq_bones);   /* no effect if nonexistent */
+        fq_bones = fqname(bones, BONESPREFIX, 0);
+        uncompress(fq_bones);   /* no effect if nonexistent */
 # ifdef MAC
-    fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
+        nhfp->fd = macopen(fq_bones, O_RDONLY | O_BINARY, BONE_TYPE);
 # else
-    fd = open(fq_bones, O_RDONLY | O_BINARY, 0);
+        nhfp->fd = open(fq_bones, O_RDONLY | O_BINARY, 0);
 # endif
 #endif  /* FILE_AREAS */
-    return fd;
+    }
+    nhfp = viable_nhfile(nhfp);
+    return nhfp;
 }
 
 
@@ -1016,9 +1156,11 @@ set_savefile_name(void)
 
 #ifdef INSURANCE
 void
-save_savefile_name(int fd)
+save_savefile_name(NHFILE *nhfp)
 {
-    (void) write(fd, (genericptr_t) SAVEF, sizeof(SAVEF));
+    if (nhfp->structlevel) {
+        (void) write(nhfp->fd, (genericptr_t) SAVEF, sizeof(SAVEF));
+    }
 }
 #endif
 
@@ -1048,34 +1190,42 @@ set_error_savefile(void)
 
 
 /* create save file, overwriting one if it already exists */
-int
+NHFILE *
 create_savefile(void)
 {
 #ifndef FILE_AREAS
     const char *fq_save;
 #endif
-    int fd;
+    NHFILE *nhfp = (NHFILE *) 0;
 
+    nhfp = new_nhfile();
+    if (nhfp) {
+        nhfp->structlevel = TRUE;
+        nhfp->fieldlevel = FALSE;
+        nhfp->ftype = NHF_SAVEFILE;
+        nhfp->mode = WRITING;
+        if (nhfp->structlevel) {
 #ifdef FILE_AREAS
 # ifdef MICRO
-    fd = open_area(FILE_AREA_SAVE, SAVEF,
-                   O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
+            nhfp->fd = open_area(FILE_AREA_SAVE, SAVEF,
+                                 O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 # else
-    fd = creat_area(FILE_AREA_SAVE, SAVEF, FCMASK);
+            nhfp->fd = creat_area(FILE_AREA_SAVE, SAVEF, FCMASK);
 # endif
 #else   /* FILE_AREAS */
-    fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+            fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 # if defined(MICRO) || defined(WIN32)
-    fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
+            nhfp->fd = open(fq_save, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK);
 # else
 #  ifdef MAC
-    fd = maccreat(fq_save, SAVE_TYPE);
+            nhfp->fd = maccreat(fq_save, SAVE_TYPE);
 #  else
-    fd = creat(fq_save, FCMASK);
+            nhfp->fd = creat(fq_save, FCMASK);
 #  endif
 # endif /* MICRO */
 #endif  /* FILE_AREAS */
-
+        }
+    }
 #if defined(VMS) && !defined(SECURE)
     /*
        Make sure the save file is owned by the current process.  That's
@@ -1092,30 +1242,40 @@ create_savefile(void)
 # endif
 #endif /* VMS && !SECURE */
 
-    return fd;
+    nhfp = viable_nhfile(nhfp);
+    return nhfp;
 }
-
 
 /* open savefile for reading */
-int
+NHFILE *
 open_savefile(void)
 {
-    int fd;
+    NHFILE *nhfp = (NHFILE *) 0;
 
+    nhfp = new_nhfile();
+    if (nhfp) {
+        nhfp->structlevel = TRUE;
+        nhfp->fieldlevel = FALSE;
+        nhfp->ftype = NHF_SAVEFILE;
+        nhfp->mode = READING;
+        if (nhfp->structlevel) {
+            const char *fq_save;
+            fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 #ifdef FILE_AREAS
-    fd = open_area(FILE_AREA_SAVE, SAVEF, O_RDONLY | O_BINARY, 0);
+            nhfp->fd = open_area(FILE_AREA_SAVE, SAVEF, O_RDONLY | O_BINARY, 0);
 #else
-    const char *fq_save;
-    fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+            fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 # ifdef MAC
-    fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);
+            nhfp->fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);
 # else
-    fd = open(fq_save, O_RDONLY | O_BINARY, 0);
+            nhfp->fd = open(fq_save, O_RDONLY | O_BINARY, 0);
 # endif
 #endif  /* FILE_AREAS */
-    return fd;
+        }
+    }
+    nhfp = viable_nhfile(nhfp);
+    return nhfp;
 }
-
 
 /* delete savefile */
 int
@@ -1129,15 +1289,12 @@ delete_savefile(void)
     return 0;   /* for restore_saved_game() (ex-xxxmain.c) test */
 }
 
-
 /* try to open up a save file and prepare to restore it */
-int
+NHFILE *
 restore_saved_game(void)
 {
-#ifndef FILE_AREAS
-    const char *fq_save;
-#endif
-    int fd;
+    const char *fq_save = NULL;
+    NHFILE *nhfp = (NHFILE *) 0;
 
     set_savefile_name();
 #ifndef FILE_AREAS
@@ -1145,114 +1302,162 @@ restore_saved_game(void)
 
     uncompress(fq_save);
 #else
+    fq_save = SAVEF;
     uncompress_area(FILE_AREA_SAVE, SAVEF);
 #endif
-    if ((fd = open_savefile()) < 0) {
-        return fd;
-    }
-
-#ifndef FILE_AREAS
-    if (!uptodate(fd, fq_save)) {
-#else
-    if (!uptodate(fd, SAVEF)) {
-#endif
-        (void) close(fd),  fd = -1;
-        (void) delete_savefile();
-    }
-    return fd;
-}
-
-#if defined(UNIX) && defined(QT_GRAPHICS)
-/*ARGSUSED*/
-static char*
-plname_from_file(filename)
-const char* filename;
-{
-#ifdef STORE_PLNAME_IN_FILE
-    int fd;
-    char* result = 0;
-
-    Strcpy(SAVEF, filename);
-#ifdef COMPRESS_EXTENSION
-    SAVEF[strlen(SAVEF)-strlen(COMPRESS_EXTENSION)] = '\0';
-#endif
-    uncompress(SAVEF);
-    if ((fd = open_savefile()) >= 0) {
-        if (uptodate(fd, filename)) {
-            char tplname[PL_NSIZ];
-            mread(fd, (genericptr_t) tplname, PL_NSIZ);
-            result = strdup(tplname);
+    if ((nhfp = open_savefile()) != 0) {
+        if (validate(nhfp, fq_save, FALSE) != 0) {
+            close_nhfile(nhfp);
+            nhfp = (NHFILE *) 0;
+            (void) delete_savefile();
         }
-        (void) close(fd);
     }
-    compress(SAVEF);
-
-    return result;
-#else
-# if defined(UNIX) && defined(QT_GRAPHICS)
-    /* Name not stored in save file, so we have to extract it from
-       the filename, which loses information
-       (eg. "/", "_", and "." characters are lost. */
-    int k;
-    int uid;
-    char name[64]; /* more than PL_NSIZ */
-#ifdef COMPRESS_EXTENSION
-#define EXTSTR COMPRESS_EXTENSION
-#else
-#define EXTSTR ""
-#endif
-    if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
-#undef EXTSTR
-        /* "_" most likely means " ", which certainly looks nicer */
-        for (k=0; name[k]; k++) {
-            if (name[k] == '_' ) {
-                name[k] = ' ';
-            }
-        }
-        return strdup(name);
-    } else {
-        return 0;
-    }
-# else
-    return 0;
-# endif
-#endif
+    return nhfp;
 }
-#endif /* defined(UNIX) && defined(QT_GRAPHICS) */
 
 char**
 get_saved_games(void)
 {
-#if defined(UNIX) && defined(QT_GRAPHICS)
-    int myuid=getuid();
-    struct dirent **namelist;
-    int n = scandir("save", &namelist, 0, alphasort);;
-    if ( n > 0 ) {
-        int i, j=0;
-        char** result = (char**)alloc((n+1)*sizeof(char*)); /* at most */
-        for (i=0; i<n; i++) {
-            int uid;
-            char name[64]; /* more than PL_NSIZ */
-            if ( sscanf( namelist[i]->d_name, "%d%63s", &uid, name ) == 2 ) {
-                if ( uid == myuid ) {
-                    char filename[BUFSZ];
-                    char* r;
-                    Sprintf(filename, "save/%d%s", uid, name);
-                    r = plname_from_file(filename);
-                    if ( r ) {
-                        result[j++] = r;
+#if defined(SELECTSAVED)
+#if defined(WIN32) || defined(UNIX)
+    int n;
+#endif
+    int j = 0;
+    char **result = 0;
+
+#ifdef WIN32
+    {
+        char *foundfile;
+        const char *fq_save;
+        const char *fq_new_save;
+        const char *fq_old_save;
+        char **files = 0;
+        int i, count_failures = 0;
+
+        Strcpy(plname, "*");
+        set_savefile_name(FALSE);
+#if defined(ZLIB_COMP)
+        Strcat(SAVEF, COMPRESS_EXTENSION);
+#endif
+        fq_save = fqname(SAVEF, SAVEPREFIX, 0);
+
+        n = 0;
+        foundfile = foundfile_buffer();
+        if (findfirst((char *) fq_save)) {
+            do {
+                ++n;
+            } while (findnext());
+        }
+
+        if (n > 0) {
+            files = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
+            (void) memset((genericptr_t) files, 0, (n + 1) * sizeof(char *));
+            if (findfirst((char *) fq_save)) {
+                i = 0;
+                do {
+                    files[i++] = dupstr(foundfile);
+                } while (findnext());
+            }
+        }
+
+        if (n > 0) {
+            result = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
+            (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
+            for(i = 0; i < n; i++) {
+                char *r;
+                r = plname_from_file(files[i], SUPPRESS_WAITSYNCH_PERFILE);
+
+                if (r) {
+                    /* rename file if it is not named as expected */
+                    Strcpy(gp.plname, r);
+                    set_savefile_name(TRUE);
+                    fq_new_save = fqname(gs.SAVEF, SAVEPREFIX, 0);
+                    fq_old_save = fqname(files[i], SAVEPREFIX, 1);
+
+                    if (strcmp(fq_old_save, fq_new_save) != 0 &&
+                         !file_exists(fq_new_save)) {
+                        (void) rename(fq_old_save, fq_new_save);
                     }
+
+                    result[j++] = r;
+                } else {
+                    count_failures++;
                 }
             }
         }
-        result[j++] = 0;
-        return result;
-    } else {
-        return 0;
+
+        free_saved_games(files);
+        if (count_failures) {
+            wait_synch();
+        }
     }
-#else
-    return 0;
 #endif
+#ifdef UNIX
+    /* posixly correct version */
+    int myuid = getuid();
+    DIR *dir;
+
+#ifdef FILE_AREAS
+    const char *saves_directory = FILE_AREA_SAVE;
+#else
+    const char *saves_directory = fqname("save", SAVEPREFIX, 0);
+#endif
+    if ((dir = opendir(saves_directory))) {
+        for (n = 0; readdir(dir); n++) {
+            ;
+        }
+        closedir(dir);
+        if (n > 0) {
+            int i;
+
+            if (!(dir = opendir(saves_directory))) {
+                return 0;
+            }
+            result = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
+            (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
+            for (i = 0, j = 0; i < n; i++) {
+                int uid;
+                char name[64]; /* more than PL_NSIZ */
+                struct dirent *entry = readdir(dir);
+
+                if (!entry) {
+                    break;
+                }
+                if (sscanf(entry->d_name, "%d%63s", &uid, name) == 2) {
+                    if (uid == myuid) {
+                        char filename[BUFSZ];
+                        char *r;
+
+                        Sprintf(filename, "save/%d%s", uid, name);
+                        r = plname_from_file(filename, ALLOW_WAITSYNCH_PERFILE);
+                        if (r) {
+                            result[j++] = r;
+                        }
+                    }
+                }
+            }
+            closedir(dir);
+        }
+    }
+#endif
+#ifdef VMS
+    Strcpy(gp.plname, "*");
+    set_savefile_name(FALSE);
+    j = vms_get_saved_games(gs.SAVEF, &result);
+#endif /* VMS */
+
+    if (j > 0) {
+        if (j > 1) {
+            qsort(result, j, sizeof (char *), strcmp_wrap);
+        }
+        result[j] = 0;
+        return result;
+    } else if (result) { /* could happen if save files are obsolete */
+        free_saved_games(result);
+    }
+#endif /* SELECTSAVED */
+
+    return 0;
 }
 
 void
@@ -1851,7 +2056,7 @@ fopen_config_file(const char *filename, int src)
             /* fall through to standard names */
         } else
 #endif
-        if ((fp = fopenp(filename, "r")) != (FILE *)0) {
+        if ((fp = fopen(filename, "r")) != (FILE *)0) {
             configfile = filename;
             return fp;
 #if defined(UNIX) || defined(VMS)
@@ -1907,7 +2112,7 @@ fopen_config_file(const char *filename, int src)
     } else {
         Sprintf(tmp_config, "%s/%s", envp, configfile);
     }
-    if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+    if ((fp = fopen(tmp_config, "r")) != (FILE *)0) {
         return fp;
     } else {
         /* try .nethackrc? */
@@ -1916,7 +2121,7 @@ fopen_config_file(const char *filename, int src)
         } else {
             Sprintf(tmp_config, "%s/%s", envp, oldconfigfile);
         }
-        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0) {
+        if ((fp = fopen(tmp_config, "r")) != (FILE *)0) {
             return fp;
         }
     }
@@ -2205,7 +2410,7 @@ parse_config_line(FILE *fp,
             char include_buf[4*BUFSZ];
             /* parse a config file from a global path or relative
              * to the program binary */
-            if ((include_fp = fopenp(bufp, "r")) == (FILE *)0) {
+            if ((include_fp = fopen(bufp, "r")) == (FILE *)0) {
                 return 0;
             }
 
@@ -2553,7 +2758,7 @@ fopen_wizkit_file(void)
         /* fall through to standard names */
     } else
 #endif
-    if ((fp = fopenp(wizkit, "r")) != (FILE *)0) {
+    if ((fp = fopen(wizkit, "r")) != (FILE *)0) {
         return fp;
 #if defined(UNIX) || defined(VMS)
     } else {
@@ -2586,7 +2791,7 @@ fopen_wizkit_file(void)
     } else {
         Strcpy(tmp_wizkit, wizkit);
     }
-    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *)0) {
+    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *)0) {
         return fp;
     } else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home

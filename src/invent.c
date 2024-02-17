@@ -2022,7 +2022,10 @@ learn_unseen_invent(void)
 void
 update_inventory(void)
 {
-    if (restoring) {
+    if (!program_state.in_moveloop) { /* not covered by suppress_map_output */
+        return;
+    }
+    if (suppress_map_output()) { /* despite name, used for perm_invent too */
         return;
     }
 

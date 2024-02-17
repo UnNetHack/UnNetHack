@@ -912,17 +912,16 @@ newgame(void)
         }
     }
 
-#ifdef INSURANCE
-    save_currentstate();
-#endif
-    program_state.something_worth_saving++; /* useful data now exists */
-
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
-
     /* Start the timer here */
     urealtime.realtime = (time_t)0L;
     urealtime.start_timing = current_epoch();
 #endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
+
+#ifdef INSURANCE
+    save_currentstate();
+#endif
+    program_state.something_worth_saving++; /* useful data now exists */
 
     /* Success! */
     welcome(TRUE);

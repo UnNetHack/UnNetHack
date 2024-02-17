@@ -575,6 +575,23 @@ warning_of(struct monst *mon)
     return wl;
 }
 
+/* map or status window might not be ready for output during level creation
+   or game restoration (something like u.usteed which affects display of
+   the hero and also a status condition might not be set up yet) */
+boolean
+suppress_map_output(void)
+{
+    if (in_mklev || program_state.saving || program_state.restoring) {
+        return TRUE;
+    }
+#ifdef HANGUPHANDLING
+    if (program_state.done_hup) {
+        return TRUE;
+    }
+#endif
+    return FALSE;
+}
+
 /*
  * feel_newsym()
  *
@@ -606,6 +623,11 @@ feel_location(coordxy x, coordxy y)
     struct rm *lev;
     struct obj *boulder;
     struct monst *mon;
+
+    /* replicate safeguards used by newsym(); might not be required here */
+    if (suppress_map_output()) {
+        return;
+    }
 
     if (!isok(x, y)) {
         return;
@@ -778,7 +800,8 @@ newsym(coordxy x, coordxy y)
     int see_it;
     coordxy worm_tail;
 
-    if (in_mklev) {
+    /* don't try to produce map output when level is in a state of flux */
+    if (suppress_map_output()) {
         return;
     }
 
@@ -1524,7 +1547,7 @@ redraw_map(void)
      * !u.ux: display isn't ready yet; (restoring || !on_level()): was part
      * of cliparound() but interface shouldn't access this much internals
      */
-    if (!u.ux || restoring || !on_level(&u.uz0, &u.uz)) {
+    if (!u.ux || suppress_map_output() || !on_level(&u.uz0, &u.uz)) {
         return;
     }
 
@@ -1540,6 +1563,51 @@ redraw_map(void)
         }
     }
     flush_screen(1);
+}
+
+/*
+ * =======================================================
+ */
+void
+reglyph_darkroom(void)
+{
+    coordxy x, y;
+
+    for (x = 1; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            struct rm *lev = &levl[x][y];
+
+            if (!iflags.dark_room) {
+                if (lev->glyph == cmap_to_glyph(S_corr) &&
+                     lev->waslit) {
+                    lev->glyph = cmap_to_glyph(S_litcorr);
+                }
+            } else {
+                if (lev->glyph == cmap_to_glyph(S_litcorr) &&
+                     !cansee(x, y)) {
+                    lev->glyph = cmap_to_glyph(S_corr);
+                }
+            }
+
+            if (!iflags.dark_room || !iflags.use_color || Is_rogue_level(&u.uz)) {
+                if (lev->glyph == cmap_to_glyph(S_darkroom)) {
+                    lev->glyph = lev->waslit ? cmap_to_glyph(S_room) : GLYPH_NOTHING;
+                }
+            } else {
+                if (lev->glyph == cmap_to_glyph(S_room) &&
+                     lev->seenv &&
+                     lev->waslit &&
+                     !cansee(x, y)) {
+                    lev->glyph = cmap_to_glyph(S_darkroom);
+                } else if (lev->glyph == GLYPH_NOTHING &&
+                           lev->typ == ROOM &&
+                           lev->seenv &&
+                           !cansee(x, y)) {
+                    lev->glyph = cmap_to_glyph(S_darkroom);
+                }
+            }
+        }
+    }
 }
 
 /* ========================================================================= */
@@ -1732,6 +1800,11 @@ flush_screen(int cursor_on_u)
     static boolean flushing = 0;
     static boolean delay_flushing = 0;
     int x, y;
+
+    /* 3.7: don't update map, status, or perm_invent during save/restore */
+    if (suppress_map_output()) {
+        return;
+    }
 
     if (cursor_on_u == -1) {
         delay_flushing = !delay_flushing;

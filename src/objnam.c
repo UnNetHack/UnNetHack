@@ -1557,7 +1557,7 @@ ring:
        bill might not be available yet while restore is in progress
        (objects won't normally be formatted during that time, but if
        'perm_invent' is enabled then they might be) */
-    if (iflags.suppress_price || restoring) {
+    if (iflags.suppress_price || program_state.restoring) {
         ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
     } else if (obj->unpaid) {
         long quotedprice = unpaid_cost(obj, TRUE);

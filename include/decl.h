@@ -183,26 +183,8 @@ E NEARDATA char tune[6];
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 E struct linfo level_info[MAXLINFO];
 
-E NEARDATA struct sinfo {
-    int gameover;       /* self explanatory? */
-    int stopprint;      /* inhibit further end of game disclosure */
-#if defined(UNIX) || defined(VMS) || defined (__EMX__) || defined(WIN32)
-    int done_hup;       /* SIGHUP or moral equivalent received
-                         * -- no more screen output */
-#endif
-    int something_worth_saving; /* in case of panic */
-    int panicking;      /* `panic' is in progress */
-#if defined(VMS) || defined(WIN32)
-    int exiting;        /* an exit handler is executing */
-#endif
-    int in_impossible;
-#ifdef PANICLOG
-    int in_paniclog;
-#endif
-    int wizkit_wishing;
-} program_state;
+extern struct sinfo program_state; /* flags describing game's current state */
 
-E boolean restoring;
 E boolean ransacked;
 extern boolean zombify;
 
@@ -213,6 +195,9 @@ E const char ynqchars[];
 E const char ynaqchars[];
 E const char ynNaqchars[];
 E NEARDATA long yn_number;
+
+extern struct restore_info restoreinfo;
+extern struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 E const char disclosure_options[];
 
@@ -579,6 +564,8 @@ extern struct u_realtime {
     time_t last_displayed_time; /**< Last time displayed on the status line */
 } urealtime;
 #endif /* RECORD_REALTIME || REALTIME_ON_BOTL */
+
+extern d_level uz_save;
 
 #ifdef SIMPLE_MAIL
 E int mailckfreq;

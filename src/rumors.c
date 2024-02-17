@@ -225,15 +225,19 @@ init_oracles(dlb *fp)
 }
 
 void
-save_oracles(int fd, int mode)
+save_oracles(NHFILE *nhfp)
 {
-    if (perform_bwrite(mode)) {
-        bwrite(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
+        }
         if (oracle_cnt) {
-            bwrite(fd, (genericptr_t)oracle_loc, oracle_cnt*sizeof (long));
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t)oracle_loc, oracle_cnt*sizeof (long));
+            }
         }
     }
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         if (oracle_cnt) {
             free((genericptr_t)oracle_loc);
             oracle_loc = 0,  oracle_cnt = 0,  oracle_flg = 0;
@@ -242,12 +246,18 @@ save_oracles(int fd, int mode)
 }
 
 void
-restore_oracles(int fd)
+restore_oracles(NHFILE *nhfp)
 {
-    mread(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
+    }
+
     if (oracle_cnt) {
-        oracle_loc = (long *) alloc(oracle_cnt * sizeof (long));
-        mread(fd, (genericptr_t) oracle_loc, oracle_cnt * sizeof (long));
+        oracle_loc = (unsigned long *) alloc(oracle_cnt * sizeof(long));
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) oracle_loc,
+                  oracle_cnt * sizeof (long));
+        }
         oracle_flg = 1; /* no need to call init_oracles() */
     }
 }

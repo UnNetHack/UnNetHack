@@ -1171,7 +1171,7 @@ amii_init_nhwindows(argcp,argv)
 		     */
 		    NewHackScreen.Height = wbscr->Height;
 		    NewHackScreen.Width = wbscr->Width;
-		
+
 		    /*
 		     * Request LACE if it looks laced.  For 2.1/3.0, we will get
 		     * promoted to the users choice of modes (if promotion is allowed)
@@ -2249,7 +2249,6 @@ void
 amii_cliparound(x,y)
     register int x,y;
 {
-    extern boolean restoring;
 #ifdef	CLIPPING
     int oldx = clipx, oldy = clipy;
     int oldxmax = clipxmax, oldymax = clipymax;

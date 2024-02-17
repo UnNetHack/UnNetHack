@@ -99,18 +99,35 @@ check_version(struct version_info *version_data, const char *filename, boolean c
 /* this used to be based on file date and somewhat OS-dependant,
    but now examines the initial part of the file's contents */
 boolean
-uptodate(int fd, const char *name)
+uptodate(NHFILE *nhfp, const char *name, unsigned long utdflags)
 {
-    int rlen;
+    ssize_t rlen = 0;
+    int cmc = 0, filecmc = 0;
     struct version_info vers_info;
     boolean verbose = name ? TRUE : FALSE;
+    char indicator;
 
-    rlen = read(fd, (genericptr_t) &vers_info, sizeof vers_info);
-    minit();        /* ZEROCOMP */
+    if (nhfp->structlevel) {
+        rlen = read(nhfp->fd, (genericptr_t) &indicator, sizeof indicator);
+        rlen = read(nhfp->fd, (genericptr_t) &filecmc, sizeof filecmc);
+        if (rlen == 0) {
+            return FALSE;
+        }
+    }
+    if (cmc != filecmc) {
+        return FALSE;
+    }
+
+    if (nhfp->structlevel) {
+        rlen = read(nhfp->fd, (genericptr_t) &vers_info, sizeof vers_info);
+    }
+    minit(); /* ZEROCOMP */
     if (rlen == 0) {
         if (verbose) {
             pline("File \"%s\" is empty?", name);
-            wait_synch();
+            if ((utdflags & UTD_WITHOUT_WAITSYNCH_PERFILE) == 0) {
+                wait_synch();
+            }
         }
         return FALSE;
     }
@@ -124,17 +141,35 @@ uptodate(int fd, const char *name)
 }
 
 void
-store_version(int fd)
+store_formatindicator(NHFILE *nhfp)
+{
+    char indicate = 'u';
+    int cmc = 0;
+
+    if (nhfp->mode & WRITING) {
+        if (nhfp->structlevel) {
+            indicate = 'h'; /* historical */
+            bwrite(nhfp->fd, (genericptr_t) &indicate, sizeof indicate);
+            bwrite(nhfp->fd, (genericptr_t) &cmc, sizeof cmc);
+        }
+    }
+}
+
+void
+store_version(NHFILE *nhfp)
 {
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
         VERSION_SANITY1, VERSION_SANITY2
     };
 
-    bufoff(fd);
-    /* bwrite() before bufon() uses plain write() */
-    bwrite(fd, (genericptr_t)&version_data, (unsigned)(sizeof version_data));
-    bufon(fd);
+    if (nhfp->structlevel) {
+        bufoff(nhfp->fd);
+        /* bwrite() before bufon() uses plain write() */
+        store_formatindicator(nhfp);
+        bwrite(nhfp->fd, (genericptr_t) &version_data, (unsigned) (sizeof version_data));
+        bufon(nhfp->fd);
+    }
     return;
 }
 

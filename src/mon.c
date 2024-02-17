@@ -3710,10 +3710,10 @@ hide_monst(struct monst *mon)
         if (mon->data->mlet == S_MIMIC && !M_AP_TYPE(mon)) {
             (void) restrap(mon);
         }
+        viz_array[y][x] = save_viz;
         if (hider_under) {
             (void) hideunder(mon);
         }
-        viz_array[y][x] = save_viz;
     }
 }
 

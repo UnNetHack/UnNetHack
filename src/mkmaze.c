@@ -1855,7 +1855,7 @@ water_friction(void)
 }
 
 void
-save_waterlevel(int fd, int mode)
+save_waterlevel(NHFILE* nhfp)
 {
     struct bubble *b;
 
@@ -1863,27 +1863,35 @@ save_waterlevel(int fd, int mode)
         return;
     }
 
-    if (perform_bwrite(mode)) {
+    if (!bbubbles) {
+        return;
+    }
+
+    if (perform_bwrite(nhfp)) {
         int n = 0;
         for (b = bbubbles; b; b = b->next) {
             ++n;
         }
-        bwrite(fd, &n, sizeof n);
-        bwrite(fd, &xmin, sizeof xmin);
-        bwrite(fd, &ymin, sizeof ymin);
-        bwrite(fd, &xmax, sizeof xmax);
-        bwrite(fd, &ymax, sizeof ymax);
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &n, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &xmin, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &ymin, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &xmax, sizeof(int));
+            bwrite(nhfp->fd, (genericptr_t) &ymax, sizeof(int));
+        }
         for (b = bbubbles; b; b = b->next) {
-            bwrite(fd, b, sizeof *b);
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) b, sizeof(struct bubble));
+            }
         }
     }
-    if (release_data(mode)) {
+    if (release_data(nhfp)) {
         unsetup_waterlevel();
     }
 }
 
 void
-restore_waterlevel(int fd)
+restore_waterlevel(NHFILE* nhfp)
 {
     struct bubble *b = (struct bubble *)0, *btmp;
     int i, n;
@@ -1893,15 +1901,19 @@ restore_waterlevel(int fd)
     }
 
     set_wportal();
-    mread(fd, &n, sizeof n);
-    mread(fd, &xmin, sizeof xmin);
-    mread(fd, &ymin, sizeof ymin);
-    mread(fd, &xmax, sizeof xmax);
-    mread(fd, &ymax, sizeof ymax);
+    if (nhfp->structlevel) {
+        mread(nhfp->fd, &n, sizeof n);
+        mread(nhfp->fd, &xmin, sizeof xmin);
+        mread(nhfp->fd, &ymin, sizeof ymin);
+        mread(nhfp->fd, &xmax, sizeof xmax);
+        mread(nhfp->fd, &ymax, sizeof ymax);
+    }
     for (i = 0; i < n; i++) {
         btmp = b;
         b = (struct bubble *) alloc(sizeof *b);
-        mread(fd, b, sizeof *b);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, b, sizeof *b);
+        }
         if (bbubbles) {
             btmp->next = b;
             b->prev = btmp;
@@ -1912,7 +1924,19 @@ restore_waterlevel(int fd)
         mv_bubble(b, 0, 0, TRUE);
     }
     ebubbles = b;
-    b->next = (struct bubble *)0;
+    if (b) {
+        b->next = (struct bubble *) 0;
+    } else {
+        /* avoid "saving and reloading may fix this" */
+        program_state.something_worth_saving = 0;
+        /* during restore, information about what level this is might not
+           be available so we're wishy-washy about what we describe */
+        impossible("No %s to restore?",
+                   (Is_waterlevel(&u.uz) || Is_waterlevel(&uz_save)) ? "air bubbles" :
+                   (Is_airlevel(&u.uz) || Is_airlevel(&uz_save)) ? "clouds" :
+                   "air bubbles or clouds");
+        program_state.something_worth_saving = 1;
+    }
     was_waterlevel = TRUE;
 }
 

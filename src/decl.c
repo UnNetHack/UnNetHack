@@ -325,7 +325,34 @@ struct u_achieve achieve = DUMMY;
 struct u_realtime urealtime = { 0 };
 #endif
 
+d_level uz_save = DUMMY;
+
 struct _plinemsg *pline_msg = NULL;
+
+const struct savefile_info default_sfinfo = {
+#ifdef NHSTDC
+    0x00000000UL
+#else
+    0x00000000L
+#endif
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+        | SFI1_EXTERNALCOMP
+#endif
+#if defined(ZEROCOMP)
+        | SFI1_ZEROCOMP
+#endif
+#if defined(RLECOMP)
+        | SFI1_RLECOMP
+#endif
+    ,
+#ifdef NHSTDC
+    0x00000000UL, 0x00000000UL
+#else
+    0x00000000L, 0x00000000L
+#endif
+};
+
+struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 /* FIXME: The curses windowport requires this stupid hack, in the
    case where a game is in progress and the user is asked if he
