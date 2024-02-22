@@ -274,8 +274,10 @@
 #define GLYPH_STATUE_OFF    (WARNCOUNT + GLYPH_WARNING_OFF)
 #define MAX_GLYPH           (NUMMONS + GLYPH_STATUE_OFF)
 
-#define NO_GLYPH            MAX_GLYPH
-#define GLYPH_INVISIBLE     GLYPH_INVIS_OFF
+#define NO_GLYPH          MAX_GLYPH
+#define GLYPH_INVISIBLE   GLYPH_INVIS_OFF
+#define GLYPH_UNEXPLORED  (cmap_to_glyph(S_stone))
+#define GLYPH_NOTHING     (cmap_to_glyph(S_stone))
 
 #define warning_to_glyph(mwarnlev) ((mwarnlev)+GLYPH_WARNING_OFF)
 #define mon_to_glyph(mon)          ((int) what_mon(monsndx((mon)->data))+GLYPH_MON_OFF)

@@ -29,6 +29,9 @@ static boolean zap_steed(struct obj *);
 
 static int zap_hit(int, int);
 static void backfire(struct obj *);
+/* all callers of boxlock_invent() pass a NONNULL obj, and boxlock
+ * boxlock_invent() calls boxlock() which has nonnull arg. */
+static void boxlock_invent(struct obj *) NONNULLARG1;
 static int spell_hit_bonus(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM-1)
@@ -372,15 +375,15 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     case WAN_OPENING:
     case SPE_KNOCK:
         wake = FALSE; /* don't want immediate counterattack */
-        if (u.uswallow && mtmp == u.ustuck) {
-            if (is_animal(mtmp->data)) {
-                if (Blind) {
-                    You_feel("a sudden rush of air!");
-                } else {
-                    pline("%s opens its mouth!", Monnam(mtmp));
-                }
-            }
-            expels(mtmp, mtmp->data, TRUE);
+        if (mtmp == u.ustuck) {
+            /* zapping either holder/holdee or self [zapyourself()] will
+               release hero from holder's grasp or holdee from hero's grasp */
+            release_hold();
+            learn_it = TRUE;
+
+        /* zap which hits steed will only release saddle if it
+           doesn't hit a holding or falling trap; playability
+           here overrides the more logical target ordering */
         } else if (openholdingtrap(mtmp, &learn_it)) {
             break;
         } else if (openfallingtrap(mtmp, TRUE, &learn_it)) {
@@ -535,6 +538,44 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     }
 
     return 0;
+}
+
+/* hero is held by a monster or engulfed or holding a monster and has zapped
+   opening/unlocking magic at holder/engulfer/holdee or at self */
+void
+release_hold(void)
+{
+    struct monst *mtmp = u.ustuck;
+
+    if (!mtmp) {
+        impossible("release_hold when not held?");
+    } else if (u.uswallow) { /* possible for sticky hero to be swallowed */
+        if (digests(mtmp->data)) {
+            if (!Blind) {
+                pline("%s opens its mouth!", Monnam(mtmp));
+            } else {
+                You_feel("a sudden rush of air!");
+            }
+        }
+        /* gives "you get regurgitated" or "you get expelled from <mon>" */
+        expels(mtmp, mtmp->data, TRUE);
+    } else if (sticks(youmonst.data)) {
+        /* order matters if 'holding' status condition is enabled;
+           set_ustuck() will set flag for botl update, You() pline will
+           trigger a status update with "UHold" removed */
+        set_ustuck((struct monst *) 0);
+        You("release %s.", mon_nam(mtmp));
+    } else { /* held but not swallowed */
+        char relbuf[BUFSZ];
+
+        unstuck(u.ustuck);
+        if (!nohands(mtmp->data)) {
+            Sprintf(relbuf, "from %s grasp", s_suffix(mon_nam(mtmp)));
+        } else {
+            Sprintf(relbuf, "by %s", mon_nam(mtmp));
+        }
+        You("are released %s.", relbuf);
+    }
 }
 
 void
@@ -2493,6 +2534,26 @@ dozap(void)
     return 1;
 }
 
+/** Lock or unlock all boxes in inventory */
+static void
+boxlock_invent(struct obj *obj)
+{
+    struct obj *otmp;
+    boolean boxing = FALSE;
+
+    /* (un)lock carried boxes */
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (Is_box(otmp)) {
+            (void) boxlock(otmp, obj);
+            boxing = TRUE;
+        }
+    }
+
+    if (boxing) {
+        update_inventory(); /* in case any box->lknown has changed */
+    }
+}
+
 int
 zapyourself(struct obj *obj, boolean ordinary)
 {
@@ -2729,35 +2790,29 @@ zapyourself(struct obj *obj, boolean ordinary)
         }
         damage = 0; /* reset */
         break;
+
     case WAN_OPENING:
-        if (Punished) {
-            makeknown(WAN_OPENING);
-        }
-        /* fall through */
     case SPE_KNOCK:
+        if (u.ustuck) {
+            /* zapping either self or holder/holdee [bhitm()] will release
+               holder's grasp from the hero or hero's grasp from holdee */
+            release_hold();
+            learn_it = TRUE;
+        }
         if (Punished) {
+            learn_it = TRUE;
             Your("chain quivers for a moment.");
+            makeknown_msg(WAN_OPENING);
+            unpunish();
         }
         /* invent is hit iff hero doesn't escape from a trap */
         if (!u.utrap || !openholdingtrap(&youmonst, &learn_it)) {
-            struct obj *otmp;
-            boolean boxing = FALSE;
-
-            /* unlock carried boxes */
-            for (otmp = invent; otmp; otmp = otmp->nobj) {
-                if (Is_box(otmp)) {
-                    (void) boxlock(otmp, obj);
-                    boxing = TRUE;
-                }
-            }
-            if (boxing) {
-                update_inventory(); /* in case any box->lknown has changed */
-            }
-
+            boxlock_invent(obj);
             /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&youmonst, TRUE, &learn_it);
         }
         break;
+
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
         /* similar logic to opening; invent is hit iff no trap triggered */

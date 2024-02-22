@@ -16,6 +16,7 @@ static int drop(struct obj *);
 static int wipeoff(void);
 
 static int menu_drop(int);
+static boolean u_stuck_cannot_go(const char *);
 static NHFILE *currentlevel_rewrite(void);
 static void final_level(void);
 /* static boolean badspot(coordxy,coordxy); */
@@ -1027,6 +1028,27 @@ drop_done:
     return n_dropped;
 }
 
+static boolean
+u_stuck_cannot_go(const char *updn)
+{
+    if (u.ustuck) {
+        if (u.uswallow || !sticks(youmonst.data)) {
+            You("are %s, and cannot go %s.",
+                !u.uswallow ? "being held" :
+                digests(u.ustuck->data) ? "swallowed" :
+                "engulfed",
+                updn);
+            return TRUE;
+        } else {
+            struct monst *mtmp = u.ustuck;
+
+            set_ustuck((struct monst *) 0);
+            You("release %s.", mon_nam(mtmp));
+        }
+    }
+    return FALSE;
+}
+
 /* on a ladder, used in goto_level */
 static NEARDATA boolean at_ladder = FALSE;
 
@@ -1119,6 +1141,10 @@ dodown(void)
         return 1; /* came out of hiding; might need '>' again to go down */
     }
 
+    if (u_stuck_cannot_go("down")) {
+        return ECMD_TIME;
+    }
+
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap &&
@@ -1138,12 +1164,7 @@ dodown(void)
             }
         }
     }
-    if (u.ustuck) {
-        You("are %s, and cannot go down.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data) ?
-            "swallowed" : "engulfed");
-        return 1;
-    }
+
     if (on_level(&valley_level, &u.uz) && stairs_down && !u.uevent.gehennom_entered) {
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");
@@ -1224,12 +1245,10 @@ doup(void)
         return 0;
     }
 
-    if (u.ustuck) {
-        You("are %s, and cannot go up.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data) ?
-            "swallowed" : "engulfed");
-        return 1;
+    if (u_stuck_cannot_go("up")) {
+        return ECMD_TIME;
     }
+
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
         Your("load is too heavy to climb the %s.",

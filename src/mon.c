@@ -2666,6 +2666,23 @@ monkilled(struct monst *mdef, const char *fltxt, int how)
 }
 
 void
+set_ustuck(struct monst *mtmp)
+{
+    if (iflags.sanity_check || iflags.debug_fuzzer) {
+        if (mtmp && !m_next2u(mtmp)) {
+            impossible("Sticking to %s at distu %d?", mon_nam(mtmp), mdistu(mtmp));
+        }
+    }
+
+    flags.botl = TRUE;
+    u.ustuck = mtmp;
+    if (!u.ustuck) {
+        u.uswallow = 0;
+        u.uswldtim = 0;
+    }
+}
+
+void
 unstuck(struct monst* mtmp)
 {
     if (u.ustuck == mtmp) {

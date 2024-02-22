@@ -694,29 +694,40 @@ delallobj(coordxy x, coordxy y)
     }
 }
 
-/* destroy object in fobj chain (if unpaid, it remains on the bill) */
+/* normal object deletion (if unpaid, it remains on the bill) */
 void
 delobj(struct obj *obj)
 {
+    delobj_core(obj, FALSE);
+}
+
+/* destroy object; caller has control over whether to destroy something
+   that ordinarily shouldn't be destroyed */
+void
+delobj_core(
+    struct obj *obj,
+    boolean force) /**< 'force==TRUE' used when reviving Rider corpses */
+{
     boolean update_map;
 
-    if (obj->otyp == AMULET_OF_YENDOR ||
-        obj->otyp == CANDELABRUM_OF_INVOCATION ||
-        obj->otyp == BELL_OF_OPENING ||
-        obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+    /* obj_resists(obj,0,0) protects the Amulet, the invocation tools,
+       and Rider corspes */
+    if (!force && obj_resists(obj, 0, 0)) {
         /* player might be doing something stupid, but we
          * can't guarantee that.  assume special artifacts
          * are indestructible via drawbridges, and exploding
          * chests, and golem creation, and ...
          */
+        obj->in_use = 0; /* in case caller has set this to 1 */
         return;
     }
     update_map = (obj->where == OBJ_FLOOR);
     obj_extract_self(obj);
-    if (update_map) {
+    if (update_map) { /* floor object's coordinates are always up to date */
+        maybe_unhide_at(obj->ox, obj->oy);
         newsym(obj->ox, obj->oy);
     }
-    obfree(obj, (struct obj *) 0);  /* frees contents also */
+    obfree(obj, (struct obj *) 0); /* frees contents also */
 }
 
 /* try to find a particular type of object at designated map location */

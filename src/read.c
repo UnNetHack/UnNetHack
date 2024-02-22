@@ -2858,12 +2858,11 @@ unpunish(void)
     struct obj *savechain = uchain;
 
     /* chain goes away */
-    obj_extract_self(uchain);
-    newsym(uchain->ox, uchain->oy);
     setworn((struct obj *) 0, W_CHAIN); /* sets 'uchain' to Null */
-    dealloc_obj(savechain);
-    /* ball persists */
-    uball->spe = 0;
+    /* for floor, unhides monster hidden under chain, calls newsym() */
+    delobj(savechain);
+
+    /* the chain is gone but the no longer attached ball persists */
     setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
 }
 

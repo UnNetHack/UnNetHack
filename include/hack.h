@@ -324,6 +324,7 @@ typedef struct {
 #include "botl.h"
 
 /* Symbol offsets */
+#define SYM_NOTHING 0
 #define SYM_OFF_P (0)
 #define SYM_OFF_O (SYM_OFF_P + MAXPCHARS)
 #define SYM_OFF_M (SYM_OFF_O + MAXOCLASSES)

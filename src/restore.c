@@ -816,7 +816,7 @@ restlevelfile(xint8 ltmp)
 int
 dorecover(NHFILE *nhfp)
 {
-    xint8 ltmp;
+    xint8 ltmp = 0;
     int rtmp;
     struct obj *otmp;
 
@@ -972,8 +972,9 @@ dorecover(NHFILE *nhfp)
 
     load_qtlist();  /* re-load the quest text info */
     reset_attribute_clock();
-    /* Set up the vision internals, after levl[] data is loaded */
-    /* but before docrt().                      */
+    /* Set up the vision internals, after levl[] data is loaded
+       but before docrt(). */
+    reglyph_darkroom();
     vision_reset();
     vision_full_recalc = 1; /* recompute vision (not saved) */
 
