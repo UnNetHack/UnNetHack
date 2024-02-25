@@ -1257,24 +1257,19 @@ makemon_rnd_goodpos(struct monst *mon, unsigned int gpflags, coord *cc)
                 }
             }
             if (bl == 0 && (!mon || mon->data->mmove)) {
+                stairway *stway = stairs;
                 /* all map positions are visible (or not good),
                    try to pick something logical */
-                if (dnstair.sx && !rn2(2)) {
-                    nx = dnstair.sx;
-                    ny = dnstair.sy;
-                } else if (upstair.sx && !rn2(2)) {
-                    nx = upstair.sx;
-                    ny = upstair.sy;
-                } else if (dnladder.sx && !rn2(2)) {
-                    nx = dnladder.sx;
-                    ny = dnladder.sy;
-                } else if (upladder.sx && !rn2(2)) {
-                    nx = upladder.sx;
-                    ny = upladder.sy;
+                while (stway) {
+                    if (stway->tolev.dnum == u.uz.dnum && !rn2(2)) {
+                        nx = stway->sx;
+                        ny = stway->sy;
+                        break;
+                    }
+                    stway = stway->next;
                 }
-                if (goodpos(nx, ny, mon, gpflags)) {
+                if (goodpos(nx, ny, mon, gpflags))
                     goto gotgood;
-                }
             }
         }
     } else {

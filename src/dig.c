@@ -201,7 +201,8 @@ dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
     const char *verb = (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
 
     if (On_stairs(x, y)) {
-        if (x == xdnladder || x == xupladder) {
+        stairway *stway = stairway_at(x, y);
+        if (stway->isladder) {
             if (verbose) {
                 pline_The("ladder resists your effort.");
             }
@@ -1639,9 +1640,10 @@ zap_dig(void)
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 int dmg;
                 if (On_stairs(u.ux, u.uy)) {
+                    stairway *stway = stairway_at(u.ux, u.uy);
                     pline_The("beam bounces off the %s and hits the %s.",
-                              (u.ux == xdnladder || u.ux == xupladder) ?
-                              "ladder" : "stairs", ceiling(u.ux, u.uy));
+                              stway->isladder ? "ladder" : "stairs",
+                              ceiling(u.ux, u.uy));
                 }
                 You("loosen a rock from the %s.", ceiling(u.ux, u.uy));
                 pline("It falls on your %s!", body_part(HEAD));
@@ -1898,8 +1900,7 @@ adj_pit_checks(coord *cc, char *msg)
     } else if (IS_SINK(ltyp)) {
         Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
         return FALSE;
-    } else if ((cc->x == xupladder && cc->y == yupladder) || /* ladder up */
-               (cc->x == xdnladder && cc->y == ydnladder)) { /* " down */
+    } else if (On_ladder(cc->x, cc->y)) {
         Strcpy(msg, "The ladder is unaffected.");
         return FALSE;
     } else {
@@ -1911,15 +1912,8 @@ adj_pit_checks(coord *cc, char *msg)
             supporting = "throne";
         } else if (IS_ALTAR(ltyp)) {
             supporting = "altar";
-        } else if ((cc->x == xupstair && cc->y == yupstair) ||
-                   (cc->x == sstairs.sx && cc->y == sstairs.sy &&
-                     sstairs.up)) {
-            /* "staircase up" */
-            supporting = "stairs";
-        } else if ((cc->x == xdnstair && cc->y == ydnstair) ||
-                   (cc->x == sstairs.sx && cc->y == sstairs.sy &&
-                     !sstairs.up)) {
-            /* "staircase down" */
+        } else if (On_stairs(cc->x, cc->y)) {
+            /* staircase up or down. On_ladder handled above. */
             supporting = "stairs";
         } else if (ltyp == DRAWBRIDGE_DOWN || /* "lowered drawbridge" */
                     ltyp == DBWALL) {      /* "raised drawbridge" */

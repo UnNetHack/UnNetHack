@@ -2798,8 +2798,8 @@ randomkey(void)
     }
 
     /* increase chances of going down and changing branches */
-    boolean stairs_down = ((u.ux == xdnstair && u.uy == ydnstair) ||
-                           (u.ux == sstairs.sx && u.uy == sstairs.sy));
+    stairway *stway = stairway_at(u.ux, u.uy);
+    boolean stairs_down = (stway && !stway->up);
     if (stairs_down && rnf(1,5)) {
         c = '>';
     }
@@ -3644,6 +3644,7 @@ here_cmd_menu(boolean doit)
     char ch;
     char buf[BUFSZ];
     schar typ = levl[u.ux][u.uy].typ;
+    stairway *stway = stairway_at(u.ux, u.uy);
     int npick;
     menu_item *picks = (menu_item *) 0;
 
@@ -3662,18 +3663,12 @@ here_cmd_menu(boolean doit)
         add_herecmd_menuitem(win, dosit, "Sit on the throne");
     }
 
-    if ((u.ux == xupstair && u.uy == yupstair) ||
-        (u.ux == sstairs.sx && u.uy == sstairs.sy && sstairs.up) ||
-        (u.ux == xupladder && u.uy == yupladder)) {
-        Sprintf(buf, "Go up the %s",
-                (u.ux == xupladder && u.uy == yupladder) ? "ladder" : "stairs");
+    if (stway && stway->up) {
+        Sprintf(buf, "Go up the %s", stway->isladder ? "ladder" : "stairs");
         add_herecmd_menuitem(win, doup, buf);
     }
-    if ((u.ux == xdnstair && u.uy == ydnstair) ||
-        (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up) ||
-        (u.ux == xdnladder && u.uy == ydnladder)) {
-        Sprintf(buf, "Go down the %s",
-                (u.ux == xupladder && u.uy == yupladder) ? "ladder" : "stairs");
+    if (stway && !stway->up) {
+        Sprintf(buf, "Go down the %s", stway->isladder ? "ladder" : "stairs");
         add_herecmd_menuitem(win, dodown, buf);
     }
     if (u.usteed) { /* another movement choice */
@@ -3772,6 +3767,7 @@ click_to_cmd(coordxy x, coordxy y, int mod)
                 cmd[0] = here_cmd_menu(FALSE);
                 return cmd;
             }
+            stairway *stway = stairway_at(u.ux, u.uy);
 
             /* here */
             if (IS_FOUNTAIN(levl[u.ux][u.uy].typ) || IS_SINK(levl[u.ux][u.uy].typ)) {
@@ -3780,14 +3776,10 @@ click_to_cmd(coordxy x, coordxy y, int mod)
             } else if (IS_THRONE(levl[u.ux][u.uy].typ)) {
                 cmd[0] = cmd_from_func(dosit);
                 return cmd;
-            } else if ((u.ux == xupstair && u.uy == yupstair)
-                      || (u.ux == sstairs.sx && u.uy == sstairs.sy && sstairs.up)
-                      || (u.ux == xupladder && u.uy == yupladder)) {
+            } else if (stway && stway->up) {
                 cmd[0] = cmd_from_func(doup);
                 return cmd;
-            } else if ((u.ux == xdnstair && u.uy == ydnstair)
-                      || (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)
-                      || (u.ux == xdnladder && u.uy == ydnladder)) {
+            } else if (stway && !stway->up) {
                 cmd[0] = cmd_from_func(dodown);
                 return cmd;
             } else if (OBJ_AT(u.ux, u.uy)) {

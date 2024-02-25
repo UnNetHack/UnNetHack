@@ -1001,10 +1001,10 @@ litter(void)
         nextobj = otmp->nobj;
         if ((otmp != uball) && (rnd(capacity) <= (int)otmp->owt)) {
             if (canletgo(otmp, "")) {
-                const char *stairs = levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder";
+                const char *dungeon_feature = levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder";
                 You("drop %s and %s %s you down the %s.",
                     yname(otmp), (otmp->quan == 1L) ? "it" : "they",
-                    otense(otmp, "follow"), stairs);
+                    otense(otmp, "follow"), dungeon_feature);
                 dropx(otmp);
                 encumber_msg(); /* drop[xyz]() probably ought to to this... */
             }

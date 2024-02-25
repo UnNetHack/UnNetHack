@@ -144,19 +144,7 @@ E struct dgn_topology {     /* special dungeon levels for speed */
 #define town_level      (dungeon_topology.d_town_level)
 #define moria_level     (dungeon_topology.d_moria_level)
 
-E NEARDATA stairway dnstair, upstair;       /* stairs up and down */
-#define xdnstair    (dnstair.sx)
-#define ydnstair    (dnstair.sy)
-#define xupstair    (upstair.sx)
-#define yupstair    (upstair.sy)
-
-E NEARDATA stairway dnladder, upladder;     /* ladders up and down */
-#define xdnladder   (dnladder.sx)
-#define ydnladder   (dnladder.sy)
-#define xupladder   (upladder.sx)
-#define yupladder   (upladder.sy)
-
-E NEARDATA stairway sstairs;
+extern stairway *stairs;
 
 E NEARDATA dest_area updest, dndest;    /* level-change destination areas */
 

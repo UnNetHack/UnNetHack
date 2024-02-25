@@ -84,10 +84,9 @@ check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
         if (check_tutorial_message(QT_T_LAVA)) return TRUE;
     }
     if (l->typ == STAIRS) {
+        stairway *stway = stairway_at(lx, ly);
         /* In which direction? */
-        if ((lx == xupstair   && ly == yupstair) ||
-            (lx == xupladder  && ly == yupladder) ||
-            (lx == sstairs.sx && ly == sstairs.sy && sstairs.up)) {
+        if (stway && stway->up) {
             if (u.uz.dlevel > 1) {
                 if (check_tutorial_message(QT_T_STAIRS)) {
                     return TRUE;
@@ -95,14 +94,10 @@ check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
                     if (check_tutorial_message(QT_T_L1UPSTAIRS)) return TRUE;
                 }
             }
-        } else if ((lx == xdnstair   && ly == ydnstair) ||
-                   (lx == xdnladder  && ly == ydnladder) ||
-                   (lx == sstairs.sx && ly == sstairs.sy && !sstairs.up)) {
+        } else {
             if (check_tutorial_message(QT_T_STAIRS)) {
                 return TRUE;
             }
-        } else {
-            impossible("Stairs go neither up nor down?");
         }
     }
     if (l->typ == FOUNTAIN) {

@@ -118,9 +118,7 @@ NEARDATA struct dig_info digging;
 
 NEARDATA dungeon dungeons[MAXDUNGEON];  /* ini'ed by init_dungeon() */
 NEARDATA s_level *sp_levchn;
-NEARDATA stairway upstair = { 0 }, dnstair = { 0 };
-NEARDATA stairway upladder = { 0 }, dnladder = { 0 };
-NEARDATA stairway sstairs = { 0 };
+stairway *stairs = NULL;
 NEARDATA dest_area updest = { 0 };
 NEARDATA dest_area dndest = { 0 };
 NEARDATA coord inv_pos = { 0 };

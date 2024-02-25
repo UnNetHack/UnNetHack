@@ -855,9 +855,7 @@ clear_level_structures(void)
     doorindex = 0;
     init_rect();
     init_vault();
-    xdnstair = ydnstair = xupstair = yupstair = 0;
-    sstairs.sx = sstairs.sy = 0;
-    xdnladder = ydnladder = xupladder = yupladder = 0;
+    stairway_free_all();
     made_branch = FALSE;
     clear_regions();
 }
@@ -1632,6 +1630,7 @@ place_branch(
         return;
     }
 
+    nhUse(br_room);
     if (!x) {   /* find random coordinates for branch */
         br_room = find_branch_room(&m);
         x = m.x;
@@ -1653,14 +1652,10 @@ place_branch(
     if (br->type == BR_PORTAL) {
         mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
-        sstairs.sx = x;
-        sstairs.sy = y;
-        sstairs.up = (char) on_level(&br->end1, &u.uz) ?
-                     br->end1_up : !br->end1_up;
-        assign_level(&sstairs.tolev, dest);
-        sstairs_room = br_room;
+        boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
 
-        levl[x][y].ladder = sstairs.up ? LA_UP : LA_DOWN;
+        stairway_add(x, y, goes_up, FALSE, dest);
+        levl[x][y].ladder = goes_up ? LA_UP : LA_DOWN;
         levl[x][y].typ = STAIRS;
     }
     /*
@@ -1868,8 +1863,10 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
 }
 
 void
-mkstairs(coordxy x, coordxy y, char up, struct mkroom *croom)
+mkstairs(coordxy x, coordxy y, char up, struct mkroom *croom UNUSED)
 {
+    d_level dest;
+
     if (!x) {
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
@@ -1884,15 +1881,9 @@ mkstairs(coordxy x, coordxy y, char up, struct mkroom *croom)
         (dunlev(&u.uz) == dunlevs_in_dungeon(&u.uz) && !up))
         return;
 
-    if (up) {
-        xupstair = x;
-        yupstair = y;
-        upstairs_room = croom;
-    } else {
-        xdnstair = x;
-        ydnstair = y;
-        dnstairs_room = croom;
-    }
+    dest.dnum = u.uz.dnum;
+    dest.dlevel = u.uz.dlevel + (up ? -1 : 1);
+    stairway_add(x, y, up ? TRUE : FALSE, FALSE, &dest);
 
     levl[x][y].typ = STAIRS;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;

@@ -326,37 +326,42 @@ strategy(struct monst *mtmp)
     return dstrat;
 }
 
-static void
-choose_stairs(coordxy *sx, coordxy *sy)
+void
+choose_stairs(
+    coordxy *sx, coordxy *sy, /**< output; left as-is if no spot found */
+    boolean dir) /**< True: forward, False: backtrack (usually up) */
 {
-    coordxy x = 0, y = 0;
+    stairway *stway;
+    boolean stdir = builds_up(&u.uz) ? dir : !dir;
 
-    if (builds_up(&u.uz)) {
-        if (xdnstair) {
-            x = xdnstair;
-            y = ydnstair;
-        } else if (xdnladder) {
-            x = xdnladder;
-            y = ydnladder;
+    /* look for stairs in direction 'stdir' (True: up, False: down) */
+    stway = stairway_find_type_dir(FALSE, stdir);
+    if (!stway) {
+        /* no stairs; look for ladder it that direction */
+        stway = stairway_find_type_dir(TRUE, stdir);
+        if (!stway) {
+            /* no ladder either; look for branch stairs or ladder in any
+               direction */
+            for (stway = stairs; stway; stway = stway->next) {
+                if (stway->tolev.dnum != u.uz.dnum) {
+                    break;
+                }
+            }
+            /* if no branch stairs/ladder, check for regular stairs in
+               opposite direction, then for regular ladder if necessary */
+            if (!stway) {
+                stway = stairway_find_type_dir(FALSE, !stdir);
+                if (!stway) {
+                    stway = stairway_find_type_dir(TRUE, !stdir);
+                }
+            }
         }
-    } else {
-        if (xupstair) {
-            x = xupstair;
-            y = yupstair;
-        } else if (xupladder) {
-            x = xupladder;
-            y = yupladder;
-        }
+        /* [note: 'stway' could still be Null if the only access to this
+           level is via magic portal] */
     }
 
-    if (!x && sstairs.sx) {
-        x = sstairs.sx;
-        y = sstairs.sy;
-    }
-
-    if (x && y) {
-        *sx = x;
-        *sy = y;
+    if (stway) {
+        *sx = stway->sx, *sy = stway->sy;
     }
 }
 
@@ -378,7 +383,7 @@ tactics(struct monst *mtmp)
     case STRAT_HEAL: /* hide and recover */
         mx = mtmp->mx, my = mtmp->my;
         /* if wounded, hole up on or near the stairs (to block them) */
-        choose_stairs(&sx, &sy);
+        choose_stairs(&sx, &sy, FALSE);
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
         if (In_W_tower(mx, my, &u.uz) ||
             (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {

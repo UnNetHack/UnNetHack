@@ -22,6 +22,7 @@ static void bputc(int);
 static void savelevchn(NHFILE *);
 static void savelevl(NHFILE *,boolean);
 static void savedamage(NHFILE *);
+static void save_stairs(NHFILE *);
 static void saveobj(NHFILE *, struct obj *);
 static void saveobjchn(NHFILE *, struct obj **) NO_NNARGS;
 static void savemon(NHFILE *, struct monst *);
@@ -605,11 +606,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     savelevl(nhfp, ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &monstermoves, sizeof(monstermoves));
-        bwrite(nhfp->fd, (genericptr_t) &upstair, sizeof(stairway));
-        bwrite(nhfp->fd, (genericptr_t) &dnstair, sizeof(stairway));
-        bwrite(nhfp->fd, (genericptr_t) &upladder, sizeof(stairway));
-        bwrite(nhfp->fd, (genericptr_t) &dnladder, sizeof(stairway));
-        bwrite(nhfp->fd, (genericptr_t) &sstairs, sizeof(stairway));
+        save_stairs(nhfp);
         bwrite(nhfp->fd, (genericptr_t) &updest, sizeof(dest_area));
         bwrite(nhfp->fd, (genericptr_t) &dndest, sizeof(dest_area));
         bwrite(nhfp->fd, (genericptr_t) &level.flags, sizeof(level.flags));
@@ -970,6 +967,39 @@ save_lvl_sounds(NHFILE *nhfp, struct lvl_sounds *or)
             free(or->sounds);
             or->sounds = NULL;
             or->n_sounds = 0;
+        }
+    }
+}
+
+static void
+save_stairs(NHFILE *nhfp)
+{
+    stairway *stway = stairs;
+    int buflen = (int) sizeof *stway;
+
+    while (stway) {
+        if (perform_bwrite(nhfp)) {
+            boolean use_relative = (program_state.restoring != REST_GSTATE &&
+                                    stway->tolev.dnum == u.uz.dnum);
+            if (use_relative) {
+                /* make dlevel relative to current level */
+                stway->tolev.dlevel -= u.uz.dlevel;
+            }
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+                bwrite(nhfp->fd, (genericptr_t) stway, sizeof *stway);
+            }
+            if (use_relative) {
+                /* reset stairway dlevel back to absolute */
+                stway->tolev.dlevel += u.uz.dlevel;
+            }
+        }
+        stway = stway->next;
+    }
+    if (perform_bwrite(nhfp)) {
+        buflen = -1;
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
         }
     }
 }

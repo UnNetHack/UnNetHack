@@ -2266,11 +2266,16 @@ mondead_helper(struct monst *mtmp, uchar adtyp)
 
 #ifdef KOPS
     if (mtmp->data->mlet == S_KOP) {
+        stairway *stway = stairway_find_type_dir(FALSE, FALSE);
+
         /* Dead Kops may come back. */
         switch (rnd(5)) {
         case 1: /* returns near the stairs */
-            (void) makemon(mtmp->data, xdnstair, ydnstair, NO_MM_FLAGS);
-            break;
+            if (stway) {
+                (void) makemon(mtmp->data, stway->sx, stway->sy, NO_MM_FLAGS);
+                break;
+            }
+            /* fall-through */
         case 2: /* randomly */
             (void) makemon(mtmp->data, 0, 0, NO_MM_FLAGS);
             break;

@@ -397,8 +397,8 @@
 #define NewTab(type, size)	(type **) alloc(sizeof(type *) * size)
 #define Free(ptr)		free((genericptr_t)ptr)
 
-extern void VDECL(lc_error, (const char *, ...));
-extern void VDECL(lc_warning, (const char *, ...));
+extern void lc_error(const char *, ...);
+extern void lc_warning(const char *, ...);
 extern void yyerror(const char *);
 extern void yywarning(const char *);
 extern int yylex();
@@ -421,7 +421,7 @@ extern genericptr_t get_last_opcode_data2(sp_lev *, int,int);
 extern boolean check_subrooms(sp_lev *);
 extern boolean write_level_file(char *,sp_lev *);
 extern struct opvar *set_opvar_int(struct opvar *, long);
-extern void VDECL(add_opvars, (sp_lev *, const char *, ...));
+extern void add_opvars(sp_lev *, const char *, ...);
 
 extern struct lc_funcdefs *funcdef_new(long,char *);
 extern void funcdef_free_all(struct lc_funcdefs *);

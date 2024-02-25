@@ -2648,8 +2648,8 @@ use_trap(struct obj *otmp)
     } else if (is_lava(u.ux, u.uy)) {
         what = "in lava";
     } else if (On_stairs(u.ux, u.uy)) {
-        what = (u.ux == xdnladder || u.ux == xupladder) ?
-               "on the ladder" : "on the stairs";
+        stairway *stway = stairway_at(u.ux, u.uy);
+        what = stway->isladder ? "on the ladder" : "on the stairs";
     } else if (IS_FURNITURE(levl[u.ux][u.uy].typ) ||
              IS_ROCK(levl[u.ux][u.uy].typ) ||
              closed_door(u.ux, u.uy) || t_at(u.ux, u.uy))

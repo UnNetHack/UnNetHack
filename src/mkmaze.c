@@ -1298,16 +1298,18 @@ makemaz(const char *s)
             panic("inv_pos: maze is too small! (%d x %d)",
                   x_maze_max, y_maze_max);
 #endif
+        stairway *stway;
         inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
         do {
             x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
             y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
             /* we don't want it to be too near the stairs, nor
                to be on a spot that's already in use (wall|trap) */
-        } while (x == xupstair || y == yupstair ||  /*(direct line)*/
-                 abs(x - xupstair) == abs(y - yupstair) ||
-                 distmin(x, y, xupstair, yupstair) <= INVPOS_DISTANCE ||
-                 !SPACE_POS(levl[x][y].typ) || occupied(x, y));
+        } while (((stway = stairway_find_dir(TRUE)) != 0) &&
+                (x == stway->sx || y == stway->sy || /*(direct line)*/
+                abs(x - stway->sx) == abs(y - stway->sy) ||
+                distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE ||
+                !SPACE_POS(levl[x][y].typ) || occupied(x, y)));
         inv_pos.x = x;
         inv_pos.y = y;
 

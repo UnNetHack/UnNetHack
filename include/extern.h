@@ -639,10 +639,23 @@ extern void next_level(boolean);
 extern void prev_level(boolean);
 extern void u_on_newpos(coordxy, coordxy);
 extern void u_on_rndspot(int);
+extern void stairway_add(coordxy, coordxy,
+                         boolean, boolean, d_level *) NONNULLPTRS;
+extern void stairway_print(void);
+extern void stairway_free_all(void);
+extern stairway *stairway_at(coordxy, coordxy);
+extern stairway *stairway_find(d_level *) NONNULLARG1;
+extern stairway *stairway_find_from(d_level *, boolean) NONNULLARG1;
+extern stairway *stairway_find_dir(boolean);
+extern stairway *stairway_find_type_dir(boolean, boolean);
+extern stairway *stairway_find_special_dir(boolean);
 extern void u_on_sstairs(int);
 extern void u_on_upstairs(void);
 extern void u_on_dnstairs(void);
 extern boolean On_stairs(coordxy, coordxy);
+extern boolean On_ladder(coordxy, coordxy);
+extern boolean On_stairs_up(coordxy, coordxy);
+extern boolean On_stairs_dn(coordxy, coordxy);
 extern void get_level(d_level *, int);
 extern boolean Is_botlevel(d_level *);
 extern boolean Can_fall_thru(d_level *);
@@ -666,6 +679,8 @@ extern int induced_align(int);
 extern boolean Invocation_lev(d_level *);
 extern xint16 level_difficulty(void);
 extern schar lev_by_name(const char *);
+extern boolean known_branch_stairs(stairway *);
+extern char *stairs_description(stairway *, char *, boolean) NONNULLARG1;
 #ifdef WIZARD
 extern schar print_dungeon(boolean, schar *, xint16 *);
 #endif
@@ -731,7 +746,7 @@ extern void done_intr(int);
 #endif
 extern void done_in_by(struct monst *);
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
-extern void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2);
+ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 extern void done(int);
 extern void container_contents(struct obj *, boolean, boolean, boolean);
@@ -1200,7 +1215,7 @@ extern int SanePositions(void);
 /* ### mttymain.c ### */
 
 extern void getreturn(char *);
-extern void VDECL(msmsg, (const char *, ...));
+extern void msmsg(const char *, ...);
 extern void gettty(void);
 extern void setftty(void);
 extern void settty(const char *);
@@ -1926,7 +1941,7 @@ extern int dosh(void);
 extern void append_slash(char *);
 extern void getreturn(const char *);
 # ifndef AMIGA
-extern void VDECL(msmsg, (const char *, ...));
+extern void msmsg(const char *, ...);
 # endif
 extern FILE *fopenp(const char *, const char *);
 #endif /* MICRO || WIN32 */
@@ -1937,7 +1952,7 @@ extern FILE *fopenp(const char *, const char *);
 extern void gettty(void);
 extern void settty(const char *);
 extern void setftty(void);
-extern void VDECL(error, (const char *, ...));
+extern void error(const char *, ...);
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 extern void msleep(unsigned);
 #endif
@@ -1991,23 +2006,23 @@ extern boolean autopick_testobj(struct obj *, boolean);
 
 extern void msgpline_add(int, char *);
 extern void msgpline_free(void);
-extern void VDECL(pline, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(custompline, (unsigned, const char *, ...)) PRINTF_F(2, 3);
+extern void pline(const char *, ...) PRINTF_F(1, 2);
+extern void custompline(unsigned, const char *, ...) PRINTF_F(2, 3);
 extern void urgent_pline(const char *, ...) PRINTF_F(1, 2);
-extern void VDECL(Norep, (const char *, ...)) PRINTF_F(1, 2);
+extern void Norep(const char *, ...) PRINTF_F(1, 2);
 extern void free_youbuf(void);
-extern void VDECL(You, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(Your, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(You_feel, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(You_cant, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(You_hear, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(You_see, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(pline_The, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(There, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
-extern void VDECL(warning, (const char *, ...)) PRINTF_F(1, 2);
+extern void You(const char *, ...) PRINTF_F(1, 2);
+extern void Your(const char *, ...) PRINTF_F(1, 2);
+extern void You_feel(const char *, ...) PRINTF_F(1, 2);
+extern void You_cant(const char *, ...) PRINTF_F(1, 2);
+extern void You_hear(const char *, ...) PRINTF_F(1, 2);
+extern void You_see(const char *, ...) PRINTF_F(1, 2);
+extern void pline_The(const char *, ...) PRINTF_F(1, 2);
+extern void There(const char *, ...) PRINTF_F(1, 2);
+extern void verbalize(const char *, ...) PRINTF_F(1, 2);
+extern void raw_printf(const char *, ...) PRINTF_F(1, 2);
+extern void impossible(const char *, ...) PRINTF_F(1, 2);
+extern void warning(const char *, ...) PRINTF_F(1, 2);
 extern const char *align_str(aligntyp);
 extern void mstatusline(struct monst *);
 extern void ustatusline(void);
@@ -2692,7 +2707,7 @@ extern void settty(const char *);
 extern void setftty(void);
 extern void intron(void);
 extern void introff(void);
-extern void VDECL(error, (const char *, ...)) PRINTF_F(1, 2);
+extern void error(const char *, ...) PRINTF_F(1, 2);
 #endif /* UNIX || __BEOS__ */
 
 /* ### unixunix.c ### */
@@ -2839,7 +2854,7 @@ extern void shuttty(const char *);
 extern void setftty(void);
 extern void intron(void);
 extern void introff(void);
-extern void VDECL(error, (const char *, ...)) PRINTF_F(1, 2);
+extern void error(const char *, ...) PRINTF_F(1, 2);
 #ifdef TIMED_DELAY
 extern void msleep(unsigned);
 #endif
@@ -2949,6 +2964,7 @@ extern void genl_preference_update(const char *);
 extern void amulet(void);
 extern int mon_has_amulet(struct monst *);
 extern int mon_has_special(struct monst *);
+extern void choose_stairs(coordxy *, coordxy *, boolean) NONNULLARG12;
 extern int tactics(struct monst *);
 extern boolean has_aggravatables(struct monst *);
 extern void aggravate(void);

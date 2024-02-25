@@ -116,6 +116,7 @@ struct obj {
 #define leashmon  corpsenm  /* gets m_id of attached pet */
 #define spestudied corpsenm /* # of times a spellbook has been studied */
 #define fromsink  corpsenm  /* a potion from a sink */
+#define migr_species corpsenm /* species to endow for MIGR_TO_SPECIES */
 
 #ifdef RECORD_ACHIEVE
     coordxy record_achieve_special;
@@ -126,6 +127,8 @@ struct obj {
     long owornmask;
     long picked_up_turn;    /* keep track of when obj got picked up */
     long quiver_priority;   /* priority for automatic quivering of objects */
+    xint16 omigr_from_dnum; /* where obj is migrating from */
+    xint16 omigr_from_dlevel; /* where obj is migrating from */
     struct oextra *oextra;  /* pointer to oextra struct */
 };
 

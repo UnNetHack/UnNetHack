@@ -34,7 +34,6 @@ static void create_monster(monster *, struct mkroom *);
 static void create_object(object *, struct mkroom *);
 static void create_altar(altar *, struct mkroom *);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
-static void fix_stair_rooms(void);
 static void create_corridor(corridor *);
 static void count_features(void);
 
@@ -612,6 +611,7 @@ flip_level(int flp)
     struct engr *etmp;
     struct mkroom *sroom;
     timer_element *timer;
+    stairway *stway;
 
     /* nothing to do unless (flp & 1) or (flp & 2) or both */
     if ((flp & 3) == 0) {
@@ -634,17 +634,13 @@ flip_level(int flp)
     }
 
     /* stairs and ladders */
-    if (flp & 1) {
-        yupstair = FlipY(yupstair);
-        ydnstair = FlipY(ydnstair);
-        yupladder = FlipY(yupladder);
-        ydnladder = FlipY(ydnladder);
-    }
-    if (flp & 2) {
-        xupstair = FlipX(xupstair);
-        xdnstair = FlipX(xdnstair);
-        xupladder = FlipX(xupladder);
-        xdnladder = FlipX(xdnladder);
+    for (stway = stairs; stway; stway = stway->next) {
+        if (flp & 1) {
+            stway->sy = FlipY(stway->sy);
+        }
+        if (flp & 2) {
+            stway->sx = FlipX(stway->sx);
+        }
     }
 
     /* traps */
@@ -2833,50 +2829,6 @@ dig_corridor(coord *org, coord *dest, boolean nxcor, schar ftyp, schar btyp)
 }
 
 /*
- * Disgusting hack: since special levels have their rooms filled before
- * sorting the rooms, we have to re-arrange the speed values upstairs_room
- * and dnstairs_room after the rooms have been sorted.  On normal levels,
- * stairs don't get created until _after_ sorting takes place.
- */
-static void
-fix_stair_rooms(void)
-{
-    int i;
-    struct mkroom *croom;
-
-    if (xdnstair &&
-       !((dnstairs_room->lx <= xdnstair && xdnstair <= dnstairs_room->hx) &&
-         (dnstairs_room->ly <= ydnstair && ydnstair <= dnstairs_room->hy))) {
-        for (i=0; i < nroom; i++) {
-            croom = &rooms[i];
-            if ((croom->lx <= xdnstair && xdnstair <= croom->hx) &&
-               (croom->ly <= ydnstair && ydnstair <= croom->hy)) {
-                dnstairs_room = croom;
-                break;
-            }
-        }
-        if (i == nroom) {
-            panic("Couldn't find dnstair room in fix_stair_rooms!");
-        }
-    }
-    if (xupstair &&
-       !((upstairs_room->lx <= xupstair && xupstair <= upstairs_room->hx) &&
-         (upstairs_room->ly <= yupstair && yupstair <= upstairs_room->hy))) {
-        for (i=0; i < nroom; i++) {
-            croom = &rooms[i];
-            if ((croom->lx <= xupstair && xupstair <= croom->hx) &&
-               (croom->ly <= yupstair && yupstair <= croom->hy)) {
-                upstairs_room = croom;
-                break;
-            }
-        }
-        if (i == nroom) {
-            panic("Couldn't find upstair room in fix_stair_rooms!");
-        }
-    }
-}
-
-/*
  * Corridors always start from a door. But it can end anywhere...
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
@@ -2887,7 +2839,6 @@ create_corridor(corridor *c)
     coord org, dest;
 
     if (c->src.room == -1) {
-        fix_stair_rooms();
         makecorridors(c->src.door);
         return;
     }
@@ -4393,10 +4344,18 @@ spo_ladder(struct sp_coder *coder)
     levl[x][y].typ = LADDER;
     SpLev_Map[x][y] = 1;
     if (OV_i(up)) {
-        xupladder = x; yupladder = y;
+        d_level dest;
+
+        dest.dnum = u.uz.dnum;
+        dest.dlevel = u.uz.dlevel - 1;
+        stairway_add(x, y, TRUE, TRUE, &dest);
         levl[x][y].ladder = LA_UP;
     } else {
-        xdnladder = x; ydnladder = y;
+        d_level dest;
+
+        dest.dnum = u.uz.dnum;
+        dest.dlevel = u.uz.dlevel + 1;
+        stairway_add(x, y, FALSE, TRUE, &dest);
         levl[x][y].ladder = LA_DOWN;
     }
     opvar_free(coord);
@@ -5378,20 +5337,15 @@ ensure_way_out(void)
     struct trap *ttmp = ftrap;
     int x,y;
     boolean ret = TRUE;
+    stairway *stway = stairs;
 
     set_selection_floodfillchk(floodfillchk_match_accessible);
 
-    if (xupstair && !selection_getpoint(xupstair, yupstair, ov)) {
-        selection_floodfill(ov, xupstair, yupstair, TRUE);
-    }
-    if (xdnstair && !selection_getpoint(xdnstair, ydnstair, ov)) {
-        selection_floodfill(ov, xdnstair, ydnstair, TRUE);
-    }
-    if (xupladder && !selection_getpoint(xupladder, yupladder, ov)) {
-        selection_floodfill(ov, xupladder, yupladder, TRUE);
-    }
-    if (xdnladder && !selection_getpoint(xdnladder, ydnladder, ov)) {
-        selection_floodfill(ov, xdnladder, ydnladder, TRUE);
+    while (stway) {
+        if (stway->tolev.dnum == u.uz.dnum) {
+            selection_floodfill(ov, stway->sx, stway->sy, TRUE);
+        }
+        stway = stway->next;
     }
 
     while (ttmp) {

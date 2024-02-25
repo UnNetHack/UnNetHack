@@ -1915,7 +1915,7 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
     struct obj *otmp2 = level.objects[x][y];
 
     if (!isok(x, y)) { /* validate location */
-        void VDECL((*func), (const char *, ...)) PRINTF_F(1, 2);
+        void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
 
         func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
                : impossible;
@@ -2306,6 +2306,8 @@ add_to_migration(struct obj *obj)
 
     obj->where = OBJ_MIGRATING;
     obj->nobj = migrating_objs;
+    obj->omigr_from_dnum = u.uz.dnum;
+    obj->omigr_from_dlevel = u.uz.dlevel;
     migrating_objs = obj;
 }
 

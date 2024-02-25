@@ -24,8 +24,7 @@ static boolean tried_heaplog = FALSE;
 #endif
 
 long *alloc(unsigned int);
-extern void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2);
-
+ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 
 long *
 alloc(unsigned int lth)

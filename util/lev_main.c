@@ -109,8 +109,8 @@ static boolean write_common_data(int,sp_lev *);
 static boolean write_maze(int,sp_lev *);
 static void init_obj_classes(void);
 
-void VDECL(lc_error, (const char *, ...));
-void VDECL(add_opvars, (sp_lev *, const char *, ...));
+void lc_error(const char *, ...);
+void add_opvars(sp_lev *, const char *, ...);
 
 static const struct {
     long functype;

@@ -1057,9 +1057,8 @@ int
 dodown(void)
 {
     struct trap *trap = 0;
-    boolean stairs_down = ((u.ux == xdnstair && u.uy == ydnstair) ||
-                           (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)),
-            ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
+    stairway *stway;
+    boolean stairs_down, ladder_down;
 
     if (u_rooted()) {
         return 1;
@@ -1067,6 +1066,12 @@ dodown(void)
 
     if (stucksteed(TRUE)) {
         return 0;
+    }
+
+    stairs_down = ladder_down = FALSE;
+    if ((stway = stairway_at(u.ux, u.uy)) != 0 && !stway->up) {
+        stairs_down = !stway->isladder;
+        ladder_down = !stairs_down;
     }
 
     /* Levitation might be blocked, but player can still use '>' to
@@ -1216,11 +1221,7 @@ dodown(void)
 int
 doup(void)
 {
-    boolean not_on_stairs = (
-        (u.ux != xupstair || u.uy != yupstair) &&
-        (!xupladder || u.ux != xupladder || u.uy != yupladder) &&
-        (!sstairs.sx || u.ux != sstairs.sx ||
-         u.uy != sstairs.sy || !sstairs.up));
+    stairway *stway = stairway_at(u.ux,u.uy);
 
     if (u_rooted()) {
         return 1;
@@ -1232,10 +1233,10 @@ doup(void)
         return 1;
     }
 
-    if (not_on_stairs) {
+    if (!On_stairs_up(u.ux, u.uy)) {
         if (do_stair_travel('<')) {
             return 0;
-        } else {
+        } else if (!stway || (stway && !stway->up)) {
             You_cant("go up here.");
             return 0;
         }
@@ -1615,8 +1616,10 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
         u_on_newpos(ttrap->tx, ttrap->ty);
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
-            if (at_ladder) {
-                u_on_newpos(xdnladder, ydnladder);
+            stairway *stway = stairway_find_from(&u.uz0, at_ladder);
+            if (stway) {
+                u_on_newpos(stway->sx, stway->sy);
+                stway->u_traversed = TRUE;
             } else {
                 if (newdungeon) {
                     if (Is_stronghold(&u.uz)) {
@@ -1651,9 +1654,11 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             } else if (at_ladder) {
                 You("climb up the ladder.");
             }
-        } else {    /* down */
-            if (at_ladder) {
-                u_on_newpos(xupladder, yupladder);
+        } else { /* down */
+            stairway *stway = stairway_find_from(&u.uz0, at_ladder);
+            if (stway) {
+                u_on_newpos(stway->sx, stway->sy);
+                stway->u_traversed = TRUE;
             } else {
                 if (newdungeon) {
                     u_on_sstairs(1);

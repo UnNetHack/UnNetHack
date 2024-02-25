@@ -749,23 +749,28 @@ nexttodoor(int sx, int sy)
 boolean
 has_dnstairs(struct mkroom *sroom)
 {
-    if (sroom == dnstairs_room) {
-        return TRUE;
+    stairway *stway = stairs;
+
+    while (stway) {
+        if (!stway->up && inside_room(sroom, stway->sx, stway->sy)) {
+            return TRUE;
+        }
+        stway = stway->next;
     }
-    if (sstairs.sx && !sstairs.up) {
-        return (boolean)(sroom == sstairs_room);
-    }
+
     return FALSE;
 }
 
 boolean
 has_upstairs(struct mkroom *sroom)
 {
-    if (sroom == upstairs_room) {
-        return TRUE;
-    }
-    if (sstairs.sx && sstairs.up) {
-        return (boolean)(sroom == sstairs_room);
+    stairway *stway = stairs;
+
+    while (stway) {
+        if (stway->up && inside_room(sroom, stway->sx, stway->sy)) {
+            return TRUE;
+        }
+        stway = stway->next;
     }
     return FALSE;
 }

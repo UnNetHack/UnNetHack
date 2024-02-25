@@ -38,6 +38,7 @@ static void restore_gamelog(NHFILE *);
 static void restore_msghistory(NHFILE *);
 static void reset_oattached_mids(boolean);
 static void rest_levl(NHFILE *, boolean);
+static void rest_stairs(NHFILE *);
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -996,6 +997,39 @@ dorecover(NHFILE *nhfp)
     return 1;
 }
 
+static void
+rest_stairs(NHFILE *nhfp)
+{
+    int buflen = 0;
+    stairway stway = { 0 };
+    stairway *newst;
+
+    stairway_free_all();
+    while (1) {
+        if (nhfp->structlevel) {
+            Mread(nhfp->fd, &buflen, sizeof buflen);
+        }
+
+        if (buflen == -1) {
+            break;
+        }
+
+        if (nhfp->structlevel) {
+            Mread(nhfp->fd, &stway, sizeof stway);
+        }
+        if (program_state.restoring != REST_GSTATE &&
+             stway.tolev.dnum == u.uz.dnum) {
+            /* stairway dlevel is relative, make it absolute */
+            stway.tolev.dlevel += u.uz.dlevel;
+        }
+        stairway_add(stway.sx, stway.sy, stway.up, stway.isladder, &(stway.tolev));
+        newst = stairway_at(stway.sx, stway.sy);
+        if (newst) {
+            newst->u_traversed = stway.u_traversed;
+        }
+    }
+}
+
 void
 restcemetery(NHFILE *nhfp, struct cemetery **cemeteryaddr)
 {
@@ -1146,12 +1180,9 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
         Mread(nhfp->fd, &omoves, sizeof omoves);
     }
     elapsed = moves - omoves;
+
     if (nhfp->structlevel) {
-        Mread(nhfp->fd, (genericptr_t)&upstair, sizeof(stairway));
-        Mread(nhfp->fd, (genericptr_t)&dnstair, sizeof(stairway));
-        Mread(nhfp->fd, (genericptr_t)&upladder, sizeof(stairway));
-        Mread(nhfp->fd, (genericptr_t)&dnladder, sizeof(stairway));
-        Mread(nhfp->fd, (genericptr_t)&sstairs, sizeof(stairway));
+        rest_stairs(nhfp);
         Mread(nhfp->fd, &updest, sizeof updest);
         Mread(nhfp->fd, &dndest, sizeof dndest);
         Mread(nhfp->fd, &level.flags, sizeof level.flags);
@@ -1250,11 +1281,19 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     rest_regions(nhfp);
 
     if (ghostly) {
+        stairway *stway = stairs;
+        while (stway) {
+            if (!stway->isladder && !stway->up &&
+                 stway->tolev.dnum == u.uz.dnum) {
+                break;
+            }
+            stway = stway->next;
+        }
         /* Now get rid of all the temp fruits... */
         freefruitchn(oldfruit),  oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level) &&
-            lev < ledger_no(&stronghold_level) && xdnstair == 0) {
+             lev < ledger_no(&stronghold_level) && !stway) {
             coord cc;
             d_level dest;
 
@@ -1262,8 +1301,7 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
             dest.dlevel = u.uz.dlevel + 1;
 
             mazexy(&cc);
-            xdnstair = cc.x;
-            ydnstair = cc.y;
+            stairway_add(cc.x, cc.y, FALSE, FALSE, &dest);
             levl[cc.x][cc.y].typ = STAIRS;
         }
 
@@ -1281,7 +1319,16 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
             case BR_STAIR:
             case BR_NO_END1:
             case BR_NO_END2: /* OK to assign to sstairs if it's not used */
-                assign_level(&sstairs.tolev, &ltmp);
+                stway = stairs;
+                while (stway) {
+                    if (stway->tolev.dnum != u.uz.dnum) {
+                        break;
+                    }
+                    stway = stway->next;
+                }
+                if (stway) {
+                    assign_level(&(stway->tolev), &ltmp);
+                }
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
             {

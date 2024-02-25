@@ -195,12 +195,13 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
 
         /* provide a visible difference if normal and lit corridor
          * use the same symbol */
+        stairway *stway = stairway_at(x, y);
         if (iflags.use_color &&
             offset == S_litcorr && ch == showsyms[S_corr]) {
             color = CLR_WHITE;
         } else if (iflags.use_color &&
                  (offset == S_upstair || offset == S_dnstair) &&
-                 (x == sstairs.sx && y == sstairs.sy)) {
+                 (stway && u.uz.dnum != stway->tolev.dnum)) {
             color = CLR_YELLOW;
 
         } else if (iflags.use_color && offset >= S_vwall && offset <= S_trwall) {

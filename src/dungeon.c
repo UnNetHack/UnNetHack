@@ -1331,13 +1331,18 @@ builds_up(d_level *lev)
 void
 next_level(boolean at_stairs)
 {
-    if (at_stairs && u.ux == sstairs.sx && u.uy == sstairs.sy) {
-        /* Taking a down dungeon branch. */
-        goto_level(&sstairs.tolev, at_stairs, FALSE, FALSE);
-    } else {
-        /* Going down a stairs or jump in a trap door. */
-        d_level newlevel;
+    stairway *stway = stairway_at(u.ux, u.uy);
+    d_level newlevel;
 
+    if (at_stairs && stway) {
+        stway->u_traversed = TRUE;
+    }
+
+    if (at_stairs && stway) {
+        newlevel.dnum = stway->tolev.dnum;
+        newlevel.dlevel = stway->tolev.dlevel;
+        goto_level(&newlevel, at_stairs, FALSE, FALSE);
+    } else {
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = u.uz.dlevel + 1;
         goto_level(&newlevel, at_stairs, !at_stairs, FALSE);
@@ -1348,18 +1353,26 @@ next_level(boolean at_stairs)
 void
 prev_level(boolean at_stairs)
 {
-    if (at_stairs && u.ux == sstairs.sx && u.uy == sstairs.sy) {
+    stairway *stway = stairway_at(u.ux, u.uy);
+    d_level newlevel;
+
+    if (at_stairs && stway) {
+        stway->u_traversed = TRUE;
+    }
+
+    if (at_stairs && stway && stway->tolev.dnum != u.uz.dnum) {
         /* Taking an up dungeon branch. */
         /* KMH -- Upwards branches are okay if not level 1 */
         /* (Just make sure it doesn't go above depth 1) */
         if (!u.uz.dnum && u.uz.dlevel == 1 && !u.uhave.amulet) {
             done(ESCAPED);
         } else {
-            goto_level(&sstairs.tolev, at_stairs, FALSE, FALSE);
+            newlevel.dnum = stway->tolev.dnum;
+            newlevel.dlevel = stway->tolev.dlevel;
+            goto_level(&newlevel, at_stairs, FALSE, FALSE);
         }
     } else {
         /* Going up a stairs or rising through the ceiling. */
-        d_level newlevel;
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = u.uz.dlevel - 1;
         goto_level(&newlevel, at_stairs, FALSE, FALSE);
@@ -1371,7 +1384,7 @@ u_on_newpos(coordxy x, coordxy y)
 {
     /* validate location */
     if (!isok(x, y)) {
-        void VDECL((*func), (const char *, ...)) PRINTF_F(1, 2);
+        void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
 
         func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
                : impossible;
@@ -1427,12 +1440,123 @@ u_on_rndspot(int upflag)
     switch_terrain();
 }
 
+void
+stairway_add(
+    coordxy x, coordxy y,
+    boolean up, boolean isladder,
+    d_level *dest)
+{
+    stairway *tmp = (stairway *) alloc(sizeof (stairway));
+
+    (void) memset((genericptr_t) tmp, 0, sizeof (stairway));
+    tmp->sx = x;
+    tmp->sy = y;
+    tmp->up = up;
+    tmp->isladder = isladder;
+    tmp->u_traversed = FALSE;
+    assign_level(&(tmp->tolev), dest);
+    tmp->next = stairs;
+    stairs = tmp;
+}
+
+void
+stairway_free_all(void)
+{
+    stairway *tmp = stairs;
+
+    while (tmp) {
+        stairway *tmp2 = tmp->next;
+        free(tmp);
+        tmp = tmp2;
+    }
+    stairs = NULL;
+}
+
+stairway *
+stairway_at(coordxy x, coordxy y)
+{
+    stairway *tmp = stairs;
+
+    while (tmp && !(tmp->sx == x && tmp->sy == y)) {
+        tmp = tmp->next;
+    }
+    return tmp;
+}
+
+stairway *
+stairway_find(d_level *fromdlev)
+{
+    stairway *tmp = stairs;
+
+    while (tmp) {
+        if (tmp->tolev.dnum == fromdlev->dnum &&
+             tmp->tolev.dlevel == fromdlev->dlevel) {
+            break; /* return */
+        }
+        tmp = tmp->next;
+    }
+    return tmp;
+}
+
+stairway *
+stairway_find_from(d_level *fromdlev, boolean isladder)
+{
+    stairway *tmp = stairs;
+
+    while (tmp) {
+        if (tmp->tolev.dnum == fromdlev->dnum &&
+             tmp->tolev.dlevel == fromdlev->dlevel &&
+             tmp->isladder == isladder) {
+            break; /* return */
+        }
+        tmp = tmp->next;
+    }
+    return tmp;
+}
+
+stairway *
+stairway_find_dir(boolean up)
+{
+    stairway *tmp = stairs;
+
+    while (tmp && !(tmp->up == up))
+        tmp = tmp->next;
+    return tmp;
+}
+
+stairway *
+stairway_find_type_dir(boolean isladder, boolean up)
+{
+    stairway *tmp = stairs;
+
+    while (tmp && !(tmp->isladder == isladder && tmp->up == up)) {
+        tmp = tmp->next;
+    }
+    return tmp;
+}
+
+stairway *
+stairway_find_special_dir(boolean up)
+{
+    stairway *tmp = stairs;
+
+    while (tmp) {
+        if (tmp->tolev.dnum != u.uz.dnum && tmp->up != up) {
+            return tmp;
+        }
+        tmp = tmp->next;
+    }
+    return tmp;
+}
+
 /* place you on the special staircase */
 void
 u_on_sstairs(int upflag)
 {
-    if (sstairs.sx) {
-        u_on_newpos(sstairs.sx, sstairs.sy);
+    stairway *stway = stairway_find_special_dir(upflag);
+
+    if (stway) {
+        u_on_newpos(stway->sx, stway->sy);
     } else {
         u_on_rndspot(upflag);
     }
@@ -1442,8 +1566,10 @@ u_on_sstairs(int upflag)
 void
 u_on_upstairs(void)
 {
-    if (xupstair) {
-        u_on_newpos(xupstair, yupstair);
+    stairway *stway = stairway_find_dir(TRUE);
+
+    if (stway) {
+        u_on_newpos(stway->sx, stway->sy);
     } else {
         u_on_sstairs(0); /* destination upstairs implies moving down */
     }
@@ -1453,8 +1579,10 @@ u_on_upstairs(void)
 void
 u_on_dnstairs(void)
 {
-    if (xdnstair) {
-        u_on_newpos(xdnstair, ydnstair);
+    stairway *stway = stairway_find_dir(FALSE);
+
+    if (stway) {
+        u_on_newpos(stway->sx, stway->sy);
     } else {
         u_on_sstairs(1); /* destination dnstairs implies moving up */
     }
@@ -1463,11 +1591,31 @@ u_on_dnstairs(void)
 boolean
 On_stairs(coordxy x, coordxy y)
 {
-    return((boolean)((x == xupstair && y == yupstair) ||
-                     (x == xdnstair && y == ydnstair) ||
-                     (x == xdnladder && y == ydnladder) ||
-                     (x == xupladder && y == yupladder) ||
-                     (x == sstairs.sx && y == sstairs.sy)));
+    return (stairway_at(x, y) != NULL);
+}
+
+boolean
+On_ladder(coordxy x, coordxy y)
+{
+    stairway *stway = stairway_at(x, y);
+
+    return (boolean) (stway && stway->isladder);
+}
+
+boolean
+On_stairs_up(coordxy x, coordxy y)
+{
+    stairway *stway = stairway_at(x, y);
+
+    return (boolean) (stway && stway->up);
+}
+
+boolean
+On_stairs_dn(coordxy x, coordxy y)
+{
+    stairway *stway = stairway_at(x, y);
+
+    return (boolean) (stway && !stway->up);
 }
 
 boolean
@@ -1503,14 +1651,17 @@ Can_fall_thru(d_level *lev)
 boolean
 Can_rise_up(coordxy x, coordxy y, d_level *lev)
 {
+    stairway *stway = stairway_find_special_dir(FALSE);
+
     /* can't rise up from inside the top of the Wizard's tower */
     /* KMH -- or in sokoban */
     if (In_endgame(lev) || In_sokoban(lev) ||
         (Is_wiz1_level(lev) && In_W_tower(x, y, lev)))
         return FALSE;
     return (boolean)(lev->dlevel > 1 ||
-                     (dungeons[lev->dnum].entry_lev == 1 && ledger_no(lev) != 1 &&
-                      sstairs.sx && sstairs.up));
+                     (dungeons[lev->dnum].entry_lev == 1 &&
+                      ledger_no(lev) != 1 &&
+                      stway && stway->up));
 }
 
 boolean
@@ -1708,6 +1859,23 @@ goto_hell(boolean at_stairs, boolean falling)
 
     find_hell(&lev);
     goto_level(&lev, at_stairs, falling, FALSE);
+}
+
+/** is 'lev' the only level in its branch?  affects level teleporters */
+boolean
+single_level_branch(d_level *lev)
+{
+    /*
+     * TODO:  this should be generalized instead of assuming that
+     * Fort Ludios is the only single level branch in the dungeon.
+     */
+    if (Is_knox(lev) ||
+         Is_advent_calendar(lev) ||
+         Is_blackmarket(lev)) {
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 /* equivalent to dest = source */
@@ -2939,6 +3107,65 @@ seen_string(xint16 x, const char *obj)
     }
 
     return "(unknown)";
+}
+
+/** return TRUE if 'sway' is a branch staircase and hero has used these stairs
+   to visit the branch */
+boolean
+known_branch_stairs(stairway *sway)
+{
+    return (sway && sway->tolev.dnum != u.uz.dnum && sway->u_traversed);
+}
+
+/* describe staircase 'sway' based on whether hero knows the destination */
+char *
+stairs_description(
+    stairway *sway, /* stairs/ladder to describe */
+    char *outbuf,   /* result buffer */
+    boolean stcase) /* True: "staircase" or "ladder", always singular;
+                     * False: "stairs" or "ladder"; caller needs to deal
+                     * with singular vs plural when forming a sentence */
+{
+    d_level tolev;
+    const char *stairs, *updown;
+
+    tolev = sway->tolev;
+    stairs = sway->isladder ? "ladder" : stcase ? "staircase" : "stairs";
+    updown = sway->up ? "up" : "down";
+
+    if (!known_branch_stairs(sway)) {
+        /* ordinary stairs or branch stairs to not-yet-visited branch */
+        Sprintf(outbuf, "%s %s", stairs, updown);
+        if (sway->u_traversed) {
+            boolean specialdepth = (tolev.dnum == quest_dnum ||
+                                    single_level_branch(&tolev)); /* knox */
+            int to_dlev = specialdepth ? dunlev(&tolev) : depth(&tolev);
+
+            Sprintf(eos(outbuf), " to level %d", to_dlev);
+        }
+    } else if (u.uz.dnum == 0 && u.uz.dlevel == 1 && sway->up) {
+        /* stairs up from level one are a special case; they are marked
+           as having been traversed because the hero obviously started
+           the game by coming down them, but the remote side varies
+           depending on whether the Amulet is being carried */
+        Sprintf(outbuf, "%s%s %s %s",
+                !u.uhave.amulet ? "" : "branch ",
+                stairs, updown,
+                !u.uhave.amulet ? "out of the dungeon" :
+                /* minimize our expectations about what comes next */
+                  (on_level(&tolev, &earth_level) ||
+                   on_level(&tolev, &air_level) ||
+                   on_level(&tolev, &fire_level) ||
+                   on_level(&tolev, &water_level)) ? "to the Elemental Planes" :
+                  "to the end game");
+    } else {
+        /* known branch stairs; tacking on destination level is too verbose */
+        Sprintf(outbuf, "branch %s %s to %s",
+                stairs, updown, dungeons[tolev.dnum].dname);
+        /* dungeons[].dname is capitalized; undo that for "The <Branch>" */
+        (void) strsubst(outbuf, "The ", "the ");
+    }
+    return outbuf;
 }
 
 /* better br_string */

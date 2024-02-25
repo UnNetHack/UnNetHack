@@ -377,6 +377,8 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     xint16 wander;
     int num_segs;
     boolean failed_to_place = FALSE;
+    stairway *stway;
+    d_level fromdlev;
 
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -405,8 +407,9 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     xyflags = mtmp->mtrack[0].y;
     xlocale = mtmp->mtrack[1].x;
     ylocale = mtmp->mtrack[1].y;
-    mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
-    mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
+    fromdlev.dnum = mtmp->mtrack[2].x;
+    fromdlev.dlevel = mtmp->mtrack[2].y;
+    mon_track_clear(mtmp);
 
     if (mtmp == u.usteed) {
         return; /* don't place steed on the map */
@@ -454,19 +457,34 @@ mon_arrive(struct monst *mtmp, boolean with_you)
         xlocale = u.ux, ylocale = u.uy;
         break;
     case MIGR_STAIRS_UP:
-        xlocale = xupstair, ylocale = yupstair;
+        if ((stway = stairway_find_from(&fromdlev, FALSE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_STAIRS_DOWN:
-        xlocale = xdnstair, ylocale = ydnstair;
+        if ((stway = stairway_find_from(&fromdlev, FALSE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_LADDER_UP:
-        xlocale = xupladder, ylocale = yupladder;
+        if ((stway = stairway_find_from(&fromdlev, TRUE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_LADDER_DOWN:
-        xlocale = xdnladder, ylocale = ydnladder;
+        if ((stway = stairway_find_from(&fromdlev, TRUE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_SSTAIRS:
-        xlocale = sstairs.sx, ylocale = sstairs.sy;
+        if ((stway = stairway_find(&fromdlev)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_PORTAL:
         if (In_endgame(&u.uz)) {
@@ -834,6 +852,8 @@ migrate_to_level(
     }
     mtmp->wormno = num_segs;
     mtmp->mlstmv = monstermoves;
+    mtmp->mtrack[2].x = u.uz.dnum; /* migrating from this dungeon */
+    mtmp->mtrack[2].y = u.uz.dlevel; /* migrating from this dungeon level */
     mtmp->mtrack[1].x = cc ? cc->x : mtmp->mx;
     mtmp->mtrack[1].y = cc ? cc->y : mtmp->my;
     mtmp->mtrack[0].x = xyloc;

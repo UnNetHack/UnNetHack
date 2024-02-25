@@ -331,6 +331,7 @@ find_defensive(struct monst *mtmp)
     int x=mtmp->mx, y=mtmp->my;
     boolean stuck = (mtmp == u.ustuck);
     boolean immobile = (mtmp->data->mmove == 0);
+    stairway *stway;
     int fraction;
 
     m.defensive = (struct obj *) 0;
@@ -427,26 +428,28 @@ find_defensive(struct monst *mtmp)
     if (stuck || immobile) {
         ; /* fleeing by stairs or traps is not possible */
     } else if (levl[x][y].typ == STAIRS) {
-        if (x == xdnstair && y == ydnstair) {
+        stway = stairway_at(x,y);
+        if (stway && !stway->up && stway->tolev.dnum == u.uz.dnum) {
             if (!is_floater(mtmp->data)) {
                 m.has_defense = MUSE_DOWNSTAIRS;
             }
-        } else if (x == xupstair && y == yupstair) {
+        } else if (stway && stway->up && stway->tolev.dnum == u.uz.dnum) {
             m.has_defense = MUSE_UPSTAIRS;
-        } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
-            if (sstairs.up || !is_floater(mtmp->data)) {
+        } else if (stway &&  stway->tolev.dnum != u.uz.dnum) {
+            if (stway->up || !is_floater(mtmp->data)) {
                 m.has_defense = MUSE_SSTAIRS;
             }
         }
     } else if (levl[x][y].typ == LADDER) {
-        if (x == xupladder && y == yupladder) {
+        stway = stairway_at(x,y);
+        if (stway && stway->up && stway->tolev.dnum == u.uz.dnum) {
             m.has_defense = MUSE_UP_LADDER;
-        } else if (x == xdnladder && y == ydnladder) {
+        } else if (stway && !stway->up && stway->tolev.dnum == u.uz.dnum) {
             if (!is_floater(mtmp->data)) {
                 m.has_defense = MUSE_DN_LADDER;
             }
-        } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
-            if (sstairs.up || !is_floater(mtmp->data)) {
+        } else if (stway && stway->tolev.dnum != u.uz.dnum) {
+            if (stway->up || !is_floater(mtmp->data)) {
                 m.has_defense = MUSE_SSTAIRS;
             }
         }
@@ -670,6 +673,7 @@ use_defensive(struct monst *mtmp)
     int i, fleetim, how = 0;
     struct obj *otmp = m.defensive;
     boolean vis, vismon, oseen;
+    stairway *stway;
 
     if ((i = precheck(mtmp, otmp)) != 0) {
         return i;
@@ -803,10 +807,9 @@ mon_tele:
             makeknown(WAN_DIGGING);
         }
         if (IS_FURNITURE(levl[mtmp->mx][mtmp->my].typ) ||
-            IS_DRAWBRIDGE(levl[mtmp->mx][mtmp->my].typ) ||
-            (is_drawbridge_wall(mtmp->mx, mtmp->my) >= 0) ||
-            (sstairs.sx && sstairs.sx == mtmp->mx &&
-             sstairs.sy == mtmp->my)) {
+             IS_DRAWBRIDGE(levl[mtmp->mx][mtmp->my].typ) ||
+             (is_drawbridge_wall(mtmp->mx, mtmp->my) >= 0) ||
+             stairway_at(mtmp->mx, mtmp->my)) {
             pline_The("digging ray is ineffective.");
             return 2;
         }
@@ -935,6 +938,10 @@ mon_tele:
          * player stranded.
          */
         m_flee(mtmp);
+        stway = stairway_at(mtmp->mx, mtmp->my);
+        if (!stway) {
+            return 0;
+        }
         if (ledger_no(&u.uz) == 1) {
             goto escape; /* impossible; level 1 upstairs are SSTAIRS */
         }
@@ -947,50 +954,61 @@ mon_tele:
                the Wizard and he'll immediately go right to the
                upstairs, so there's not much point in having any
                chance for a random position on the current level */
-            migrate_to_level(mtmp, ledger_no(&u.uz) + 1,
-                             MIGR_RANDOM, (coord *)0);
+            migrate_to_level(mtmp, ledger_no(&u.uz) + 1, MIGR_RANDOM, (coord *) 0);
         } else {
             if (vismon) {
                 pline("%s %s upstairs!", Monnam(mtmp),
                       is_weeping(mtmp->data) ? "has escaped" : "escapes");
             }
-            migrate_to_level(mtmp, ledger_no(&u.uz) - 1,
-                             MIGR_STAIRS_DOWN, (coord *)0);
+            migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_STAIRS_DOWN, (coord *) 0);
         }
         return 2;
 
     case MUSE_DOWNSTAIRS:
         m_flee(mtmp);
+        stway = stairway_at(mtmp->mx, mtmp->my);
+        if (!stway) {
+            return 0;
+        }
         if (vismon) {
             pline("%s %s downstairs!", Monnam(mtmp),
                           is_weeping(mtmp->data) ? "has escaped" : "escapes");
         }
-        migrate_to_level(mtmp, ledger_no(&u.uz) + 1,
-                         MIGR_STAIRS_UP, (coord *)0);
+        migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_STAIRS_UP, (coord *) 0);
         return 2;
 
     case MUSE_UP_LADDER:
         m_flee(mtmp);
+        stway = stairway_at(mtmp->mx, mtmp->my);
+        if (!stway) {
+            return 0;
+        }
         if (vismon) {
             pline("%s %s up the ladder!", Monnam(mtmp),
                           is_weeping(mtmp->data) ? "has escaped" : "escapes");
         }
-        migrate_to_level(mtmp, ledger_no(&u.uz) - 1,
-                         MIGR_LADDER_DOWN, (coord *)0);
+        migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_LADDER_DOWN, (coord *) 0);
         return 2;
 
     case MUSE_DN_LADDER:
         m_flee(mtmp);
+        stway = stairway_at(mtmp->mx, mtmp->my);
+        if (!stway) {
+            return 0;
+        }
         if (vismon) {
             pline("%s %s down the ladder!", Monnam(mtmp),
                           is_weeping(mtmp->data) ? "has escaped" : "escapes");
         }
-        migrate_to_level(mtmp, ledger_no(&u.uz) + 1,
-                         MIGR_LADDER_UP, (coord *)0);
+        migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_LADDER_UP, (coord *) 0);
         return 2;
 
     case MUSE_SSTAIRS:
         m_flee(mtmp);
+        stway = stairway_at(mtmp->mx, mtmp->my);
+        if (!stway) {
+            return 0;
+        }
         if (ledger_no(&u.uz) == 1) {
  escape:
             /* Monsters without the Amulet escape the dungeon and
@@ -1012,14 +1030,14 @@ mon_tele:
         }
         if (vismon) {
             pline("%s %s %sstairs!", Monnam(mtmp),
-                is_weeping(mtmp->data) ? "has escaped" : "escapes",
-                sstairs.up ? "up" : "down");
+                  is_weeping(mtmp->data) ? "has escaped" : "escapes",
+                  stway->up ? "up" : "down");
         }
         /* going from the Valley to Castle (Stronghold) has no sstairs
            to target, but having sstairs.<sx,sy> == <0,0> will work the
            same as specifying MIGR_RANDOM when mon_arrive() eventually
            places the monster, so we can use MIGR_SSTAIRS unconditionally */
-        migrate_to_level(mtmp, ledger_no(&sstairs.tolev), MIGR_RANDOM, (coord *)0);
+        migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_SSTAIRS, (coord *) 0);
         return 2;
 
     case MUSE_TELEPORT_TRAP:

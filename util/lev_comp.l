@@ -80,7 +80,7 @@ void savetoken(char *);
 void newline(void);
 void advancepos(char *);
 
-extern void VDECL(lc_error, (const char *, ...));
+extern void lc_error(const char *, ...);
 
 extern char core_func_retval(int);
 extern int is_core_func(char *);
