@@ -2226,13 +2226,14 @@ domove(void)
         if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
             if (!next2u(u.ustuck->mx, u.ustuck->my)) {
                 /* perhaps it fled (or was teleported or ... ) */
-                u.ustuck = 0;
+                set_ustuck((struct monst *) 0);
             } else if (sticks(youmonst.data)) {
                 /* When polymorphed into a sticking monster,
                  * u.ustuck means it's stuck to you, not you to it.
                  */
-                You("release %s.", mon_nam(u.ustuck));
-                u.ustuck = 0;
+                mtmp = u.ustuck;
+                set_ustuck((struct monst *) 0);
+                You("release %s.", mon_nam(mtmp));
             } else {
                 /* If holder is asleep or paralyzed:
                  *  37.5% chance of getting away,
@@ -2248,8 +2249,9 @@ domove(void)
                 case 1:
                 case 2:
 pull_free:
-                    You("pull free from %s.", mon_nam(u.ustuck));
-                    u.ustuck = 0;
+                    mtmp = u.ustuck;
+                    set_ustuck((struct monst *) 0);
+                    You("pull free from %s.", mon_nam(mtmp));
                     break;
                 case 3:
                     if (!u.ustuck->mcanmove) {

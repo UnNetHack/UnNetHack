@@ -551,6 +551,8 @@ teleok(coordxy x, coordxy y, boolean trapok)
 void
 teleds(coordxy nux, coordxy nuy, boolean allow_drag)
 {
+    unsigned was_swallowed;
+
     if (u.utraptype == TT_BURIEDBALL) {
         /* unearth it */
         buried_ball_to_punishment();
@@ -589,7 +591,8 @@ teleds(coordxy nux, coordxy nuy, boolean allow_drag)
     }
     u.ufeetfrozen = 0;   /* ice doesn't teleport with the player */
     reset_utrap(FALSE);
-    u.ustuck = 0;
+    was_swallowed = u.uswallow; /* set_ustuck(Null) clears uswallow */
+    set_ustuck((struct monst *) 0);
     u.ux0 = u.ux;
     u.uy0 = u.uy;
 
@@ -598,7 +601,7 @@ teleds(coordxy nux, coordxy nuy, boolean allow_drag)
         youmonst.m_ap_type = M_AP_NOTHING;
     }
 
-    if (u.uswallow) {
+    if (was_swallowed) {
         u.uswldtim = u.uswallow = 0;
         if (Punished && !ball_active) {
             /* ensure ball placement, like unstuck */

@@ -1201,7 +1201,7 @@ Mb_hit(struct monst *magr, /**< attacker */
                 nomul(-3, "being scared stiff");
                 nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(youmonst.data)) {
-                    u.ustuck = (struct monst *)0;
+                    set_ustuck((struct monst *) 0);
                     You("release %s!", mon_nam(magr));
                 }
             }

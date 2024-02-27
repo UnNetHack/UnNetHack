@@ -1461,7 +1461,7 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     }
     reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
     fill_pit(u.ux, u.uy);
-    u.ustuck = 0; /* idem */
+    set_ustuck((struct monst *) 0); /* clear u.ustuck and u.uswallow */
     u.uinwater = 0;
     u.uundetected = 0;/* not hidden, even if means are available */
     keepdogs(FALSE);

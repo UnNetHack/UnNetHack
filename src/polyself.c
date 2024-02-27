@@ -681,7 +681,7 @@ polymon(int mntmp)  /* returns 1 if polymorph successful */
     newsym(u.ux, u.uy);      /* Change symbol */
 
     if (!sticky && !u.uswallow && u.ustuck && sticks(youmonst.data)) {
-        u.ustuck = 0;
+        set_ustuck((struct monst *) 0);
     } else if (sticky && !sticks(youmonst.data)) {
         uunstick();
     }
@@ -1464,12 +1464,14 @@ domindblast(void)
 void
 uunstick(void)
 {
-    if (!u.ustuck) {
+    struct monst *mtmp = u.ustuck;
+
+    if (!mtmp) {
         warning("uunstick: no ustuck?");
         return;
     }
-    pline("%s is no longer in your clutches.", Monnam(u.ustuck));
-    u.ustuck = 0;
+    set_ustuck((struct monst *) 0); /* before pline() */
+    pline("%s is no longer in your clutches.", Monnam(mtmp));
 }
 
 void

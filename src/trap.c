@@ -3216,7 +3216,7 @@ float_down(long int hmask, long int emask) /**< might cancel timeout */
                 pline("Startled, %s can no longer hold you!",
                       mon_nam(u.ustuck));
             }
-            u.ustuck = 0;
+            set_ustuck((struct monst *) 0);
         }
         /* kludge alert:
          * drown() and lava_effects() print various messages almost

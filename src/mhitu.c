@@ -563,7 +563,7 @@ mattacku(struct monst *mtmp)
                   youmonst.data->mname, plname);
         }
         if (sticky) {
-            u.ustuck = mtmp;
+            set_ustuck(mtmp);
         }
         youmonst.m_ap_type = M_AP_NOTHING;
         youmonst.mappearance = 0;
@@ -1062,7 +1062,7 @@ hitmu(struct monst *mtmp, struct attack *mattk)
                 if (u_slip_free(mtmp, mattk)) {
                     dmg = 0;
                 } else {
-                    u.ustuck = mtmp;
+                    set_ustuck(mtmp);
                     pline("%s grabs you!", Monnam(mtmp));
                 }
             } else if (u.ustuck == mtmp) {
@@ -1463,7 +1463,7 @@ do_stone:
     case AD_STCK:
         hitmsg(mtmp, mattk);
         if (uncancelled && !u.ustuck && !sticks(youmonst.data)) {
-            u.ustuck = mtmp;
+            set_ustuck(mtmp);
         }
         break;
 
@@ -1476,7 +1476,7 @@ do_stone:
                 } else {
                     urgent_pline("%s %s itself around you!", Monnam(mtmp),
                           is_vegetation(mdat) ? "winds" : "swings");
-                    u.ustuck = mtmp;
+                    set_ustuck(mtmp);
                 }
             } else if (u.ustuck == mtmp) {
                 if (is_pool(mtmp->mx, mtmp->my) && !Swimming
@@ -2183,7 +2183,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         remove_monster(mtmp->mx, mtmp->my);
         mtmp->mtrapped = 0;     /* no longer on old trap */
         place_monster(mtmp, u.ux, u.uy);
-        u.ustuck = mtmp;
+        set_ustuck(mtmp);
         newsym(mtmp->mx, mtmp->my);
         if (is_animal(mtmp->data) && u.usteed) {
             char buf[BUFSZ];
@@ -2231,7 +2231,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (Punished) {
                 placebc();
             }
-            u.ustuck = 0;
+            set_ustuck((struct monst *) 0);
             return (!DEADMONSTER(mtmp)) ? 0 : 2;
         }
 

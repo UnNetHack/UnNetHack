@@ -149,7 +149,7 @@ attack_checks(struct monst *mtmp, struct obj *wep) /**< uwep for attack(), null 
             /* applied pole-arm attack is too far to get stuck */
              next2u(mtmp->mx, mtmp->my)) {
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)) {
-                u.ustuck = mtmp;
+                set_ustuck(mtmp);
             }
         }
         /* #H7329 - if hero is on engraved "Elbereth", this will end up
@@ -555,7 +555,7 @@ known_hitum(struct monst *mon, struct obj *weapon, int *mhit, int rollneeded, in
                 }
 
                 if (u.ustuck == mon && !u.uswallow && !sticks(youmonst.data)) {
-                    u.ustuck = 0;
+                    set_ustuck((struct monst *) 0);
                 }
             }
             /* Vorpal Blade hit converted to miss */
@@ -2344,7 +2344,7 @@ physical:
 
     case AD_STCK:
         if (!negated && !sticks(mdef->data)) {
-            u.ustuck = mdef; /* it's now stuck to you */
+            set_ustuck(mdef); /* it's now stuck to you */
         }
         break;
 
@@ -2356,7 +2356,7 @@ physical:
                 } else {
                     You("swing yourself around %s!",
                         mon_nam(mdef));
-                    u.ustuck = mdef;
+                    set_ustuck(mdef);
                 }
             } else if (u.ustuck == mdef) {
                 /* Monsters don't wear amulets of magical breathing */
@@ -3149,7 +3149,7 @@ use_weapon:
                     uunstick();
                 }
                 You("grab %s!", mon_nam(mon));
-                u.ustuck = mon;
+                set_ustuck(mon);
                 if (silverhit && flags.verbose) {
                     silver_sears(&youmonst, mon, silverhit);
                 }
@@ -3607,7 +3607,7 @@ stumble_onto_mimic(struct monst *mtmp)
                *what = 0;
 
     if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)) {
-        u.ustuck = mtmp;
+        set_ustuck(mtmp);
     }
 
     if (Blind) {

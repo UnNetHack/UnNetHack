@@ -1831,9 +1831,15 @@ replmon(struct monst *mtmp, struct monst *mtmp2)
     }
     mtmp2->nmon = fmon;
     fmon = mtmp2;
-    if (u.ustuck == mtmp) u.ustuck = mtmp2;
-    if (u.usteed == mtmp) u.usteed = mtmp2;
-    if (mtmp2->isshk) replshk(mtmp, mtmp2);
+    if (u.ustuck == mtmp) {
+        set_ustuck(mtmp2);
+    }
+    if (u.usteed == mtmp) {
+        u.usteed = mtmp2;
+    }
+    if (mtmp2->isshk) {
+        replshk(mtmp, mtmp2);
+    }
 
     /* discard the old monster */
     dealloc_monst(mtmp);
@@ -2691,23 +2697,31 @@ void
 unstuck(struct monst* mtmp)
 {
     if (u.ustuck == mtmp) {
-        if (u.uswallow) {
+        struct permonst *ptr = mtmp->data;
+        unsigned swallowed = u.uswallow;
+
+        /* do this first so that docrt()'s botl update is accurate;
+           clears u.uswallow as well as setting u.ustuck to Null */
+        set_ustuck((struct monst *) 0);
+
+        if (swallowed) {
             u.ux = mtmp->mx;
             u.uy = mtmp->my;
-            u.uswallow = 0;
-            u.uswldtim = 0;
             if (Punished && uchain->where != OBJ_FLOOR) {
                 placebc();
             }
             vision_full_recalc = 1;
             docrt();
-            /* prevent swallower (mtmp might have just poly'd into something
-               without an engulf attack) from immediately re-engulfing */
-            if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used) {
-                mtmp->mspec_used = rnd(2);
-            }
         }
-        u.ustuck = 0;
+        /* prevent holder/engulfer from immediately re-holding/re-engulfing
+           [note: this call to unstuck() might be because u.ustuck has just
+           changed shape and doesn't have a holding attack any more, hence
+           don't set mspec_used unconditionally] */
+        if (!mtmp->mspec_used && (dmgtype(ptr, AD_STCK) ||
+                                  attacktype(ptr, AT_ENGL) ||
+                                  attacktype(ptr, AT_HUGS))) {
+            mtmp->mspec_used = rnd(2);
+        }
     }
 }
 
