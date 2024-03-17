@@ -2483,11 +2483,11 @@ dozap(void)
     int damage;
 
     if (check_capacity((char *)0)) {
-        return 0;
+        return ECMD_OK;
     }
     obj = getobj(zap_syms, "zap");
     if (!obj) {
-        return 0;
+        return ECMD_CANCEL;
     }
 
     check_unpaid(obj);
@@ -2501,7 +2501,7 @@ dozap(void)
     else if (obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
         backfire(obj); /* the wand blows up in your face! */
         exercise(A_STR, FALSE);
-        return 1;
+        return ECMD_TIME;
     } else if (!(objects[obj->otyp].oc_dir == NODIR) && !getdir((char *)0)) {
         if (!Blind) {
             pline("%s glows and fades.", The(xname(obj)));
@@ -2531,7 +2531,8 @@ dozap(void)
         useup(obj);
     }
     update_inventory(); /* maybe used a charge */
-    return 1;
+
+    return ECMD_TIME;
 }
 
 /** Lock or unlock all boxes in inventory */

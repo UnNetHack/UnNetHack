@@ -3054,10 +3054,10 @@ rhack(char *cmd)
 
             if (!wizard && (tlist->flags & WIZMODECMD)) {
                 You_cant("do that!");
-                res = 0;
+                res = ECMD_OK;
             } else if (u.uburied && !(tlist->flags & IFBURIED)) {
                 You_cant("do that while you are buried!");
-                res = 0;
+                res = ECMD_OK;
             } else {
                 /* we discard 'const' because some compilers seem to have
                    trouble with the pointer passed to set_occupation() */
@@ -3069,7 +3069,7 @@ rhack(char *cmd)
                 last_cmd_char = *cmd;
                 res = (*func)();    /* perform the command */
             }
-            if (!res) {
+            if (!(res & ECMD_TIME)) {
                 flags.move = FALSE;
                 multi = 0;
             }

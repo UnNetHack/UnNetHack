@@ -310,25 +310,25 @@ wield(boolean prompt_for_obj)
     multi = 0;
     if (cantwield(youmonst.data)) {
         pline("Don't be ridiculous!");
-        return 0;
+        return ECMD_FAIL;
     }
 
     /* Prompt for a new weapon */
     if (prompt_for_obj) {
         if (!(wep = getobj(wield_objs, "wield"))) {
             /* Cancelled */
-            return 0;
+            return ECMD_CANCEL;
         } else if (wep == uwep) {
             You("are already wielding that!");
             if (is_weptool(wep) || is_wet_towel(wep)) {
                 unweapon = FALSE; /* [see setuwep()] */
             }
-            return 0;
+            return ECMD_FAIL;
         } else if (welded(uwep)) {
             weldmsg(uwep);
             /* previously interrupted armor removal mustn't be resumed */
             reset_remarm();
-            return 0;
+            return ECMD_FAIL;
         }
     }
 
@@ -341,7 +341,7 @@ wield(boolean prompt_for_obj)
         setuqwep((struct obj *) 0);
     } else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot wield that!");
-        return 0;
+        return ECMD_FAIL;
     }
 
     /* Set your new primary weapon */
@@ -365,11 +365,11 @@ doswapweapon(void)
     multi = 0;
     if (cantwield(youmonst.data)) {
         pline("Don't be ridiculous!");
-        return 0;
+        return ECMD_FAIL;
     }
     if (welded(uwep)) {
         weldmsg(uwep);
-        return 0;
+        return ECMD_FAIL;
     }
 
     /* Unwield your current secondary weapon */
@@ -416,7 +416,7 @@ dowieldquiver(void)
     /* Prompt for a new quiver */
     if (!(newquiver = getobj(quivee_types, "ready"))) {
         /* Cancelled */
-        return 0;
+        return ECMD_CANCEL;
     }
 
     /* Handle no object, or object in other slot */
@@ -428,19 +428,19 @@ dowieldquiver(void)
             setuqwep(newquiver = (struct obj *) 0);
         } else {
             You("already have no ammunition readied!");
-            return 0;
+            return ECMD_CANCEL;
         }
     } else if (newquiver == uquiver) {
         pline("That ammunition is already readied!");
-        return 0;
+        return ECMD_OK;
     } else if (newquiver == uwep) {
         /* Prevent accidentally readying the main weapon */
         pline("%s already being used as a weapon!",
               !is_plural(uwep) ? "That is" : "They are");
-        return 0;
+        return ECMD_OK;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot ready that!");
-        return 0;
+        return ECMD_OK;
     } else {
         long dummy;
 
@@ -471,7 +471,7 @@ dowieldquiver(void)
         }
     }
     /* Take no time since this is a convenience slot */
-    return 0;
+    return ECMD_OK;
 }
 
 /* used for #rub and for applying pick-axe, whip, grappling hook, or polearm */
@@ -648,7 +648,7 @@ dotwoweapon(void)
         You("switch to your primary weapon.");
         u.twoweap = 0;
         update_inventory();
-        return 0;
+        return ECMD_OK;
     }
 
     /* May we use two weapons? */
@@ -657,9 +657,9 @@ dotwoweapon(void)
         You("begin two-weapon combat.");
         u.twoweap = 1;
         update_inventory();
-        return (rnd(20) > ACURR(A_DEX));
+        return (rnd(20) > ACURR(A_DEX)) ? ECMD_TIME : ECMD_OK;
     }
-    return 0;
+    return ECMD_OK;
 }
 
 /*** Functions to empty a given slot ***/

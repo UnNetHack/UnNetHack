@@ -112,32 +112,32 @@ dowrite(struct obj *pen)
 
     if (u.roleplay.illiterate) {
         You("don't know how to write!");
-        return 0;
+        return ECMD_OK;
     } else if (nohands(youmonst.data)) {
         You("need hands to be able to write!");
-        return 0;
+        return ECMD_OK;
     } else if (Glib) {
         pline("%s from your %s.",
               Tobjnam(pen, "slip"), fingers_or_gloves(FALSE));
         dropx(pen);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* get paper to write on */
     paper = getobj(write_on, "write on");
     if (!paper) {
-        return 0;
+        return ECMD_CANCEL;
     }
     typeword = (paper->oclass == SPBOOK_CLASS) ? "spellbook" : "scroll";
     if (Blind && !paper->dknown) {
         You("don't know if that %s is blank or not!", typeword);
-        return 0;
+        return ECMD_OK;
     }
     paper->dknown = 1;
     if (paper->otyp != SCR_BLANK_PAPER && paper->otyp != SPE_BLANK_PAPER) {
         pline("That %s is not blank!", typeword);
         exercise(A_WIS, FALSE);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* what to write */
@@ -145,7 +145,7 @@ dowrite(struct obj *pen)
     getlin(qbuf, namebuf);
     (void)mungspaces(namebuf);  /* remove any excess whitespace */
     if (namebuf[0] == '\033' || !namebuf[0]) {
-        return 1;
+        return ECMD_TIME;
     }
     nm = namebuf;
     if (!strncmpi(nm, "scroll ", 7)) {
@@ -208,22 +208,22 @@ dowrite(struct obj *pen)
     }
 
     There("is no such %s!", typeword);
-    return 1;
+    return ECMD_TIME;
 found:
 
     if (i == SCR_BLANK_PAPER || i == SPE_BLANK_PAPER) {
         You_cant("write that!");
         pline("It's obscene!");
-        return 1;
+        return ECMD_TIME;
     } else if (i == SPE_BOOK_OF_THE_DEAD) {
         pline("No mere dungeon adventurer could write that.");
-        return 1;
+        return ECMD_TIME;
     } else if (by_descr && paper->oclass == SPBOOK_CLASS &&
                !objects[i].oc_name_known) {
         /* can't write unknown spellbooks by description */
         pline(
             "Unfortunately you don't have enough information to go on.");
-        return 1;
+        return ECMD_TIME;
     }
 
     /* KMH, conduct */
@@ -243,7 +243,7 @@ found:
     if (pen->spe < basecost/2)  {
         Your("marker is too dry to write that!");
         obfree(new_obj, (struct obj *) 0);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* we're really going to write now, so calculate cost
@@ -265,7 +265,7 @@ found:
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
-        return 1;
+        return ECMD_TIME;
     }
     pen->spe -= actualcost;
 
@@ -315,7 +315,7 @@ found:
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* can write scrolls when blind, but requires luck too;
@@ -329,7 +329,7 @@ found:
         You("fail to write the scroll correctly and it disappears.");
         useup(paper);
         obfree(new_obj, (struct obj *) 0);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* useup old scroll / spellbook */
@@ -361,7 +361,8 @@ found:
     new_obj = hold_another_object(new_obj, "Oops!  %s out of your grasp!",
                                   The(aobjnam(new_obj, "slip")),
                                   (const char *)0);
-    return 1;
+    nhUse(new_obj); /* try to avoid complaint about dead assignment */
+    return ECMD_TIME;
 }
 
 /* most book descriptions refer to cover appearance, so we can issue a

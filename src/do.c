@@ -683,15 +683,15 @@ static int
 drop(struct obj *obj)
 {
     if (!obj) {
-        return 0;
+        return ECMD_OK;
     }
     if (!canletgo(obj, "drop")) {
-        return 0;
+        return ECMD_OK;
     }
     if (obj == uwep) {
         if (welded(uwep)) {
             weldmsg(obj);
-            return 0;
+            return ECMD_OK;
         }
         setuwep((struct obj *) 0);
     }
@@ -719,7 +719,7 @@ drop(struct obj *obj)
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING) &&
            IS_SINK(levl[u.ux][u.uy].typ)) {
             dosinkring(obj);
-            return 1;
+            return ECMD_TIME;
         }
 
         if (!can_reach_floor(TRUE)) {
@@ -732,14 +732,14 @@ drop(struct obj *obj)
             }
             freeinv(obj);
             hitfloor(obj, TRUE);
-            return 1;
+            return ECMD_TIME;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose) {
             You("drop %s.", doname(obj));
         }
     }
     dropx(obj);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* Called in several places - may produce output */
@@ -887,7 +887,7 @@ doddrop(void)
 
     if (!invent) {
         You("have nothing to drop.");
-        return 0;
+        return ECMD_OK;
     }
     add_valid_menu_class(0); /* clear any classes already there */
     if (*u.ushops) {
@@ -1061,11 +1061,11 @@ dodown(void)
     boolean stairs_down, ladder_down;
 
     if (u_rooted()) {
-        return 1;
+        return ECMD_TIME;
     }
 
     if (stucksteed(TRUE)) {
-        return 0;
+        return ECMD_OK;
     }
 
     stairs_down = ladder_down = FALSE;
@@ -1156,16 +1156,16 @@ dodown(void)
              !Levitation &&
              (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
             dotrap(trap, TOOKPLUNGE);
-            return 1;
+            return ECMD_TIME;
         } else if (!trap || !is_hole(trap->ttyp) || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !flags.nopick &&
                 uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
             } else if (do_stair_travel('>')) {
-                return 0;
+                return ECMD_OK;
             } else {
                 You_cant("go down here.");
-                return 0;
+                return ECMD_OK;
             }
         }
     }
@@ -1174,7 +1174,7 @@ dodown(void)
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");
         if (yn("Are you sure you want to enter?") != 'y') {
-            return 0;
+            return ECMD_OK;
         } else {
             pline("So be it.");
         }
@@ -1183,7 +1183,7 @@ dodown(void)
 
     if (!next_to_u()) {
         You("are held back by your pet!");
-        return 0;
+        return ECMD_OK;
     }
 
     if (trap) {
@@ -1200,7 +1200,7 @@ dodown(void)
                 u.utraptype = TT_PIT;
                 You("%s down into the pit.", locomotion(youmonst.data, "go"));
             }
-            return 0;
+            return ECMD_OK;
         } else {
             You("%s %s.", locomotion(youmonst.data, "jump"),
                 trap->ttyp == HOLE ? "down the hole" : "through the trap door");
@@ -1214,7 +1214,7 @@ dodown(void)
         next_level(!trap);
         at_ladder = FALSE;
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /** the '<' command */
@@ -1224,26 +1224,26 @@ doup(void)
     stairway *stway = stairway_at(u.ux,u.uy);
 
     if (u_rooted()) {
-        return 1;
+        return ECMD_TIME;
     }
 
     /* "up" to get out of a pit... */
     if (u.utrap && u.utraptype == TT_PIT) {
         climb_pit();
-        return 1;
+        return ECMD_TIME;
     }
 
     if (!On_stairs_up(u.ux, u.uy)) {
         if (do_stair_travel('<')) {
-            return 0;
+            return ECMD_OK;
         } else if (!stway || (stway && !stway->up)) {
             You_cant("go up here.");
-            return 0;
+            return ECMD_OK;
         }
     }
 
     if (stucksteed(TRUE)) {
-        return 0;
+        return ECMD_OK;
     }
 
     if (u_stuck_cannot_go("up")) {
@@ -1254,24 +1254,24 @@ doup(void)
         /* No levitation check; inv_weight() already allows for it */
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
-        return 1;
+        return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer) {
-            return 0;
+            return ECMD_OK;
         }
         if (yn("Beware, there will be no return! Still climb?") != 'y') {
-            return 0;
+            return ECMD_OK;
         }
     }
     if (!next_to_u()) {
         You("are held back by your pet!");
-        return 0;
+        return ECMD_OK;
     }
     at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
     prev_level(TRUE);
     at_ladder = FALSE;
-    return 1;
+    return ECMD_TIME;
 }
 
 d_level save_dlevel = {0, 0};
@@ -2315,12 +2315,12 @@ wipeoff(void)
             Blinded = 1;
             make_blinded(0L, TRUE);
         }
-        return 0;
+        return ECMD_OK;
     } else if (!u.ucreamed) {
         Your("%s feels clean now.", body_part(FACE));
-        return 0;
+        return ECMD_OK;
     }
-    return 1;      /* still busy */
+    return ECMD_TIME; /* still busy */
 }
 
 int
@@ -2334,10 +2334,10 @@ dowipe(void)
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?
          */
-        return 1;
+        return ECMD_TIME;
     }
     Your("%s is already clean.", body_part(FACE));
-    return 1;
+    return ECMD_TIME;
 }
 
 void
