@@ -137,6 +137,18 @@ struct gamelog_line {
     struct gamelog_line *next;
 };
 
+/* inventory counts (slots in tty parlance)
+ * a...zA..Z    invlet_basic (52)
+ * $a...zA..Z#  2 special additions
+ */
+enum inventory_counts {
+    invlet_basic = 52,
+    invlet_gold = 1,
+    invlet_overflow = 1,
+    invlet_max = invlet_basic + invlet_gold + invlet_overflow,
+    /* 2023/11/30 invlet_max is not yet used anywhere */
+};
+
 /* getpos() return values */
 enum getpos_retval {
     LOOK_TRADITIONAL = 0, /* '.' -- ask about "more info?" */

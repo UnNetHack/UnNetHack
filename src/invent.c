@@ -4296,111 +4296,148 @@ reassign(void)
 int
 doorganize(void) /* inventory organizer by Del Lamb */
 {
-    struct obj *obj, *otmp;
-    int ix, cur;
+    struct obj *obj, *otmp, *splitting, *bumped;
+    int ix, cur, trycnt;
     char let;
 #define GOLD_INDX   0
 #define GOLD_OFFSET 1
 #define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
-#define ALPHABET_SIZE 1 + 52 + 1 + 1
-    char alphabet[ALPHABET_SIZE], buf[ALPHABET_SIZE]; /* room for '$a-zA-Z#\0' */
+    char lets[1 + invlet_basic + 1 + 1]; /* room for '$a-zA-Z#\0' */
     char qbuf[QBUFSZ];
-#ifdef ADJSPLIT
+    char *objname, *otmpname;
     char allowallcnt[3];
-#else
-    char allowall[2];
-#endif
     const char *adj_type;
+    boolean ever_mind = FALSE, collect, isgold;
 
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!invent ||
         (invent->oclass == COIN_CLASS && invent->invlet == GOLD_SYM && !invent->nobj)) {
         You("aren't carrying anything %s.", !invent ? "to adjust" : "adjustable");
-        return 0;
+        return ECMD_OK;
     }
 
     if (!flags.invlet_constant) {
         reassign();
     }
     /* get a pointer to the object the user wants to organize */
-#ifdef ADJSPLIT
     allowallcnt[0] = ALLOW_COUNT;
     allowallcnt[1] = ALL_CLASSES;
     allowallcnt[2] = '\0';
     if (!(obj = getobj(allowallcnt, "adjust"))) {
-        return 0;
+        return ECMD_CANCEL;
     }
-#else
-    allowall[0] = ALL_CLASSES; allowall[1] = '\0';
-    if (!(obj = getobj(allowall, "adjust"))) {
-        return 0;
-    }
-#endif
 
-    /* initialize the list with all upper and lower case letters */
-    alphabet[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
+    /* can only be gold if check_invent_gold() found a problem:  multiple '$'
+       stacks and/or gold in some other slot, otherwise (*adjust_filter)()
+       won't allow gold to be picked; if player has picked any stack of gold
+       as #adjust 'from' slot, we'll force the 'to' slot to be '$' below */
+    isgold = (obj->oclass == COIN_CLASS);
+
+    /* figure out whether user gave a split count to getobj() */
+    splitting = bumped = 0;
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (otmp->nobj == obj) { /* knowledge of splitobj() operation */
+            if (otmp->invlet == obj->invlet) {
+                splitting = otmp;
+            }
+            break;
+        }
+    }
+
+    /* initialize the list with all lower and upper case letters */
+    lets[GOLD_INDX] = (obj->oclass == COIN_CLASS) ? GOLD_SYM : ' ';
     for (ix = GOLD_OFFSET, let = 'a'; let <= 'z';) {
-        alphabet[ix++] = let++;
+        lets[ix++] = let++;
     }
     for (let = 'A'; let <= 'Z';) {
-        alphabet[ix++] = let++;
+        lets[ix++] = let++;
     }
-    alphabet[OVRFLW_INDX] = ' ';
-    alphabet[sizeof alphabet - 1] = '\0';
-
-    /* blank out all the letters currently in use in the inventory */
-    /* except those that will be merged with the selected object   */
+    lets[OVRFLW_INDX] = ' ';
+    lets[sizeof lets - 1] = '\0';
+    /* for floating inv letters, truncate list after the first open slot */
+    if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < invlet_basic) {
+        lets[ix + (splitting ? 1 : 2)] = '\0';
+    }
+    /* blank out all the letters currently in use in the inventory
+       except those that will be merged with the selected object */
     for (otmp = invent; otmp; otmp = otmp->nobj) {
         if (otmp != obj && !mergable(otmp, obj)) {
             let = otmp->invlet;
             if (let >= 'a' && let <= 'z') {
-                alphabet[GOLD_OFFSET + let - 'a'] = ' ';
+                lets[GOLD_OFFSET + let - 'a'] = ' ';
             } else if (let >= 'A' && let <= 'Z') {
-                alphabet[GOLD_OFFSET + let - 'A' + 26] = ' ';
+                lets[GOLD_OFFSET + let - 'A' + 26] = ' ';
             /* overflow defaults to off, but it we find a stack using that
                slot, switch to on -- the opposite of normal invlet handling */
             } else if (let == NOINVSYM) {
-                alphabet[OVRFLW_INDX] = NOINVSYM;
+                lets[OVRFLW_INDX] = NOINVSYM;
             }
         }
     }
 
     /* compact the list by removing all the blanks */
-    for (ix = cur = 0; ix <= sizeof alphabet-1; ix++) {
-        if (alphabet[ix] != ' ') {
-            buf[cur++] = alphabet[ix];
+    for (ix = cur = 0; lets[ix]; ix++) {
+        if (lets[ix] != ' ' && cur++ < ix) {
+            lets[cur - 1] = lets[ix];
         }
     }
-    buf[cur] = '\0';
+    lets[cur] = '\0';
 
     /* and by dashing runs of letters */
     if (cur > 5) {
-        compactify(buf);
+        compactify(lets);
     }
 
-    /* get new letter to use as inventory letter */
-    for (;;) {
-        Sprintf(qbuf, "Adjust letter to what [%s]?", buf);
-        let = yn_function(qbuf, (char *)0, '\0');
-        if (index(quitchars, let)) {
-            pline("%s", Never_mind);
-#ifdef ADJSPLIT
-            goto cleansplit;
-#else
-            return 0;
-#endif
+    /* get 'to' slot to use as destination */
+    if (!splitting) {
+        Strcpy(qbuf, "Adjust letter");
+    } else { /* note: splitting->quan is the amount being left in original slot */
+        Sprintf(qbuf, "Split %ld", obj->quan);
+    }
+    Sprintf(eos(qbuf), " to what [%s]%s?", lets, invent ? " (? see used letters)" : "");
+    for (trycnt = 1; ; ++trycnt) {
+        let = !isgold ? yn_function(qbuf, (char *) 0, '\0') : GOLD_SYM;
+        if (let == '?' || let == '*') {
+            let = display_used_invlets(splitting ? obj->invlet : 0);
+            if (!let) {
+                continue;
+            }
+            if (let == '\033') {
+                goto noadjust;
+            }
         }
-        if (let == '@' || !letter(let)) {
-            pline("Select an inventory slot letter.");
-        } else {
-            break;
+        if (strchr(quitchars, let) ||
+            /* adjusting to same slot is meaningful since all
+               compatible stacks get collected along the way,
+               but splitting to same slot is not */
+             (splitting && let == obj->invlet)) {
+ noadjust:
+            if (splitting) {
+                (void) merged(&splitting, &obj);
+            }
+            if (!ever_mind) {
+                pline("%s", Never_mind);
+            }
+            return ECMD_OK;
+        } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
+            pline("Only gold coins may be moved into the '%c' slot.",
+                  GOLD_SYM);
+            ever_mind = TRUE;
+            goto noadjust;
         }
+        /* letter() classifies '@' as one; compactify() can put '-' in lets;
+           the only thing of interest that strchr() might find is '$' or '#'
+           since letter() catches everything else that we put into lets[] */
+        if ((letter(let) && let != '@') || (strchr(lets, let) && let != '-'))
+            break; /* got one */
+        if (trycnt == 5)
+            goto noadjust;
+        pline("Select an inventory slot letter."); /* else try again */
     }
 
+    collect = (let == obj->invlet);
     /* change the inventory and print the resulting item */
-#ifndef ADJSPLIT
-    adj_type = "Moving:";
-#endif
+    adj_type = collect ? "Collecting:" : !splitting ? "Moving:" : "Splitting:";
 
     /*
      * don't use freeinv/addinv to avoid double-touching artifacts,
@@ -4408,80 +4445,104 @@ doorganize(void) /* inventory organizer by Del Lamb */
      */
     extract_nobj(obj, &invent);
 
-#ifdef ADJSPLIT
-    for (otmp = invent; otmp && otmp->invlet != let;) {
-        otmp = otmp->nobj;
-    }
-    if (!otmp) {
-        adj_type = "Moving:";
-    } else if (merged(&otmp, &obj)) {
-#else
-    for (otmp = invent; otmp;)
-        if (merged(&otmp, &obj)) {
-#endif
-        adj_type = "Merging:";
-        obj = otmp;
-#ifndef ADJSPLIT
-        otmp = otmp->nobj;
-#endif
-        extract_nobj(obj, &invent);
-    } else {
-#ifdef ADJSPLIT
-        struct obj *otmp2;
-        for (otmp2 = invent; otmp2
-             && otmp2->invlet != obj->invlet;) {
-            otmp2 = otmp2->nobj;
-        }
-        if (otmp2) {
-            char oldlet = obj->invlet;
+    for (otmp = invent; otmp; ) {
+        otmpname = has_oname(otmp) ? ONAME(otmp) : (char *) 0;
+        /* it's tempting to pull this outside the loop, but merged() could
+           free ONAME(obj) [via obfree()] and replace it with ONAME(otmp) */
+        objname = has_oname(obj) ? ONAME(obj) : (char *) 0;
 
-            adj_type = "Displacing:";
-
-            /* Here be a nasty hack; solutions that don't
-             * require duplication of assigninvlet's code
-             * here are welcome.
-             */
-            assigninvlet(obj);
-
-            if (obj->invlet == NOINVSYM) {
-                pline("There's nowhere to put that.");
-                obj->invlet = oldlet;
-                goto cleansplit;
+        if (collect) {
+            /* Collecting: #adjust an inventory stack into its same slot;
+               keep it there and merge other compatible stacks into it.
+               Traditional inventory behavior is to merge unnamed stacks
+               with compatible named ones; we only want that if it is
+               the 'from' stack (obj) with a name and candidate (otmp)
+               without one, not unnamed 'from' with named candidate. */
+            if ((!otmpname || (objname && !strcmp(objname, otmpname))) && merged(&otmp, &obj)) {
+                /*adj_type = "Collecting:"; //already set to this*/
+                obj = otmp;
+                otmp = otmp->nobj;
+                extract_nobj(obj, &invent);
+                continue; /* otmp has already been updated */
             }
-        } else {
-#else
-        if (otmp->invlet == let) {
-#endif
-            adj_type = "Swapping:";
-        }
-        otmp->invlet = obj->invlet;
-    }
-#ifndef ADJSPLIT
-    otmp = otmp->nobj;
-}
-#endif
+        } else if (otmp->invlet == let) {
+            /* Merging: when from and to are compatible */
+            if ((!otmpname || (objname && !strcmp(objname, otmpname))) && merged(&otmp, &obj)) {
+                adj_type = "Merging:";
+                obj = otmp;
+                otmp = otmp->nobj;
+                extract_nobj(obj, &invent);
+                break; /* otmp has been updated and we're done merging */
+            }
+            /* Moving or splitting: don't merge extra compatible stacks.
+               Found 'otmp' in destination slot; merge if compatible,
+               otherwise bump whatever is there to an open slot. */
+            if (!splitting) {
+                adj_type = "Swapping:";
+                otmp->invlet = obj->invlet;
+            } else {
+                /* strip 'from' name if it has one */
+                if (objname && !obj->oartifact) {
+                    ONAME(obj) = (char *) 0;
+                }
+                if (!mergable(otmp, obj)) {
+                    /* won't merge; put 'from' name back */
+                    if (objname) {
+                        ONAME(obj) = objname;
+                    }
+                } else {
+                    /* will merge; discard 'from' name */
+                    if (objname) {
+                        free((genericptr_t) objname), objname = 0;
+                    }
+                }
 
-    /* inline addinv (assuming flags.invlet_constant and !merged) */
+                if (merged(&otmp, &obj)) {
+                    adj_type = "Splitting and merging:";
+                    obj = otmp;
+                    extract_nobj(obj, &invent);
+                } else if (inv_cnt(FALSE) >= invlet_basic) {
+                    (void) merged(&splitting, &obj); /* undo split */
+                    /* "knapsack cannot accommodate any more items" */
+                    Your("pack is too full.");
+                    return ECMD_OK;
+                } else {
+                    bumped = otmp;
+                    extract_nobj(bumped, &invent);
+                }
+            } /* moving vs splitting */
+            break; /* not collecting and found 'to' slot */
+        } /* collect */
+        otmp = otmp->nobj;
+    }
+
+    /* inline addinv; insert loose object at beginning of inventory */
     obj->invlet = let;
-    obj->nobj = invent; /* insert at beginning */
+    obj->nobj = invent;
     obj->where = OBJ_INVENT;
     invent = obj;
     reorder_invent();
-
-    prinv(adj_type, obj, 0L);
-    update_inventory();
-    return 0;
-#ifdef ADJSPLIT
-cleansplit:
-    for (otmp = invent; otmp; otmp = otmp->nobj) {
-        if (otmp != obj && otmp->invlet == obj->invlet) {
-            merged(&otmp, &obj);
-            break;
-        }
+    if (bumped) {
+        /* splitting the 'from' stack is causing an incompatible
+           stack in the 'to' slot to be moved into an open one;
+           we need to do another inline insertion to inventory */
+        assigninvlet(bumped);
+        bumped->nobj = invent;
+        bumped->where = OBJ_INVENT;
+        invent = bumped;
+        reorder_invent();
     }
 
-    return 0;
-#endif
+    /* messages deferred until inventory has been fully reestablished */
+    prinv(adj_type, obj, 0L);
+    if (bumped) {
+        prinv("Moving:", bumped, 0L);
+    }
+    if (splitting) {
+        clear_splitobjs(); /* reset splitobj context */
+    }
+    update_inventory();
+    return ECMD_OK;
 }
 
 /* common to display_minventory and display_cinventory */

@@ -465,7 +465,6 @@ typedef long glyph_t;
 #define ASTRAL_ESCAPE /* Allow escape from Astral plane (with the Amulet) - CWC */
 /* #define LIVELOG_BONES_KILLER */ /* Report if a ghost of a former player is
  * killed - Patric Mueller (15 Aug 2009) */
-#define ADJSPLIT /* splittable #adjust - Sam Dennis, conditionalized by Jukka Lahtinen */
 #define TUTORIAL_MODE /* Alex Smith */
 #define ELBERETH_CONDUCT /* Track the number of times the player engraves Elbereth. - Ray Kulhanek */
 #define SHOW_WEIGHT
