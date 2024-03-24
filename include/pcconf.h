@@ -281,6 +281,7 @@
 #   endif
 #  endif
 # endif
+# define ASCIIGRAPH
 # ifdef TEXTCOLOR
 #  define VIDEOSHADES
 # endif

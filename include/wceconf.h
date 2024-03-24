@@ -62,6 +62,7 @@
                                LEVELDIR, SAVEDIR, BONESDIR, DATADIR,
                                SCOREDIR, LOCKDIR, CONFIGDIR, and TROUBLEDIR */
 #define NO_TERMS
+#define ASCIIGRAPH
 
 #ifdef OPTIONS_USED
 #undef OPTIONS_USED
