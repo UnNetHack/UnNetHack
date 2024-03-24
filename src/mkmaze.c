@@ -853,7 +853,7 @@ migrate_orc(struct monst *mtmp, long unsigned int mflags)
         if (!rn2(40)) {
             nlev--;
         }
-        mtmp->mspare1 |= MIGR_LEFTOVERS;
+        mtmp->migflags |= MIGR_LEFTOVERS;
     } else {
         nlev = rn2((max_depth - cur_depth) + 1) + cur_depth;
         if (nlev == cur_depth) {
@@ -862,7 +862,7 @@ migrate_orc(struct monst *mtmp, long unsigned int mflags)
         if (nlev > max_depth) {
             nlev = max_depth;
         }
-        mtmp->mspare1 = (mtmp->mspare1 & ~MIGR_LEFTOVERS);
+        mtmp->migflags = (mtmp->migflags & ~MIGR_LEFTOVERS);
     }
     get_level(&dest, nlev);
     migrate_to_level(mtmp, ledger_no(&dest), MIGR_RANDOM, (coord *) 0);
@@ -1764,6 +1764,7 @@ movebubbles(void)
 
                         newsym(x, y); /* clean up old position */
                         mon->mx = mon->my = 0;
+                        mon->mstate |= MON_BUBBLEMOVE;
                     }
                     if (!u.uswallow && x == u.ux && y == u.uy) {
                         struct container *cons = (struct container *)

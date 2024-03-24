@@ -129,6 +129,11 @@ mon_sanity_check(void)
                        mtmp->data->mname, fmt_ptr(mtmp), x, y);
         } else if (mtmp->wormno) {
             sanity_check_worm(mtmp);
+        /* some temp mstate bits can be expected for a mon on fmon, as part of
+           removing it, but DEADMONSTER check above should skip those. */
+        } else if (mon_offmap(mtmp)) {
+            impossible("floor mon (%s) with mstate set to 0x%08lx",
+                       fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
         }
     }
 
@@ -157,6 +162,11 @@ mon_sanity_check(void)
 
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, FALSE, "migr");
+
+        if ((mtmp->mstate & ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR | MON_OFFMAP)) != 0L ||
+             !(mtmp->mstate & MON_MIGRATING))
+            impossible("migrating mon (%s) with mstate set to 0x%08lx",
+                       fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
     }
 
     wormno_sanity_check(); /* test for bogus worm tail */
@@ -822,7 +832,7 @@ movemon(void)
            off the map too; gd_move() decides whether the temporary
            corridor can be removed and guard discarded (via clearing
            mon->isgd flag so that dmonsfree() will get rid of mon) */
-        if (mtmp->isgd && !mtmp->mx) {
+        if (mtmp->isgd && !mtmp->mx && !(mtmp->mstate & MON_MIGRATING)) {
             /* parked at <0,0>; eventually isgd should get set to false */
             if (monstermoves > mtmp->mlstmv) {
                 (void) gd_move(mtmp);
@@ -2037,8 +2047,12 @@ m_detach(struct monst *mtmp, struct permonst *mptr) /**< reflects mtmp->data _pr
         mtmp->mstate |= MON_ENDGAME_FREE;
     }
 
-    mtmp->mstate |= MON_DETACH;
-    iflags.purge_monsters++;
+    if ((mtmp->mstate & MON_DETACH) != 0) {
+        impossible("m_detach: %s is already detached?", minimal_monnam(mtmp, FALSE));
+    } else {
+        mtmp->mstate |= MON_DETACH;
+        iflags.purge_monsters++;
+    }
 }
 
 /* find the worn amulet of life saving which will save a monster */
@@ -3067,7 +3081,6 @@ migrate_mon(
     unstuck(mtmp);
     mdrop_special_objs(mtmp);
     migrate_to_level(mtmp, target_lev, xyloc, (coord *) 0);
-    mtmp->mstate |= MON_MIGRATING;
 }
 
 static boolean

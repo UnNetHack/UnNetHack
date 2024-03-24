@@ -534,16 +534,22 @@ dochug(struct monst *mtmp)
         return 0; /* uses up monster's turn */
     }
 
-    set_apparxy(mtmp);
-    /* Must be done after you move and before the monster does.  The
-     * set_apparxy() call in m_move() doesn't suffice since the variables
-     * inrange, etc. all depend on stuff set by set_apparxy().
+    /* The monster decides where it thinks you are. This call to set_apparxy()
+       must be done after you move and before the monster does. The
+       set_apparxy() call in m_move() doesn't suffice since the variables
+       inrange, etc. all depend on stuff set by set_apparxy().
      */
+    set_apparxy(mtmp);
 
-    /* Monsters that want to acquire things */
-    /* may teleport, so do it before inrange is set */
+    /* Monsters that want to acquire things may teleport, so do it before
+       inrange is set. This costs a turn only if mstate is set.  */
     if (is_covetous(mdat)) {
         (void) tactics(mtmp);
+        /* tactics -> mnexto -> deal_with_overcrowding */
+        if (mtmp->mstate) {
+            return 0;
+        }
+        set_apparxy(mtmp);
     }
 
     /* check distance and scariness of attacks */

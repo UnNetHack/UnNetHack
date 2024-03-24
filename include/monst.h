@@ -60,7 +60,6 @@ enum m_ap_types {
 #define MON_ENDGAME_FREE 0x20
 #define MON_ENDGAME_MIGR 0x40
 #define MON_OBLITERATE   0x80
-#define MSTATE_MASK      0xFF
 
 #define M_AP_TYPMASK  0x7
 #define M_AP_F_DKNOWN 0x8
@@ -162,8 +161,9 @@ struct monst {
 
     long mtrapseen;     /* bitmap of traps we've been trapped in */
     long mlstmv;        /* for catching up with lost time */
+    long mstate;        /* debugging info on monsters stored here */
+    long migflags;      /* migrating flags */
     long mspare1;
-#define mstate mspare1  /* only for debug exam right now, not code flow */
     struct obj *minvent;   /* mon's inventory */
     struct obj *mw;        /* mon's weapon */
     long misc_worn_check;  /* mon's wornmask */
@@ -226,5 +226,7 @@ struct monst {
 
 #define engulfing_u(mon) (u.uswallow && (u.ustuck == (mon)))
 #define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove)
+
+#define mon_offmap(mon) ((mon)->mstate != MON_FLOOR)
 
 #endif /* MONST_H */

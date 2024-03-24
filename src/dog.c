@@ -400,6 +400,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     /* some monsters might need to do something special upon arrival
        _after_ the current level has been fully set up; see dochug() */
     mtmp->mstrategy |= STRAT_ARRIVE;
+    mtmp->mstate &= ~(MON_MIGRATING | MON_LIMBO);
 
     /* make sure mnexto(rloc_to(set_apparxy())) doesn't use stale data */
     mtmp->mux = u.ux,  mtmp->muy = u.uy;
@@ -514,7 +515,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
         break;
     }
 
-    if ((mtmp->mspare1 & MIGR_LEFTOVERS) != 0L) {
+    if ((mtmp->migflags & MIGR_LEFTOVERS) != 0L) {
         /* Pick up the rest of the MIGR_TO_SPECIES objects */
         if (migrating_objs) {
             deliver_obj_to_mon(mtmp, 0, DF_ALL);
@@ -841,6 +842,7 @@ migrate_to_level(
         m_unleash(mtmp, TRUE);
     }
     relmon(mtmp, &migrating_mons); /* move it from map to migrating_mons */
+    mtmp->mstate |= MON_MIGRATING;
 
     new_lev.dnum = ledger_to_dnum((xint16)tolev);
     new_lev.dlevel = ledger_to_dlev((xint16)tolev);

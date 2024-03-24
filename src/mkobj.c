@@ -1806,6 +1806,7 @@ save_mtraits(struct obj *obj, struct monst *mtmp)
         if (mtmp->mextra) {
             copy_mextra(mtmp2, mtmp);
         }
+        mtmp2->mstate &= ~MON_DETACH;
     }
     return obj;
 }

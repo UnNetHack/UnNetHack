@@ -825,8 +825,7 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
     }
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
-    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO |
-                     MON_BUBBLEMOVE | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
+    mon->mstate = MON_FLOOR;
 
     if (mon->data == &mons[PM_GIANT_TURTLE] && (!mon->minvis || See_invisible)) {
         block_point(x, y);
