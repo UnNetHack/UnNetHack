@@ -1790,13 +1790,12 @@ save_mtraits(struct obj *obj, struct monst *mtmp)
         newomonst(obj);
     }
     if (has_omonst(obj)) {
+        int baselevel = mtmp->data->mlevel; /* mtmp->data is valid ptr */
         struct monst *mtmp2 = OMONST(obj);
 
         *mtmp2 = *mtmp;
         mtmp2->mextra = (struct mextra *) 0;
-        if (mtmp->data) {
-            mtmp2->mnum = monsndx(mtmp->data);
-        }
+        mtmp2->mnum = monsndx(mtmp->data);
         /* invalidate pointers */
         /* m_id is needed to know if this is a revived quest leader */
         /* but m_id must be cleared when loading bones */
@@ -1805,6 +1804,22 @@ save_mtraits(struct obj *obj, struct monst *mtmp)
         mtmp2->minvent = (struct obj *) 0;
         if (mtmp->mextra) {
             copy_mextra(mtmp2, mtmp);
+        }
+        /* if mtmp is a long worm with segments, its saved traits will
+           be one without any segments */
+        mtmp2->wormno = 0;
+        /* mtmp might have been killed by repeated life draining; make sure
+           mtmp2 can survive if revived ('baselevel' will be 0 for 1d4 mon) */
+        if (mtmp2->mhpmax <= baselevel) {
+            mtmp2->mhpmax = baselevel + 1;
+        }
+        /* mtmp is assumed to be dead but we don't kill it or its saved
+           traits, just force those to have a sane value for current HP */
+        if (mtmp2->mhp > mtmp2->mhpmax) {
+            mtmp2->mhp = mtmp2->mhpmax;
+        }
+        if (mtmp2->mhp < 1) {
+            mtmp2->mhp = 0;
         }
         mtmp2->mstate &= ~MON_DETACH;
     }
