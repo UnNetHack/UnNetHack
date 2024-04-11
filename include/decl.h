@@ -675,6 +675,10 @@ struct instance_globals_i {
     boolean in_mk_themerooms;
 };
 
+struct instance_globals_k {
+    coord kickedloc; /* location hero just kicked */
+};
+
 struct instance_globals_l {
     /* nhlua.c */
     genericptr_t luacore; /* lua_State * */
@@ -713,6 +717,7 @@ extern struct instance_globals_c gc;
 extern struct instance_globals_e ge;
 extern struct instance_globals_g gg;
 extern struct instance_globals_i gi;
+extern struct instance_globals_k gk;
 extern struct instance_globals_l gl;
 extern struct instance_globals_o go;
 extern struct instance_globals_t gt;

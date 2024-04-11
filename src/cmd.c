@@ -3080,6 +3080,13 @@ rhack(char *cmd)
             if (!(res & ECMD_TIME)) {
                 flags.move = FALSE;
                 multi = 0;
+            } else {
+                flags.move = TRUE;
+                if (func != dokick) {
+                    /* hero did something else than kicking a location;
+                       reset the location, so pets don't avoid it */
+                    gk.kickedloc.x = 0, gk.kickedloc.y = 0;
+                }
             }
             return;
         }

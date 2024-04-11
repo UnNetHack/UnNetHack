@@ -2744,6 +2744,8 @@ do_nothing:
     }
 
     runmode_delay_output();
+
+    gk.kickedloc.x = 0, gk.kickedloc.y = 0;
 }
 
 /* delay output based on value of runmode,

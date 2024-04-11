@@ -371,6 +371,7 @@ struct instance_globals_c gc;
 struct instance_globals_e ge;
 struct instance_globals_g gg;
 struct instance_globals_i gi;
+struct instance_globals_k gk;
 struct instance_globals_l gl;
 struct instance_globals_o go;
 struct instance_globals_t gt;
@@ -403,6 +404,10 @@ const struct instance_globals_g g_init_g = {
 const struct instance_globals_i g_init_i = {
     /* sp_lev.c */
     FALSE, /* in_mk_themerooms */
+};
+
+static const struct instance_globals_k g_init_k = {
+    { 0, 0 }, /* kickedloc */
 };
 
 const struct instance_globals_l g_init_l = {
@@ -446,6 +451,7 @@ decl_globals_init(void)
     ge = g_init_e;
     gg = g_init_g;
     gi = g_init_i;
+    gk = g_init_k;
     gl = g_init_l;
     go = g_init_o;
     gt = g_init_t;

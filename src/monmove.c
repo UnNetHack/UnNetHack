@@ -952,6 +952,23 @@ m_digweapon_check(struct monst *mtmp, coordxy nix, coordxy niy)
     return FALSE;
 }
 
+/* monster avoids a location nx, ny, if hero kicked that location */
+boolean
+m_avoid_kicked_loc(struct monst *mtmp, coordxy nx, coordxy ny)
+{
+    if ((mtmp->mpeaceful || mtmp->mtame)
+        && mtmp->mcansee
+        && !mtmp->mconf && !mtmp->mstun
+        && !Conflict
+        && isok(gk.kickedloc.x, gk.kickedloc.y)
+        && nx == gk.kickedloc.x && ny == gk.kickedloc.y
+        && next2u(nx, ny)) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -1396,6 +1413,10 @@ look_for_obj:
         }
         nx = poss[i].x;
         ny = poss[i].y;
+
+        if (m_avoid_kicked_loc(mtmp, nx, ny)) {
+            continue;
+        }
 
         if (MON_AT(nx, ny) &&
                 (info[i] & ALLOW_MDISP) &&
