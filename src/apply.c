@@ -2717,9 +2717,8 @@ use_trap(struct obj *otmp)
             return;
         }
     }
-    You("begin setting %s %s.",
-        shk_your(buf, otmp),
-        defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
+    You("begin setting %s%s.", shk_your(buf, otmp), trapname(ttyp, FALSE));
+    use_unpaid_trapobj(otmp, u.ux, u.uy);
     set_occupation(set_trap, occutext, 0);
     return;
 }

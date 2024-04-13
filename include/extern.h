@@ -2541,6 +2541,7 @@ extern void bars_around_portal(boolean);
 #endif /* BLACKMARKET */
 extern char *shk_your(char *, struct obj *);
 extern char *Shk_Your(char *, struct obj *);
+extern void use_unpaid_trapobj(struct obj *, coordxy, coordxy) NONNULLARG1;
 extern void sanity_check_shopkeepers(void);
 
 /* ### shknam.c ### */
