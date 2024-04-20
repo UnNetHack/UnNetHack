@@ -2019,6 +2019,10 @@ const char *oldconfigfile =
 const char *backward_compat_configfile = "nethack.cnf";
 #endif
 
+#ifdef __APPLE__
+#define fopenp fopen
+#endif
+
 static FILE *
 fopen_config_file(const char *filename, int src)
 {
