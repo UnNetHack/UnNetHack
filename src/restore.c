@@ -888,7 +888,7 @@ dorecover(NHFILE *nhfp)
     while (1) {
         if (nhfp->structlevel) {
 #ifdef ZEROCOMP
-            if (mread(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp) < 0) {
+            if (read(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp) < 0) {
 #else
             if (read(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp) != sizeof ltmp) {
 #endif
