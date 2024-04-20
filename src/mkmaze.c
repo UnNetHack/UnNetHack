@@ -1897,7 +1897,7 @@ void
 restore_waterlevel(NHFILE* nhfp)
 {
     struct bubble *b = (struct bubble *)0, *btmp;
-    int i, n;
+    int i, n = 0;
 
     if (!Is_waterlevel(&u.uz)) {
         return;

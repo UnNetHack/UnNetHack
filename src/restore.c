@@ -133,7 +133,7 @@ inven_inuse(boolean quietly)
 static void
 restlevchn(NHFILE *nhfp)
 {
-    int cnt;
+    int cnt = 0;
     s_level *tmplev, *x;
 
     sp_levchn = (s_level *) 0;
@@ -191,7 +191,7 @@ restdamage(NHFILE *nhfp)
 struct lvl_sounds *
 rest_lvl_sounds(NHFILE *nhfp)
 {
-    int marker;
+    int marker = 0;
     struct lvl_sounds *or = NULL;
     if (nhfp->structlevel) {
         Mread(nhfp->fd, &marker, sizeof marker);
@@ -224,7 +224,7 @@ rest_lvl_sounds(NHFILE *nhfp)
 struct mon_gen_override *
 rest_mongen_override(NHFILE *nhfp)
 {
-    int marker;
+    int marker = 0;
     struct mon_gen_override *or = NULL;
     struct mon_gen_tuple *mt = NULL;
     int next;

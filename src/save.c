@@ -430,7 +430,7 @@ tricked_fileremoved(NHFILE *nhfp, char *whynot)
 void
 savestateinlock(void)
 {
-    int hpid;
+    int hpid = 0;
     static boolean havestate = TRUE;
     char whynot[BUFSZ];
     NHFILE *nhfp;
