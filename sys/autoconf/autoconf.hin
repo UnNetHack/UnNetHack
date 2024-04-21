@@ -105,15 +105,15 @@
 /* Define to 1 if you have the <curses.h> header file. */
 #undef HAVE_CURSES_H
 
-/* Define to 1 if you have the declaration of `strncmpi', and to 0 if you
+/* Define to 1 if you have the declaration of 'strncmpi', and to 0 if you
    don't. */
 #undef HAVE_DECL_STRNCMPI
 
-/* Define to 1 if you have the declaration of `strnicmp', and to 0 if you
+/* Define to 1 if you have the declaration of 'strnicmp', and to 0 if you
    don't. */
 #undef HAVE_DECL_STRNICMP
 
-/* Define to 1 if you have the `fcntl' function. */
+/* Define to 1 if you have the 'fcntl' function. */
 #undef HAVE_FCNTL
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -242,13 +242,13 @@
 /* simple mail dgamelaunch support */
 #undef SIMPLE_MAIL
 
-/* The size of `unsigned int', as computed by sizeof. */
+/* The size of 'unsigned int', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_INT
 
-/* The size of `unsigned long', as computed by sizeof. */
+/* The size of 'unsigned long', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_LONG
 
-/* The size of `unsigned long long', as computed by sizeof. */
+/* The size of 'unsigned long long', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_LONG_LONG
 
 /* Sort item lists alphabetically by description. */
@@ -257,7 +257,7 @@
 /* TTY graphics status color */
 #undef STATUS_COLORS
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
@@ -304,8 +304,8 @@
 /* More verbose logfile */
 #undef XLOGFILE
 
-/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
-   `char[]'. */
+/* Define to 1 if 'lex' declares 'yytext' as a 'char *' by default, not a
+   'char[]'. */
 #undef YYTEXT_POINTER
 
 /* If not already defined, then define as a datatype of *exactly* 32 bits. */
