@@ -4,6 +4,7 @@
 #include "hack.h"
 #include "sp_lev.h"
 #include "lev.h"    /* save & restore info */
+#include "dlb.h"
 
 /* from sp_lev.c, for fixup_special() */
 extern lev_region *lregions;
@@ -1385,7 +1386,7 @@ makemaz(const char *s)
             }
         }
 
-        if (load_special(protofile)) {
+        if (load_special_des(protofile)) {
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */
             dmonsfree();

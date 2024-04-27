@@ -5,6 +5,8 @@
 #include "hack.h"
 #include "dlb.h"
 
+#include "nhlua.h"
+
 #ifndef LUA_VERSION_RELEASE_NUM
 #ifdef NHL_SANDBOX
 #undef NHL_SANDBOX

@@ -48,6 +48,7 @@
 
 
 #define LEV_EXT ".lev"      /* extension for special level files */
+#define LUA_EXT ".lua"      /* extension for special level files written in Lua */
 #define RECORD        "record"  /* file containing list of topscorers */
 #define HELP          "help"    /* file containing command descriptions */
 #define SHELP         "hh"  /* abbreviated form of the same */

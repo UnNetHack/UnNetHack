@@ -575,6 +575,23 @@ dlb_ftell(dlb *dp)
     return do_dlb_ftell(dp);
 }
 
+boolean
+dlb_fexists(const char *area, const char *name)
+{
+#ifndef FILE_AREAS
+    dlb *dp = dlb_fopen(name, RDBMODE);
+#else
+    dlb *dp = dlb_fopen_area(area, name, RDBMODE);
+#endif
+
+    if (!dp) {
+        return FALSE;
+    } else {
+        dlb_fclose(dp);
+        return TRUE;
+    }
+}
+
 #endif /* DLB */
 
 /*dlb.c*/

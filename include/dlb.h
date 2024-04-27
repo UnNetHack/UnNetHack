@@ -86,7 +86,7 @@ int dlb_fseek(DLB_P, long, int);
 char *dlb_fgets(char *, int, DLB_P);
 int dlb_fgetc(DLB_P);
 long dlb_ftell(DLB_P);
-
+boolean dlb_fexists(const char *, const char *);
 
 /* Resource DLB entry points */
 #ifdef DLBRSRC

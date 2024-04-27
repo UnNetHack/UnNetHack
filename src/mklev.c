@@ -326,7 +326,7 @@ makerooms(void)
                 Strcat(protofile, LEV_EXT);
                 in_mk_rndvault = TRUE;
                 rndvault_failed = FALSE;
-                (void) load_special(protofile);
+                (void) load_special_des(protofile);
                 in_mk_rndvault = FALSE;
                 if (rndvault_failed) {
                     return;
