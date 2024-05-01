@@ -10,4 +10,4 @@ clean:
 TEST_CFLAGS=-Wall -Wno-unused-variable -Wno-unused-but-set-variable
 %: %.c
 	echo `pkg-config --libs check`
-	$(CC) $(TEST_CFLAGS) -I../include -I../src -g $(CFLAGS) $@.c `pkg-config --libs check` -o $@ && ./$@
+	$(CC) $(TEST_CFLAGS) -I../include -I../src -g $(CFLAGS) $@.c `pkg-config --libs --cflags check lua5.4` -o $@ && ./$@

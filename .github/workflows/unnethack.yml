@@ -14,6 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: install lua
+      run : sudo apt-get install lua5.4 liblua5.4-dev
+
     - name: configure
       env:
         CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration -Werror=unused-variable -Wno-format-overflow'
@@ -38,6 +41,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: setting up lua
+      run: |
+          brew install lua
+          echo "LUA=$HOMEBREW_PREFIX/bin/lua" >> $GITHUB_ENV
+          echo "LUA_INCLUDE=`$HOMEBREW_PREFIX/bin/pkg-config --cflags lua`" >> $GITHUB_ENV
+          echo "LUA_LIB=`$HOMEBREW_PREFIX/bin/pkg-config --libs lua`" >> $GITHUB_ENV
+
     - name: configure
       env:
         CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration'
@@ -51,6 +61,7 @@ jobs:
       run: make all
 
   windows:
+    if: false # deactivate until lua.dll is build
     runs-on: ubuntu-latest
 
     steps:
@@ -67,6 +78,9 @@ jobs:
           # wine
           sudo apt-get install gcc-mingw-w64-i686 wine-development wine32 wine-binfmt imagemagick
           sudo update-binfmts --import /usr/share/binfmts/wine
+
+          # lua
+          sudo apt-get install lua5.4 liblua5.4-dev
 
     - name: Build
       run: sys/autoconf/build_win32.sh
