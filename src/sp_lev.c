@@ -3946,6 +3946,8 @@ lspo_level_flags(lua_State *L)
             level.flags.sokoban_rules = 1;
         } else if (!strcmpi(s, "inaccessibles")) {
             gc.coder->check_inaccessibles = 1;
+        } else if (!strcmpi(s, "outdoors")) {
+            level.flags.sky = 1;
         } else if (!strcmpi(s, "noflipx")) {
             gc.coder->allow_flips &= ~2;
         } else if (!strcmpi(s, "noflipy")) {
