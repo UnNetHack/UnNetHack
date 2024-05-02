@@ -279,7 +279,12 @@ mapfrag_get(struct mapfragment *mf, int x, int y)
         panic("outside mapfrag (%i,%i), wanted (%i,%i)",
               mf->wid, mf->hei, x, y);
     }
-    return splev_chr2typ(mf->data[y * (mf->wid + 1) + x]);
+    char map_char = mf->data[y * (mf->wid + 1) + x];
+    schar ret = splev_chr2typ(map_char);
+    if (ret == INVALID_TYPE) {
+        warning("Unknown map character '%c' at (%d,%d)", map_char, x, y);
+    }
+    return ret;
 }
 
 boolean
