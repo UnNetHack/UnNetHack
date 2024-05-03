@@ -2752,9 +2752,9 @@ int
 doquickwhatis(void)
 {
     if (iflags.num_pad) {
-        check_tutorial_message(QT_T_CURSOR_NUMPAD);
+        check_tutorial_message("qt_tutorial_cursor_numpad");
     } else {
-        check_tutorial_message(QT_T_CURSOR_VIKEYS);
+        check_tutorial_message("qt_tutorial_cursor_vikeys");
     }
 
     return do_look(1, (coord *) 0);

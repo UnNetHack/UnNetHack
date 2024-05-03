@@ -10,161 +10,46 @@
 #define QTEXT_AREA      FILE_AREA_SHARE
 #include "qtext.h"
 
-#define QTEXT_FILE  "quest.dat"
+#define QTEXT_FILE "quest.lua"
 
 /* #define DEBUG */ /* uncomment for debugging */
 
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
 
-static void Fread(genericptr_t, int, int, dlb *);
-static struct qtmsg * construct_qtlist(long);
 static const char * intermed(void);
 static const char * creatorname(void);
-static const char * neminame(void);
-static const char * guardname(void);
-static const char * homebase(void);
+/* sometimes find_qarti(gi.invent), and gi.invent can be null */
+static struct obj *find_qarti(struct obj *) NO_NNARGS;
+static const char *neminame(void);
+static const char *guardname(void);
+static const char *homebase(void);
 static void qtext_pronoun(char, char);
-static struct qtmsg * msg_in(struct qtmsg *, int);
 static void convert_arg(char);
 static void convert_line(char *,char *);
-static void deliver_by_pline(struct qtmsg *);
-static void deliver_by_window(struct qtmsg *, int);
+static void deliver_by_pline(const char *);
+static void deliver_by_window(const char *, int);
+static boolean skip_pager(boolean);
+static boolean com_pager_core(const char *, const char *, boolean, char **);
 
-static char in_line[80], cvt_buf[64], out_line[128];
-static struct   qtlists qt_list;
-static dlb  *msg_file;
+static char qu_in_line[80], cvt_buf[64], qu_out_line[128];
 /* used by ldrname() and neminame(), then copied into cvt_buf */
 static char nambuf[sizeof cvt_buf];
-
-#ifdef DEBUG
-static void dump_qtlist();
-
-/** dump the character msg list to check appearance */
-static void
-dump_qtlist()
-{
-    struct  qtmsg   *msg;
-    long size;
-
-    for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
-        pline("msgnum %d: delivery %c",
-              msg->msgnum, msg->delivery);
-        more();
-        (void) dlb_fseek(msg_file, msg->offset, SEEK_SET);
-        deliver_by_window(msg, NHW_TEXT);
-    }
-}
-#endif /* DEBUG */
-
-static void
-Fread(genericptr_t ptr, int size, int nitems, dlb *stream)
-{
-    int cnt;
-
-    if ((cnt = dlb_fread(ptr, size, nitems, stream)) != nitems) {
-
-        panic("PREMATURE EOF ON QUEST TEXT FILE! Expected %d bytes, got %d",
-              (size * nitems), (size * cnt));
-    }
-}
-
-static struct qtmsg *
-construct_qtlist(long int hdr_offset)
-{
-    struct qtmsg *msg_list;
-    int n_msgs;
-
-    (void) dlb_fseek(msg_file, hdr_offset, SEEK_SET);
-    Fread(&n_msgs, sizeof(int), 1, msg_file);
-    msg_list = (struct qtmsg *)
-               alloc((unsigned)(n_msgs+1)*sizeof(struct qtmsg));
-
-    /*
-     * Load up the list.
-     */
-    Fread((genericptr_t)msg_list, n_msgs*sizeof(struct qtmsg), 1, msg_file);
-
-    msg_list[n_msgs].msgnum = -1;
-    return msg_list;
-}
-
-void
-load_qtlist(void)
-{
-
-    int n_classes, i;
-    char qt_classes[N_HDR][LEN_HDR];
-    long qt_offsets[N_HDR];
-
-    msg_file = dlb_fopen_area(QTEXT_AREA, QTEXT_FILE, RDBMODE);
-    if (!msg_file) {
-        panic("CANNOT OPEN QUEST TEXT FILE %s.", QTEXT_FILE);
-    }
-
-    /*
-     * Read in the number of classes, then the ID's & offsets for
-     * each header.
-     */
-
-    Fread(&n_classes, sizeof(int), 1, msg_file);
-    Fread(&qt_classes[0][0], sizeof(char)*LEN_HDR, n_classes, msg_file);
-    Fread(qt_offsets, sizeof(long), n_classes, msg_file);
-
-    /*
-     * Now construct the message lists for quick reference later
-     * on when we are actually paging the messages out.
-     */
-
-    qt_list.common = qt_list.chrole = (struct qtmsg *)0;
-
-    for (i = 0; i < n_classes; i++) {
-        if (!strncmp(COMMON_ID, qt_classes[i], LEN_HDR)) {
-            qt_list.common = construct_qtlist(qt_offsets[i]);
-        } else if (!strncmp(urole.filecode, qt_classes[i], LEN_HDR)) {
-            qt_list.chrole = construct_qtlist(qt_offsets[i]);
-        }
-#if 0   /* UNUSED but available */
-        else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR)) {
-            qt_list.chrace = construct_qtlist(qt_offsets[i]);
-        }
-#endif
-    }
-
-    if (!qt_list.common || !qt_list.chrole) {
-        impossible("load_qtlist: cannot load quest text.");
-    }
-#ifdef DEBUG
-    dump_qtlist();
-#endif
-    return; /* no ***DON'T*** close the msg_file */
-}
-
-/* called at program exit */
-void
-unload_qtlist(void)
-{
-    if (msg_file) {
-        (void) dlb_fclose(msg_file),  msg_file = 0;
-    }
-    if (qt_list.common) {
-        free((genericptr_t) qt_list.common),  qt_list.common = 0;
-    }
-    if (qt_list.chrole) {
-        free((genericptr_t) qt_list.chrole),  qt_list.chrole = 0;
-    }
-    return;
-}
 
 short
 quest_info(int typ)
 {
     switch (typ) {
-    case 0:     return (urole.questarti);
-    case MS_LEADER: return (urole.ldrnum);
-    case MS_NEMESIS:    return (urole.neminum);
-    case MS_GUARDIAN:   return (urole.guardnum);
-    default:        warning("quest_info(%d)", typ);
+    case 0:
+        return urole.questarti;
+    case MS_LEADER:
+        return urole.ldrnum;
+    case MS_NEMESIS:
+        return urole.neminum;
+    case MS_GUARDIAN:
+        return urole.guardnum;
+    default:
+        impossible("quest_info(%d)", typ);
     }
     return 0;
 }
@@ -192,6 +77,67 @@ boolean
 is_quest_artifact(struct obj *otmp)
 {
     return (boolean)(otmp->oartifact == urole.questarti);
+}
+
+static struct obj *
+find_qarti(struct obj *ochain)
+{
+    struct obj *otmp, *qarti;
+
+    for (otmp = ochain; otmp; otmp = otmp->nobj) {
+        if (is_quest_artifact(otmp)) {
+            return otmp;
+        }
+        if (Has_contents(otmp) && (qarti = find_qarti(otmp->cobj)) != 0) {
+            return qarti;
+        }
+    }
+    return (struct obj *) 0;
+}
+
+/* check several object chains for the quest artifact to determine
+   whether it is present on the current level */
+struct obj *
+find_quest_artifact(unsigned whichchains)
+{
+    struct monst *mtmp;
+    struct obj *qarti = 0;
+
+    if ((whichchains & (1 << OBJ_INVENT)) != 0) {
+        qarti = find_qarti(invent);
+    }
+    if (!qarti && (whichchains & (1 << OBJ_FLOOR)) != 0) {
+        qarti = find_qarti(fobj);
+    }
+    if (!qarti && (whichchains & (1 << OBJ_MINVENT)) != 0) {
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp)) {
+                continue;
+            }
+            if ((qarti = find_qarti(mtmp->minvent)) != 0) {
+                break;
+            }
+        }
+    }
+    if (!qarti && (whichchains & (1 << OBJ_MIGRATING)) != 0) {
+        /* check migrating objects and minvent of migrating monsters */
+        for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp)) {
+                continue;
+            }
+            if ((qarti = find_qarti(mtmp->minvent)) != 0) {
+                break;
+            }
+        }
+        if (!qarti) {
+            qarti = find_qarti(migrating_objs);
+        }
+    }
+    if (!qarti && (whichchains & (1 << OBJ_BURIED)) != 0) {
+        qarti = find_qarti(level.buriedobjlist);
+    }
+
+    return qarti;
 }
 
 /** return your role nemesis' name */
@@ -259,20 +205,6 @@ qtext_pronoun(char who, char which)
         cvt_buf[0] = highc(cvt_buf[0]);
     }
     return;
-}
-
-static struct qtmsg *
-msg_in(struct qtmsg *qtm_list, int msgnum)
-{
-    struct qtmsg *qt_msg;
-
-    for (qt_msg = qtm_list; qt_msg->msgnum > 0; qt_msg++) {
-        if (qt_msg->msgnum == msgnum) {
-            return qt_msg;
-        }
-    }
-
-    return (struct qtmsg *)0;
 }
 
 static void
@@ -353,10 +285,9 @@ static void
 convert_line(char *in_line, char *out_line)
 {
     char *c, *cc;
-    char xbuf[BUFSZ];
 
     cc = out_line;
-    for (c = xcrypt(in_line, xbuf); *c; c++) {
+    for (c = in_line; *c; c++) {
         *cc = 0;
         switch (*c) {
         case '\r':
@@ -438,137 +369,262 @@ convert_line(char *in_line, char *out_line)
 char *
 string_subst(char *str)
 {
-    xcrypt(str, in_line);
-    convert_line(in_line, out_line);
-    return out_line;
+    xcrypt(str, qu_in_line);
+    convert_line(qu_in_line, qu_out_line);
+    return qu_out_line;
 }
 
-
 static void
-deliver_by_pline(struct qtmsg *qt_msg)
+deliver_by_pline(const char *str)
 {
-    long size;
+    char in_line[BUFSZ], out_line[BUFSZ];
+    const char *msgp = str, *msgend = eos((char *) str);
 
-    for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+    while (msgp < msgend) {
+        /* copynchars() will stop at newline if it finds one */
+        copynchars(in_line, msgp, (int) sizeof in_line - 1);
+        msgp += strlen(in_line) + 1;
+
         convert_line(in_line, out_line);
         pline("%s", out_line);
     }
-
 }
 
 static void
-deliver_by_window(struct qtmsg *qt_msg, int how)
+deliver_by_window(const char *msg, int how)
 {
-    long size;
     char in_line[BUFSZ], out_line[BUFSZ];
-    boolean qtdump = (how == NHW_MAP);
-    winid datawin = create_nhwindow(qtdump ? NHW_TEXT : how);
+    const char *msgp = msg, *msgend = eos((char *) msg);
+    winid datawin = create_nhwindow(how);
 
-#ifdef DEBUG
-    if (qtdump) {
-        char buf[BUFSZ];
+    while (msgp < msgend) {
+        /* copynchars() will stop at newline if it finds one */
+        copynchars(in_line, msgp, (int) sizeof in_line - 1);
+        msgp += strlen(in_line) + 1;
 
-        /* when dumping quest messages at startup, all of them are passed to
-         * deliver_by_window(), even if normally given to deliver_by_pline()
-         */
-        Sprintf(buf, "msgnum: %d, delivery: %c",
-                qt_msg->msgnum, qt_msg->delivery);
-        putstr(datawin, 0, buf);
-        putstr(datawin, 0, "");
-    }
-#endif
-    for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
-        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
         convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
     }
+
     display_nhwindow(datawin, TRUE);
     destroy_nhwindow(datawin);
 }
 
-void
-qt_com_firstline(int msgnum, char *msgbuf)
+static boolean
+skip_pager(boolean common UNUSED)
 {
-    struct qtmsg *qt_msg;
-
-    if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
-        impossible("qt_com_firstline: message %d not found.", msgnum);
-        *msgbuf = 0;
-        return;
+    /* WIZKIT: suppress plot feedback if starting with quest artifact */
+    if (program_state.wizkit_wishing) {
+        return TRUE;
     }
-
-    (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
-    (void) dlb_fgets(in_line, sizeof in_line, msg_file);
-    convert_line(in_line, out_line);
-    strcpy(msgbuf, out_line);
+    return FALSE;
 }
 
-void
-com_pager(int msgnum)
+char *
+qt_com_firstline(const char *msgid)
 {
-    struct qtmsg *qt_msg;
+    char *msgbuf = NULL;
+    com_pager_core("common", msgid, TRUE, &msgbuf);
+    return msgbuf;
+}
 
-    if (!(qt_msg = msg_in(qt_list.common, msgnum))) {
-        warning("com_pager: message %d not found.", msgnum);
-        return;
+static boolean
+com_pager_core(
+    const char *section,
+    const char *msgid,
+    boolean showerror,
+    char **rawtext)
+{
+    static const char *const howtoput[] = {
+        "pline", "window", "text", "menu", "default", NULL
+    };
+    static const int howtoput2i[] = { 1, 2, 2, 3, 0, 0 };
+    int output;
+    lua_State *L;
+    char *text = NULL, *synopsis = NULL, *fallback_msgid = NULL;
+    boolean res = FALSE;
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 1*1024*1024, 0, 1*1024*1024};
+
+    if (skip_pager(TRUE)) {
+        return FALSE;
     }
 
-    (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
-    if (qt_msg->delivery == 'p') {
-        deliver_by_pline(qt_msg);
-    } else if (qt_msg->delivery == 'm') {
-        deliver_by_window(qt_msg, NHW_MENU);
+    L = nhl_init(&sbi);
+    if (!L) {
+        if (showerror) {
+            impossible("com_pager: nhl_init() failed");
+        }
+        goto compagerdone;
+    }
+
+    if (!nhl_loadlua(L, NH_DATAAREA, QTEXT_FILE)) {
+        if (showerror) {
+            impossible("com_pager: %s not found.", QTEXT_FILE);
+        }
+        goto compagerdone;
+    }
+
+    lua_settop(L, 0);
+    lua_getglobal(L, "questtext");
+    if (!lua_istable(L, -1)) {
+        if (showerror) {
+            impossible("com_pager: questtext in %s is not a lua table", QTEXT_FILE);
+        }
+        goto compagerdone;
+    }
+
+    lua_getfield(L, -1, section);
+    if (!lua_istable(L, -1)) {
+        if (showerror) {
+            impossible("com_pager: questtext[%s] in %s is not a lua table", section, QTEXT_FILE);
+        }
+        goto compagerdone;
+    }
+
+ tryagain:
+    lua_getfield(L, -1, fallback_msgid ? fallback_msgid : msgid);
+    if (!lua_istable(L, -1)) {
+        if (!fallback_msgid) {
+            /* Do we have questtxt[msg_fallbacks][<msgid>]? */
+            lua_getfield(L, -3, "msg_fallbacks");
+            if (lua_istable(L, -1)) {
+                fallback_msgid = get_table_str_opt(L, msgid, NULL);
+                lua_pop(L, 2);
+                if (fallback_msgid) {
+                    goto tryagain;
+                }
+            }
+        }
+        if (showerror) {
+            if (!fallback_msgid) {
+                impossible("com_pager: questtext[%s][%s] in %s is not a lua table",
+                           section, msgid, QTEXT_FILE);
+            } else {
+                impossible("com_pager: questtext[%s][%s] and [][%s] in %s are not lua tables",
+                           section, msgid, fallback_msgid, QTEXT_FILE);
+            }
+        }
+        goto compagerdone;
+    }
+
+    text = get_table_str_opt(L, "text", NULL);
+    if (rawtext) {
+        /* only copy first line */
+        for (int i = 0; i < strlen(text); i++) {
+            if (text[i] == '\n') {
+                text[i] = '\0';
+                break;
+            }
+        }
+        *rawtext = dupstr(text);
+        res = TRUE;
+        goto compagerdone;
+    }
+    synopsis = get_table_str_opt(L, "synopsis", NULL);
+    output = howtoput2i[get_table_option(L, "output", "default", howtoput)];
+
+    if (!text) {
+        int nelems;
+
+        lua_len(L, -1);
+        nelems = (int) lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        if (nelems < 2) {
+            if (showerror) {
+                impossible("com_pager: questtext[%s][%s] in %s is not an array of strings",
+                           section, fallback_msgid ? fallback_msgid : msgid,
+                           QTEXT_FILE);
+            }
+            goto compagerdone;
+        }
+        nelems = rn2(nelems) + 1;
+        lua_pushinteger(L, nelems);
+        lua_gettable(L, -2);
+        text = dupstr(luaL_checkstring(L, -1));
+    }
+
+    /* switch from by_pline to by_window if line has multiple segments or
+       is unreasonably long (the latter ought to checked after formatting
+       conversions rather than before...) */
+    if (output == 0 && (strchr(text, '\n') || strlen(text) >= BUFSZ - 1)) {
+        output = 2;
+
+        /*
+         * FIXME:  should update quest.lua to include proper synopsis line
+         * for any item subject to having its delivery converted to by_window.
+         */
+        if (!synopsis) {
+            char tmpbuf[BUFSZ];
+
+            Sprintf(tmpbuf, "[%.*s]", BUFSZ - 1 - 2, text);
+            /* change every newline character to a space */
+            (void) strNsubst(tmpbuf, "\n", " ", 0);
+            synopsis = dupstr(tmpbuf);
+        }
+    }
+
+    if (output == 0 || output == 1) {
+        deliver_by_pline(text);
     } else {
-        deliver_by_window(qt_msg, NHW_TEXT);
+        deliver_by_window(text, (output == 3) ? NHW_MENU : NHW_TEXT);
     }
-    return;
+
+    if (synopsis) {
+        char in_line[BUFSZ], out_line[BUFSZ];
+
+#if 0   /* not yet -- brackets need to be removed from quest.lua */
+        Sprintf(in_line, "[%.*s]",
+                (int) (sizeof in_line - sizeof "[]"), synopsis);
+#else
+        Strcpy(in_line, synopsis);
+#endif
+        convert_line(in_line, out_line);
+        /* bypass message delivery but be available for ^P recall */
+#ifdef NEXT_VERSION
+        putmsghistory(out_line, FALSE);
+#endif
+    }
+    res = TRUE;
+
+ compagerdone:
+    if (text) {
+        free((genericptr_t) text);
+    }
+    if (synopsis) {
+        free((genericptr_t) synopsis);
+    }
+    if (fallback_msgid) {
+        free((genericptr_t) fallback_msgid);
+    }
+    nhl_done(L);
+    return res;
 }
 
 void
-qt_pager(int msgnum)
+com_pager(const char *msgid)
 {
-    struct qtmsg *qt_msg;
-
-    if (!(qt_msg = msg_in(qt_list.chrole, msgnum))) {
-        warning("qt_pager: message %d not found.", msgnum);
-        return;
-    }
-
-    (void) dlb_fseek(msg_file, qt_msg->offset, SEEK_SET);
-    if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11")) {
-        deliver_by_pline(qt_msg);
-    } else {
-        deliver_by_window(qt_msg, NHW_TEXT);
-    }
-    return;
+    (void) com_pager_core("common", msgid, TRUE, (char **) 0);
 }
+
+void
+qt_pager(const char *msgid)
+{
+    if (!com_pager_core(urole.filecode, msgid, FALSE, (char **) 0)) {
+        (void) com_pager_core("common", msgid, TRUE, (char **) 0);
+    }
+}
+
+
 /** special levels can include a custom arrival message; display it */
 void
 deliver_splev_message(void)
 {
-    char *str, *nl, in_line[BUFSZ], out_line[BUFSZ];
-
     /* there's no provision for delivering via window instead of pline */
     if (lev_message) {
-        /* lev_message can span multiple lines using embedded newline chars;
-           any segments too long to fit within in_line[] will be truncated */
-        for (str = lev_message; *str; str = nl + 1) {
-            /* copying will stop at newline if one is present */
-            copynchars(in_line, str, (int) (sizeof in_line) - 1);
+        deliver_by_pline(lev_message);
 
-            /* convert_line() expects encrypted input */
-            (void) xcrypt(in_line, in_line);
-            convert_line(in_line, out_line);
-            pline("%s", out_line);
-
-            if ((nl = index(str, '\n')) == 0) {
-                break; /* done if no newline */
-            }
-        }
-
-        free(lev_message);
-        lev_message = 0;
+        free((genericptr_t) lev_message);
+        lev_message = NULL;
     }
 }
 

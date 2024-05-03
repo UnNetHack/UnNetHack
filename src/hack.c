@@ -3458,7 +3458,7 @@ check_special_room(boolean newlev)
             } else {
                 msg_given = FALSE;
             }
-            check_tutorial_message(QT_T_ORACLE);
+            check_tutorial_message("qt_tutorial_oracle");
             break;
         }
 #ifdef BLACKMARKET

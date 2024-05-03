@@ -157,7 +157,7 @@ E NEARDATA s_level *sp_levchn;
 E struct q_score quest_status;
 
 #include "qtext.h"
-E NEARDATA char pl_tutorial[QT_T_MAX-QT_T_FIRST+1];
+extern char pl_tutorial[QT_T_MAX];
 
 E NEARDATA char pl_character[PL_CSIZ];
 E NEARDATA char pl_race;        /* character's race */

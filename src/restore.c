@@ -972,7 +972,6 @@ dorecover(NHFILE *nhfp)
      */
     inven_inuse(FALSE);
 
-    load_qtlist();  /* re-load the quest text info */
     reset_attribute_clock();
     /* Set up the vision internals, after levl[] data is loaded
        but before docrt(). */

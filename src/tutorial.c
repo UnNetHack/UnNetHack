@@ -6,20 +6,122 @@
 #include "quest.h"
 #include "qtext.h"
 
+const char *qt_tutorial_messages[] = {
+    "qt_tutorial_welcome",
+    "qt_tutorial_cursor_numpad",
+    "qt_tutorial_cursor_vikeys",
+    "qt_tutorial_look_tame",
+    "qt_tutorial_look_hostile",
+    "qt_tutorial_look_peaceful",
+    "qt_tutorial_look_invisible",
+    "qt_tutorial_doors",
+    "qt_tutorial_corridor",
+    "qt_tutorial_secretdoor",
+    "qt_tutorial_poolormoat",
+    "qt_tutorial_lava",
+    "qt_tutorial_stairs",
+    "qt_tutorial_fountain",
+    "qt_tutorial_throne",
+    "qt_tutorial_sink",
+    "qt_tutorial_grave",
+    "qt_tutorial_altar",
+    "qt_tutorial_drawbridge",
+    "qt_tutorial_trap",
+    "qt_tutorial_l1upstairs",
+    "qt_tutorial_farmove_vikeys",
+    "qt_tutorial_farmove_numpad",
+    "qt_tutorial_travel",
+    "qt_tutorial_diagonals_vi",
+    "qt_tutorial_diagonals_num",
+    "qt_tutorial_repeat_vikeys",
+    "qt_tutorial_repeat_numpad",
+    "qt_tutorial_chooseitem",
+    "qt_tutorial_massunequip",
+    "qt_tutorial_callmonster",
+    "qt_tutorial_multidrop",
+    "qt_tutorial_massinventory",
+    "qt_tutorial_secondwield",
+    "qt_tutorial_look_reminder",
+    "qt_tutorial_fire",
+    "qt_tutorial_dgn_overview",
+    "qt_tutorial_viewtutorial",
+    "qt_tutorial_check_items",
+    "qt_tutorial_objective",
+    "qt_tutorial_saveload",
+    "qt_tutorial_messagerecall",
+    "qt_tutorial_spells",
+    "qt_tutorial_thrownweapons",
+    "qt_tutorial_projectiles",
+    "qt_tutorial_elbereth",
+    "qt_tutorial_melee",
+    "qt_tutorial_item_gold",
+    "qt_tutorial_item_weapon",
+    "qt_tutorial_item_armor",
+    "qt_tutorial_item_food",
+    "qt_tutorial_item_scroll",
+    "qt_tutorial_item_wand",
+    "qt_tutorial_item_ring",
+    "qt_tutorial_item_potion",
+    "qt_tutorial_item_tool",
+    "qt_tutorial_item_container",
+    "qt_tutorial_item_amulet",
+    "qt_tutorial_item_gem",
+    "qt_tutorial_item_statue",
+    "qt_tutorial_item_book",
+    "qt_tutorial_callitem",
+    "qt_tutorial_artifact",
+    "qt_tutorial_randappearance",
+    "qt_tutorial_levelup",
+    "qt_tutorial_rankup",
+    "qt_tutorial_abilup",
+    "qt_tutorial_abildown",
+    "qt_tutorial_dlevelchange",
+    "qt_tutorial_damaged",
+    "qt_tutorial_pwused",
+    "qt_tutorial_pwempty",
+    "qt_tutorial_acimproved",
+    "qt_tutorial_gainedexp",
+    "qt_tutorial_hunger",
+    "qt_tutorial_satiation",
+    "qt_tutorial_status",
+    "qt_tutorial_enhance",
+    "qt_tutorial_polyself",
+    "qt_tutorial_engraving",
+    "qt_tutorial_majortrouble",
+    "qt_tutorial_burden",
+    "qt_tutorial_equipcurse",
+    "qt_tutorial_mailscroll",
+    "qt_tutorial_caster_armor",
+    "qt_tutorial_weapon_skill",
+    "qt_tutorial_engulfed",
+    "qt_tutorial_death",
+    "qt_tutorial_shopentry",
+    "qt_tutorial_shopbuy",
+    "qt_tutorial_mines",
+    "qt_tutorial_sokoban",
+    "qt_tutorial_oracle",
+};
+
 /* Display a tutorial message, if it hasn't been displayed before.
    Returns TRUE if a tutorial message is output. */
 boolean
-check_tutorial_message(int msgnum)
+check_tutorial_message(const char *msgid)
 {
     if (!flags.tutorial) {
         return FALSE;
     }
-    if (pl_tutorial[msgnum - QT_T_FIRST] > 0) {
+    int index;
+    for (index = 0; index < QT_T_MAX; index++) {
+        if (!strcmp(msgid, qt_tutorial_messages[index])) {
+            break;
+        }
+    }
+    if (pl_tutorial[index]) {
         return FALSE;
     }
-    pl_tutorial[msgnum - QT_T_FIRST] = 1;
+    pl_tutorial[index] = 1;
     flush_screen(1);
-    com_pager(msgnum);
+    com_pager(msgid);
     return TRUE;
 }
 
@@ -32,20 +134,48 @@ int
 check_tutorial_oclass(int oclass)
 {
     switch (oclass) {
-    case WEAPON_CLASS: check_tutorial_message(QT_T_ITEM_WEAPON);   return 1;
-    case FOOD_CLASS:   check_tutorial_message(QT_T_ITEM_FOOD);     return 1;
-    case GEM_CLASS:    check_tutorial_message(QT_T_ITEM_GEM);      return 1;
-    case TOOL_CLASS:   check_tutorial_message(QT_T_ITEM_TOOL);     return 1;
-    case AMULET_CLASS: check_tutorial_message(QT_T_ITEM_AMULET);   return 1;
-    case POTION_CLASS: check_tutorial_message(QT_T_ITEM_POTION);   return 1;
-    case SCROLL_CLASS: check_tutorial_message(QT_T_ITEM_SCROLL);   return 1;
-    case SPBOOK_CLASS: check_tutorial_message(QT_T_ITEM_BOOK);     return 1;
-    case ARMOR_CLASS:  check_tutorial_message(QT_T_ITEM_ARMOR);    return 1;
-    case WAND_CLASS:   check_tutorial_message(QT_T_ITEM_WAND);     return 1;
-    case RING_CLASS:   check_tutorial_message(QT_T_ITEM_RING);     return 1;
-    case ROCK_CLASS:   check_tutorial_message(QT_T_ITEM_STATUE);   return 1;
-    case COIN_CLASS:   check_tutorial_message(QT_T_ITEM_GOLD);     return 1;
-    default: return 0; /* venom/ball/chain/mimic don't concern us */
+        case WEAPON_CLASS:
+            check_tutorial_message("qt_tutorial_item_weapon");
+            return 1;
+        case FOOD_CLASS:
+            check_tutorial_message("qt_tutorial_item_food");
+            return 1;
+        case GEM_CLASS:
+            check_tutorial_message("qt_tutorial_item_gem");
+            return 1;
+        case TOOL_CLASS:
+            check_tutorial_message("qt_tutorial_item_tool");
+            return 1;
+        case AMULET_CLASS:
+            check_tutorial_message("qt_tutorial_item_amulet");
+            return 1;
+        case POTION_CLASS:
+            check_tutorial_message("qt_tutorial_item_potion");
+            return 1;
+        case SCROLL_CLASS:
+            check_tutorial_message("qt_tutorial_item_scroll");
+            return 1;
+        case SPBOOK_CLASS:
+            check_tutorial_message("qt_tutorial_item_book");
+            return 1;
+        case ARMOR_CLASS:
+            check_tutorial_message("qt_tutorial_item_armor");
+            return 1;
+        case WAND_CLASS:
+            check_tutorial_message("qt_tutorial_item_wand");
+            return 1;
+        case RING_CLASS:
+            check_tutorial_message("qt_tutorial_item_ring");
+            return 1;
+        case ROCK_CLASS:
+            check_tutorial_message("qt_tutorial_item_statue");
+            return 1;
+        case COIN_CLASS:
+            check_tutorial_message("qt_tutorial_item_gold");
+            return 1;
+        default:
+            return 0;
+            /* venom/ball/chain/mimic don't concern us */
     }
 }
 
@@ -60,13 +190,19 @@ check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
         return FALSE; /* short-circuit */
     }
     if (glyph_is_trap(l->glyph)) { /* seen traps only */
-        if (check_tutorial_message(QT_T_TRAP)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_trap")) {
+            return TRUE;
+        }
     }
     if (IS_DOOR(l->typ) && l->doormask >= D_ISOPEN) {
-        if (check_tutorial_message(QT_T_DOORS)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_doors")) {
+            return TRUE;
+        }
     }
     if (l->typ == CORR) {
-        if (check_tutorial_message(QT_T_CORRIDOR)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_corridor")) {
+            return TRUE;
+        }
     }
     /* A freebie: we give away the location of a secret door or
        corridor, once. This is so that the advice to search will
@@ -75,48 +211,68 @@ check_tutorial_location(coordxy lx, coordxy ly, boolean from_farlook)
        first game having no visible exits from the first room (it
        can happen!) */
     if (l->typ == SCORR || l->typ == SDOOR) {
-        if (check_tutorial_message(QT_T_SECRETDOOR)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_secretdoor")) {
+            return TRUE;
+        }
     }
     if (l->typ == POOL || l->typ == MOAT) {
-        if (check_tutorial_message(QT_T_POOLORMOAT)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_poolormoat")) {
+            return TRUE;
+        }
     }
     if (l->typ == LAVAPOOL) {
-        if (check_tutorial_message(QT_T_LAVA)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_lava")) {
+            return TRUE;
+        }
     }
     if (l->typ == STAIRS) {
         stairway *stway = stairway_at(lx, ly);
         /* In which direction? */
         if (stway && stway->up) {
             if (u.uz.dlevel > 1) {
-                if (check_tutorial_message(QT_T_STAIRS)) {
+                if (check_tutorial_message("qt_tutorial_stairs")) {
                     return TRUE;
                 } else if (from_farlook) {
-                    if (check_tutorial_message(QT_T_L1UPSTAIRS)) return TRUE;
+                    if (check_tutorial_message("qt_tutorial_l1upstairs")) {
+                        return TRUE;
+                    }
                 }
             }
         } else {
-            if (check_tutorial_message(QT_T_STAIRS)) {
+            if (check_tutorial_message("qt_tutorial_stairs")) {
                 return TRUE;
             }
         }
     }
     if (l->typ == FOUNTAIN) {
-        if (check_tutorial_message(QT_T_FOUNTAIN)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_fountain")) {
+            return TRUE;
+        }
     }
     if (l->typ == THRONE) {
-        if (check_tutorial_message(QT_T_THRONE)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_throne")) {
+            return TRUE;
+        }
     }
     if (l->typ == SINK) {
-        if (check_tutorial_message(QT_T_SINK)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_sink")) {
+            return TRUE;
+        }
     }
     if (l->typ == GRAVE) {
-        if (check_tutorial_message(QT_T_GRAVE)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_grave")) {
+            return TRUE;
+        }
     }
     if (l->typ == ALTAR) {
-        if (check_tutorial_message(QT_T_ALTAR)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_altar")) {
+            return TRUE;
+        }
     }
     if (IS_DRAWBRIDGE(l->typ)) {
-        if (check_tutorial_message(QT_T_DRAWBRIDGE)) return TRUE;
+        if (check_tutorial_message("qt_tutorial_drawbridge")) {
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -130,11 +286,11 @@ check_tutorial_farlook(coordxy x, coordxy y)
         return; /* short-circuit */
     }
     if (glyph_is_invisible(glyph)) {
-        check_tutorial_message(QT_T_LOOK_INVISIBLE);
+        check_tutorial_message("qt_tutorial_look_invisible");
         return;
     }
     if (glyph_is_pet(glyph) || glyph_is_ridden_monster(glyph)) {
-        check_tutorial_message(QT_T_LOOK_TAME);
+        check_tutorial_message("qt_tutorial_look_tame");
         return;
     }
     if (glyph_is_monster(glyph)) {
@@ -145,11 +301,11 @@ check_tutorial_farlook(coordxy x, coordxy y)
             return; /* to prevent null pointer deref */
         }
         if (m_at(x, y)->mpeaceful) {
-            check_tutorial_message(QT_T_LOOK_PEACEFUL);
+            check_tutorial_message("qt_tutorial_look_peaceful");
         } else if (m_at(x, y)->mtame) { /* without showpet on */
-            check_tutorial_message(QT_T_LOOK_TAME);
+            check_tutorial_message("qt_tutorial_look_tame");
         } else {
-            check_tutorial_message(QT_T_LOOK_HOSTILE);
+            check_tutorial_message("qt_tutorial_look_hostile");
         }
         return;
     }
@@ -166,7 +322,7 @@ check_tutorial_farlook(coordxy x, coordxy y)
 }
 
 #define CHECK_TUTORIAL_COMMAND_BUFSIZE 100
-static int check_tutorial_command_message = 0;
+static const char *check_tutorial_command_message = NULL;
 static char check_tutorial_command_buffer[CHECK_TUTORIAL_COMMAND_BUFSIZE];
 static int check_tutorial_command_pointer = 0;
 static int check_tutorial_command_count = 0;
@@ -223,50 +379,50 @@ check_tutorial_command(char c)
         }
         if (moves > 125 && r > 5 && farmove) {
             if (iflags.num_pad) {
-                check_tutorial_command_message = QT_T_FARMOVE_NUMPAD;
+                check_tutorial_command_message = "qt_tutorial_farmove_numpad";
             } else {
-                check_tutorial_command_message = QT_T_FARMOVE_VIKEYS;
+                check_tutorial_command_message = "qt_tutorial_farmove_vikeys";
             }
             break;
         }
         if (moves > 125 && r > 30 && travel) {
-            check_tutorial_command_message = QT_T_TRAVEL;
+            check_tutorial_command_message = "qt_tutorial_travel";
             break;
         }
         if (moves > 80 && r > 20 && c == 'b') {
             if (iflags.num_pad) {
-                check_tutorial_command_message = QT_T_DIAGONALS_NUM;
+                check_tutorial_command_message = "qt_tutorial_diagonals_num";
             } else {
-                check_tutorial_command_message = QT_T_DIAGONALS_VI;
+                check_tutorial_command_message = "qt_tutorial_diagonals_vi";
             }
             break;
         }
         if (repeat && r > 5 && c == 's') {
             if (iflags.num_pad) {
-                check_tutorial_command_message = QT_T_REPEAT_NUMPAD;
+                check_tutorial_command_message = "qt_tutorial_repeat_numpad";
             } else {
-                check_tutorial_command_message = QT_T_REPEAT_VIKEYS;
+                check_tutorial_command_message = "qt_tutorial_repeat_vikeys";
             }
             break;
         }
         if (moves > 45 && r >= 2 && massunequip) {
-            check_tutorial_command_message = QT_T_MASSUNEQUIP;
+            check_tutorial_command_message = "qt_tutorial_massunequip";
             break;
         }
         if (moves > 45 && r >= 2 && repeat && c == 'd') {
-            check_tutorial_command_message = QT_T_MULTIDROP;
+            check_tutorial_command_message = "qt_tutorial_multidrop";
             break;
         }
         if (moves > 45 && r >= 2 && repeat && c == 'I') {
-            check_tutorial_command_message = QT_T_MASSINVENTORY;
+            check_tutorial_command_message = "qt_tutorial_massinventory";
             break;
         }
         if (moves > 45 && secondwield >= 3 && r == 50) {
-            check_tutorial_command_message = QT_T_SECONDWIELD;
+            check_tutorial_command_message = "qt_tutorial_secondwield";
             break;
         }
         if (r >= 3 && repeat && c == 't') {
-            check_tutorial_command_message = QT_T_FIRE;
+            check_tutorial_command_message = "qt_tutorial_fire";
             break;
         }
         i--;
@@ -278,7 +434,7 @@ check_tutorial_command(char c)
 
     if (check_tutorial_command_message == 0 && look_reminder &&
         check_tutorial_command_count >= 100)
-        check_tutorial_command_message = QT_T_LOOK_REMINDER;
+        check_tutorial_command_message = "qt_tutorial_look_reminder";
 }
 
 /* Display tutorial messages based on the state of the character. */
@@ -304,7 +460,7 @@ maybe_tutorial(void)
        Stop checking once one message is output. */
 
     /* Welcome message: show immediately */
-    if (check_tutorial_message(QT_T_WELCOME)) {
+    if (check_tutorial_message("qt_tutorial_welcome")) {
         return;
     }
 
@@ -324,11 +480,15 @@ maybe_tutorial(void)
                     }
                     /* Some non-terrain checks in the same loop */
                     if (glyph_is_invisible(glyph_at(lx, ly))) {
-                        if (check_tutorial_message(QT_T_LOOK_INVISIBLE)) return;
+                        if (check_tutorial_message("qt_tutorial_look_invisible")) {
+                            return;
+                        }
                     }
                     if (glyph_is_monster(glyph_at(lx, ly))) {
                         if (monsterglyph == glyph_at(lx, ly)) {
-                            if (check_tutorial_message(QT_T_CALLMONSTER)) return;
+                            if (check_tutorial_message("qt_tutorial_callmonster")) {
+                                return;
+                            }
                         }
                         monsterglyph = glyph_at(lx, ly);
                     }
@@ -349,16 +509,18 @@ maybe_tutorial(void)
     if (!time_since_combat && old_time_since_combat > 5) {
         if (!firstcombat) {
             if (u.uz.dlevel >= 3) {
-                if (check_tutorial_message(QT_T_ELBERETH)) return;
+                if (check_tutorial_message("qt_tutorial_elbereth")) {
+                    return;
+                }
             }
             for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
                 if (spellid(i) == SPE_FORCE_BOLT) {
-                    if (check_tutorial_message(QT_T_SPELLS)) {
+                    if (check_tutorial_message("qt_tutorial_spells")) {
                         return;
                     }
                 }
             }
-            if (check_tutorial_message(QT_T_MELEE)) {
+            if (check_tutorial_message("qt_tutorial_melee")) {
                 return;
             }
         } else {
@@ -373,18 +535,22 @@ maybe_tutorial(void)
             (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE) ||
             (uarmg && is_metallic(uarmg)) ||
             (uarmf && is_metallic(uarmf)))
-            if (check_tutorial_message(QT_T_CASTER_ARMOR)) {
+            if (check_tutorial_message("qt_tutorial_caster_armor")) {
                 return;
             }
     }
     if (uwep && uwep != &zeroobj && weapon_dam_bonus(uwep) < 0 && !u.twoweap) {
-        if (check_tutorial_message(QT_T_WEAPON_SKILL)) return;
+        if (check_tutorial_message("qt_tutorial_weapon_skill")) {
+            return;
+        }
     }
     if (u.ulevel >= 2) {
-        if (check_tutorial_message(QT_T_LEVELUP)) return;
+        if (check_tutorial_message("qt_tutorial_levelup")) {
+            return;
+        }
     }
     if (u.ulevel >= 3) {
-        if (check_tutorial_message(QT_T_RANKUP)) {
+        if (check_tutorial_message("qt_tutorial_rankup")) {
             return;
         }
     }
@@ -401,75 +567,111 @@ maybe_tutorial(void)
     }
     if (!firstturn) {
         if (incdec > 0) {
-            if (check_tutorial_message(QT_T_ABILUP)) {
+            if (check_tutorial_message("qt_tutorial_abilup")) {
                 return;
             }
         }
         if (incdec < 0) {
-            if (check_tutorial_message(QT_T_ABILDOWN)) {
+            if (check_tutorial_message("qt_tutorial_abildown")) {
                 return;
             }
         }
     }
     if (u.uac < oldac && oldac != 300) {
-        if (check_tutorial_message(QT_T_ACIMPROVED)) {
+        if (check_tutorial_message("qt_tutorial_acimproved")) {
             return;
         }
     }
     oldac = u.uac;
     if (Confusion || Sick || Blind || Stunned || Hallucination || Slimed) {
-        if (check_tutorial_message(QT_T_STATUS)) return;
+        if (check_tutorial_message("qt_tutorial_status")) {
+            return;
+        }
     }
     if (u.uz.dlevel >= 2) {
-        if (check_tutorial_message(QT_T_DLEVELCHANGE)) return;
+        if (check_tutorial_message("qt_tutorial_dlevelchange")) {
+            return;
+        }
     }
     if (u.uz.dlevel >= 10) {
-        if (check_tutorial_message(QT_T_DGN_OVERVIEW)) return;
+        if (check_tutorial_message("qt_tutorial_dgn_overview")) {
+            return;
+        }
     }
     if (u.uhp < u.uhpmax) {
-        if (check_tutorial_message(QT_T_DAMAGED)) return;
+        if (check_tutorial_message("qt_tutorial_damaged")) {
+            return;
+        }
     }
     if (u.uen < u.uenmax) {
-        if (check_tutorial_message(QT_T_PWUSED)) return;
+        if (check_tutorial_message("qt_tutorial_pwused")) {
+            return;
+        }
     }
     if (u.uen < 5 && u.uenmax > 10) {
-        if (check_tutorial_message(QT_T_PWEMPTY)) return;
+        if (check_tutorial_message("qt_tutorial_pwempty")) {
+            return;
+        }
     }
     if (u.umonster != u.umonnum) {
-        if (check_tutorial_message(QT_T_POLYSELF)) return;
+        if (check_tutorial_message("qt_tutorial_polyself")) {
+            return;
+        }
     }
     if (u.uexp > 0) {
-        if (check_tutorial_message(QT_T_GAINEDEXP)) return;
+        if (check_tutorial_message("qt_tutorial_gainedexp")) {
+            return;
+        }
     }
     if (u.uhs >= HUNGRY) {
-        if (check_tutorial_message(QT_T_HUNGER)) return;
+        if (check_tutorial_message("qt_tutorial_hunger")) {
+            return;
+        }
     }
     if (u.uhs <= SATIATED) {
-        if (check_tutorial_message(QT_T_SATIATION)) return;
+        if (check_tutorial_message("qt_tutorial_satiation")) {
+            return;
+        }
     }
     if (can_advance_something()) {
-        if (check_tutorial_message(QT_T_ENHANCE)) return;
+        if (check_tutorial_message("qt_tutorial_enhance")) {
+            return;
+        }
     }
     if (u.uswallow) {
-        if (check_tutorial_message(QT_T_ENGULFED)) return;
+        if (check_tutorial_message("qt_tutorial_engulfed")) {
+            return;
+        }
     }
     if (near_capacity() > UNENCUMBERED) {
-        if (check_tutorial_message(QT_T_BURDEN)) return;
+        if (check_tutorial_message("qt_tutorial_burden")) {
+            return;
+        }
     }
     if (in_trouble() > 0 && can_pray(0) && !IS_ALTAR(levl[u.ux][u.uy].typ)) {
-        if (check_tutorial_message(QT_T_MAJORTROUBLE)) return;
+        if (check_tutorial_message("qt_tutorial_majortrouble")) {
+            return;
+        }
     }
     if (inside_shop(u.ux, u.uy)) {
-        if (check_tutorial_message(QT_T_SHOPENTRY)) return;
+        if (check_tutorial_message("qt_tutorial_shopentry")) {
+            return;
+        }
     }
     if (u.uz.dnum == mines_dnum) {
-        if (check_tutorial_message(QT_T_MINES)) return;
+        if (check_tutorial_message("qt_tutorial_mines")) {
+            return;
+        }
     }
     if (u.uz.dnum == sokoban_dnum) {
-        if (check_tutorial_message(QT_T_SOKOBAN)) return;
+        if (check_tutorial_message("qt_tutorial_sokoban")) {
+            return;
+        }
     }
-    if (check_tutorial_command_message == QT_T_FIRE) {
-        if (check_tutorial_message(QT_T_FIRE)) return;
+    if (check_tutorial_command_message && !strcmp(check_tutorial_command_message, "qt_tutorial_fire")) {
+        if (check_tutorial_message("qt_tutorial_fire")) {
+            return;
+        }
     }
     /* Item-dependent events. */
     {
@@ -478,18 +680,26 @@ maybe_tutorial(void)
         struct obj *otmp;
         for (otmp = invent; otmp; otmp = otmp->nobj) {
             if (otmp->bknown && otmp->cursed) {
-                if (check_tutorial_message(QT_T_EQUIPCURSE)) return;
+                if (check_tutorial_message("qt_tutorial_equipcurse")) {
+                    return;
+                }
             }
 #ifdef MAIL
             if (otmp->otyp == SCR_MAIL) {
-                if (check_tutorial_message(QT_T_MAILSCROLL)) return;
+                if (check_tutorial_message("qt_tutorial_mailscroll")) {
+                    return;
+                }
             }
 #endif
             if (otmp->oartifact) {
-                if (check_tutorial_message(QT_T_ARTIFACT)) return;
+                if (check_tutorial_message("qt_tutorial_artifact")) {
+                    return;
+                }
             }
             if (otmp->unpaid) {
-                if (check_tutorial_message(QT_T_SHOPBUY)) return;
+                if (check_tutorial_message("qt_tutorial_shopbuy")) {
+                    return;
+                }
             }
             if (!objects[otmp->otyp].oc_name_known) {
                 switch (objects[otmp->otyp].oc_class) {
@@ -519,7 +729,7 @@ maybe_tutorial(void)
                 /* fall through */
                 case RING_CLASS:
                 case AMULET_CLASS:
-                    if (check_tutorial_message(QT_T_RANDAPPEARANCE)) {
+                    if (check_tutorial_message("qt_tutorial_randappearance")) {
                         return;
                     }
                     break;
@@ -545,7 +755,7 @@ maybe_tutorial(void)
             case ICE_BOX:
             case OILSKIN_SACK:
             case BAG_OF_HOLDING:
-                if (check_tutorial_message(QT_T_ITEM_CONTAINER)) {
+                if (check_tutorial_message("qt_tutorial_item_container")) {
                     return;
                 }
                 break;
@@ -598,7 +808,7 @@ maybe_tutorial(void)
                     if (otmp == uwep) {
                         break;
                     }
-                    if (check_tutorial_message(QT_T_THROWNWEAPONS)) {
+                    if (check_tutorial_message("qt_tutorial_thrownweapons")) {
                         return;
                     }
                     break;
@@ -607,7 +817,9 @@ maybe_tutorial(void)
             }
         }
         if (projectile_groups & launcher_groups) {
-            if (check_tutorial_message(QT_T_PROJECTILES)) return;
+            if (check_tutorial_message("qt_tutorial_projectiles")) {
+                return;
+            }
         }
     }
     /* Items on the current square. */
@@ -618,7 +830,7 @@ maybe_tutorial(void)
             case LARGE_BOX:
             case CHEST:
             case ICE_BOX:
-                if (check_tutorial_message(QT_T_ITEM_CONTAINER)) {
+                if (check_tutorial_message("qt_tutorial_item_container")) {
                     return;
                 }
                 break;
@@ -628,23 +840,35 @@ maybe_tutorial(void)
     }
     /* Ambient messages that only come up outside combat */
     if (time_since_combat > 5) {
-        if (check_tutorial_command_message > 0) {
-            if (check_tutorial_message(check_tutorial_command_message)) return;
+        if (check_tutorial_command_message) {
+            if (check_tutorial_message(check_tutorial_command_message)) {
+                return;
+            }
         }
         if (moves >= 10) {
-            if (check_tutorial_message(QT_T_VIEWTUTORIAL)) return;
+            if (check_tutorial_message("qt_tutorial_viewtutorial")) {
+                return;
+            }
         }
         if (moves >= 30) {
-            if (check_tutorial_message(QT_T_CHECK_ITEMS)) return;
+            if (check_tutorial_message("qt_tutorial_check_items")) {
+                return;
+            }
         }
         if (moves >= 60) {
-            if (check_tutorial_message(QT_T_OBJECTIVE)) return;
+            if (check_tutorial_message("qt_tutorial_objective")) {
+                return;
+            }
         }
         if (moves >= 100) {
-            if (check_tutorial_message(QT_T_SAVELOAD)) return;
+            if (check_tutorial_message("qt_tutorial_saveload")) {
+                return;
+            }
         }
         if (moves >= 150) {
-            if (check_tutorial_message(QT_T_MESSAGERECALL)) return;
+            if (check_tutorial_message("qt_tutorial_messagerecall")) {
+                return;
+            }
         }
     }
 }
@@ -658,14 +882,15 @@ tutorial_redisplay(void)
     int c;
     menu_item *s;
     start_menu(tempwin);
-    for (i.a_int = QT_T_FIRST; i.a_int <= QT_T_MAX; i.a_int++) {
-        if (pl_tutorial[i.a_int - QT_T_FIRST] > 0) {
-            static char namebuf[80];
-            const char* name;
-            qt_com_firstline(i.a_int, namebuf);
+    for (i.a_int = 0; i.a_int < SIZE(pl_tutorial); i.a_int++) {
+        if (pl_tutorial[i.a_int] > 0) {
+            char *name = qt_com_firstline(qt_tutorial_messages[i.a_int]);
+            const char *menu_entry;
             /* adding 10 to namebuf removes the 'Tutorial: ' at the start */
-            name = *namebuf ? namebuf + 10 : "(not found)";
-            add_menu(tempwin, NO_GLYPH, MENU_DEFCNT, &i, 0, 0, ATR_NONE, name, FALSE);
+            menu_entry = name ? name + 10 : "(not found)";
+            i.a_int++;
+            add_menu(tempwin, NO_GLYPH, MENU_DEFCNT, &i, 0, 0, ATR_NONE, menu_entry, FALSE);
+            free(name);
         }
     }
     end_menu(tempwin, "Which tutorial?");
@@ -677,7 +902,7 @@ tutorial_redisplay(void)
     i.a_int = s[0].item.a_int;
     free((genericptr_t)s);
     flush_screen(1);
-    com_pager(i.a_int);
+    com_pager(qt_tutorial_messages[i.a_int - 1]);
     destroy_nhwindow(tempwin);
     return 0;
 }

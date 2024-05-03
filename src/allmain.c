@@ -881,8 +881,7 @@ newgame(void)
         display_file_area(NEWS_AREA, NEWS, FALSE);
     }
 #endif
-    load_qtlist();  /* load up the quest text info */
-/*  quest_init();*/ /* Now part of role_init() */
+    /* quest_init();  --  Now part of role_init() */
 
     mklev();
     u_on_upstairs();
@@ -910,11 +909,8 @@ newgame(void)
 
     if (flags.legacy) {
         flush_screen(1);
-        if (Role_if(PM_CONVICT)) {
-            com_pager(199);
-        } else {
-            com_pager(1);
-        }
+        const char *legacy_text = Role_if(PM_CONVICT) ? "legacy_convict" : "legacy";
+        com_pager(legacy_text);
     }
 
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)

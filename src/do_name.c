@@ -1508,7 +1508,7 @@ docall(struct obj *obj)
         return;
     }
     flush_screen(1); /* buffered updates might matter to player's response */
-    check_tutorial_message(QT_T_CALLITEM);
+    check_tutorial_message("qt_tutorial_callitem");
 
     if (obj->oclass == POTION_CLASS && obj->fromsink) {
         /* kludge, meaning it's sink water */

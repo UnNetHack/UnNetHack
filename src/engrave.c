@@ -497,7 +497,7 @@ read_engr_at(coordxy x, coordxy y)
                 nomul(0, 0);
             }
             if (moves > 5) {
-                check_tutorial_message(QT_T_ENGRAVING);
+                check_tutorial_message("qt_tutorial_engraving");
             }
         }
     }

@@ -324,7 +324,7 @@ addinv_core1(struct obj *obj)
                 warning("already have quest artifact?");
             }
             u.uhave.questart = 1;
-            artitouch();
+            artitouch(obj);
         }
         set_artifact_intrinsic(obj, 1, W_ART);
     }
@@ -1182,7 +1182,7 @@ getobj(const char *let, const char *word)
             Sprintf(qbuf, "What do you want to %s? [%s or ?*]",
                     word, buf);
         }
-        check_tutorial_message(QT_T_CHOOSEITEM);
+        check_tutorial_message("qt_tutorial_chooseitem");
 #ifdef REDO
         if (in_doagain) {
             ilet = readchar();

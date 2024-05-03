@@ -1891,11 +1891,12 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             if (uarmh) {
                 You("sense something being blocked by %s.", yname(uarmh));
             }
-        } else if (u.uevent.qcalled) {
-            com_pager(Role_if(PM_ROGUE) ? 4 : 3);
-        } else {
-            com_pager(2);
-            u.uevent.qcalled = TRUE;
+        } else if (!u.uevent.qcalled) {
+            u.uevent.qcalled = 1;
+            /* main "leader needs help" message */
+            com_pager("quest_portal");
+        } else { /* reminder message */
+            com_pager(Role_if(PM_ROGUE) ? "quest_portal_demand" : "quest_portal_again");
         }
     }
 

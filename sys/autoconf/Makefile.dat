@@ -11,7 +11,7 @@ EXEEXT = @EXEEXT@
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 # UUDECODE=uudecode
 
-VARDAT = data rumors quest.dat oracles options vaults.dat
+VARDAT = data rumors oracles options vaults.dat
 LEVCOMP_FLAGS=
 
 all:	$(VARDAT) spec_levs quest_levs dungeon
@@ -275,9 +275,6 @@ data:	data.base ../util/makedefs$(EXEEXT)
 
 rumors:	rumors.tru rumors.fal ../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -r
-
-quest.dat:	quest.txt ../util/makedefs$(EXEEXT)
-	../util/makedefs$(EXEEXT) -q
 
 oracles:	oracles.txt ../util/makedefs$(EXEEXT)
 	../util/makedefs$(EXEEXT) -h

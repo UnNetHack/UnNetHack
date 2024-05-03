@@ -5,16 +5,17 @@
 #ifndef QUEST_H
 #define QUEST_H
 
-struct q_score {            /* Quest "scorecard" */
-    Bitfield(first_start, 1);    /* only set the first time */
-    Bitfield(met_leader, 1);     /* has met the leader */
-    Bitfield(not_ready, 3);      /* rejected due to alignment, etc. */
-    Bitfield(pissed_off, 1);     /* got the leader angry */
-    Bitfield(got_quest, 1);      /* got the quest assignment */
+struct q_score {              /* Quest "scorecard" */
+    Bitfield(first_start, 1); /* only set the first time */
+    Bitfield(met_leader, 1);  /* has met the leader */
+    Bitfield(not_ready, 3);   /* rejected due to alignment, etc. */
+    Bitfield(pissed_off, 1);  /* got the leader angry */
+    Bitfield(got_quest, 1);   /* got the quest assignment */
+    Bitfield(killed_leader, 1); /* killed the quest leader */
 
-    Bitfield(first_locate, 1);   /* only set the first time */
-    Bitfield(met_intermed, 1);   /* used if the locate is a person. */
-    Bitfield(got_final, 1);      /* got the final quest assignment */
+    Bitfield(first_locate, 1); /* only set the first time */
+    Bitfield(met_intermed, 1); /* used if the locate is a person. */
+    Bitfield(got_final, 1);    /* got the final quest assignment */
 
     Bitfield(made_goal, 3);      /* # of times on goal level */
     Bitfield(met_nemesis, 1);    /* has met the nemesis before */
@@ -39,7 +40,6 @@ struct q_score {            /* Quest "scorecard" */
     unsigned leader_m_id;
 };
 
-#define MAX_QUEST_TRIES  7  /* exceed this and you "fail" */
 #define MIN_QUEST_ALIGN  3  /* at least this align.record to start */
 /* note: align 3 matches "aligned" as reported by enlightenment (cmd.c) */
 #define MIN_QUEST_LEVEL 10  /* at least this u.ulevel to start */

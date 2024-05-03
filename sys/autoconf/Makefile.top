@@ -95,7 +95,7 @@ CNF_SHARE_PROXYND = gltile64.png gltile32.png gltile16.png \
 # CNF_SHARE_DATND = $(CNF_SHARE_PROXYND)
 CNF_SHARE_DATND = @CNF_SHARE_DATND@
 
-CNF_SHARE_DATD = data oracles @OPTIONS_FILES@ quest.dat rumors vaults.dat nhcore.lua nhlib.lua
+CNF_SHARE_DATD = data oracles @OPTIONS_FILES@ quest.lua rumors vaults.dat nhcore.lua nhlib.lua
 CNF_SHARE_DAT = $(CNF_SHARE_DATD) $(CNF_SHARE_DATND)
 
 # Some versions of make use the SHELL environment variable as the shell
@@ -173,8 +173,7 @@ nhcore.lua: $(GAME)
 
 nhlib.lua: $(GAME)
 
-quest.dat: $(GAME)
-	( cd dat ; $(MAKE) quest.dat )
+quest.lua: $(GAME)
 
 spec_levs: $(GAME)
 	( cd util ; $(MAKE) lev_comp$(EXEEXT) )
@@ -298,9 +297,6 @@ dofiles-nodlb:
 update: $(GAME) recover$(EXEEXT) $(CNF_SHARE_DAT) dungeon spec_levs @GUIDEBOOK_TXT@
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(DESTDIR)$(FILE_AREA_UNSHARE)/$(GAME) $(DESTDIR)$(FILE_AREA_UNSHARE)/$(GAME).old
-#	quest.dat is also kept open and has the same problems over NFS
-#	(quest.dat may be inside nhushare if dlb is in use)
-	-mv $(DESTDIR)$(FILE_AREA_UNSHARE)/quest.dat $(DESTDIR)$(FILE_AREA_UNSHARE)/quest.dat.old
 	-mv $(DESTDIR)$(FILE_AREA_UNSHARE)/nhushare $(DESTDIR)$(FILE_AREA_UNSHARE)/nhushare.old
 # set up new versions of the game files
 	( $(MAKE) dofiles )

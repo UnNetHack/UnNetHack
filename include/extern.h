@@ -2208,7 +2208,7 @@ extern char *piousness(boolean, const char *);
 
 extern void onquest(void);
 extern void nemdead(void);
-extern void artitouch(void);
+extern void artitouch(struct obj *) NONNULLARG1;
 extern boolean ok_to_quest(void);
 extern void leader_speaks(struct monst *);
 extern void nemesis_speaks(void);
@@ -2219,15 +2219,14 @@ extern void finish_quest(struct obj *);
 
 /* ### questpgr.c ### */
 
-extern void load_qtlist(void);
-extern void unload_qtlist(void);
 extern short quest_info(int);
 extern const char *ldrname(void);
 extern boolean is_quest_artifact(struct obj*);
-extern void com_pager(int);
-extern void qt_pager(int);
+extern struct obj *find_quest_artifact(unsigned);
+extern void com_pager(const char *);
+extern void qt_pager(const char *);
 extern char *string_subst(char *);
-extern void qt_com_firstline(int, char*);
+extern char *qt_com_firstline(const char *);
 extern void deliver_splev_message(void);
 
 /* ### random.c ### */
@@ -3254,7 +3253,7 @@ extern void livelog_printf(unsigned int, const char *, ...) PRINTF_F(2, 3);
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
 
 /* ### tutorial.c ### */
-extern boolean check_tutorial_message(int);
+extern boolean check_tutorial_message(const char *);
 extern void maybe_tutorial(void);
 extern int tutorial_redisplay(void);
 extern void tutorial_redisplay_message(void);

@@ -931,7 +931,7 @@ die:
     }
 
     if (how < PANICKED) {
-        check_tutorial_message(QT_T_DEATH);
+        check_tutorial_message("qt_tutorial_death");
     }
 
     if (strcmp(flags.end_disclose, "none") && how != PANICKED) {

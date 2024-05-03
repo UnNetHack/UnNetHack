@@ -46,7 +46,7 @@ struct dgn_topology dungeon_topology = { 0 };
 struct q_score quest_status = DUMMY;
 
 #include "qtext.h"
-NEARDATA char pl_tutorial[QT_T_MAX-QT_T_FIRST+1] = {0};
+char pl_tutorial[QT_T_MAX] ={ 0 };
 
 NEARDATA int smeq[MAXNROFROOMS+1] = DUMMY;
 NEARDATA int doorindex = 0;
