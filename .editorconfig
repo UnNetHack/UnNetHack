@@ -18,6 +18,9 @@ indent_style = tab
 [dat/*.des]
 trim_trailing_whitespace = false
 
+[dat/*.lua]
+trim_trailing_whitespace = false
+
 [dat/data.base]
 max_line_length=78
 
