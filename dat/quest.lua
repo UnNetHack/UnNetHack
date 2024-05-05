@@ -1,9 +1,10 @@
+-- NetHack may be freely redistributed.  See license for details.
 -- TODO:
 --  - output = "verbalize"
 --  - export the quest string replacements to lua, instead of %H etc
 --  - allow checking if hero is carrying item (see comments for %Cp Arc 00042)
 --  - fold quest_portal, quest_portal_again, quest_portal_demand into one
---  - some roles have no goal_alt, fold into goal_next?
+--  - write tests to check questtext validity?
 --  - qt_pager hack(?): if (qt_msg->delivery == 'p' && strcmp(windowprocs.name, "X11"))
 
 
@@ -24,6 +25,10 @@
 
 
 questtext = {
+   -- If a role doesn't have a specific message, try a fallback
+   msg_fallbacks = {
+      goal_alt = "goal_next"
+   },
    common = {
       TEST_PATTERN = {
          output = "text",
@@ -121,7 +126,7 @@ Go now!  You are banished from this place.]],
          "\"Thy gaze is so vacant, I thought thee a floating eye!\"",
          "\"Thy head is unfit for a mind flayer to munch upon!\"",
          "\"Only thy reflection could love thee!\"",
-         "\"Hast thou considered masking thy odor?\"",
+         "\"Hast thou considered masking thine odour?\"",
          "\"Hold! Thy face is a most exquisite torture!\"",
          "\"I wouldst fart in thy direction, but it might improve thy smell!\"",
       },
@@ -171,6 +176,7 @@ the sake of us all:  Go bravely with %d!]],
 essential in locating the Amulet of Yendor."]],
       },
       quest_portal = {
+         output = "pline",
          text = [[You receive a faint telepathic message from %l:
 Your help is urgently needed at %H!
 Look for a ...ic transporter.
@@ -2348,7 +2354,7 @@ taught you."]],
       },
       firsttime = {
          synopsis = "[You arrive at %H, but all is not well.]",
-         output = "menu",
+         output = "text",
          text = [[You are suddenly in familiar surroundings.  The buildings in the distance
 seem to be those of your old alma mater, but something is wrong.  It feels
 as if there has been a riot recently, or %H has
@@ -2360,7 +2366,7 @@ the entrance.
 Strange forbidding shapes seem to be moving in the distance.]],
       },
       goal_alt = {
-         text = "The have returned to %ns lair.",
+         text = "You have returned to %ns lair.",
       },
       goal_first = {
          synopsis = "[This strange feeling must be the presence of %o.]",
@@ -2574,7 +2580,7 @@ defeat %ni."]],
       },
       firsttime = {
          synopsis = "[You reach the vicinity of %H, but sense evil magic nearby.]",
-         output = "menu",
+         output = "text",
          text = [[Warily you scan your surroundings, all of your senses alert for signs
 of possible danger.  Off in the distance, you can %x the familiar shapes
 of %H.
@@ -2812,7 +2818,7 @@ a difficult quest as that I propose to give you.
       },
       firsttime = {
          synopsis = "[You arrive back at %H, but something is wrong here.]",
-         output = "menu",
+         output = "text",
          text = [[You descend through a barely familiar stairwell that you remember
 %l showing you when you embarked upon your vision quest.
 
@@ -3244,7 +3250,7 @@ with good conscience.
          "\"I will impale your head on my caduceus for all to see.\"",
          "\"There is no materia medica in your sack which will cure you of me!\"",
          "\"Do not fight too hard, I want your soul strong, not weakened!\"",
-         "\"You should have stopped studying at vetenary.\"",
+         "\"You should have stopped studying at veterinary.\"",
       },
       encourage = {
          "\"Remember, %p, to always wash your hands before operating.\"",
@@ -3260,7 +3266,7 @@ with good conscience.
       },
       firsttime = {
          synopsis = "[You arrive back at %H and must find %l.]",
-         output = "menu",
+         output = "text",
          text = [[What sorcery has brought you back to %H?  The smell
 of fresh funeral pyres tells you that something is amiss with the healing
 powers that used to practice here.
@@ -3497,7 +3503,7 @@ Our presence when thou hast attained the noble title of %R."]],
       },
       firsttime = {
          synopsis = "[Signs of battle include long gouges in the walls of %H.]",
-         output = "menu",
+         output = "text",
          text = [[You materialize in the shadows of %H.  Immediately, you notice
 that something is wrong.  The fields around the castle are trampled and
 withered, as if some great battle has been recently fought.
@@ -3707,12 +3713,12 @@ return when you have attained the post of %R."]],
       },
       firsttime = {
          synopsis = "[You have reached %H but something is wrong.  %lC needs your aid.]",
-         output = "menu",
+         output = "text",
          text = [[You find yourself standing in sight of %H.
 Something is obviously wrong here.  Strange shapes lumber around
 outside %H!
 
-You realize that the %l needs your assistance!]],
+You realize that %l needs your assistance!]],
       },
       goal_first = {
          synopsis = "[You are surrounded by brimstone, lava, and elementals.]",
@@ -3795,7 +3801,7 @@ as you have failed us utterly."]],
          synopsis = "[You have reached %i.  %nC lurks further ahead.]",
          output = "text",
          text = [[You remember the descriptions of %i, given
-to you by the %l.  It is ahead that you will find
+to you by %l.  It is ahead that you will find
 %n's trail.]],
       },
       locate_next = {
@@ -3920,7 +3926,7 @@ when you have attained the post of %R."]],
       },
       firsttime = {
          synopsis = "[You are at %H; the doors are closed.  %lC needs your help!]",
-         output = "menu",
+         output = "text",
          text = [[You find yourself standing in sight of %H.  Something
 is obviously wrong here.  The doors to %H, which usually
 stand open, are closed.  Strange human shapes shamble around
@@ -4143,7 +4149,7 @@ which we need you to do.  %RA might just be able to do this thing.
       },
       firsttime = {
          synopsis = "[The ancient forest grove is surrounded by centaurs.]",
-         output = "menu",
+         output = "text",
          text = [[You arrive in familiar surroundings.  In the distance, you %x the
 ancient forest grove, the place of worship to %d.
 
@@ -4363,7 +4369,7 @@ leave you, %p?  Oh yeah, I remember, I was going to kill you!"]],
       },
       firsttime = {
          synopsis = "[You are in Ransmannsby, where you trained.  Find %l.]",
-         output = "menu",
+         output = "text",
          text = [[Unexpectedly, you find yourself back in Ransmannsby, where you trained to
 be a thief.  Quickly you make the guild sign, hoping that you AND word
 of your arrival reach %ls den.]],
@@ -4579,7 +4585,7 @@ are ready, return to me."]],
       },
       firsttime = {
          synopsis = "[The banner of %n flies above town.  What has happened to %l?]",
-         output = "menu",
+         output = "text",
          text = [[Even before your senses adjust, you recognize the kami of
 %H.
 
@@ -4670,7 +4676,7 @@ become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"]],
 being my vassal?"]],
       },
       leader_other = {
-         synopsis = "[Are you truely a samurai?]",
+         synopsis = "[Are you truly a samurai?]",
          output = "text",
          text = [["You begin to test my matsu, %p-san.
 If you cannot determine what I want in a samurai, how can I rely on you
@@ -4811,7 +4817,7 @@ you will be ready.
       },
       firsttime = {
          synopsis = "[You find yourself back at %H, but the quiet is ominous.]",
-         output = "menu",
+         output = "text",
          text = [[You breathe a sigh of relief as you find yourself back in the familiar
 surroundings of %H.
 
@@ -4910,7 +4916,7 @@ the handiwork of %ns henchlings everywhere.]],
 %o from me!
 
 "It only proves how desperate he has become that he sends %ra to
-try and defeat me.  When this day is over, I will have you enslaved
+try to defeat me.  When this day is over, I will have you enslaved
 in the mines where you will rue the day that you ever entered
 %i."]],
       },
@@ -5032,7 +5038,7 @@ Only when you have returned %Ra will you be able to defeat %n."]],
       },
       firsttime = {
          synopsis = "[You arrive below %H.  Something is wrong; there is lava present.]",
-         output = "menu",
+         output = "text",
          text = [[You materialize at the base of a snowy hill.  Atop the hill sits
 a place you know well, %H.  You immediately realize
 that something here is very wrong!
@@ -5249,7 +5255,7 @@ renown as %Ra."]],
       },
       firsttime = {
          synopsis = "[You have arrived at %ls tower but something is very wrong.]",
-         output = "menu",
+         output = "text",
          text = [[You are suddenly in familiar surroundings.  You notice what appears to
 be a large, squat stone structure nearby.  Wait!  That looks like the
 tower of your former teacher, %l.
