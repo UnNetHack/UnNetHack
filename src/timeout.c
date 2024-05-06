@@ -1999,6 +1999,7 @@ run_timers(void)
             (curr->arg.a_obj)->timed--;
         }
         (*timeout_funcs[curr->func_index].f)(&curr->arg, curr->timeout);
+        (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
         free((genericptr_t) curr);
     }
 }
@@ -2063,6 +2064,7 @@ start_timer(long int when, short int kind, short int func_index, anything *arg)
 long
 stop_timer(short int func_index, anything *arg)
 {
+    timeout_proc cleanup_func;
     timer_element *doomed;
     long timeout;
 
@@ -2073,9 +2075,10 @@ stop_timer(short int func_index, anything *arg)
         if (doomed->kind == TIMER_OBJECT) {
             (arg->a_obj)->timed--;
         }
-        if (timeout_funcs[doomed->func_index].cleanup) {
-            (*timeout_funcs[doomed->func_index].cleanup)(arg, timeout);
+        if ((cleanup_func = timeout_funcs[doomed->func_index].cleanup) != 0) {
+            (*cleanup_func)(arg, timeout);
         }
+        (void) memset((genericptr_t) doomed, 0, sizeof(timer_element));
         free((genericptr_t) doomed);
         return (timeout - monstermoves);
     }
@@ -2147,6 +2150,7 @@ obj_split_timers(struct obj *src, struct obj *dest)
 void
 obj_stop_timers(struct obj *obj)
 {
+    timeout_proc cleanup_func;
     timer_element *curr, *prev, *next_timer=0;
 
     for (prev = 0, curr = timer_base; curr; curr = next_timer) {
@@ -2157,10 +2161,10 @@ obj_stop_timers(struct obj *obj)
             } else {
                 timer_base = curr->next;
             }
-            if (timeout_funcs[curr->func_index].cleanup) {
-                (*timeout_funcs[curr->func_index].cleanup)(&curr->arg,
-                                                           curr->timeout);
+            if ((cleanup_func = timeout_funcs[curr->func_index].cleanup) != 0) {
+                (*cleanup_func)(&curr->arg, curr->timeout);
             }
+            (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
             free((genericptr_t) curr);
         } else {
             prev = curr;
@@ -2187,6 +2191,7 @@ obj_has_timer(struct obj *object, short int timer_type)
 void
 spot_stop_timers(coordxy x, coordxy y, short int func_index)
 {
+    timeout_proc cleanup_func;
     timer_element *curr, *prev, *next_timer = 0;
     long where = (((long) x << 16) | ((long) y));
 
@@ -2199,10 +2204,10 @@ spot_stop_timers(coordxy x, coordxy y, short int func_index)
             } else {
                 timer_base = curr->next;
             }
-            if (timeout_funcs[curr->func_index].cleanup) {
-                (*timeout_funcs[curr->func_index].cleanup)(&curr->arg,
-                                                           curr->timeout);
+            if ((cleanup_func = timeout_funcs[curr->func_index].cleanup) != 0) {
+                (*cleanup_func)(&curr->arg, curr->timeout);
             }
+            (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
             free((genericptr_t) curr);
         } else {
             prev = curr;
@@ -2486,6 +2491,7 @@ save_timers(NHFILE* nhfp, int range)
                 } else {
                     timer_base = curr->next;
                 }
+                (void) memset((genericptr_t) curr, 0, sizeof(timer_element));
                 free((genericptr_t) curr);
                 /* prev stays the same */
             } else {
