@@ -1830,10 +1830,17 @@ static const char *
 kind_name(short int kind)
 {
     switch (kind) {
-    case TIMER_LEVEL: return "level";
-    case TIMER_GLOBAL: return "global";
-    case TIMER_OBJECT: return "object";
-    case TIMER_MONSTER: return "monster";
+    case TIMER_NONE:
+        impossible("no timer type");
+        return "none";
+    case TIMER_LEVEL:
+        return "level";
+    case TIMER_GLOBAL:
+        return "global";
+    case TIMER_OBJECT:
+        return "object";
+    case TIMER_MONSTER:
+        return "monster";
     }
     return "unknown";
 }
@@ -2013,7 +2020,10 @@ start_timer(long int when, short int kind, short int func_index, anything *arg)
 {
     timer_element *gnu, *dup;
 
-    if (kind < 0 || kind >= NUM_TIMER_KINDS || func_index < 0 || func_index >= NUM_TIME_FUNCS) {
+    if (kind <= TIMER_NONE ||
+         kind >= NUM_TIMER_KINDS ||
+         func_index < 0 ||
+         func_index >= NUM_TIME_FUNCS) {
         panic("start_timer (%s: %d)", kind_name(kind), (int) func_index);
     }
 
