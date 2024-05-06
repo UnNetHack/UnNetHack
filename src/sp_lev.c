@@ -1385,6 +1385,10 @@ is_ok_location(coordxy x, coordxy y, getloc_flags_t humidity)
         return TRUE;
     }
 
+    if ((humidity & DRY) && IS_SWAMP(typ)) {
+        return FALSE;
+    }
+
     if ((humidity & (DRY|SPACELOC)) && SPACE_POS(typ)) {
         boolean bould = (sobj_at(BOULDER, x, y) != NULL);
 
