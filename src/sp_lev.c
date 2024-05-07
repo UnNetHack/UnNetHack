@@ -1444,9 +1444,16 @@ get_location_coord(
     c = get_unpacked_coord(crd, humidity);
     *x = c.x;
     *y = c.y;
+
+    if (c.getloc_flags & STAIRS_LOC) {
+        set_ok_location_func(good_stair_loc);
+    }
     get_location(x, y, c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0), croom);
     if (*x == -1 && *y == -1 && c.is_random) {
         get_location(x, y, humidity, croom);
+    }
+    if (c.getloc_flags & STAIRS_LOC) {
+        set_ok_location_func(NULL);
     }
 }
 

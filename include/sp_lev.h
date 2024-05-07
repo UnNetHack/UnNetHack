@@ -279,6 +279,7 @@ enum corefuncs {
 #define ANY_LOC      0x10 /* even outside the level */
 #define NO_LOC_WARN  0x20 /* no complaints and set x & y to -1, if no loc */
 #define SPACELOC     0x40 /* like DRY, but accepts furniture too */
+#define STAIRS_LOC   0x80 /* suitable for stairs */
 
 #define SP_COORD_X(l)   ((int8_t)(l & 0xff))
 #define SP_COORD_Y(l)   ((int8_t)((l >> 16) & 0xff))

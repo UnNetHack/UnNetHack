@@ -3506,7 +3506,7 @@ spo_stair(struct sp_coder *coder)
         return;
     }
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(scoord));
+    get_location_coord(&x, &y, DRY | STAIRS_LOC, coder->croom, OV_i(scoord));
     if ((badtrap = t_at(x, y)) != 0) {
         deltrap(badtrap);
     }
