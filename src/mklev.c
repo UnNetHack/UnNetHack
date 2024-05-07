@@ -19,6 +19,9 @@
 /* conversion of result to int is reasonable */
 
 
+static boolean generate_stairs_room_good(struct mkroom *, int);
+static struct mkroom *generate_stairs_find_room(void);
+static void generate_stairs(void);
 static void mkfount(int, struct mkroom *);
 static boolean find_okay_roompos(struct mkroom *, coord *);
 static void mksink(struct mkroom *);
@@ -1045,11 +1048,9 @@ skip_nonrogue:
 static void
 makelevel(void)
 {
-    struct mkroom *croom, *troom;
-    int tryct;
+    struct mkroom *croom;
     branch *branchp;
     int room_threshold;
-    coord pos;
 
     if (wiz1_level.dlevel == 0) {
         init_dungeons();
@@ -1118,35 +1119,7 @@ makelevel(void)
     makerooms();
     /*sort_rooms();*/ /* messes up roomno order. */
 
-    /* construct stairs (up and down in different rooms if possible) */
-    tryct = 0;
-    do {
-        croom = &rooms[rn2(nroom)];
-    } while (!croom->needjoining && ++tryct < 100);
-    if (!Is_botlevel(&u.uz)) {
-        if (!somexyspace(croom, &pos, 0)) {
-            pos.x = somex(croom);
-            pos.y = somey(croom);
-        }
-        mkstairs(pos.x, pos.y, 0, croom, FALSE); /* down */
-    }
-    if (nroom > 1) {
-        troom = croom;
-        tryct = 0;
-        do {
-            croom = &rooms[rn2(nroom-1)];
-        } while ((!croom->needjoining || (croom == troom)) && ++tryct < 100);
-    }
-
-    if (u.uz.dlevel != 1) {
-        if (!somexyspace(croom, &pos, 0)) {
-            if (!somexy(croom, &pos)) {
-                pos.x = somex(croom);
-                pos.y = somey(croom);
-            }
-        }
-        mkstairs(pos.x, pos.y, 1, croom, FALSE); /* up */
-    }
+    generate_stairs(); /* up and down stairs */
 
     branchp = Is_branchlev(&u.uz);  /* possible dungeon branch */
     room_threshold = branchp ? 4 : 3; /* minimum number of rooms needed
@@ -1928,6 +1901,98 @@ mkstairs(
 
     levl[x][y].typ = STAIRS;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
+}
+
+/* is room a good one to generate up or down stairs in? */
+static boolean
+generate_stairs_room_good(struct mkroom *croom, int phase)
+{
+    /*
+     * phase values, smaller allows for more relaxed criteria:
+     *  2 == no relaxed criteria;
+     *  1 == allow a themed room;
+     *  0 == allow same room as existing up/downstairs;
+     * -1 == allow an unjoined room.
+     */
+    return (croom && (croom->needjoining || (phase < 0)) &&
+            ((!has_dnstairs(croom) && !has_upstairs(croom)) || phase < 1) &&
+            (croom->rtype == OROOM || ((phase < 2) && croom->rtype == THEMEROOM)));
+}
+
+/* find a good room to generate an up or down stairs in */
+static struct mkroom *
+generate_stairs_find_room(void)
+{
+    struct mkroom *croom;
+    int i, phase, ai;
+    int *rmarr;
+
+    if (!nroom) {
+        return (struct mkroom *) 0;
+    }
+
+    rmarr = (int *) alloc(sizeof(int) * nroom);
+
+    for (phase = 2; phase > -1; phase--) {
+        ai = 0;
+        for (i = 0; i < nroom; i++) {
+            if (generate_stairs_room_good(&rooms[i], phase)) {
+                rmarr[ai++] = i;
+            }
+        }
+
+        if (ai > 0) {
+            i = rmarr[rn2(ai)];
+            free(rmarr);
+            return &rooms[i];
+        }
+    }
+
+    free(rmarr);
+    croom = &rooms[rn2(nroom)];
+    return croom;
+}
+
+
+/* construct stairs up and down within the same branch,
+   up and down in different rooms if possible */
+static void
+generate_stairs(void)
+{
+    /* generate_stairs_find_room() returns Null if nroom == 0, but that
+       should never happen for a rooms+corridors style level */
+    static const char
+        gen_stairs_panic[] = "generate_stairs: failed to find a room! (%d)";
+    struct mkroom *croom;
+    coord pos;
+
+    if (!Is_botlevel(&u.uz)) {
+        if ((croom = generate_stairs_find_room()) == NULL) {
+            panic(gen_stairs_panic, nroom);
+        }
+
+        if (!somexyspace(croom, &pos, 0)) {
+            pos.x = somex(croom);
+            pos.y = somey(croom);
+        }
+        mkstairs(pos.x, pos.y, 0, croom, FALSE); /* down */
+    }
+
+    if (u.uz.dlevel != 1) {
+        /* if there is only 1 room and we found it above, this will find
+           it again */
+        if ((croom = generate_stairs_find_room()) == NULL) {
+            panic(gen_stairs_panic, nroom);
+        }
+
+        if (!somexyspace(croom, &pos, 0)) {
+            if (!somexy(croom, &pos)) {
+                pos.x = somex(croom);
+                pos.y = somey(croom);
+            }
+        }
+        mkstairs(pos.x, pos.y, 1, croom, FALSE); /* up */
+    }
 }
 
 static void
