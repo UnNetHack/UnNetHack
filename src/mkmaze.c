@@ -400,6 +400,7 @@ bad_location(
                       within_bounded_area(x, y, nlx, nly, nhx, nhy) ||
                       !((levl[x][y].typ == CORR && level.flags.is_maze_lev) ||
                         levl[x][y].typ == ROOM ||
+                        levl[x][y].typ == ICE ||
                         levl[x][y].typ == AIR));
 }
 
