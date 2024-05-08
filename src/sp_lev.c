@@ -1389,12 +1389,14 @@ is_ok_location(coordxy x, coordxy y, getloc_flags_t humidity)
         return FALSE;
     }
 
-    if ((humidity & (DRY|SPACELOC)) && SPACE_POS(typ)) {
-        boolean bould = (sobj_at(BOULDER, x, y) != NULL);
-
-        if (!bould || (bould && (humidity & SOLID))) {
+    if (humidity & DRY) {
+        if (typ == ROOM || typ == AIR || typ == CLOUD || typ == ICE || typ == CORR) {
             return TRUE;
         }
+    }
+
+    if ((humidity & SPACELOC) && SPACE_POS(typ)) {
+        return TRUE;
     }
     if ((humidity & WET) && is_pool(x, y)) {
         return TRUE;
