@@ -20,7 +20,7 @@ static int extend_spine(int [3][3], int, int, int);
 static boolean okay(coordxy, coordxy, int);
 static void maze0xy(coord *);
 static boolean put_lregion_here(coordxy, coordxy, coordxy,
-                                coordxy, coordxy, coordxy, xint16, boolean, d_level *, coordxy);
+                                coordxy, coordxy, coordxy, xint16, boolean, d_level *);
 static void move(coordxy *, coordxy *, int);
 static void setup_waterlevel(void);
 static void unsetup_waterlevel(void);
@@ -31,6 +31,7 @@ static void migrate_orc(struct monst *, unsigned long);
 static void stolen_booty(void);
 static boolean maze_inbounds(coordxy, coordxy);
 static void maze_remove_deadends(xint16);
+static boolean is_exclusion_zone(xint16, coordxy, coordxy);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -373,22 +374,33 @@ maze0xy(coord *cc)
     return;
 }
 
-boolean
-bad_location(coordxy x, coordxy y, coordxy lx, coordxy ly, coordxy hx, coordxy hy, coordxy lax)
+static boolean
+is_exclusion_zone(xint16 type, coordxy x, coordxy y)
 {
-    return((boolean)(t_at(x, y) || invocation_pos(x, y) ||
-                     within_bounded_area(x, y, lx, ly, hx, hy) ||
-                     (lax < 2 && IS_FURNITURE(levl[x][y].typ)) ||
-                     !((levl[x][y].typ == CORR && level.flags.is_maze_lev) ||
-                       levl[x][y].typ == ROOM || levl[x][y].typ == AIR ||
-                       (lax && (levl[x][y].typ == ICE || levl[x][y].typ == CLOUD)) ||
-                       ((lax > 1) && (ACCESSIBLE(levl[x][y].typ) &&
-                                      levl[x][y].typ != STAIRS &&
-                                      levl[x][y].typ != LADDER)) ||
-                       ((lax > 2) && (levl[x][y].typ == POOL || levl[x][y].typ == MOAT ||
-                                      levl[x][y].typ == WATER || levl[x][y].typ == LAVAPOOL ||
-                                      levl[x][y].typ == BOG))
-                       )));
+    struct exclusion_zone *ez = ge.exclusion_zones;
+
+    while (ez) {
+        if (((type == LR_DOWNTELE && (ez->zonetype == LR_DOWNTELE || ez->zonetype == LR_TELE)) ||
+              (type == LR_UPTELE && (ez->zonetype == LR_UPTELE || ez->zonetype == LR_TELE)) ||
+              type == ez->zonetype) &&
+             within_bounded_area(x, y, ez->lx, ez->ly, ez->hx, ez->hy)) {
+            return TRUE;
+        }
+        ez = ez->next;
+    }
+    return FALSE;
+}
+
+boolean
+bad_location(
+    coordxy x, coordxy y,
+    coordxy nlx, coordxy nly, coordxy nhx, coordxy nhy)
+{
+    return (boolean) (occupied(x, y) ||
+                      within_bounded_area(x, y, nlx, nly, nhx, nhy) ||
+                      !((levl[x][y].typ == CORR && level.flags.is_maze_lev) ||
+                        levl[x][y].typ == ROOM ||
+                        levl[x][y].typ == AIR));
 }
 
 /** Pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
@@ -405,7 +417,6 @@ place_lregion(
     int trycnt;
     boolean oneshot;
     coordxy x, y;
-    int lax = 0;
 
     if (!lx) { /* default to whole level */
         /*
@@ -423,27 +434,25 @@ place_lregion(
         hy = ROWNO - 1;
     }
 
-    do {
-        /* first a probabilistic approach */
-        oneshot = (lx == hx && ly == hy);
-        for (trycnt = 0; trycnt < 200; trycnt++) {
-            x = rn1((hx - lx) + 1, lx);
-            y = rn1((hy - ly) + 1, ly);
-            if (put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev, lax)) {
+    /* first a probabilistic approach */
+    oneshot = (lx == hx && ly == hy);
+    for (trycnt = 0; trycnt < 200; trycnt++) {
+        x = rn1((hx - lx) + 1, lx);
+        y = rn1((hy - ly) + 1, ly);
+        if (put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev)) {
+            return TRUE;
+        }
+    }
+
+    /* then a deterministic one */
+    oneshot = TRUE;
+    for (x = lx; x <= hx; x++) {
+        for (y = ly; y <= hy; y++) {
+            if (put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev)) {
                 return TRUE;
             }
         }
-
-        /* then a deterministic one */
-        oneshot = TRUE;
-        for (x = lx; x <= hx; x++) {
-            for (y = ly; y <= hy; y++) {
-                if (put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev, lax)) {
-                    return TRUE;
-                }
-            }
-        }
-    } while (lax++ < 4);
+    }
 
     return FALSE;
 }
@@ -454,12 +463,11 @@ put_lregion_here(
     coordxy nhx, coordxy nhy,
     xint16 rtype,
     boolean oneshot,
-    d_level *lev,
-    coordxy lax)
+    d_level *lev)
 {
     struct monst *mtmp;
 
-    if (bad_location(x, y, nlx, nly, nhx, nhy, lax)) {
+    if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
         if (!oneshot) {
             return FALSE;   /* caller should try again */
         } else {
@@ -471,7 +479,7 @@ put_lregion_here(
             if (t && t->ttyp != MAGIC_PORTAL && t->ttyp != VIBRATING_SQUARE) {
                 deltrap(t);
             }
-            if (bad_location(x, y, nlx, nly, nhx, nhy, lax)) {
+            if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
                 return FALSE;
             }
         }

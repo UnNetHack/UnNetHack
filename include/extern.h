@@ -1396,7 +1396,7 @@ extern void mazexy(coord *);
 extern void get_level_extends(coordxy *, coordxy *, coordxy *, coordxy *) NONNULLPTRS;
 extern void bound_digging(void);
 extern void mkportal(coordxy, coordxy, xint16, xint16);
-extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
+extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
 extern int place_lregion(coordxy, coordxy, coordxy, coordxy,
                     coordxy, coordxy, coordxy, coordxy,
                     xint16, d_level *);
