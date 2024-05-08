@@ -1517,6 +1517,7 @@ reset_oattached_mids(boolean ghostly)
 {
     struct obj *otmp;
     unsigned oldid, nid;
+
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
         if (ghostly && has_omonst(otmp)) {
             struct monst *mtmp = OMONST(otmp);
@@ -1525,11 +1526,9 @@ reset_oattached_mids(boolean ghostly)
             mtmp->mpeaceful = mtmp->mtame = 0; /* pet's owner died! */
         }
         if (ghostly && has_omid(otmp)) {
-            (void) memcpy((genericptr_t) &oldid, (genericptr_t) OMID(otmp),
-                          sizeof(oldid));
+            oldid = OMID(otmp);
             if (lookup_id_mapping(oldid, &nid)) {
-                (void) memcpy((genericptr_t) OMID(otmp), (genericptr_t) &nid,
-                              sizeof(nid));
+                OMID(otmp) = nid;
             } else {
                 free_omid(otmp);
             }

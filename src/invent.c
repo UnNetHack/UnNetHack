@@ -3896,8 +3896,8 @@ mergable(struct obj *otmp, struct obj *obj) /* returns TRUE if obj  & otmp can b
     }
 
     /* for the moment, any additional information is incompatible */
-    if (has_omonst(obj) || has_omid(obj) || has_olong(obj) || has_omonst(otmp)
-        || has_omid(otmp) || has_olong(otmp)) {
+    if (has_omonst(obj) || has_omid(obj) ||
+         has_omonst(otmp) || has_omid(otmp)) {
         return FALSE;
     }
 

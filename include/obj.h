@@ -20,9 +20,8 @@ union vptrs {
 struct oextra {
     char *oname;          /* ptr to name of object */
     struct monst *omonst; /* ptr to attached monst struct */
-    unsigned *omid;       /* ptr to m_id */
-    long *olong;          /* ptr to misc long (temporary gold object) */
-    char *omailcmd;       /* response_cmd for mail deliver */
+    char *omailcmd;       /* response_cmd for mail delivery */
+    unsigned omid;        /* for corpse: m_id of corpse's ghost; overloaded */
 };
 
 struct obj {
@@ -139,16 +138,14 @@ struct obj {
  */
 
 #define ONAME(o) ((o)->oextra->oname)
-#define OMID(o) ((o)->oextra->omid)
 #define OMONST(o) ((o)->oextra->omonst)
-#define OLONG(o) ((o)->oextra->olong)
 #define OMAILCMD(o) ((o)->oextra->omailcmd)
+#define OMID(o) ((o)->oextra->omid) /* non-zero => set, zero => not set */
 
 #define has_oname(o) ((o)->oextra && ONAME(o))
-#define has_omid(o) ((o)->oextra && OMID(o))
 #define has_omonst(o) ((o)->oextra && OMONST(o))
-#define has_olong(o) ((o)->oextra && OLONG(o))
 #define has_omailcmd(o) ((o)->oextra && OMAILCMD(o))
+#define has_omid(o) ((o)->oextra && OMID(o))
 
 /* Weapons and weapon-tools */
 /* KMH -- now based on skill categories.  Formerly:

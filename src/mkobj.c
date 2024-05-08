@@ -88,7 +88,6 @@ newoextra(void)
     oextra->oname = 0;
     oextra->omonst = 0;
     oextra->omid = 0;
-    oextra->olong = 0;
     oextra->omailcmd = 0;
     return oextra;
 }
@@ -104,12 +103,6 @@ dealloc_oextra(struct obj *o)
         }
         if (x->omonst) {
             free_omonst(o);     /* 'o' rather than 'x' */
-        }
-        if (x->omid) {
-            free((genericptr_t) x->omid);
-        }
-        if (x->olong) {
-            free((genericptr_t) x->olong);
         }
         if (x->omailcmd) {
             free((genericptr_t) x->omailcmd);
@@ -157,40 +150,13 @@ newomid(struct obj *otmp)
     if (!otmp->oextra) {
         otmp->oextra = newoextra();
     }
-    if (!OMID(otmp)) {
-        OMID(otmp) = (unsigned *) alloc(sizeof (unsigned));
-        (void) memset((genericptr_t) OMID(otmp), 0, sizeof (unsigned));
-    }
+    OMID(otmp) = 0;
 }
 
 void
 free_omid(struct obj *otmp)
 {
-    if (otmp->oextra && OMID(otmp)) {
-        free((genericptr_t) OMID(otmp));
-        OMID(otmp) = (unsigned *) 0;
-    }
-}
-
-void
-newolong(struct obj *otmp)
-{
-    if (!otmp->oextra) {
-        otmp->oextra = newoextra();
-    }
-    if (!OLONG(otmp)) {
-        OLONG(otmp) = (long *) alloc(sizeof (long));
-        (void) memset((genericptr_t) OLONG(otmp), 0, sizeof (long));
-    }
-}
-
-void
-free_olong(struct obj *otmp)
-{
-    if (otmp->oextra && OLONG(otmp)) {
-        free((genericptr_t) OLONG(otmp));
-        OLONG(otmp) = (long *) 0;
-    }
+    OMID(otmp) = 0;
 }
 
 void
@@ -433,22 +399,14 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
             copy_mextra(OMONST(obj2), OMONST(obj1));
         }
     }
+    if (has_omailcmd(obj1)) {
+        new_omailcmd(obj2, OMAILCMD(obj1));
+    }
     if (has_omid(obj1)) {
         if (!OMID(obj2)) {
             newomid(obj2);
         }
-        (void) memcpy((genericptr_t) OMID(obj2), (genericptr_t) OMID(obj1),
-                      sizeof (unsigned));
-    }
-    if (has_olong(obj1)) {
-        if (!OLONG(obj2)) {
-            newolong(obj2);
-        }
-        (void) memcpy((genericptr_t) OLONG(obj2), (genericptr_t) OLONG(obj1),
-                      sizeof (long));
-    }
-    if (has_omailcmd(obj1)) {
-        new_omailcmd(obj2, OMAILCMD(obj1));
+        OMID(obj2) = OMID(obj1);
     }
 }
 
@@ -1776,7 +1734,7 @@ obj_attach_mid(struct obj *obj, unsigned int mid)
         return (struct obj *) 0;
     }
     newomid(obj);
-    *OMID(obj) = mid;
+    OMID(obj) = mid;
     return obj;
 }
 

@@ -1972,9 +1972,6 @@ size_obj(struct obj *otmp)
         if (OMID(otmp)) {
             sz += (int) sizeof (unsigned);
         }
-        if (OLONG(otmp)) {
-            sz += (int) sizeof (long);
-        }
         if (OMAILCMD(otmp)) {
             sz += (int) strlen(OMAILCMD(otmp)) + 1;
         }
