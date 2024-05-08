@@ -48,7 +48,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x06001000L   /* 6.0.10-e0 */
+#define VERSION_COMPATIBILITY 0x06000A00L   /* 6.0.10-e0 */
 
 
 /*****************************************************************************/
