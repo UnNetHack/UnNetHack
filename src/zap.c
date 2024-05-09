@@ -1112,6 +1112,10 @@ remove_corpse(struct obj *corpse)
             break;
         }
         /* fall through */
+    case OBJ_FREE:
+    case OBJ_MIGRATING:
+    case OBJ_ONBILL:
+    case OBJ_LUAFREE:
     default:
         panic("remove_corpse");
     }

@@ -27,6 +27,7 @@ static int l_obj_timer_peek(lua_State *);
 static int l_obj_timer_stop(lua_State *);
 static int l_obj_timer_start(lua_State *);
 static int l_obj_bury(lua_State *);
+static struct _lua_obj *l_obj_push(lua_State *, struct obj *);
 
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 
@@ -132,9 +133,10 @@ l_obj_add_to_container(lua_State *L)
 
     /* was lo->obj merged? */
     if (otmp != lo->obj) {
-        lo->obj->lua_ref_cnt += refs;
         lo->obj = otmp;
+        lo->obj->lua_ref_cnt += refs;
     }
+    lobox->obj->owt = weight(lobox->obj);
 
     return 0;
 }

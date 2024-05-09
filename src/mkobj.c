@@ -438,22 +438,30 @@ splitobj(struct obj *obj, long int num)
     obj->owt = weight(obj);
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
+    otmp->lua_ref_cnt = 0;
     otmp->picked_up_turn = 0;
 
     context_objsplit.parent_oid = obj->o_id;
     context_objsplit.child_oid = otmp->o_id;
     obj->nobj = otmp;
-    /* Only set nexthere when on the floor, nexthere is also used */
-    /* as a back pointer to the container object when contained. */
+    /* Only set nexthere when on the floor, nexthere is also used
+       as a back pointer to the container object when contained.
+       For either case, otmp's nexthere pointer is already pointing
+       at the right thing. */
     if (obj->where == OBJ_FLOOR) {
-        obj->nexthere = otmp;
+        obj->nexthere = otmp; /* insert into chain: obj -> otmp -> next */
     }
-    copy_oextra(otmp, obj);
-    if (has_omid(otmp)) {
-        free_omid(otmp); /* only one association with m_id*/
+    /* lua isn't tracking the split off portion even if it happens to
+       be tracking the original */
+    if (otmp->where == OBJ_LUAFREE) {
+        otmp->where = OBJ_FREE;
     }
     if (obj->unpaid) {
         splitbill(obj, otmp);
+    }
+    copy_oextra(otmp, obj);
+    if (has_omid(otmp)) {
+        free_omid(otmp); /* only one association with m_id */
     }
     if (obj->timed) {
         obj_split_timers(obj, otmp);
@@ -827,6 +835,7 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp->otyp = otyp;
     otmp->where = OBJ_FREE;
     otmp->dknown = index(dknowns, let) ? 0 : 1;
+    otmp->lua_ref_cnt = 0;
     if (otmp->otyp == AMULET_OF_YENDOR) {
         otmp->orecursive = FALSE;
     }
@@ -2118,13 +2127,14 @@ discard_minvent(struct monst *mtmp)
  *      OBJ_MIGRATING   migrating chain
  *      OBJ_BURIED      level.buriedobjs chain
  *      OBJ_ONBILL      on billobjs chain
- *      OBJ_FREE        not on any list
+ *      OBJ_LUAFREE     obj is dealloc'd from core, but still used by lua
  */
 void
 obj_extract_self(struct obj *obj)
 {
     switch (obj->where) {
     case OBJ_FREE:
+    case OBJ_LUAFREE:
         break;
     case OBJ_FLOOR:
         remove_object(obj);
@@ -2319,7 +2329,7 @@ container_weight(struct obj *container)
 void
 dealloc_obj(struct obj *obj)
 {
-    if (obj->where != OBJ_FREE) {
+    if (obj->where != OBJ_FREE && obj->where != OBJ_LUAFREE) {
         panic("dealloc_obj: obj not free (%d,%d,%d)", obj->where, obj->otyp, obj->invlet);
     }
     if (obj->nobj) {
@@ -2355,6 +2365,11 @@ dealloc_obj(struct obj *obj)
 
     if (obj->oextra) {
         dealloc_oextra(obj);
+    }
+    if (obj->lua_ref_cnt) {
+        /* obj is referenced from a lua script, let lua gc free it */
+        obj->where = OBJ_LUAFREE;
+        return;
     }
     free((genericptr_t) obj);
 }
