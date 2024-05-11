@@ -226,6 +226,9 @@ dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
             pline_The("altar is too hard to break apart.");
         }
         return FALSE;
+    } else if (IS_MAGIC_PLATFORM(levl[x][y].typ)) {
+        pline_The("magic platform resists your effort.");
+        return FALSE;
     } else if (Is_airlevel(&u.uz)) {
         if (verbose) {
             You("cannot %s thin air.", verb);
@@ -882,7 +885,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     struct trap *ttmp;
     struct rm *lev;
     struct obj *boulder_here;
-    schar typ;
+    schar typ, old_typ;
     coordxy dig_x, dig_y;
     boolean nohole;
 
@@ -900,9 +903,11 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     ttmp = t_at(dig_x, dig_y);
     lev = &levl[dig_x][dig_y];
     nohole = (!Can_dig_down(&u.uz) && !lev->candig);
+    old_typ = lev->typ;
 
     if ((ttmp && (ttmp->ttyp == MAGIC_PORTAL ||
                   ttmp->ttyp == VIBRATING_SQUARE || nohole)) ||
+        (IS_MAGIC_PLATFORM(old_typ)) ||
         /* ALI - artifact doors */
         (IS_DOOR(levl[dig_x][dig_y].typ) && artifact_door(dig_x, dig_y)) ||
         (IS_ROCK(lev->typ) && lev->typ != SDOOR &&

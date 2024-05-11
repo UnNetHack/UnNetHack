@@ -269,6 +269,23 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
                     }
                 }
             }
+        } else if (offset == S_magicplatform && iflags.use_color) {
+            if (Role_if(PM_VALKYRIE) && Is_qlocate(&u.uz)) {
+                static int rainbow_bridge_colors[] = {
+                    CLR_RED,
+                    CLR_ORANGE,
+                    CLR_YELLOW,
+                    CLR_BRIGHT_GREEN,
+                    CLR_BLUE,
+                    CLR_BRIGHT_MAGENTA,
+                };
+                /* this makes some assumptions about Val-loca.lua's map */
+                if (y >= 8 && y <= 13) {
+                    /* this additionally assumes platform colors beyond default are in
+                     * ROYGBV order */
+                    color = rainbow_bridge_colors[y - 8];
+                }
+            }
         } else
 #endif
         cmap_color(offset);

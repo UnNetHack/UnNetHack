@@ -245,6 +245,7 @@ struct symdef defsyms[MAXPCHARS] = {
        { '}', "water",      C(CLR_BLUE) },   /* pool */
        { '.', "ice",        C(CLR_CYAN) },   /* ice */
        { '}', "muddy swamp",    C(CLR_GREEN) },  /* muddy swamp, bog */
+       { '.', "magic platform", C(CLR_GRAY) },  /* magic platform */
        { '}', "molten lava",    C(CLR_RED) },    /* lava */
        { '.', "lowered drawbridge", C(CLR_BROWN) },   /* vodbridge */
        { '.', "lowered drawbridge", C(CLR_BROWN) },   /* hodbridge */
@@ -365,6 +366,7 @@ static glyph_t ibm_graphics[MAXPCHARS] = {
     0xf7,   /* S_pool:  meta-w, approx. equals */
     0xfa,   /* S_ice:   meta-z, centered dot */
     0xf7,   /* S_bog:   meta-w, approx. equals */
+    0xfa,   /* S_magic_platform: meta-z, centered dot */
     0xf7,   /* S_lava:  meta-w, approx. equals */
     0xfa,   /* S_vodbridge: meta-z, centered dot */
     0xfa,   /* S_hodbridge: meta-z, centered dot */
@@ -473,6 +475,7 @@ static glyph_t dec_graphics[MAXPCHARS] = {
     0xe0,   /* S_pool:  meta-\, diamond */
     0xfe,   /* S_ice:   meta-~, centered dot */
     0xe0,   /* S_bog:   meta-\, diamond */
+    0xfa,   /* S_magic_platform: meta-~, centered dot */
     0xe0,   /* S_lava:  meta-\, diamond */
     0xfe,   /* S_vodbridge: meta-~, centered dot */
     0xfe,   /* S_hodbridge: meta-~, centered dot */
@@ -579,6 +582,7 @@ static glyph_t mac_graphics[MAXPCHARS] = {
     0xe0,   /* S_pool */
     g_FILLER(S_ice),
     g_FILLER(S_bog),
+    g_FILLER(S_magic_platform),
     g_FILLER(S_lava),
     g_FILLER(S_vodbridge),
     g_FILLER(S_hodbridge),
@@ -687,6 +691,7 @@ static glyph_t utf8_graphics[MAXPCHARS] = {
     0x224b, /* S_pool:  TRIPLE TILDE */
     0x00b7, /* S_ice:   MIDDLE DOT */
     0x224b, /* S_bog:   TRIPLE TILDE */
+    0x00b7, /* S_magic_platform: MIDDLE DOT */
     0x224b, /* S_lava:  TRIPLE TILDE */
     0x00b7, /* S_vodbridge: MIDDLE DOT */
     0x00b7, /* S_hodbridge: MIDDLE DOT */

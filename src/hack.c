@@ -3723,8 +3723,9 @@ lookaround(void)
             }
 
             /*  More boring cases that don't interrupt anything. */
-            if (IS_ROCK(levl[x][y].typ) || (levl[x][y].typ == ROOM) ||
-                IS_AIR(levl[x][y].typ)) {
+            if (IS_ROCK(levl[x][y].typ) || levl[x][y].typ == ROOM ||
+                 IS_AIR(levl[x][y].typ) || levl[x][y].typ == ICE ||
+                 IS_MAGIC_PLATFORM(levl[x][y].typ)) {
                 continue;
             } else if (closed_door(x, y) ||
                         (mtmp && is_door_mappear(mtmp))) {

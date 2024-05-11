@@ -677,6 +677,9 @@ engrave(const char *engraving, boolean fingers)
     if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) /* in bubble */) {
         You_cant("write in thin air!");
         return 0;
+    } else if (IS_MAGIC_PLATFORM(levl[u.ux][u.uy].typ)) {
+        You_cant("make any mark on the magic surface.");
+        return FALSE;
     } else if (!accessible(u.ux, u.uy)) {
         /* stone, tree, wall, secret corridor, pool, lava, bars */
         You_cant("write here.");

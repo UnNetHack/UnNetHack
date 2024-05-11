@@ -354,6 +354,7 @@ const struct {
                 { 'T', TREE },
                 { 'F', IRONBARS }, /* Fe = iron */
                 { ',', ROOM }, /* TODO: grass */
+                { 'p', MAGIC_PLATFORM },
                 { 'x', MAX_TYPE }, /* "see-through" */
                 { 'B', CROSSWALL }, /* hack: boundary location */
                 { 'w', MATCH_WALL }, /* IS_STWALL() */

@@ -1322,6 +1322,7 @@ static const char *levltyp[] = {
     "drawbridge up", "lava pool", "iron bars", "door", "corridor", "room",
     "stairs", "ladder", "fountain", "throne", "sink", "grave", "altar", "ice",
     "swamp",
+    "magic platform",
     "drawbridge down", "air", "cloud",
     /* not a real terrain type, but used for undiggable stone
        by wiz_map_levltyp() */

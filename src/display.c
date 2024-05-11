@@ -2146,6 +2146,9 @@ back_to_glyph(coordxy x, coordxy y)
     case THRONE:        idx = S_throne;   break;
     case LAVAPOOL:      idx = S_lava;     break;
     case ICE:       idx = S_ice;      break;
+    case MAGIC_PLATFORM:
+        idx = S_magicplatform;
+        break;
     case AIR:       idx = S_air;      break;
     case CLOUD:     idx = S_cloud;    break;
     case ICEWALL:       idx = S_icewall;  break;
@@ -2180,7 +2183,6 @@ back_to_glyph(coordxy x, coordxy y)
 
     return cmap_to_glyph(idx);
 }
-
 
 /*
  * swallow_to_glyph()
@@ -2317,7 +2319,6 @@ get_bk_glyph(coordxy x, coordxy y)
     }
     return bkglyph;
 }
-
 
 /* ------------------------------------------------------------------------- */
 /* Wall Angle -------------------------------------------------------------- */
@@ -3016,4 +3017,4 @@ do_crwall:
     return idx;
 }
 
-/*display.c*/
+/* display.c */

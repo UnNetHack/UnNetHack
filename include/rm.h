@@ -70,6 +70,7 @@ enum levl_typ_types {
     ALTAR,
     ICE,
     BOG,
+    MAGIC_PLATFORM,
     DRAWBRIDGE_DOWN,
     AIR,
     CLOUD,
@@ -109,6 +110,7 @@ enum levl_typ_types {
 #define IS_SWAMP(typ)   ((typ) == BOG)
 #define IS_DRAWBRIDGE(typ) ((typ) == DRAWBRIDGE_UP || (typ) == DRAWBRIDGE_DOWN)
 #define IS_FURNITURE(typ) ((typ) >= STAIRS && (typ) <= ALTAR)
+#define IS_MAGIC_PLATFORM(typ) ((typ) == MAGIC_PLATFORM)
 #define IS_AIR(typ) ((typ) == AIR || (typ) == CLOUD)
 #define IS_SOFT(typ)    ((typ) == AIR || (typ) == CLOUD || IS_POOL(typ) || (typ) == BOG)
 #define IS_LAVA(typ)    ((typ) == LAVAPOOL)
@@ -158,6 +160,7 @@ enum screen_symbols {
     S_pool,
     S_ice,
     S_bog,
+    S_magicplatform,
     S_lava,
     S_vodbridge,
     S_hodbridge,
