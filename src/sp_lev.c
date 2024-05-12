@@ -1035,7 +1035,11 @@ flip_level_rnd(int flp, boolean extras)
     /* Workaround for preventing the stairs to Vlad's tower appearing
      * in the wizard's tower because of a bug in level flipping. */
     if (On_W_tower_level(&u.uz)) {
-        flp &= 1;
+        c &= 1;
+    }
+
+    if (!In_sokoban(&u.uz)) {
+        c = 0;
     }
 
     if (c) {
