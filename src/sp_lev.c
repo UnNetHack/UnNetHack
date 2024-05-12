@@ -2492,7 +2492,10 @@ create_object(object *o, struct mkroom *croom)
                 if (otmp->otyp == SADDLE) {
                     put_saddle_on_mon(otmp, invent_carrying_monster);
                 } else {
-                    (void) mpickobj(invent_carrying_monster, otmp);
+                    if (mpickobj(invent_carrying_monster, otmp)) {
+                        /* otmp has been merged */
+                        return NULL;
+                    }
                 }
             }
         } else {
