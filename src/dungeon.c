@@ -1336,6 +1336,10 @@ find_level_beneath(const d_level *start, d_level *beneath)
     if (Is_stronghold((d_level *) start)) {
         /* special case for Castle */
         assign_level(beneath, &valley_level);
+    } else if (In_V_tower(start)) {
+        /* special case for Vlad's tower to fall down to the start of the branch */
+        *beneath = *start;
+        beneath->dlevel = dunlevs_in_dungeon(start);
     } else if (start->dlevel != dunlevs_in_dungeon((d_level *) start)) {
         /* if not on the bottom level of a branch, then fall to next lowest
          * level (not multiple levels as might happen with a trapdoor) */
