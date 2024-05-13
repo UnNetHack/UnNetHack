@@ -162,7 +162,75 @@ TRAP:random,$place[2]
 [75%]: OBJECT: ('(',"blindfold"),$place[3]
 TRAP:random,$place[3]
 
-PORTAL:(05,04,13,08),(0,0,0,0),"valley"
-
 # Walls in the tower are non diggable
 NON_DIGGABLE:(00,00,18,12)
+
+# Grounds and entrance to Vlad's tower
+LEVEL: "tower4"
+FLAGS: noteleport, hardfloor, mazelevel
+INIT_MAP: solidfill, ' '
+MESSAGE: "You stand before a sheer ravine, beyond which rises a windowless tower."
+
+GEOMETRY: center, center
+#         1         2         3         4         5         6         7
+#123456789012345678901234567890123456789012345678901234567890123456789012345
+MAP
+                                                                            
+                              .......................}}}}}}.......          
+                            ..t.......t..t.....t..T.}}}}}}..........        
+                          .....T...................}}}}}}......t......      
+  ---------------       ....t.......t....t...T......}}}}}.T.............    
+  |.............|     .....t....t.....t....t.........}}}}}....t...T.......  
+---.-----------.---  ..........................t......}}}}}T............... 
+|...|. ..... .|...| ..t..T...t..t......T..t.........T...}}}}}.............. 
+|.---.........---.| ..............t..t........t..........}}}}}..T.......... 
+|.|#+. ..... .S#|.| .......t........................T.....}}}}}............ 
+|.-----------+-+-.|....t......T.....t....t....t.......T..}}}}}..T.......... 
+|...|#########|...|......t.t....t......T.................##}#}##........... 
+---S|#-------------..t............t........t..t......T...#}#}###..T...t.... 
+}}|.F#########+|}}|......t..T....t....t.............T......}}}}}........... 
+}}---+---+---+--FFF.....t......t...........t..............}}}}}..T...t..... 
+ }}|..| |.| |..|}}    ....t.........T..........t........T.}}}}}......t....  
+ }}-+F---F---F--}}     ........t........t...T....t.....T..}}}}}.T.......    
+  }}}}}}}}}}}}}}}.      B...t.....t...........t..........}}}}}}...t...      
+   }}}}}}}}}}}}}. . . ..   .....t...t....t.........t..T.}}}}}}.T....        
+     ....  ....... . .       .................t........}}}}}}.....          
+         ..                                                                 
+ENDMAP
+
+NON_DIGGABLE: (00,00,75,20)
+
+DRAWBRIDGE: (16,13), west, closed
+DRAWBRIDGE: (17,13), east, open
+DOOR: closed, (14,13)
+
+DOOR: locked, (13,14)
+DOOR: locked, (09,14)
+DOOR: locked, (05,14)
+
+DOOR: locked, (13,10)
+DOOR: locked, (04,09)
+
+REGION: (40,10,40,10), lit, "ordinary", unfilled
+REGION: (68,10,68,10), lit, "ordinary", unfilled
+
+BRANCH: (73,10,73,10), (00,00,00,00)
+LADDER: (03,11), up
+
+MONSTER: ('@',"nurse"), (09,08), hostile, "Persephone"
+MONSTER: ('@',"nurse"), (08,08), hostile, "Nyx"
+MONSTER: ('@',"werewolf"), (10,08), hostile
+
+MONSTER: ('&',"pit fiend"), (03,13), hostile
+
+MONSTER: ('Z',"elf zombie"), (05,15), hostile
+MONSTER: ('Z',"elf zombie"), (04,15), hostile
+MONSTER: ('Z',"skeleton"), (09,15), hostile
+MONSTER: ('Z',"skeleton"), (13,15), hostile
+MONSTER: ('Z',"gnome zombie"), (14,15), hostile
+
+LOOP [10] {
+  MONSTER: ('B',"raven"), random, hostile
+  MONSTER: 'V', random, hostile
+  MONSTER: ('Z',"human zombie"), random, hostile
+}
