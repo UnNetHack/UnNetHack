@@ -3183,11 +3183,11 @@ float_down(long int hmask, long int emask) /**< might cancel timeout */
         return 1;
     }
 
-    if (Punished && !carried(uball) &&
+    if (Punished && !carried(uball) && !m_at(uball->ox, uball->oy) &&
         (is_pool(uball->ox, uball->oy) ||
+         is_open_air(uball->ox, uball->oy) ||
          ((trap = t_at(uball->ox, uball->oy)) &&
-          ((trap->ttyp == PIT) || (trap->ttyp == SPIKED_PIT) ||
-           (trap->ttyp == TRAPDOOR) || (trap->ttyp == HOLE))))) {
+          (is_pit(trap->ttyp) || is_hole(trap->ttyp))))) {
         u.ux0 = u.ux;
         u.uy0 = u.uy;
         u.ux = uball->ox;
@@ -3226,6 +3226,10 @@ float_down(long int hmask, long int emask) /**< might cancel timeout */
         }
         if (is_swamp(u.ux, u.uy) && !Wwalking) {
             (void) swamp_effects();
+            no_msg = TRUE;
+        }
+        if (is_open_air(u.ux, u.uy)) {
+            u_aireffects();
             no_msg = TRUE;
         }
     }

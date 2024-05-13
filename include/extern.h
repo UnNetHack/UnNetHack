@@ -243,6 +243,7 @@ extern boolean is_lava(coordxy, coordxy);
 extern boolean is_pool_or_lava(coordxy, coordxy);
 extern boolean is_ice(coordxy, coordxy);
 extern boolean is_moat(coordxy, coordxy);
+extern boolean is_open_air(coordxy, coordxy);
 extern boolean is_swamp(coordxy, coordxy);
 extern boolean is_icewall(coordxy, coordxy);
 extern boolean is_any_icewall(coordxy, coordxy);
@@ -404,6 +405,7 @@ extern int donull(void);
 extern int dowipe(void);
 extern void set_wounded_legs(long, int);
 extern void heal_legs(int);
+extern boolean obj_aireffects(struct obj *, boolean);
 
 /* ### do_name.c ### */
 
@@ -636,6 +638,7 @@ extern xint16 ledger_to_dnum(xint16);
 extern xint16 ledger_to_dlev(xint16);
 extern xint16 deepest_lev_reached(boolean);
 extern boolean on_level(d_level *, d_level *);
+extern void find_level_beneath(const d_level *, d_level *);
 extern void next_level(boolean);
 extern void prev_level(boolean);
 extern void u_on_newpos(coordxy, coordxy);
@@ -924,6 +927,7 @@ extern void switch_terrain(void);
 extern boolean pooleffects(boolean);
 extern void wounds_message(struct monst *);
 extern char *mon_wounds(struct monst *);
+extern void u_aireffects(void);
 extern void spoteffects(boolean);
 extern char *in_rooms(coordxy, coordxy, int);
 extern boolean in_town(coordxy, coordxy);
@@ -1583,6 +1587,7 @@ extern void golemeffects(struct monst *, int, int);
 extern boolean angry_guards(boolean);
 extern void pacify_guards(void);
 extern void decide_to_shapeshift(struct monst *, int);
+extern void mon_aireffects(struct monst *);
 
 /* ### mondata.c ### */
 

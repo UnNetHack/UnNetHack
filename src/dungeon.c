@@ -1327,6 +1327,37 @@ builds_up(d_level *lev)
                       && dptr->entry_lev == dptr->num_dunlevs);
 }
 
+/* get the next level beneath this one; if there is none (last level of a branch
+ * that builds down), return (0,0) */
+void
+find_level_beneath(const d_level *start, d_level *beneath)
+{
+    branch *br = Is_branchlev((d_level *) start);
+    if (Is_stronghold((d_level *) start)) {
+        /* special case for Castle */
+        assign_level(beneath, &valley_level);
+    } else if (start->dlevel != dunlevs_in_dungeon((d_level *) start)) {
+        /* if not on the bottom level of a branch, then fall to next lowest
+         * level (not multiple levels as might happen with a trapdoor) */
+        *beneath = *start;
+        beneath->dlevel++;
+    } else if (br && br->type == BR_STAIR && builds_up((d_level *) start)) {
+        /* In Vlad's Tower cavern (or theoretically some other branch that
+         * grows upwards and is physically connected to the parent branch by a
+         * stairway), fall to that parent branch level beneath it */
+        if (br->end1.dnum == start->dnum) {
+            *beneath = br->end2;
+        } else {
+            *beneath = br->end1;
+        }
+    } else {
+        /* on the bottom level of a branch that either doesn't grow upward or
+         * doesn't connect via a stair */
+        beneath->dnum = 0;
+        beneath->dlevel = 0;
+    }
+}
+
 /* goto the next level (or appropriate dungeon) */
 void
 next_level(boolean at_stairs)

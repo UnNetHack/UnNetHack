@@ -808,6 +808,8 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
        }
     } else if (is_lava(x, y) && !stopping_short) {
         Norep("You move over some lava.");
+    } else if (is_open_air(x, y) && !stopping_short) {
+        Norep("You pass over the chasm.");
     }
 
     /* FIXME:
@@ -1142,6 +1144,11 @@ petrify:
             thrownobj = 0;  /* now either gone or on floor */
             done(STONING);
             return obj ? TRUE : FALSE;
+        }
+        if (is_open_air(bhitpos.x, bhitpos.y)) {
+            thrownobj = 0;
+            losehp(dmg, "falling object", KILLED_BY_AN);
+            return FALSE;
         }
         hitfloor(obj, TRUE);
         thrownobj = 0;

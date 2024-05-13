@@ -398,6 +398,7 @@ bad_location(
 {
     return (boolean) (occupied(x, y) ||
                       within_bounded_area(x, y, nlx, nly, nhx, nhy) ||
+                      is_open_air(x, y) ||
                       !((levl[x][y].typ == CORR && level.flags.is_maze_lev) ||
                         levl[x][y].typ == ROOM ||
                         levl[x][y].typ == ICE ||

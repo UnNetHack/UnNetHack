@@ -36,6 +36,8 @@
 #define is_flyer(ptr)       (((ptr)->mflags1 & M1_FLY) != 0L)
 #define is_floater(ptr)     ((ptr)->mlet == S_EYE)
 #define is_clinger(ptr)     (((ptr)->mflags1 & M1_CLING) != 0L)
+#define grounded(ptr) (!is_flyer(ptr) && !is_floater(ptr) \
+                       && (!is_clinger(ptr) || !has_ceiling(&u.uz)))
 #define is_swimmer(ptr)     (((ptr)->mflags1 & M1_SWIM) != 0L)
 #define breathless(ptr)     (((ptr)->mflags1 & M1_BREATHLESS) != 0L)
 #define amphibious(ptr)     (((ptr)->mflags1 & (M1_AMPHIBIOUS | M1_BREATHLESS)) != 0L)

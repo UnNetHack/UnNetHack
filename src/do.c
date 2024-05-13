@@ -132,6 +132,20 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
             obfree(otmp, (struct obj *) 0);
         }
         return TRUE;
+    } else if (is_open_air(rx, ry)) {
+        coordxy ox = otmp->ox, oy = otmp->oy;
+        obj_extract_self(otmp);
+        otmp->ox = rx, otmp->oy = ry;
+        if (!obj_aireffects(otmp, (pushing || cansee(rx, ry)))) {
+            if (pushing) { /* put it back on the floor where it was */
+                place_object(otmp, ox, oy);
+            }
+            return FALSE;
+        }
+        maybe_unhide_at(ox, oy);
+        newsym(ox, oy);
+        newsym(rx, ry);
+        return TRUE;
     }
     return FALSE;
 }
@@ -206,7 +220,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
                 if (!Passes_walls && !throws_rocks(youmonst.data)) {
                     losehp(Maybe_Half_Phys(rnd(15)), "squished under a boulder",
                            NO_KILLER_PREFIX);
-                    return FALSE; /* player remains trapped */
+                    goto deletedwithboulder;
                 } else {
                     reset_utrap(TRUE);
                 }
@@ -229,6 +243,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
          * Note:  trap might have gone away via ((hmon -> killed -> xkilled)
          *  || mondied) -> mondead -> m_detach -> fill_pit.
          */
+deletedwithboulder:
         if ((t = t_at(x, y)) != 0) {
             deltrap(t);
         }
@@ -287,6 +302,10 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
                   the_your[t->madeby_u],
                   is_pit(t->ttyp) ? "pit" : "hole");
         }
+    } else if (is_open_air(x, y)) {
+        boolean res = obj_aireffects(obj, cansee(x, y));
+        newsym(x, y);
+        return res;
     }
     return FALSE;
 }
@@ -2401,6 +2420,73 @@ heal_legs(int how) /**< 0: ordinary, 1: dismounting steed, 2: limbs turn to ston
             (void) encumber_msg();
         }
     }
+}
+
+/* Object falls into open air. */
+boolean
+obj_aireffects(struct obj *obj, boolean talk)
+{
+    boolean fell = TRUE;
+    const char *it_falls = Tobjnam(obj, "fall"),
+               *disappears = otense(obj, "disappear");
+
+    if ((breaktest(obj) || !rn2(4)) &&
+        !(obj->oartifact || objects[obj->otyp].oc_unique || obj == uball || obj == uchain)) {
+        delobj(obj);
+        /* it will break, but no messages since it'll be really far away by
+         * then */
+    } else {
+        d_level dest;
+        find_level_beneath(&u.uz, &dest);
+        if (dest.dnum == 0 && dest.dlevel == 0) {
+            /* nowhere to fall to; avoid destroying Amulet etc. so they'll just
+             * weirdly hang there in midair */
+            if (objects[obj->otyp].oc_unique) {
+                if (talk) {
+                    pline("For some reason, %s %s in midair.",
+                          the(xname(obj)), otense(obj, "hover"));
+                }
+                fell = FALSE;
+            } else if (obj == uball || obj == uchain) {
+                if (obj == uball && !Levitation) {
+                    pline("%s away, dragging you into the abyss.", it_falls);
+                    /* force hero to fall now if the iron ball hasn't been
+                       thrown; throwit(dothrow.c) will move hero and call
+                       spoteffects later, so avoid duplication */
+                    if (uball != thrownobj) {
+                        u_aireffects();
+                    }
+                }
+                fell = FALSE;
+            } else {
+                delobj(obj);
+            }
+        } else {
+            if (obj == uball || obj == uchain) {
+                if (obj == uball && !Levitation) {
+                    pline("%s away, and %s you down with %s!",
+                          it_falls, otense(obj, "yank"),
+                          obj->quan > 1L ? "them" : "it");
+                    if (uball != thrownobj) {
+                        u_aireffects();
+                    }
+                }
+                fell = FALSE; /* either doesn't fall at all (if levitating),
+                               * or doesn't fall by itself */
+            } else {
+                add_to_migration(obj);
+                if (obj->otyp == BOULDER) {
+                    //obj->next_boulder = 0;
+                }
+                obj->ox = dest.dnum;
+                obj->oy = dest.dlevel;
+            }
+        }
+    }
+    if (fell && talk) {
+        pline("%s away and %s.", it_falls, disappears);
+    }
+    return fell;
 }
 
 /* return true if any unique item is on the floor or in monsters' possession */

@@ -759,7 +759,9 @@ nh_timeout(void)
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
                     flags.botl = 1;
-                    You("land.");
+                    if (!is_open_air(u.ux, u.uy)) {
+                        You("land.");
+                    }
                     spoteffects(TRUE);
                 }
                 break;

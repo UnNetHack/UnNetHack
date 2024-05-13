@@ -674,7 +674,8 @@ engrave(const char *engraving, boolean fingers)
         You_cant("write on the %s!", surface(u.ux, u.uy));
         return 0;
     }
-    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) /* in bubble */) {
+    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) || /* in bubble */
+         is_open_air(u.ux, u.uy)) {
         You_cant("write in thin air!");
         return 0;
     } else if (IS_MAGIC_PLATFORM(levl[u.ux][u.uy].typ)) {

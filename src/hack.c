@@ -1247,7 +1247,7 @@ testdiag:
         if ((t && t->tseen) ||
             (!Levitation && !Flying &&
              !is_clinger(youmonst.data) &&
-             (is_pool_or_lava(x, y) || is_swamp(x, y)) && levl[x][y].seenv)) {
+             (is_pool_or_lava(x, y) || is_open_air(x, y) || is_swamp(x, y)) && levl[x][y].seenv)) {
             if (mode == DO_MOVE) {
                 if (t && t->tseen) {
                     autoexplore_msg("a trap", mode);
@@ -1317,6 +1317,10 @@ testdiag:
             }
         }
         /* assume you'll be able to push it when you get there... */
+    }
+
+    if (flags.run && is_open_air(x, y)) {
+        return FALSE;
     }
 
     /* OK, it is a legal place to move. */
@@ -2202,7 +2206,7 @@ domove(void)
         if (((trap = t_at(x, y)) && trap->tseen) ||
             (Blind && !Levitation && !Flying &&
              !is_clinger(youmonst.data) &&
-             is_pool_or_lava(x, y) && levl[x][y].seenv)) {
+             (is_pool_or_lava(x, y) || is_open_air(x, y)) && levl[x][y].seenv)) {
             if (flags.run >= 2) {
                 if (iflags.mention_walls) {
                     if (trap && trap->tseen) {
@@ -3018,6 +3022,56 @@ pooleffects(boolean newspot) /**< TRUE if called by spoteffects */
     return FALSE;
 }
 
+/* like pooleffects but for open air */
+void
+u_aireffects(void)
+{
+    static boolean in_aireffects = FALSE;
+    d_level destination;
+
+    /* avoid being called twice: spoteffects -> aireffects -> dismount_steed ->
+     * float_down -> aireffects */
+    if (in_aireffects) {
+        return;
+    }
+    in_aireffects = TRUE;
+
+    find_level_beneath(&u.uz, &destination);
+    if (destination.dnum == 0 && destination.dlevel == 0) {
+        You("fall a few thousand feet to your death.");
+        /* if there's no lower level, then... well, you're done for */
+        Sprintf(killer.name, "fell to %s death", uhis());
+        killer.format = NO_KILLER_PREFIX;
+        done(DIED);
+        /* life-saved */
+        if (safe_teleds(TRUE)) {
+            ;
+        } else {
+            pline("Unfortunately, there is still nowhere safe to land.");
+            You("fall to your death again.");
+            Sprintf(killer.name, "fell to %s death", uhis());
+            killer.format = NO_KILLER_PREFIX;
+            done(DIED);
+        }
+    } else {
+        pline("Air currents pull you down!");
+        if (u.usteed) {
+            You("lose control of %s!", mon_nam(u.usteed));
+            /* DISMOUNT_FELL makes the most sense, but causes damage which can
+             * kill hero prematurely */
+            dismount_steed(DISMOUNT_GENERIC);
+        }
+        nomul(0, 0);
+        /* You can die here from touching a cockatrice corpse, but the
+         * interesting and unintended effect is that the bones (containing the
+         * statue of the player) will actually get saved on the level you fall
+         * to. Usually this wouldn't happen due to inter-branch levels and the
+         * bottom levels of branches being ineligible for bones, though. */
+        schedule_goto(&destination, UTOTYPE_FALLING, (char *) 0, (char *) 0);
+    }
+    in_aireffects = FALSE;
+}
+
 void
 spoteffects(boolean pick)
 {
@@ -3052,6 +3106,15 @@ spoteffects(boolean pick)
     }
 
     if (pooleffects(TRUE)) {
+        goto spotdone;
+    }
+
+    if (is_open_air(u.ux, u.uy) &&
+         !Levitation &&
+         /* normally won't fall if flying, unless iron ball is pulling you */
+         !(Flying && !(Punished && !carried(uball) && is_open_air(uball->ox, uball->oy))) &&
+         !(u.usteed && !grounded(u.usteed->data))) {
+        u_aireffects();
         goto spotdone;
     }
 

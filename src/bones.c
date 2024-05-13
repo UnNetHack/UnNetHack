@@ -384,6 +384,10 @@ can_make_bones(void)
     if (u.uswallow) {
         return FALSE;       /* no bones when swallowed */
     }
+    if (is_open_air(u.ux, u.uy)) {
+        return FALSE; /* possessions would all fall to another level; rest of
+                         this level probably isn't very interesting as bones */
+    }
     if (!Is_branchlev(&u.uz)) {
         /* no bones on non-branches with portals */
         for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap) {

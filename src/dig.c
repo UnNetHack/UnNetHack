@@ -2406,6 +2406,9 @@ wiz_debug_cmd_bury()
 
     for (x = u.ux - 1; x <= u.ux + 1; x++) {
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            if (is_open_air(x, y)) {
+                continue;
+            }
             if (isok(x, y)) {
                 bury_objs(x, y);
             }
