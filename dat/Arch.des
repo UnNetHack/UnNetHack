@@ -363,7 +363,7 @@ TRAP:"rolling boulder",(30,14)
 TRAP:"rolling boulder",(46,05)
 TRAP:"rolling boulder",(46,14)
 # Random monsters.
-MONSTER:('&',"Minion of Huhetotl"),$altar[0] {
+MONSTER:('@',"Schliemann"),$altar[0] {
   OBJECT:('(', "Bell of Opening"),uncursed
   OBJECT:random,cursed
   OBJECT:random,cursed

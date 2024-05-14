@@ -2294,20 +2294,23 @@ to figure out how those ones work for yourself.]],
    },
    Arc = {
       assignquest = {
-         synopsis = "[%nC has stolen %o.  Locate %i, defeat %ni, and return %O.]",
+         synopsis = "[%nC is after %o.  Locate %i and try to get to %O first.]",
          output = "text",
-         text = [["Grave times have befallen the college, for %na has
-stolen %o.  Without it, the board of directors of
-the university will soon have no choice but to revoke our research grants.
+         text = [[
+"No sooner had we published our latest research on locating the fabled
+%o, than %n announced that %nh and %nj team were heading
+to %i to claim it first.
 
-"You must locate the entrance to %i.  Within it,
-you will find %n.
+"%nS methods of archeology are abhorrent.  %nH will blast %nj
+way into the temple with no regard for anything but %nj prize,
+destroying priceless pieces of history.  They are well-funded and outnumber
+us.  You are the only one who might stand a chance of beating them to it.
 
-"You must then defeat %n and return %o
-to me.
+"Go through the great jungle and locate the ancient entrance to
+%i.  Somewhere deep within it, you will find
+%o.  They will not be watching that way, I think.
 
-"Only in this way will we be able to prevent the budget cuts that could
-close this college.
+"Make haste.  %nC must not be allowed to make off with %o.
 
 "May the wisdom of %d be your guide."]],
       },
@@ -2318,7 +2321,7 @@ close this college.
 results lately can hardly be called suitable for %ra!
 
 "How could you have strayed from the %a path?  Go from here, and come
-back only when you have purified yourself."]],
+back only when you have brushed up on your basics."]],
       },
       badlevel = {
          synopsis = "[%pC, a mere %r is too inexperienced.]",
@@ -2329,76 +2332,89 @@ survive.  Go forth, and come here again when your adventures have further
 taught you."]],
       },
       discourage = {
-         "\"Try your best, %p.  You cannot defeat me.\"",
-         "\"I shall rend the flesh from your body whilst you still breathe!\"",
-         "\"First you, %p, then I shall destroy your mentor, %l.\"",
-         "\"Tiring yet, %p?  I draw my power from my master and cannot falter!\"",
-         "\"I shall rend thy soul from thy body and consume it!\"",
-         "\"You are far too %a -- it weakens you.  You shall die in this place.\"",
-         "\"%d has forsaken you!  You are lost now!\"",
-         "\"A mere %r cannot hope to defeat me!\"",
+         "\"%lC is weak! %lH is blind to the success of my methods.\"",
+         "\"Ah, this bell? An ancient tool that has opened the way to many discoveries!\"",
+         "\"Surrender to me, %p.  I will let you return to %H in shame.\"",
          "\"If you are the best %l can send, I have nothing to fear.\"",
-         "\"Die %c!  I shall exhibit your carcass as a trophy.\"",
+         "\"What are a few walls worth, compared to the treasure behind them?\"",
+         "\"%lC names me chaotic.  I consider myself pragmatic.\"",
+         "\"Do you mean to kill me? Are we not professionals?\"",
+         "\"Ancient artifacts don't belong in a museum! They're meant to be used!\"",
+         "\"Soon, all the pupils at your college will want to study under me!\"",
+         "\"Why do you strive against me? Abandon %l and we can work together.\"",
+         "\"You'll never get anywhere gingerly dusting in the dirt.\"",
+         "\"Oh, you had trouble with mummies? I just blew them up.\"",
+         "\"I will blast you to the heavens!\"",
+         "\"I did not expect you to demand death if you could not have %o.\"",
+         "\"I got here first! Go find some other dig site!\"",
+         "\"Is this what it's come to? Taking someone's find by force?\"",
       },
       encourage = {
-         "\"Beware, for %n is powerful and cunning.\"",
-         "\"To locate the entrance to %i, you must pass many traps.\"",
-         "\"A %nt may be vulnerable to attacks by magical cold.\"",
-         "\"Call upon %d when you encounter %n.\"",
-         "\"You must destroy %n.  It will pursue you otherwise.\"",
-         "\"%oC is a mighty talisman.  With it you can destroy %n.\"",
+         "\"To delve into %i, you must pass many traps.\"",
+         "\"The jungle trek is dangerous.  You may need to cut your way through it.\"",
+         "\"Beware the wild beasts you will surely encounter on your journey.\"",
+         "\"The tomb has never been opened.  None can say for sure what lies within.\"",
+         "\"You may encounter mummies.  Beware their withering touch.\"",
+         "\"%nC has always had a penchant for using explosives.\"",
+         "\"Remember not to stray from the true %a path.\"",
          "\"Go forth with the blessings of %d.\"",
          "\"I will have my %gP watch for your return.\"",
-         "\"Remember not to stray from the true %a path.\"",
-         "\"You may be able to sense %o when you are near.\"",
+         "\"%nS henchmen are just as ruthless as %nh is.\"",
+         "\"Do not listen to %ns lies.  The end does not justify the means.\"",
+         "\"%o is a mighty scrying device.  %nC will see you coming if %nh gets it.\"",
+         "\"Wearing %o should defend against many types of rays.\"",
+         "\"Expect %i to be warded against magical mapping.\"",
       },
       firsttime = {
-         synopsis = "[You arrive at %H, but all is not well.]",
+         synopsis = "[You arrive at %H.]",
          output = "text",
-         text = [[You are suddenly in familiar surroundings.  The buildings in the distance
-seem to be those of your old alma mater, but something is wrong.  It feels
-as if there has been a riot recently, or %H has
-been under siege.
+         text = [[
+You are suddenly in familiar surroundings.  The buildings nearby seem
+to be those of your old alma mater.
 
-All of the windows are boarded up, and there are objects scattered around
-the entrance.
-
-Strange forbidding shapes seem to be moving in the distance.]],
+Everything looks fine on the surface, but you remember %ls plea
+for help, and know that something must be wrong.]],
       },
       goal_alt = {
-         text = "You have returned to %ns lair.",
+         text = "You have returned to the lowest level of the tomb.",
       },
       goal_first = {
-         synopsis = "[This strange feeling must be the presence of %o.]",
+         synopsis = "[Explosions continue deep in the temple.]",
          output = "text",
-         text = [[A strange feeling washes over you, and you think back to things you
-learned during the many lectures of %l.
+         text = [[
+As you press into the depths of the temple, you notice cracks in the
+walls, and the blasts of explosions grow ever more powerful.  You realize
+that %n and %nj team must already be nearby.
 
-You realize the feeling must be the presence of %o.]],
+You hope the continued blasts mean that they have not found
+%o yet, and you are not too late.]],
       },
       goal_next = {
-         text = "The familiar presence of %o is in the ether.",
+         text = "You return to the deepest depths of the temple.",
       },
       gotit = {
-         synopsis = "[The power of %o flows through your body!  You must return it to %l.]",
+         synopsis = "[%o is what you were looking for.  Take it back to %l.]",
          output = "text",
-         text = [[The power of %o flows through your body!  You feel
-as if you could now take on the Wizard of Yendor himself and win, but
-you know you must return %o to %l.]],
+         text = [[
+As you hold %o, you feel the weight of its long and storied
+history, and feel a profound sense of respect.  You know you must take
+it to %l for analysis.]],
       },
       guardtalk_after = {
-         "\"Did you see Lash LaRue in 'Song of Old Wyoming' the other night?\"",
-         "\"Hey man, got any potions of hallucination for sale?\"",
+         "\"Truth be told, I don't actually like fedoras that much.\"",
+         "\"Hey, got any spare potions of booze?\"",
          "\"I guess you are guaranteed to make full professor now.\"",
          "\"So, what was worse, %n or your entrance exams?\"",
          "\"%oC is impressive, but nothing like the bones I dug up!\"",
+         "\"Snakes.  Why did it have to be snakes?\"",
       },
       guardtalk_before = {
          "\"Did you see Lash LaRue in 'Song of Old Wyoming' the other night?\"",
-         "\"Hey man, got any potions of hallucination for sale?\"",
-         "\"Did you see the artifact %l brought back from the last dig?\"",
+         "\"Hey, got any potions of hallucination for sale?\"",
+         "\"Did you see the bracelet %l brought back from the last dig?\"",
          "\"So what species do *you* think we evolved from?\"",
          "\"So you're %ls prize pupil!  I don't know what he sees in you.\"",
+         "\"Ever since we dug up that burial ground, I think we've been cursed.\"",
       },
       hasamulet = {
          synopsis = "[Take the Amulet to the Astral Plane and sacrifice it at the altar of %d.]",
@@ -2414,7 +2430,15 @@ Amulet on that altar to fulfill your destiny.
 "Remember, your path now should always be upwards."]],
       },
       killed_nemesis = {
-         text = "The body of %n dissipates in a cloud of noxious fumes.",
+         synopsis = "[%nC collapses to the ground and dies.]",
+         output = "text",
+         text = [[
+%nC collapses to the ground, wounded beyond any possibility of
+healing.  For a moment, it seems as though %nh is trying to say
+something, but the life leaves %ni before %nh can say it.
+
+You are unhappy that it had to come to this, and wonder if you went too
+far by killing %ni.]],
       },
       leader_first = {
          synopsis = "[\"You have returned, %p, to a difficult task.\"]",
@@ -2440,65 +2464,88 @@ Let me see if you have gained experience in the interim."]],
 Are you finally ready for the task that must be accomplished?"]],
       },
       locate_first = {
-         synopsis = "[This foreboding edifice must hide the entrance to %i.]",
+         synopsis = "[You arrive at the ruined edifice, and feel an explosion.]",
          output = "text",
-         text = [[A plain opens before you.  Beyond the plain lies a foreboding edifice.
+         text = [[
+The trees give way ahead, as the ground abruptly steepens into a
+mountainside.  Carved into the mountainside are the clear signs of ruins
+of a once-great edifice -- %i.  It's not clear
+where the entrance is, if indeed there still is one.
 
-You have the feeling that you will soon find the entrance to
-%i.]],
+A short tremor runs through the ground as you stand there.  Alarmed, you
+realize that it was a detonation.  %nS team must already be here
+and blasting their way into the other side of the mountain.]],
       },
       locate_next = {
          text = "Once again, you are near the entrance to %i.",
       },
       nemesis_first = {
-         synopsis = "[\"Come, %p, I shall destroy you!\"]",
+         synopsis = "[\"The treasure is mine.  You dispute this?  Come, then!\"]",
          output = "text",
-         text = [["So, %p, you think that you can succeed in recovering
-%o, when your teacher, %l, has already failed.
+         text = [[
+%nC levels a piercing gaze at you.  A slow smile comes across %nh
+face.
 
-"Come, try your best!  I shall destroy you, and gnaw on your bones."]],
+%nH briefly tips %nj hat to you.  "So %l did send someone
+after all.  Alas, it seems that I was faster, so the treasure is mine."
+
+%nH lifts %nj arm, admiring the gleam of %o on it in the dim
+light, then glances at you again.  "Ah.  I see you will not accept your
+loss gracefully.  I should not have expected better from one of
+%l's pupils.  Very well then: come!  And you shall see what
+I am made of."]],
       },
       nemesis_next = {
-         synopsis = "[\"Again you try to best me, %p?  You shall never recover %o.\"]",
+         synopsis = "[\"You are foolish.  Accept that %o is not yours.\"]",
          output = "text",
-         text = [["Again you try to best me, eh %p?  Well, you shall fail again.
+         text = [[
+"You are entirely too bloodthirsty, %p.  This is foolishness.
 
-"You shall never recover %o.
-
-"I shall bear your soul to the Plane of Origins for my master's pleasure."]],
+"If you insist on being beaten into the dirt until you accept that
+%o belongs to me now, though, I am happy to oblige."]],
       },
       nemesis_other = {
-         text = "\"You persist yet %p!  Good.  Now, you shall die!\"",
+         text = "\"Your misguided persistence is growing tiresome.\"",
       },
       nemesis_wantsit = {
-         text = [["I shall have %o from you, %p, then feast
-upon your entrails!"]],
+         text = "\"You have no claim to %o!  Return it!\"",
       },
       nexttime = {
          text = "Once again, you are back at %H.",
       },
       offeredit = {
-         synopsis = "[%lC instructs you to guard %o from now on.]",
+         synopsis = "[%lC instructs you to take %o with you.]",
          output = "text",
-         text = [[%lC touches %o briefly, gazes into it,
-then smiles at you and says:
+         text = [[
+You briefly tell the details of your journey to %l.
 
-"Well done, %p.  You have defeated %n and
-recovered %o.  But I fear that it shall never be safe
-here.
+%lH takes %o and holds it briefly, gazing into its surface.
+"So, %n is defeated.  I regret the conflict it caused, though I
+cannot say I sympathize with a man who so grievously destroyed the
+archaeological record in order to get at one piece of treasure.
 
-Please take %o with you.  You, %p, can
-guard it now far better than I.
+"One thing though that I now realize %nh was right about:  %o
+cannot sit for decades gathering dust in some storeroom, or even a
+museum.  It yearns to be wielded by one who is worthy.  I can think of
+none more worthy than you.
 
-May the blessings of %d follow you and guard you."]],
+"Now that we have photographed %o and recorded its
+characteristics, it seems fitting that you should keep it for further
+study.  I expect that you will have a fine treatise published soon.
+
+"May the blessings of %d follow you and guard you."]],
       },
       offeredit2 = {
          synopsis = "[\"Resume your search for the Amulet beyond the magic portal to %Z.\"]",
          output = "text",
-         text = [["Careful, %p!  %oC might break, and that would be
-a tragic loss.  You are its keeper now, and the time has come to
-resume your search for the Amulet.  %Z await your
-return through the magic portal that brought you here."]],
+         text = [["
+Lord Carnarvon raises an eyebrow and hands Itlachiayaque back to you.
+"We've already documented this as thoroughly as we can right now.
+Perhaps some day when your great quest for the Amulet is complete, you
+can return it here.
+
+"For now, take it back with you through the magic portal to
+%Z, with my blessing."]],
       },
       othertime = {
          text = [[You are back at %H.

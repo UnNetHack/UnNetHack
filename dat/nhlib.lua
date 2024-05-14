@@ -48,3 +48,25 @@ end
 function pline(fmt, ...)
    nh.pline(string.format(fmt, table.unpack({...})));
 end
+
+-- find all dead-ends on the level enclosed by walls on 7 sides;
+-- return selection containing all such points
+function get_deadends()
+   local deadendN = [[
+www
+w.w
+wxw]]
+   local deadendE = [[
+www
+x.w
+www]]
+   local deadendS = [[
+wxw
+w.w
+www]]
+   local deadendW = [[
+www
+w.x
+www]]
+   return selection.match(deadendN) | selection.match(deadendE) | selection.match(deadendS) | selection.match(deadendW)
+end
