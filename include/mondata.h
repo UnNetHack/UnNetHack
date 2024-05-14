@@ -319,4 +319,8 @@
 #define PM_ELVEN_MONARCH PM_ELVENKING
 #define PM_ELF_NOBLE PM_ELF_LORD
 
+/* The monster is covetous, but should not warp, heal, or otherwise use
+ * tactics(). */
+#define covetous_nonwarper(ptr) ((ptr) == &mons[PM_SCHLIEMANN])
+
 #endif /* MONDATA_H */

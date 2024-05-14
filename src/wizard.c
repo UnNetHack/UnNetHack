@@ -379,6 +379,13 @@ tactics(struct monst *mtmp)
 
     mtmp->mstrategy = (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
 
+    if (covetous_nonwarper(mtmp->data)) {
+        /* currently every strategy below this involves warping; for
+         * non-warpers, we still want to set mstrategy but don't want to go any
+         * further */
+        return 0;
+    }
+
     switch (strat) {
     case STRAT_HEAL: /* hide and recover */
         mx = mtmp->mx, my = mtmp->my;

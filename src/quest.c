@@ -401,7 +401,13 @@ chat_with_nemesis(void)
 void
 nemesis_speaks(void)
 {
-    if (!Qstat(in_battle)) {
+    /* This code assumed a sequence of: tactics() -> rloc_to() ->
+     * back in dochug() -> nemesis_speaks(), in which the nemesis wasn't
+     * initially next to the player but just warped there, bypassing
+     * Qstat(in_battle) being set to true. For non-warping nemeses, ignore
+     * whether this flag is set or not because nemesis_speaks should only get
+     * called when nearby anyway. */
+    if (!Qstat(in_battle) || covetous_nonwarper(&mons[urole.neminum])) {
         if (u.uhave.questart) {
             qt_pager("nemesis_wantsit");
         } else if (Qstat(made_goal) == 1 || !Qstat(met_nemesis)) {

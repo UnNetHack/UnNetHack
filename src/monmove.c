@@ -1076,7 +1076,9 @@ m_move(struct monst *mtmp, int after)
         } else {
             mmoved = 0;
         }
-        goto postmov;
+        if (!covetous_nonwarper(ptr)) {
+            goto postmov;
+        }
     }
 
     /* and for the priest */
