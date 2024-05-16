@@ -268,7 +268,7 @@ AC_DEFUN([AX_PROG_LUA],
         ax_cv_lua_version=[`$LUA -e '
           -- return a version number in X.Y format
           local _, _, ver = string.find(_VERSION, "^Lua (%d+%.%d+)")
-          print(ver)'`]
+          print(ver)' | tr -d '[:cntrl:]'`]
       ])
     AS_IF([test "x$ax_cv_lua_version" = 'x'],
       [AC_MSG_ERROR([invalid Lua version number])])
@@ -372,7 +372,7 @@ AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
         return n * fact(n-1)
       end
     end
-    print("fact(5) is " .. fact(5))'`]
+    print("fact(5) is " .. fact(5))' | tr -d '[:cntrl:]'`]
   AS_IF([test "$_ax_lua_factorial" = 'fact(5) is 120'],
     [$2], [$3])
 ])

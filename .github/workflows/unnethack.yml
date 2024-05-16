@@ -61,7 +61,6 @@ jobs:
       run: make all
 
   windows:
-    if: false # deactivate until lua.dll is build
     runs-on: ubuntu-latest
 
     steps:

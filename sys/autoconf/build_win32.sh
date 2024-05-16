@@ -7,6 +7,21 @@
 # Arch:
 # mingw-w64-gcc wine imagemagick
 
+
+if [ ! -d "liblua" ]; then
+    git clone -b v5.4 --depth 1 https://github.com/lua/lua.git liblua
+
+    cd liblua
+    sed -i -e 's/ -DLUA_USE_LINUX -DLUA_USE_READLINE//' makefile
+    sed -i -e 's/^MYLIBS=.*/MYLIBS=/' makefile
+    make AR='i686-w64-mingw32-ar rc' CC=i686-w64-mingw32-gcc RANLIB=i686-w64-mingw32-ranlib
+    cd ..
+fi
+
+export LUA=`pwd`/liblua/lua.exe
+export LUA_INCLUDE=-I`pwd`/liblua
+export LUA_LIB="`pwd`/liblua/liblua.a -lm"
+
 INSTALL=/tmp/unnethack_win32
 DESTDIR=/tmp/unnethack_destdir
 mkdir -p $DESTDIR $INSTALL
