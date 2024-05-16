@@ -711,6 +711,25 @@ Z = (195, 195, 195)
   OAAAAAAAAAAAAAAB
   PON.LKJIHGFEDCBA
 }
+# tile 33 (magic platform)
+{
+  DDDDDDCDDDDDDDDD
+  DDDDDCDKDDDDDDDD
+  DDCCDDKDDDDCCCDD
+  DCJJKDDDDDCKJJKD
+  DCJDKDDDDDCJKDKD
+  DDKKDDDDDDCJDKKD
+  DDDDDDDCDDDKKKDD
+  DDDCDDDDDDDDDDDD
+  DDDDJDCDDDDCDDDD
+  DDDDDDDDDDCJKDDD
+  DDDDDDDDDDDKDDDC
+  DDDDCCDDDDDDDDDD
+  DDDCJJKDDDDDDDDD
+  CDDCJDKDDDDDDJDD
+  DDDDKKDDDDCDDDDD
+  DDDDDDDDDDDKDDDD
+}
 # tile 33 (molten lava)
 {
   DDDDDDCDDDDDDDDD
@@ -1623,7 +1642,7 @@ Z = (195, 195, 195)
   .......FF.......
   ................
 }
-# tile 84 (cmap 84)
+# tile 85 (cmap 85)
 {
   AAAAAAADDDDDDAAA
   AAAAADDDDDDDDDDD
@@ -1642,7 +1661,7 @@ Z = (195, 195, 195)
   AAAADDDDDD......
   AAAADDDDDD......
 }
-# tile 85 (cmap 85)
+# tile 86 (cmap 86)
 {
   AAAAAAAAAAAAAAAA
   DDAAAAAAAAAAAAAA
@@ -1661,7 +1680,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 86 (cmap 86)
+# tile 87 (cmap 87)
 {
   AAAAAAAAAAAAAAAA
   AAADDDDDAAAAAAAA
@@ -1680,7 +1699,7 @@ Z = (195, 195, 195)
   ....DDDDDDDDDDDD
   ....DDDDDDDDDDDA
 }
-# tile 87 (cmap 87)
+# tile 88 (cmap 88)
 {
   AAAADDDDDD......
   AAAADDDDDDD.....
@@ -1699,7 +1718,7 @@ Z = (195, 195, 195)
   DDDDDDD.........
   DDCCDDD.........
 }
-# tile 88 (cmap 88)
+# tile 89 (cmap 89)
 {
   ....DDDDDDDDDDDA
   ....DDDDDDDDDDDA
@@ -1718,7 +1737,7 @@ Z = (195, 195, 195)
   ......DDDDDDDDAA
   .......DDDDDDDAA
 }
-# tile 89 (cmap 89)
+# tile 90 (cmap 90)
 {
   DDDCDDD.........
   DDDCDDD.........
@@ -1737,7 +1756,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAADDDD
   AAAAAAAAAAAAAADD
 }
-# tile 90 (cmap 90)
+# tile 91 (cmap 91)
 {
   ................
   ................
@@ -1756,7 +1775,7 @@ Z = (195, 195, 195)
   DDDDDDDDDDDDDDDD
   DDDDDDDDDDDDDDAA
 }
-# tile 91 (cmap 91)
+# tile 92 (cmap 92)
 {
   ......DDDDDDDDAA
   ......DDDDDDDDDA

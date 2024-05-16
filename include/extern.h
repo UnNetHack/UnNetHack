@@ -6,6 +6,8 @@
 
 #define E extern
 
+#include "nhlua.h"
+
 /* ### alloc.c ### */
 
 #if 0

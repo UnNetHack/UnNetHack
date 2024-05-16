@@ -5842,7 +5842,7 @@ printf %s "checking if $LUA is a Lua interpreter... " >&6; }
         return n * fact(n-1)
       end
     end
-    print("fact(5) is " .. fact(5))'`
+    print("fact(5) is " .. fact(5))' | tr -d '[:cntrl:]'`
   if test "$_ax_lua_factorial" = 'fact(5) is 120'
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -5875,7 +5875,7 @@ printf %s "checking $_ax_check_text... " >&6; }
       print("yes")
     else
       print("no")
-    end'`
+    end' | tr -d '[:cntrl:]'`
     if test "x$_ax_lua_good_version" = "xyes"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
