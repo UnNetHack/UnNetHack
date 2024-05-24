@@ -390,10 +390,7 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
         OMONST(obj2)->mextra = (struct mextra *) 0;
         OMONST(obj2)->nmon = (struct monst *) 0;
 #if 0
-        OMONST(obj2)->m_id = context.ident++;
-        if (OMONST(obj2)->m_id) { /* ident overflowed */
-            OMONST(obj2)->m_id = context.ident++;
-        }
+        OMONST(obj2)->m_id = next_ident();
 #endif
         if (OMONST(obj1)->mextra) {
             copy_mextra(OMONST(obj2), OMONST(obj1));
@@ -517,8 +514,9 @@ nextoid(struct obj *oldobj, struct obj *newobj)
         }
         newdif = oid_price_adjustment(newobj, oid);
     } while (newdif != olddif && --trylimit >= 0);
-    flags.ident = oid + 1; /* ready for next new object */
-    return oid;
+    flags.ident = oid; /* update 'last ident used' */
+    (void) next_ident(); /* increment context.ident for next use */
+    return oid; /* caller will use this ident */
 }
 
 /* try to find the stack obj was split from, then merge them back together;
@@ -698,10 +696,7 @@ bill_dummy_object(struct obj *otmp)
     *dummy = *otmp;
     dummy->oextra = (struct oextra *) 0;
     dummy->where = OBJ_FREE;
-    dummy->o_id = next_ident();
-    if (!dummy->o_id) {
-        dummy->o_id = next_ident(); /* ident overflowed */
-    }
+    dummy->o_id = nextoid(otmp, dummy);
     dummy->timed = 0;
     copy_oextra(dummy, otmp);
     if (has_omid(dummy)) {
@@ -827,9 +822,6 @@ mksobj(int otyp, boolean init, boolean artif)
     *otmp = zeroobj;
     otmp->age = monstermoves;
     otmp->o_id = next_ident();
-    if (!otmp->o_id) {
-        otmp->o_id = next_ident(); /* ident overflowed */
-    }
     otmp->quan = 1L;
     otmp->oclass = let;
     otmp->otyp = otyp;

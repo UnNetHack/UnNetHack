@@ -71,7 +71,7 @@ enum m_ap_types {
 struct monst {
     struct monst *nmon;
     struct permonst *data;
-    size_t m_id;
+    unsigned m_id;
     short mnum;           /* permanent monster index number */
     short cham;           /* if shapeshifter, orig mons[] idx goes here */
     short movement;       /* movement points (derived from permonst definition and added effects */

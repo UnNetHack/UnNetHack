@@ -1033,8 +1033,7 @@ revive(struct obj *corpse, boolean by_hero)
         struct monst *ghost;
         struct obj *otmp;
 
-        (void) memcpy((genericptr_t) &m_id, (genericptr_t) OMID(corpse),
-                      sizeof m_id);
+        m_id = OMID(corpse);
         ghost = find_mid(m_id, FM_FMON);
         if (ghost && ghost->data == &mons[PM_GHOST]) {
             if (canseemon(ghost)) {

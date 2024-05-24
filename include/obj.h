@@ -32,7 +32,7 @@ struct obj {
 #define ocarry      v.v_ocarry
 
     struct obj *cobj;   /* contents list for containers */
-    size_t o_id;
+    unsigned o_id;
     coordxy ox, oy;
     short otyp;     /* object class number */
     unsigned owt;
