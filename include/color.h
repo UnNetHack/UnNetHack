@@ -50,6 +50,12 @@
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
 #define BRIGHT      8
 
+/* color aliases used in monsters.h and display.c  */
+#define HI_DOMESTIC CLR_WHITE /* for player + pets */
+#define HI_SHOPKEEPER CLR_YELLOW  /* use for entities who buy and sell */
+#define HI_LORD CLR_MAGENTA /* for high-end monsters */
+#define HI_OVERLORD CLR_BRIGHT_MAGENTA /* for few uniques */
+
 /* these can be configured */
 #define HI_OBJ      CLR_MAGENTA
 #define HI_METAL    CLR_CYAN
