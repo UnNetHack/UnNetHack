@@ -362,10 +362,8 @@ panic VA_DECL(const char *, str)
 #ifdef LIVELOGFILE
     livelog_game_action("panicked");
 #endif
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
-    if (wizard || iflags.debug_fuzzer) {
-        NH_abort(); /* generate core dump */
-    }
+#if (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
+    NH_abort(); /* generate core dump */
 #endif
     VA_END();
     done(PANICKED);
