@@ -779,6 +779,8 @@ restgamestate(NHFILE *nhfp)
 #ifdef WHEREIS_FILE
     touch_whereis();
 #endif
+    /* inventory display is now viable */
+    iflags.perm_invent = defer_perm_invent;
     return TRUE;
 }
 
