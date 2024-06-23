@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static int bestow_artifact(void);
 static boolean pray_revive(void);
 static boolean water_prayer(boolean);
 static boolean blocked_boulder(int, int);
@@ -1428,6 +1429,46 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+static int
+bestow_artifact(void)
+{
+    int nartifacts = nartifact_exist();
+
+    /* you were already in pretty good standing */
+    /* The player can gain an artifact */
+    /* The chance goes down as the number of artifacts goes up */
+    if (u.ulevel > 2 && u.uluck >= 0 &&
+        !rn2(10 + (2 * u.ugifts * nartifacts))) {
+        struct obj *otmp;
+        otmp = mk_artifact((struct obj *) 0, a_align(u.ux, u.uy));
+        if (otmp) {
+            if (otmp->spe < 0) {
+                otmp->spe = 0;
+            }
+            if (otmp->cursed) {
+                uncurse(otmp);
+            }
+            otmp->oerodeproof = TRUE;
+            dropy(otmp);
+            at_your_feet("An object");
+            godvoice(u.ualign.type, "Use my gift wisely!");
+            u.ugifts++;
+            u.ublesscnt = rnz(300 + (50 * nartifacts));
+            update_prayer_stats(PRAY_GIFT);
+            exercise(A_WIS, TRUE);
+            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                            "had %s bestowed upon %s by %s",
+                            otmp->oartifact ? artiname(otmp->oartifact) : an(xname(otmp)),
+                            uhim(), u_gname());
+            /* make sure we can use this weapon */
+            unrestrict_weapon_skill(weapon_type(otmp));
+            discover_artifact(otmp->oartifact);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 int
 dosacrifice(void)
 {
@@ -1923,38 +1964,8 @@ dosacrifice(void)
                 }
             }
         } else {
-            int nartifacts = nartifact_exist();
-
-            /* you were already in pretty good standing */
-            /* The player can gain an artifact */
-            /* The chance goes down as the number of artifacts goes up */
-            if (u.ulevel > 2 && u.uluck >= 0 &&
-                !rn2(10 + (2 * u.ugifts * nartifacts))) {
-                otmp = mk_artifact((struct obj *) 0, a_align(u.ux, u.uy));
-                if (otmp) {
-                    if (otmp->spe < 0) {
-                        otmp->spe = 0;
-                    }
-                    if (otmp->cursed) {
-                        uncurse(otmp);
-                    }
-                    otmp->oerodeproof = TRUE;
-                    dropy(otmp);
-                    at_your_feet("An object");
-                    godvoice(u.ualign.type, "Use my gift wisely!");
-                    u.ugifts++;
-                    u.ublesscnt = rnz(300 + (50 * nartifacts));
-                    update_prayer_stats(PRAY_GIFT);
-                    exercise(A_WIS, TRUE);
-                    livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
-                                    "had %s bestowed upon %s by %s",
-                                    otmp->oartifact ? artiname(otmp->oartifact) : an(xname(otmp)),
-                                    uhim(), u_gname());
-                    /* make sure we can use this weapon */
-                    unrestrict_weapon_skill(weapon_type(otmp));
-                    discover_artifact(otmp->oartifact);
-                    return 1;
-                }
+            if (bestow_artifact()) {
+                return ECMD_TIME;
             }
             change_luck((value * LUCKMAX) / (MAXVALUE * 2));
             if ((int)u.uluck < 0) {
