@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static void sacrifice_your_race(struct obj *, boolean, aligntyp);
 static int bestow_artifact(void);
 static boolean pray_revive(void);
 static boolean water_prayer(boolean);
@@ -1429,6 +1430,83 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+
+static void
+sacrifice_your_race(
+    struct obj *otmp,
+    boolean highaltar,
+    aligntyp altaralign)
+{
+    int pm;
+
+    if (is_demon(youmonst.data)) {
+        You("find the idea very satisfying.");
+        exercise(A_WIS, TRUE);
+    } else if (u.ualign.type != A_CHAOTIC) {
+        pline("You'll regret this infamous offense!");
+        exercise(A_WIS, FALSE);
+    }
+
+    if (highaltar &&
+         (altaralign != A_CHAOTIC || u.ualign.type != A_CHAOTIC)) {
+        /* curse the lawful/neutral altar */
+        pline_The("altar is stained with %s blood.", urace.adj);
+        if (!Is_astralevel(&u.uz)) {
+            levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
+        }
+        angry_priest();
+    } else {
+        struct monst *dmon;
+        const char *demonless_msg;
+
+        /* Human sacrifice on a chaotic or unaligned altar */
+        /* is equivalent to demon summoning */
+        if (altaralign == A_CHAOTIC && u.ualign.type != A_CHAOTIC) {
+            pline(
+                "The blood floods the altar, which vanishes in %s cloud!",
+                an(hcolor(NH_BLACK)));
+            levl[u.ux][u.uy].typ = ROOM;
+            levl[u.ux][u.uy].altarmask = 0;
+            newsym(u.ux, u.uy);
+            angry_priest();
+            demonless_msg = "cloud dissipates";
+        } else {
+            /* either you're chaotic or altar is Moloch's or both */
+            pline_The("blood covers the altar!");
+            change_luck(altaralign == A_NONE ? -2 : 2);
+            demonless_msg = "blood coagulates";
+        }
+        if ((pm = dlord(altaralign)) != NON_PM &&
+            (dmon = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS))) {
+            You("have summoned %s!", a_monnam(dmon));
+            if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp)) {
+                dmon->mpeaceful = TRUE;
+            }
+            You("are terrified, and unable to move.");
+            nomul(-3, "being terrified of a demon");
+        } else {
+            pline_The("%s.", demonless_msg);
+        }
+    }
+
+    if (u.ualign.type != A_CHAOTIC) {
+        adjalign(-5);
+        u.ugangr += 3;
+        (void) adjattrib(A_WIS, -1, TRUE);
+        if (!Inhell) {
+            angrygods(u.ualign.type);
+        }
+        change_luck(-5);
+    } else {
+        adjalign(5);
+    }
+    if (carried(otmp)) {
+        useup(otmp);
+    } else {
+        useupf(otmp, 1L);
+    }
+}
+
 static int
 bestow_artifact(void)
 {
@@ -1548,72 +1626,8 @@ dosacrifice(void)
         }
 
         if (your_race(ptr)) {
-            if (is_demon(youmonst.data)) {
-                You("find the idea very satisfying.");
-                exercise(A_WIS, TRUE);
-            } else if (u.ualign.type != A_CHAOTIC) {
-                pline("You'll regret this infamous offense!");
-                exercise(A_WIS, FALSE);
-            }
-
-            if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
-                /* curse the lawful/neutral altar */
-                pline_The("altar is stained with %s blood.", urace.adj);
-                if (!Is_astralevel(&u.uz)) {
-                    levl[u.ux][u.uy].altarmask = AM_CHAOTIC;
-                }
-                angry_priest();
-            } else {
-                struct monst *dmon;
-                const char *demonless_msg;
-
-                /* Human sacrifice on a chaotic or unaligned altar */
-                /* is equivalent to demon summoning */
-                if (altaralign == A_CHAOTIC && u.ualign.type != A_CHAOTIC) {
-                    pline(
-                        "The blood floods the altar, which vanishes in %s cloud!",
-                        an(hcolor(NH_BLACK)));
-                    levl[u.ux][u.uy].typ = ROOM;
-                    levl[u.ux][u.uy].altarmask = 0;
-                    newsym(u.ux, u.uy);
-                    angry_priest();
-                    demonless_msg = "cloud dissipates";
-                } else {
-                    /* either you're chaotic or altar is Moloch's or both */
-                    pline_The("blood covers the altar!");
-                    change_luck(altaralign == A_NONE ? -2 : 2);
-                    demonless_msg = "blood coagulates";
-                }
-                if ((pm = dlord(altaralign)) != NON_PM &&
-                    (dmon = makemon(&mons[pm], u.ux, u.uy, NO_MM_FLAGS))) {
-                    You("have summoned %s!", a_monnam(dmon));
-                    if (sgn(u.ualign.type) == sgn(dmon->data->maligntyp)) {
-                        dmon->mpeaceful = TRUE;
-                    }
-                    You("are terrified, and unable to move.");
-                    nomul(-3, "being terrified of a demon");
-                } else {
-                    pline_The("%s.", demonless_msg);
-                }
-            }
-
-            if (u.ualign.type != A_CHAOTIC) {
-                adjalign(-5);
-                u.ugangr += 3;
-                (void) adjattrib(A_WIS, -1, TRUE);
-                if (!Inhell) {
-                    angrygods(u.ualign.type);
-                }
-                change_luck(-5);
-            } else {
-                adjalign(5);
-            }
-            if (carried(otmp)) {
-                useup(otmp);
-            } else {
-                useupf(otmp, 1L);
-            }
-            return 1;
+            sacrifice_your_race(otmp, highaltar, altaralign);
+            return ECMD_TIME;
         } else if (has_omonst(otmp)
                    && ((mtmp = get_mtraits(otmp, FALSE)) != (struct monst *)0)
                    && mtmp->mtame) {
