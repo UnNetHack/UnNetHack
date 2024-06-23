@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static void offer_different_alignment_altar(struct obj *, aligntyp);
 static void sacrifice_your_race(struct obj *, boolean, aligntyp);
 static int bestow_artifact(void);
 static boolean pray_revive(void);
@@ -1430,6 +1431,76 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+/* possibly convert an altar's alignment or the hero's alignment */
+static void
+offer_different_alignment_altar(
+    struct obj *otmp,
+    aligntyp altaralign)
+{
+    /* Is this a conversion ? */
+    /* An unaligned altar in Gehennom will always elicit rejection. */
+    if (ugod_is_angry() || (altaralign == A_NONE && Inhell)) {
+        if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL] &&
+            altaralign != A_NONE) {
+            You("have a strong feeling that %s is angry...", u_gname());
+            consume_offering(otmp);
+            pline("%s accepts your allegiance.", a_gname());
+
+            uchangealign(altaralign, 0);
+            /* Beware, Conversion is costly */
+            change_luck(-3);
+            u.ublesscnt += 300;
+
+            update_prayer_stats(PRAY_CONV);
+        } else {
+            u.ugangr += 3;
+            adjalign(-5);
+            update_prayer_stats(PRAY_ANGER);
+            pline("%s rejects your sacrifice!", a_gname());
+            godvoice(altaralign, "Suffer, infidel!");
+            change_luck(-5);
+            (void) adjattrib(A_WIS, -2, TRUE);
+            if (!Inhell) {
+                angrygods(u.ualign.type);
+            }
+        }
+    } else {
+        consume_offering(otmp);
+        You("sense a conflict between %s and %s.", u_gname(), a_gname());
+        if (rn2(8 + u.ulevel) > 5) {
+            struct monst *pri;
+            You_feel("the power of %s increase.", u_gname());
+            exercise(A_WIS, TRUE);
+            change_luck(1);
+            /* Yes, this is supposed to be &=, not |= */
+            levl[u.ux][u.uy].altarmask &= AM_SHRINE;
+            /* the following accommodates stupid compilers */
+            levl[u.ux][u.uy].altarmask =
+                levl[u.ux][u.uy].altarmask | (Align2amask(u.ualign.type));
+            if (!Blind) {
+                pline_The("altar glows %s.",
+                            hcolor(
+                                u.ualign.type == A_LAWFUL ? NH_WHITE :
+                                u.ualign.type ? NH_BLACK : (const char *)"gray"));
+            }
+
+            if (rnl(u.ulevel) > 6 && u.ualign.record > 0 &&
+                rnd(u.ualign.record) > (3*ALIGNLIM)/4)
+                summon_minion(altaralign, TRUE);
+            /* anger priest; test handles bones files */
+            if ((pri = findpriest(temple_occupied(u.urooms))) &&
+                !p_coaligned(pri))
+                angry_priest();
+        } else {
+            pline("Unluckily, you feel the power of %s decrease.", u_gname());
+            change_luck(-1);
+            exercise(A_WIS, FALSE);
+            if (rnl(u.ulevel) > 6 && u.ualign.record > 0 &&
+                rnd(u.ualign.record) > (7*ALIGNLIM)/8)
+                summon_minion(altaralign, TRUE);
+        }
+    }
+}
 
 static void
 sacrifice_your_race(
@@ -1552,7 +1623,7 @@ dosacrifice(void)
 {
     struct obj *otmp;
     int value = 0;
-    int pm;
+    boolean highaltar;
     aligntyp altaralign = a_align(u.ux, u.uy);
     char qbuf[QBUFSZ];
     char c;
@@ -1564,6 +1635,7 @@ dosacrifice(void)
         You("are not standing on an altar.");
         return 0;
     }
+    highaltar = (levl[u.ux][u.uy].altarmask & AM_SANCTUM);
 
     /* Check for corpses or (fake) amulets of yendor on the floor */
     for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere) {
@@ -1839,73 +1911,9 @@ dosacrifice(void)
 
         /* Sacrificing at an altar of a different alignment */
         if (u.ualign.type != altaralign) {
-            /* Is this a conversion ? */
-            /* An unaligned altar in Gehennom will always elicit rejection. */
-            if (ugod_is_angry() || (altaralign == A_NONE && Inhell)) {
-                if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL] &&
-                   altaralign != A_NONE) {
-                    You("have a strong feeling that %s is angry...", u_gname());
-                    consume_offering(otmp);
-                    pline("%s accepts your allegiance.", a_gname());
-
-                    uchangealign(altaralign, 0);
-                    /* Beware, Conversion is costly */
-                    change_luck(-3);
-                    u.ublesscnt += 300;
-
-                    update_prayer_stats(PRAY_CONV);
-                } else {
-                    u.ugangr += 3;
-                    adjalign(-5);
-                    update_prayer_stats(PRAY_ANGER);
-                    pline("%s rejects your sacrifice!", a_gname());
-                    godvoice(altaralign, "Suffer, infidel!");
-                    change_luck(-5);
-                    (void) adjattrib(A_WIS, -2, TRUE);
-                    if (!Inhell) {
-                        angrygods(u.ualign.type);
-                    }
-                }
-                return 1;
-            } else {
-                consume_offering(otmp);
-                You("sense a conflict between %s and %s.",
-                    u_gname(), a_gname());
-                if (rn2(8 + u.ulevel) > 5) {
-                    struct monst *pri;
-                    You_feel("the power of %s increase.", u_gname());
-                    exercise(A_WIS, TRUE);
-                    change_luck(1);
-                    /* Yes, this is supposed to be &=, not |= */
-                    levl[u.ux][u.uy].altarmask &= AM_SHRINE;
-                    /* the following accommodates stupid compilers */
-                    levl[u.ux][u.uy].altarmask =
-                        levl[u.ux][u.uy].altarmask | (Align2amask(u.ualign.type));
-                    if (!Blind) {
-                        pline_The("altar glows %s.",
-                                  hcolor(
-                                      u.ualign.type == A_LAWFUL ? NH_WHITE :
-                                      u.ualign.type ? NH_BLACK : (const char *)"gray"));
-                    }
-
-                    if (rnl(u.ulevel) > 6 && u.ualign.record > 0 &&
-                        rnd(u.ualign.record) > (3*ALIGNLIM)/4)
-                        summon_minion(altaralign, TRUE);
-                    /* anger priest; test handles bones files */
-                    if ((pri = findpriest(temple_occupied(u.urooms))) &&
-                       !p_coaligned(pri))
-                        angry_priest();
-                } else {
-                    pline("Unluckily, you feel the power of %s decrease.",
-                          u_gname());
-                    change_luck(-1);
-                    exercise(A_WIS, FALSE);
-                    if (rnl(u.ulevel) > 6 && u.ualign.record > 0 &&
-                        rnd(u.ualign.record) > (7*ALIGNLIM)/8)
-                        summon_minion(altaralign, TRUE);
-                }
-                return 1;
-            }
+        /* Sacrificing at an altar of a different alignment */
+        offer_different_alignment_altar(otmp, altaralign);
+        return ECMD_TIME;
         }
 
         consume_offering(otmp);
