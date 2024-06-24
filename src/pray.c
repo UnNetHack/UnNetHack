@@ -1431,6 +1431,21 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+void
+desecrate_altar(boolean highaltar, aligntyp altaralign)
+{
+    nhUse(highaltar);
+    /*
+     * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
+     * gets the god who owns it truely pissed off.
+     */
+    You_feel("the air around you grow charged...");
+    pline("Suddenly, you realize that %s has noticed you...", a_gname());
+    godvoice(altaralign, "So, mortal!  You dare desecrate my High Temple!");
+    /* Throw everything we have at the player */
+    god_zaps_you(altaralign);
+}
+
 /* possibly convert an altar's alignment or the hero's alignment */
 static void
 offer_different_alignment_altar(
@@ -1888,20 +1903,11 @@ dosacrifice(void)
 
     if (value == 0) {
         pline("%s", nothing_happens);
-        return 1;
+        return ECMD_TIME;
     }
 
-    if (altaralign != u.ualign.type &&
-        (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
-        /*
-         * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
-         * gets the god who owns it truely pissed off.
-         */
-        You_feel("the air around you grow charged...");
-        pline("Suddenly, you realize that %s has noticed you...", a_gname());
-        godvoice(altaralign, "So, mortal!  You dare desecrate my High Temple!");
-        /* Throw everything we have at the player */
-        god_zaps_you(altaralign);
+    if (altaralign != u.ualign.type && highaltar) {
+        desecrate_altar(highaltar, altaralign);
     } else if (value < 0) { /* I don't think the gods are gonna like this... */
         gods_upset(altaralign);
     } else {

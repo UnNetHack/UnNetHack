@@ -2162,6 +2162,7 @@ extern short mixtype(struct obj *, struct obj *);
 #ifdef USE_TRAMPOLI
 extern int prayer_done(void);
 #endif
+extern void desecrate_altar(boolean, aligntyp);
 extern int dosacrifice(void);
 extern boolean can_pray(boolean);
 extern int dopray(void);
