@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static void offer_fake_amulet(struct obj *, boolean, aligntyp);
 static void offer_different_alignment_altar(struct obj *, aligntyp);
 static void sacrifice_your_race(struct obj *, boolean, aligntyp);
 static int bestow_artifact(void);
@@ -1446,6 +1447,44 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
     god_zaps_you(altaralign);
 }
 
+static void
+offer_fake_amulet(
+    struct obj *otmp,
+    boolean highaltar,
+    aligntyp altaralign)
+{
+    nhUse(highaltar);
+#ifdef ASTRAL_ESCAPE
+    u.uconduct.gnostic++;
+#endif
+    if (flags.soundok) {
+        You_hear("a nearby thunderclap.");
+    }
+    if (!otmp->known) {
+        You("realize you have made a %s.",
+            Hallucination ? "boo-boo" : "mistake");
+        makeknown(otmp->otyp);
+        otmp->known = TRUE;
+        update_inventory();
+        change_luck(-1);
+    } else {
+        /* don't you dare try to fool the gods */
+        if (Deaf) {
+            pline("Oh, no."); /* didn't hear thunderclap */
+        }
+        change_luck(-3);
+        adjalign(-1);
+        u.ugangr += 3;
+        /* value = -3; */
+        if (altaralign != u.ualign.type && highaltar) {
+            desecrate_altar(highaltar, altaralign);
+        } else { /* value < 0 */
+            gods_upset(altaralign);
+        }
+        update_prayer_stats(PRAY_ANGER);
+    }
+}
+
 /* possibly convert an altar's alignment or the hero's alignment */
 static void
 offer_different_alignment_altar(
@@ -1877,28 +1916,8 @@ dosacrifice(void)
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
-#ifdef ASTRAL_ESCAPE
-        u.uconduct.gnostic++;
-#endif
-        if (flags.soundok) {
-            You_hear("a nearby thunderclap.");
-        }
-        if (!otmp->known) {
-            You("realize you have made a %s.",
-                Hallucination ? "boo-boo" : "mistake");
-            makeknown(otmp->otyp);
-            otmp->known = TRUE;
-            update_inventory();
-            change_luck(-1);
-            return 1;
-        } else {
-            /* don't you dare try to fool the gods */
-            change_luck(-3);
-            adjalign(-1);
-            u.ugangr += 3;
-            value = -3;
-            update_prayer_stats(PRAY_ANGER);
-        }
+        offer_fake_amulet(otmp, highaltar, altaralign);
+        return ECMD_TIME;
     } /* fake Amulet */
 
     if (value == 0) {
