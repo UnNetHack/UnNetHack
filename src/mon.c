@@ -954,8 +954,9 @@ movemon(void)
                 fightm(mtmp))
                 continue; /* mon might have died */
         }
-        if(dochugw(mtmp))   /* otherwise just move the monster */
+        if (dochugw(mtmp, TRUE)) { /* otherwise just move the monster */
             continue;
+        }
     }
 #if 0
     /* part of the original warning code which was replaced in 3.3.1 */

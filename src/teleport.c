@@ -1678,7 +1678,7 @@ rloc_to_core(
 
     /* if hero is busy, maybe stop occupation */
     if (occupation) {
-        (void) dochugw(mtmp);
+        (void) dochugw(mtmp, FALSE);
     }
 
     /* trapped monster teleported away */

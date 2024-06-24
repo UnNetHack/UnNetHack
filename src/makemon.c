@@ -1620,6 +1620,11 @@ _makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
 
     if (!in_mklev) {
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
+
+        /* if discernable and a threat, stop fiddling while Rome burns */
+        if (occupation) {
+            (void) dochugw(mtmp, FALSE);
+        }
     }
 
     return mtmp;

@@ -121,27 +121,39 @@ watch_on_duty(struct monst *mtmp)
 }
 
 int
-dochugw(struct monst *mtmp)
+dochugw(
+    struct monst *mtmp,
+    boolean chug) /* True: monster is moving;
+                   * False: monster was just created or has teleported
+                   * so perform stop-what-you're-doing-if-close-enough-
+                   * to-be-a-threat check but don't move mtmp */
 {
-    int x = mtmp->mx, y = mtmp->my;
-    boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
-    int rd = dochug(mtmp);
+    coordxy x = mtmp->mx, y = mtmp->my; /* 'mtmp's location before dochug() */
+    /* skip canspotmon() if occupation is Null */
+    boolean already_saw_mon = (chug && occupation) ? canspotmon(mtmp) : 0;
+    int rd = chug ? dochug(mtmp) : 0;
 
-    /* a similar check is in monster_nearby() in hack.c */
+    /*
+     * A similar check is in monster_nearby() in hack.c.
+     * [The two checks have a lot of differences and chances are high
+     * that some of those are unintentional.]
+     */
+
     /* check whether hero notices monster and stops current activity */
-    if (occupation && !rd && !Confusion &&
-        (!mtmp->mpeaceful || Hallucination) &&
+    if (occupation && !rd &&
+        /* monster is hostile and can attack (or hallu distorts knowledge) */
+         (Hallucination || (!mtmp->mpeaceful && !noattacks(mtmp->data))) &&
         /* it's close enough to be a threat */
-        mdistu(mtmp) <= (BOLT_LIM + 1) * (BOLT_LIM + 1) &&
+         mdistu(mtmp) <= (BOLT_LIM + 1) * (BOLT_LIM + 1) &&
         /* and either couldn't see it before, or it was too far away */
-        (!already_saw_mon || !couldsee(x, y) ||
-         distu(x, y) > (BOLT_LIM+1)*(BOLT_LIM+1)) &&
+         (!already_saw_mon || !couldsee(x, y) ||
+          distu(x, y) > (BOLT_LIM+1)*(BOLT_LIM+1)) &&
         /* can see it now, or sense it and would normally see it */
-        (canseemon(mtmp) ||
-         (sensemon(mtmp) && couldsee(x, y))) &&
-        mtmp->mcanmove &&
-        !noattacks(mtmp->data) && !onscary(u.ux, u.uy, mtmp))
+         canspotmon(mtmp) && couldsee(mtmp->mx, mtmp->my) &&
+        /* monster isn't paralyzed or afraid (scare monster/Elbereth) */
+         mtmp->mcanmove && !onscary(u.ux, u.uy, mtmp)) {
         stop_occupation();
+    }
 
     return rd;
 }

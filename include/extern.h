@@ -1641,7 +1641,7 @@ extern boolean mb_trapped(struct monst *);
 extern void mon_track_clear(struct monst *);
 extern boolean mon_has_key(struct monst *, boolean);
 extern void mon_regen(struct monst *, boolean);
-extern int dochugw(struct monst *);
+extern int dochugw(struct monst *, boolean) NONNULLARG1;
 extern boolean onscary(coordxy, coordxy, struct monst *);
 extern void monflee(struct monst *, int, boolean, boolean);
 extern int dochug(struct monst *);
