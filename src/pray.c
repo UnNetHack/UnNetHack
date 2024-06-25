@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static void offer_real_amulet(struct obj *, aligntyp); /* NORETURN */
 static void offer_fake_amulet(struct obj *, boolean, aligntyp);
 static void offer_different_alignment_altar(struct obj *, aligntyp);
 static void sacrifice_your_race(struct obj *, boolean, aligntyp);
@@ -1447,6 +1448,107 @@ desecrate_altar(boolean highaltar, aligntyp altaralign)
     god_zaps_you(altaralign);
 }
 
+/* offering the Amulet on a high altar (checked by caller) ends the game;
+   we don't declare this 'NORETURN' because done() can return (if called
+   with some reasons other than ASCENDED and ESCAPED) */
+static void
+offer_real_amulet(struct obj *otmp, aligntyp altaralign)
+{
+    int conduct, cdt;
+    char killerbuf[128];
+
+    /* The final Test.  Did you win? */
+    if (uamul == otmp) {
+        Amulet_off();
+    }
+    u.uevent.ascended = 1;
+    if (carried(otmp)) {
+        useup(otmp); /* well, it's gone now */
+    } else {
+        useupf(otmp, 1L);
+    }
+    You("offer the Amulet of Yendor to %s...", a_gname());
+    if (u.ualign.type != altaralign) {
+        /* And the opposing team picks you up and
+           carries you off on their shoulders */
+        adjalign(-99);
+        pline("%s accepts your gift, and gains dominion over %s...",
+              a_gname(), u_gname());
+        pline("%s is enraged...", u_gname());
+        pline("Fortunately, %s permits you to live...", a_gname());
+        pline("A cloud of %s smoke surrounds you...",
+              hcolor((const char *)"orange"));
+        done(ESCAPED);
+    } else { /* super big win */
+        adjalign(10);
+
+#ifdef RECORD_ACHIEVE
+        achieve.ascended = 1;
+# ifdef LIVELOGFILE
+        livelog_achieve_update();
+# endif
+#endif
+       pline("%s sings, and you are bathed in radiance...",
+             Hallucination ? "The fat lady" : "An invisible choir");
+       godvoice(altaralign, "Congratulations, mortal!");
+       display_nhwindow(WIN_MESSAGE, FALSE);
+       verbalize("In return for thy service, I grant thee the gift of Immortality!");
+       You("ascend to the status of Demigod%s...",
+           flags.female ? "dess" : "");
+
+       /*
+        * Check if there's a major successful conduct for the highscore.
+        * If so, look for additional ones and put everything into the
+        * killer-string.
+        *
+        * In the logfile this looks like:
+        *   "ascended adjective adjective ... noun"
+        *
+        * In the highscore it looks like:
+        *  Patito-Mon-Hum-Mal-Cha the nude vegan pacifist
+        *  ascended to demigod-hood.
+        */
+       conduct = FIRST_CONDUCT;
+
+       while (conduct <= LAST_CONDUCT) {
+           if (successful_cdt(conduct) && conducts[conduct].highscore
+              && !superfluous_cdt(conduct))
+               break;
+           conduct++;
+       }
+
+       if (conduct <= LAST_CONDUCT) {
+           /* we found a conduct */
+           Sprintf(killerbuf, "ascended ");
+           /*
+            * continue to search with the next following conduct
+            * and look for additional highscore conducts
+            */
+           cdt = conduct + 1;
+           while (cdt <= LAST_CONDUCT) {
+               if (successful_cdt(cdt) && conducts[cdt].highscore
+                   && !superfluous_cdt(cdt)) {
+                   /*
+                    * we found an additional conduct; now
+                    * add an adjective to the killer-string,
+                    * and continue the search
+                    */
+                   Sprintf(eos(killerbuf), "%s ", conducts[cdt].adj);
+               }
+               cdt++;
+           }
+
+           /* now finally add the noun */
+           strcat(killerbuf, conducts[conduct].noun);
+           killer.format = NO_KILLER_PREFIX;
+           Strcpy(killer.name, killerbuf);
+       } else /* No conducts found */
+           killer.name[0] = 0;
+
+       done(ASCENDED);
+   }
+}
+
 static void
 offer_fake_amulet(
     struct obj *otmp,
@@ -1682,9 +1784,6 @@ dosacrifice(void)
     char qbuf[QBUFSZ];
     char c;
 
-    int conduct, cdt;
-    char killerbuf[128];
-
     if (!on_altar() || u.uswallow) {
         You("are not standing on an altar.");
         return 0;
@@ -1821,97 +1920,8 @@ dosacrifice(void)
             }
             return 1;
         } else {
-            /* The final Test.  Did you win? */
-            if (uamul == otmp) {
-                Amulet_off();
-            }
-            u.uevent.ascended = 1;
-            if (carried(otmp)) {
-                useup(otmp); /* well, it's gone now */
-            } else {
-                useupf(otmp, 1L);
-            }
-            You("offer the Amulet of Yendor to %s...", a_gname());
-            if (u.ualign.type != altaralign) {
-                /* And the opposing team picks you up and
-                   carries you off on their shoulders */
-                adjalign(-99);
-                pline("%s accepts your gift, and gains dominion over %s...",
-                      a_gname(), u_gname());
-                pline("%s is enraged...", u_gname());
-                pline("Fortunately, %s permits you to live...", a_gname());
-                pline("A cloud of %s smoke surrounds you...",
-                      hcolor((const char *)"orange"));
-                done(ESCAPED);
-            } else { /* super big win */
-                adjalign(10);
-
-#ifdef RECORD_ACHIEVE
-                achieve.ascended = 1;
-#ifdef LIVELOGFILE
-                livelog_achieve_update();
-#endif
-#endif
-
-                pline("%s sings, and you are bathed in radiance...",
-                      Hallucination ? "The fat lady" : "An invisible choir");
-                godvoice(altaralign, "Congratulations, mortal!");
-                display_nhwindow(WIN_MESSAGE, FALSE);
-                verbalize("In return for thy service, I grant thee the gift of Immortality!");
-                You("ascend to the status of Demigod%s...",
-                    flags.female ? "dess" : "");
-
-                /*
-                 * Check if there's a major successful conduct for the highscore.
-                 * If so, look for additional ones and put everything into the
-                 * killer-string.
-                 *
-                 * In the logfile this looks like:
-                 *   "ascended adjective adjective ... noun"
-                 *
-                 * In the highscore it looks like:
-                 *  Patito-Mon-Hum-Mal-Cha the nude vegan pacifist
-                 *  ascended to demigod-hood.
-                 */
-                conduct = FIRST_CONDUCT;
-
-                while (conduct <= LAST_CONDUCT) {
-                    if (successful_cdt(conduct) && conducts[conduct].highscore
-                       && !superfluous_cdt(conduct))
-                        break;
-                    conduct++;
-                }
-
-                if (conduct <= LAST_CONDUCT) {
-                    /* we found a conduct */
-                    Sprintf(killerbuf, "ascended ");
-                    /*
-                     * continue to search with the next following conduct
-                     * and look for additional highscore conducts
-                     */
-                    cdt = conduct + 1;
-                    while (cdt <= LAST_CONDUCT) {
-                        if (successful_cdt(cdt) && conducts[cdt].highscore
-                            && !superfluous_cdt(cdt)) {
-                            /*
-                             * we found an additional conduct; now
-                             * add an adjective to the killer-string,
-                             * and continue the search
-                             */
-                            Sprintf(eos(killerbuf), "%s ", conducts[cdt].adj);
-                        }
-                        cdt++;
-                    }
-
-                    /* now finally add the noun */
-                    strcat(killerbuf, conducts[conduct].noun);
-                    killer.format = NO_KILLER_PREFIX;
-                    Strcpy(killer.name, killerbuf);
-                } else /* No conducts found */
-                    killer.name[0] = 0;
-
-                done(ASCENDED);
-            }
+            offer_real_amulet(otmp, altaralign);
+            /*NOTREACHED*/
         }
     } /* real Amulet */
 
