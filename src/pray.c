@@ -16,6 +16,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static void offer_too_soon(aligntyp);
 static void offer_real_amulet(struct obj *, aligntyp); /* NORETURN */
 static void offer_fake_amulet(struct obj *, boolean, aligntyp);
 static void offer_different_alignment_altar(struct obj *, aligntyp);
@@ -1433,6 +1434,20 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+/* feedback when attempting to offer the Amulet on a "low altar" (not one of
+   the high altars in the temples on the Astral Plane or Moloch's Sanctum) */
+static void
+offer_too_soon(aligntyp altaralign)
+{
+    nhUse(altaralign);
+    if (Hallucination) {
+        You_feel("homesick.");
+    } else {
+        You_feel("an urge to return to the surface.");
+    }
+}
+
+
 void
 desecrate_altar(boolean highaltar, aligntyp altaralign)
 {
@@ -1912,13 +1927,9 @@ dosacrifice(void)
         /* There's now an atheist option to win the game */
         u.uconduct.gnostic++;
 #endif
-        if (!Is_astralevel(&u.uz)) {
-            if (Hallucination) {
-                You_feel("homesick.");
-            } else {
-                You_feel("an urge to return to the surface.");
-            }
-            return 1;
+        if (!highaltar) {
+            offer_too_soon(altaralign);
+            return ECMD_TIME;
         } else {
             offer_real_amulet(otmp, altaralign);
             /*NOTREACHED*/
@@ -2034,7 +2045,7 @@ dosacrifice(void)
             u.reconciled = REC_REC;
         }
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 void
@@ -2643,21 +2654,17 @@ invoke_amulet(struct obj *otmp)
 
     if (!on_altar()) {
         pline("%s", nothing_happens);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* Since this is a potentially terminal effect on the game, confirm action */
     if (yn("Are you sure you want to defy the Gods by invoking the Amulet?") == 'n') {
-        return 0;
+        return ECMD_CANCEL;
     }
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!Is_astralevel(&u.uz)) {
-            if (Hallucination) {
-                You_feel("homesick.");
-            } else {
-                You_feel("an urge to return to the surface.");
-            }
+            offer_too_soon(altaralign);
             /* trying to #invoke whilst not on Astral plane still annoys your god */
             if (flags.soundok) {
                 You_hear("a nearby thunderclap.");
@@ -2665,7 +2672,7 @@ invoke_amulet(struct obj *otmp)
             change_luck(-1);
             adjalign(-10);
             gods_upset(u.ualign.type);
-            return 1;
+            return ECMD_TIME;
         } else {
             /* The final Test.  Did you win? */
             You("invoke %s.", the(xname(otmp)));
@@ -2728,9 +2735,9 @@ invoke_amulet(struct obj *otmp)
             adjalign(-12);
             gods_upset(u.ualign.type);
         }
-        return 1;
+        return ECMD_TIME;
     } /* fake Amulet */
-    return 0;
+    return ECMD_OK;
 }
 #endif
 
