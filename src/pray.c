@@ -104,6 +104,52 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 #define on_shrine() ((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
 #define a_align(x, y)    ((aligntyp)Amask2align(levl[x][y].altarmask & AM_MASK))
 
+/** critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
+boolean
+critically_low_hp(
+    boolean only_if_injured) /* determines whether maxhp <= 5 matters */
+{
+    int divisor, hplim,
+        curhp = Upolyd ? u.mh : u.uhp,
+        maxhp = Upolyd ? u.mhmax : u.uhpmax;
+
+    if (only_if_injured && !(curhp < maxhp)) {
+        return FALSE;
+    }
+    /* if maxhp is extremely high, use lower threshold for the division test
+       (golden glow cuts off at 11+5*lvl, nurse interaction at 25*lvl; this
+       ought to use monster hit dice--and a smaller multiplier--rather than
+       ulevel when polymorphed, but polyself doesn't maintain that) */
+    hplim = 15 * u.ulevel;
+    if (maxhp > hplim) {
+        maxhp = hplim;
+    }
+    /* 7 used to be the unconditional divisor */
+    switch (xlev_to_rank(u.ulevel)) { /* maps 1..30 into 0..8 */
+    case 0:
+    case 1:
+        divisor = 5;
+        break; /* explvl 1 to 5 */
+    case 2:
+    case 3:
+        divisor = 6;
+        break; /* explvl 6 to 13 */
+    case 4:
+    case 5:
+        divisor = 7;
+        break; /* explvl 14 to 21 */
+    case 6:
+    case 7:
+        divisor = 8;
+        break; /* explvl 22 to 29 */
+    default:
+        divisor = 9;
+        break; /* explvl 30+ */
+    }
+    /* 5 is a magic number in TROUBLE_HIT handling below */
+    return (boolean) (curhp <= 5 || curhp * divisor <= maxhp);
+}
+
 /* return TRUE if surrounded by impassible rock, regardless of the state
    of your own location (for example, inside a doorless closet) */
 boolean
@@ -162,9 +208,9 @@ in_trouble(void)
     if (region_danger()) {
         return TROUBLE_REGION;
     }
-    if (!heaven_or_hell_mode && (
-            Upolyd ? (u.mh <= 5 || u.mh*7 <= u.mhmax) :
-            (u.uhp <= 5 || u.uhp*7 <= u.uhpmax))) return TROUBLE_HIT;
+    if (!heaven_or_hell_mode && critically_low_hp(FALSE)) {
+        return TROUBLE_HIT;
+    }
     if (u.ulycn >= LOW_PM) {
         return TROUBLE_LYCANTHROPE;
     }
