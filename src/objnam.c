@@ -2455,6 +2455,21 @@ thesimpleoname(struct obj *obj)
     return the(simpleoname);
 }
 
+/* basic name of obj, as if it has been discovered; for some types of
+   items, we can't just use OBJ_NAME() because it doesn't always include
+   the class (for instance "light" when we want "spellbook of light");
+   minimal_xname() uses xname() to get that */
+char *
+actualoname(struct obj *obj)
+{
+    char *res;
+
+    iflags.override_ID = TRUE;
+    res = minimal_xname(obj);
+    iflags.override_ID = FALSE;
+    return res;
+}
+
 /* artifact's name without any object type or known/dknown/&c feedback */
 char *
 bare_artifactname(struct obj *obj)

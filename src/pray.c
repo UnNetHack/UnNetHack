@@ -46,9 +46,9 @@ static boolean blocked_boulder(int, int);
  *  responsible for the theft of the Amulet from Marduk, the Creator.
  *  Moloch is unaligned.
  */
-static const char *Moloch = "Moloch";
+static const char *const Moloch = "Moloch";
 
-static const char *godvoices[] = {
+static const char *const godvoices[] = {
     "booms out",
     "thunders",
     "rings out",
@@ -98,21 +98,6 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 #define TROUBLE_STUNNED            (-9)
 #define TROUBLE_CONFUSED          (-10)
 #define TROUBLE_HALLUCINATION     (-11)
-
-/* We could force rehumanize of polyselfed people, but we can't tell
-   unintentional shape changes from the other kind. Oh well.
-   3.4.2: make an exception if polymorphed into a form which lacks
-   hands; that's a case where the ramifications override this doubt.
- */
-
-/* Return 0 if nothing particular seems wrong, positive numbers for
-   serious trouble, and negative numbers for comparative annoyances. This
-   returns the worst problem. There may be others, and the gods may fix
-   more than one.
-
-   This could get as bizarre as noting surrounding opponents, (or hostile dogs),
-   but that's really hard.
- */
 
 #define ugod_is_angry() (u.ualign.record < 0)
 #define on_altar()  IS_ALTAR(levl[u.ux][u.uy].typ)
@@ -803,6 +788,7 @@ static void
 gcrownu(void)
 {
     struct obj *obj;
+    const char *what;
     boolean already_exists, in_hand;
     short class_gift;
     int sp_no;
@@ -852,22 +838,32 @@ gcrownu(void)
         u.uevent.uhand_of_elbereth = 3;
         in_hand = (uwep && uwep->oartifact == ART_STORMBRINGER);
         already_exists = exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
+        what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT) ?
+                "take lives" : "steal souls");
         verbalize("Thou art chosen to %s for My Glory!",
                   already_exists && !in_hand ? "take lives" : "steal souls");
-        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
-                       ((already_exists && !in_hand) || class_gift != STRANGE_OBJECT) ? "take lives" :
-                                                                                        "steal souls",
-                       u_gname());
+        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s", what, u_gname());
         break;
     }
 
     if (objects[class_gift].oc_class == SPBOOK_CLASS) {
+        char bbuf[BUFSZ];
+
         obj = mksobj(class_gift, TRUE, FALSE);
+        /* get book type before dropping (don't think that could destroy
+           the book because we need to be on an altar in order to become
+           crowned, but be paranoid about it) */
+        Strcpy(bbuf, actualoname(obj)); /* for livelog; "spellbook of <foo>"
+                                         * even if hero doesn't know book */
         bless(obj);
         obj->bknown = 1; /* ok to skip set_bknown() */
         at_your_feet("A spellbook");
         dropy(obj);
         u.ugifts++;
+        /* not an artifact, but treat like one for this situation;
+           classify as a spoiler in case player hasn't IDed the book yet */
+        livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT | LL_SPOILER, "was bestowed with %s", bbuf);
+
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
         for (sp_no = 0; sp_no < MAXSPELL; sp_no++) {
@@ -885,12 +881,18 @@ gcrownu(void)
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
         } else if (obj && obj->otyp == LONG_SWORD && !obj->oartifact) {
+            char lbuf[BUFSZ];
+
+            Strcpy(lbuf, simpleonames(obj)); /* before transformation */
             if (!Blind) {
                 Your("sword shines brightly for a moment.");
             }
             obj = oname(obj, artiname(ART_EXCALIBUR));
             if (obj && obj->oartifact == ART_EXCALIBUR) {
                 u.ugifts++;
+                livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                               "had %s wielded %s transformed into %s",
+                               uhis(), lbuf, artiname(ART_EXCALIBUR));
             }
         } else if (!already_exists) {
             int x = u.ux;
@@ -929,6 +931,9 @@ gcrownu(void)
                 dropy(obj);
             }
             u.ugifts++;
+            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                           "was bestowed with %s",
+                           artiname(ART_EXCALIBUR));
         }
         /* acquire Excalibur's skill regardless of weapon or gift */
         unrestrict_weapon_skill(P_LONG_SWORD);
@@ -950,6 +955,9 @@ gcrownu(void)
             at_your_feet("A sword");
             dropy(obj);
             u.ugifts++;
+            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                           "was bestowed with %s",
+                           artiname(ART_VORPAL_BLADE));
         }
         /* acquire Vorpal Blade's skill regardless of weapon or gift */
         unrestrict_weapon_skill(P_LONG_SWORD);
@@ -975,6 +983,9 @@ gcrownu(void)
             obj->spe = 1;
             dropy(obj);
             u.ugifts++;
+            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                           "was bestowed with %s",
+                           artiname(ART_STORMBRINGER));
         }
         /* acquire Stormbringer's skill regardless of weapon or gift */
         unrestrict_weapon_skill(P_BROAD_SWORD);
