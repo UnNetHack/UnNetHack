@@ -179,6 +179,20 @@ stuck_in_wall(void)
     return (count == 8) ? TRUE : FALSE;
 }
 
+/*
+ * Return 0 if nothing particular seems wrong, positive numbers for
+ * serious trouble, and negative numbers for comparative annoyances.
+ * This returns the worst problem. There may be others, and the gods
+ * may fix more than one.
+ *
+ * This could get as bizarre as noting surrounding opponents, (or
+ * hostile dogs), but that's really hard.
+ *
+ * We could force rehumanize of polyselfed people, but we can't tell
+ * unintentional shape changes from the other kind. Oh well.
+ * 3.4.2: make an exception if polymorphed into a form which lacks
+ * hands; that's a case where the ramifications override this doubt.
+ */
 int
 in_trouble(void)
 {
@@ -751,7 +765,7 @@ angrygods(aligntyp resp_god)
         resp_god = A_NONE;
     }
 
-    u.ublessed = 0;
+    u.ublessed = 0; /* lose divine protection */
 
     if (u.ualign.type == resp_god) {
         update_prayer_stats(PRAY_ANGER);
@@ -760,10 +774,10 @@ angrygods(aligntyp resp_god)
     /* changed from tmp = u.ugangr + abs (u.uluck) -- rph */
     /* added test for alignment diff -dlc */
     if (resp_god != u.ualign.type) {
-        maxanger =  u.ualign.record/2 + (Luck > 0 ? -Luck/3 : -Luck);
+        maxanger =  u.ualign.record / 2 + (Luck > 0 ? -Luck / 3 : -Luck);
     } else {
-        maxanger =  3*u.ugangr +
-                   ((Luck > 0 || u.ualign.record >= STRIDENT) ? -Luck/3 : -Luck);
+        maxanger =  3 * u.ugangr +
+                   ((Luck > 0 || u.ualign.record >= STRIDENT) ? -Luck / 3 : -Luck);
     }
     if (maxanger < 1) {
         maxanger = 1; /* possible if bad align & good luck */
@@ -1505,26 +1519,42 @@ consume_offering(struct obj *otmp)
 static void
 offer_too_soon(aligntyp altaralign)
 {
-    nhUse(altaralign);
-    if (Hallucination) {
-        You_feel("homesick.");
-    } else {
-        You_feel("an urge to return to the surface.");
+    if (altaralign == A_NONE && Inhell) {
+        /* offering on an unaligned altar in Gehennom;
+           hero has left Moloch's Sanctum (caller handles that)
+           so is in the process of getting away with the Amulet;
+           for any unaligned altar outside of Gehennom, give the
+           "you feel ashamed" feedback for wrong alignment below */
+        gods_upset(A_NONE); /* Moloch becomes angry */
+        return;
     }
+    You_feel("%s.", Hallucination ? "homesick" :
+                    /* if on track, give a big hint */
+                    (altaralign == u.ualign.type) ? "an urge to return to the surface" :
+                    /* else headed towards celestial disgrace */
+                    "ashamed");
 }
-
 
 void
 desecrate_altar(boolean highaltar, aligntyp altaralign)
 {
-    nhUse(highaltar);
     /*
      * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
-     * gets the god who owns it truely pissed off.
+     * gets the god who owns it truly pissed off.  The same effect for
+     * deliberately destroying a normal altar.
      */
+    /* if you did this to your own altar, your god will hold a grudge... */
+    if (altaralign == u.ualign.type) {
+        adjalign(-20);
+        u.ugangr += 5;
+    }
+
     You_feel("the air around you grow charged...");
-    pline("Suddenly, you realize that %s has noticed you...", a_gname());
-    godvoice(altaralign, "So, mortal!  You dare desecrate my High Temple!");
+    pline("Suddenly, you realize that %s has noticed you...",
+          align_gname(altaralign));
+    Sprintf(gvbuf, "So, mortal!  You dare desecrate my %s!",
+            highaltar ? "High Temple" : "altar");
+    godvoice(altaralign, gvbuf);
     /* Throw everything we have at the player */
     god_zaps_you(altaralign);
 }
@@ -1537,6 +1567,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 {
     int conduct, cdt;
     char killerbuf[128];
+    static const char cloud_of_smoke[] = "A cloud of %s smoke surrounds you...";
 
     /* The final Test.  Did you win? */
     if (uamul == otmp) {
@@ -1549,19 +1580,38 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         useupf(otmp, 1L);
     }
     You("offer the Amulet of Yendor to %s...", a_gname());
-    if (u.ualign.type != altaralign) {
-        /* And the opposing team picks you up and
-           carries you off on their shoulders */
+
+    if (altaralign == A_NONE) {
+        /* Moloch's high altar at the bottom of Gehennom. */
+        if (u.ualign.record > -99) {
+            u.ualign.record = -99;
+        }
+        pline("An invisible choir chants, and you are bathed in darkness...");
+        /*[apparently shrug/snarl can be sensed without being seen]*/
+        pline("%s shrugs and retains dominion over %s,", Moloch, u_gname());
+        pline("then mercilessly snuffs out your life.");
+        Sprintf(killer.name, "%s indifference", s_suffix(Moloch));
+        killer.format = KILLED_BY;
+        done(DIED);
+        /* life-saved (or declined to die in wizard/explore mode) */
+        pline("%s snarls and tries again...", Moloch);
+        fry_by_god(A_NONE, TRUE); /* wrath of Moloch */
+        /* declined to die in wizard or explore mode */
+        pline(cloud_of_smoke, hcolor(NH_BLACK));
+        done(ESCAPED);
+        /*NOTREACHED*/
+    } else if (u.ualign.type != altaralign) {
+        /* And the opposing team picks you up and carries you off
+           on their shoulders. */
         adjalign(-99);
         pline("%s accepts your gift, and gains dominion over %s...",
               a_gname(), u_gname());
         pline("%s is enraged...", u_gname());
         pline("Fortunately, %s permits you to live...", a_gname());
-        pline("A cloud of %s smoke surrounds you...",
-              hcolor((const char *)"orange"));
+        pline(cloud_of_smoke, hcolor(NH_ORANGE));
         done(ESCAPED);
-    } else { /* super big win */
-        adjalign(10);
+    } else {
+        /* You've won the game!  Feedback-wise, it's a bit of a let down. */
 
 #ifdef RECORD_ACHIEVE
         achieve.ascended = 1;
@@ -1569,13 +1619,14 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         livelog_achieve_update();
 # endif
 #endif
-       pline("%s sings, and you are bathed in radiance...",
-             Hallucination ? "The fat lady" : "An invisible choir");
-       godvoice(altaralign, "Congratulations, mortal!");
-       display_nhwindow(WIN_MESSAGE, FALSE);
-       verbalize("In return for thy service, I grant thee the gift of Immortality!");
-       You("ascend to the status of Demigod%s...",
-           flags.female ? "dess" : "");
+        adjalign(10);
+        pline("%s sings, and you are bathed in radiance...",
+              Hallucination ? "The fat lady" : "An invisible choir");
+        godvoice(altaralign, "Congratulations, mortal!");
+        display_nhwindow(WIN_MESSAGE, FALSE);
+        verbalize("In return for thy service, I grant thee the gift of Immortality!");
+        You("ascend to the status of Demigod%s...",
+            flags.female ? "dess" : "");
 
        /*
         * Check if there's a major successful conduct for the highscore.
@@ -1636,13 +1687,14 @@ offer_fake_amulet(
     boolean highaltar,
     aligntyp altaralign)
 {
-    nhUse(highaltar);
+    if (!highaltar && !otmp->known) {
+        offer_too_soon(altaralign);
+        return;
+    }
 #ifdef ASTRAL_ESCAPE
     u.uconduct.gnostic++;
 #endif
-    if (flags.soundok) {
-        You_hear("a nearby thunderclap.");
-    }
+    You_hear("a nearby thunderclap.");
     if (!otmp->known) {
         You("realize you have made a %s.",
             Hallucination ? "boo-boo" : "mistake");
@@ -2142,7 +2194,8 @@ can_pray(boolean praying) /**< FALSE means no messages should be given */
     p_aligntyp = on_altar() ? a_align(u.ux, u.uy) : u.ualign.type;
     p_trouble = in_trouble();
 
-    if (is_demon(youmonst.data) && (p_aligntyp != A_CHAOTIC)) {
+    if (is_demon(youmonst.data) && /* ok if chaotic or none (Moloch) */
+         (p_aligntyp == A_LAWFUL || p_aligntyp == A_NEUTRAL)) {
         if (praying) {
             pline_The("very idea of praying to a %s god is repugnant to you.",
                       p_aligntyp ? "lawful" : "neutral");
@@ -2162,11 +2215,13 @@ can_pray(boolean praying) /**< FALSE means no messages should be given */
         alignment = u.ualign.record;
     }
 
-    if ((p_trouble > 0) ? (u.ublesscnt > 200) : /* big trouble */
-        (p_trouble < 0) ? (u.ublesscnt > 100) : /* minor difficulties */
-        (u.ublesscnt > 0))      /* not in trouble */
+    if (p_aligntyp == A_NONE) { /* praying to Moloch */
+        p_type = -2;
+    } else if ((p_trouble > 0) ? (u.ublesscnt > 200) : /* big trouble */
+               (p_trouble < 0) ? (u.ublesscnt > 100) : /* minor difficulties */
+               (u.ublesscnt > 0)) { /* not in trouble */
         p_type = 0; /* too soon... */
-    else if ((int)Luck < 0 || u.ugangr || alignment < 0) {
+    } else if ((int)Luck < 0 || u.ugangr || alignment < 0) {
         p_type = 1; /* too naughty... */
     } else /* alignment >= 0 */ {
         if (on_altar() && u.ualign.type != p_aligntyp) {
@@ -2177,8 +2232,9 @@ can_pray(boolean praying) /**< FALSE means no messages should be given */
     }
 
     if (is_undead(youmonst.data) && !Inhell &&
-        (p_aligntyp == A_LAWFUL || (p_aligntyp == A_NEUTRAL && !rn2(10))))
+        (p_aligntyp == A_LAWFUL || (p_aligntyp == A_NEUTRAL && !rn2(10)))) {
         p_type = -1;
+    }
     /* Note:  when !praying, the random factor for neutrals makes the
        return value a non-deterministic approximation for enlightenment.
        This case should be uncommon enough to live with... */
@@ -2206,7 +2262,7 @@ pray_revive(void)
     return (revive(otmp, TRUE) != NULL);
 }
 
-/* #pray commmand */
+/* #pray command */
 int
 dopray(void)
 {
@@ -2280,7 +2336,19 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
     u.uinvulnerable = FALSE;
     u.lastprayresult = PRAY_GOOD;
 
-    if (p_type == -1) {
+    if (p_type == -2) {
+        /* praying at an unaligned altar, not necessarily in Gehennom */
+        You("%s diabolical laughter all around you...",
+            !Deaf ? "hear" : "intuit");
+        wake_nearby();
+        adjalign(-2);
+        exercise(A_WIS, FALSE);
+        if (!Inhell) {
+            /* hero's god[dess] seems to be keeping his/her head down */
+            pline("Nothing else happens."); /* not actually true... */
+            return 1;
+        } /* else use regular Inhell result below */
+    } else if (p_type == -1) {
         godvoice(alignment,
                  alignment == A_LAWFUL ?
                  "Vile creature, thou durst call upon me?" :
@@ -2302,8 +2370,10 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         return 1;
     }
     if (Inhell) {
-        pline("Since you are in Gehennom, %s won't help you.",
-              align_gname(alignment));
+        if (alignment != A_NONE) {
+            pline("Since you are in Gehennom, %s can't help you.",
+                align_gname(alignment));
+        }
         /* haltingly aligned is least likely to anger */
         if (u.ualign.record <= 0 || rnl(u.ualign.record)) {
             angrygods(u.ualign.type);
@@ -2464,7 +2534,7 @@ doturn(void)
      *  chaotic oneself (see "For some reason" above) and chaotic
      *  turning only makes targets peaceful.
      *
-     *  Paralysis duration probably ought to be based on the strengh
+     *  Paralysis duration probably ought to be based on the strength
      *  of turned creatures rather than on turner's level.
      *  Why doesn't this honor Free_action?  [Because being able to
      *  repeat #turn every turn would be too powerful.  Maybe instead
