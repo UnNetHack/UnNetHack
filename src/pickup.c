@@ -1688,6 +1688,9 @@ pickup_object(
            one of the just deleted other sokoban prizes */
         return -1;
     }
+    if (obj->ghostly) {
+        fix_ghostly_obj(obj);
+    }
     return 1;
 }
 

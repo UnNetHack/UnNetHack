@@ -523,4 +523,9 @@ struct you {
 /* hero at (x,y)? */
 #define u_at(x,y) ((x) == u.ux && (y) == u.uy)
 
+#define URIGHTY (1)
+#define ULEFTY (0)
+#define RING_ON_PRIMARY (ULEFTY ? uleft : uright)
+#define RING_ON_SECONDARY (ULEFTY ? uright : uleft)
+
 #endif /* YOU_H */

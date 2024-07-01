@@ -107,6 +107,7 @@ struct obj {
     Bitfield(bypass, 1);      /* mark this as an object to be skipped by bhito() */
     Bitfield(cknown, 1);      /* contents of container assumed to be known */
     Bitfield(lknown, 1);      /* locked/unlocked status is known */
+    Bitfield(ghostly, 1); /* it just got placed into a bones file */
     Bitfield(was_thrown, 1);  /* thrown by the hero since last picked up */
     Bitfield(odrained, 1);    /* drained corpse */
     Bitfield(was_dropped, 1); /* dropped deliberately by the hero */

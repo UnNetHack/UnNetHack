@@ -11,6 +11,7 @@ static void goodfruit(int);
 static void resetobjs(struct obj *, boolean);
 static void give_to_nearby_mon(struct obj *, coordxy, coordxy) NONNULLARG1;
 static boolean fixuporacle(struct monst *);
+static void set_ghostly_objlist(struct obj *objchain);
 
 static boolean
 no_bones_level(d_level *lev)
@@ -526,6 +527,8 @@ make_bones:
         f->fid = -f->fid;
     }
 
+    set_ghostly_objlist(invent);
+
     /* check iron balls separately--maybe they're not carrying it */
     if (uball) {
         uball->owornmask = uchain->owornmask = 0;
@@ -604,6 +607,7 @@ make_bones:
 #endif
     }
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        set_ghostly_objlist(mtmp->minvent);
         resetobjs(mtmp->minvent, FALSE);
         /* do not zero out m_ids for bones levels any more */
         mtmp->mlstmv = 0L;
@@ -615,7 +619,9 @@ make_bones:
         ttmp->madeby_u = 0;
         ttmp->tseen = (ttmp->ttyp == HOLE);
     }
+    set_ghostly_objlist(fobj);
     resetobjs(fobj, FALSE);
+    set_ghostly_objlist(level.buriedobjlist);
     resetobjs(level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
@@ -814,6 +820,43 @@ getbones(void)
     }
 
     return ok;
+}
+
+/* set the ghostly bit in a list of objects */
+static void
+set_ghostly_objlist(struct obj *objchain)
+{
+    while (objchain) {
+        objchain->ghostly = 1;
+        objchain = objchain->nobj;
+    }
+}
+
+/* This is called when a marked object from a bones file is picked-up.
+   Some could result in a message, and the obj->ghostly flag is always
+   cleared. obj->ghostly has no other usage at this time. */
+void
+fix_ghostly_obj(struct obj *obj)
+{
+    if (!obj->ghostly) {
+        return;
+    }
+
+    switch (obj->otyp) {
+        /* asymmetrical weapons */
+        case BOW:
+        case ELVEN_BOW:
+        case ORCISH_BOW:
+        case YUMI:
+        case BOOMERANG:
+            You("make adjustments to %s to suit your %s hand.",
+                the(xname(obj)),
+                URIGHTY ? "right" : "left");
+            break;
+        default:
+            break;
+    }
+    obj->ghostly = 0;
 }
 
 /*bones.c*/

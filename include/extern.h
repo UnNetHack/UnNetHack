@@ -145,6 +145,7 @@ extern void drop_upon_death(struct monst *, struct obj *, coordxy, coordxy);
 extern boolean can_make_bones(void);
 extern void savebones(struct obj *);
 extern int getbones(void);
+extern void fix_ghostly_obj(struct obj *) NONNULLARG1;
 
 /* ### botl.c ### */
 
