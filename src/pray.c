@@ -1538,6 +1538,8 @@ offer_too_soon(aligntyp altaralign)
 void
 desecrate_altar(boolean highaltar, aligntyp altaralign)
 {
+    char gvbuf[BUFSZ];
+
     /*
      * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
      * gets the god who owns it truly pissed off.  The same effect for
