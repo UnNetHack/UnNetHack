@@ -965,6 +965,22 @@ m_avoid_kicked_loc(struct monst *mtmp, coordxy nx, coordxy ny)
         && next2u(nx, ny)) {
         return TRUE;
     }
+    return FALSE;
+}
+
+/* monster avoids a location nx, ny, if we're in sokoban, and
+   there's a boulder between the location and hero */
+boolean
+m_avoid_soko_push_loc(struct monst *mtmp, coordxy nx, coordxy ny)
+{
+    if (Sokoban
+        && (mtmp->mpeaceful || mtmp->mtame)
+        && !mtmp->mconf && !mtmp->mstun
+        && !Conflict
+        && (dist2(nx, ny, u.ux, u.uy) == 4)
+        && sobj_at(BOULDER, nx + sgn(u.ux - nx), ny + sgn(u.uy - ny))) {
+        return TRUE;
+    }
 
     return FALSE;
 }

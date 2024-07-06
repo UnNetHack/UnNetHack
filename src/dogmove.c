@@ -1144,6 +1144,9 @@ dog_move(struct monst *mtmp,
         if (m_avoid_kicked_loc(mtmp, nx, ny)) {
             continue;
         }
+        if (m_avoid_soko_push_loc(mtmp, nx, ny)) {
+            continue;
+        }
 
         {
             /* Dog avoids harmful traps, but perhaps it has to pass one

@@ -1663,6 +1663,7 @@ extern void monflee(struct monst *, int, boolean, boolean);
 extern int dochug(struct monst *);
 extern boolean m_digweapon_check(struct monst *, coordxy, coordxy);
 extern boolean m_avoid_kicked_loc(struct monst *, coordxy, coordxy) NONNULLARG1;
+extern boolean m_avoid_soko_push_loc(struct monst *, coordxy, coordxy) NONNULLARG1;
 extern int m_move(struct monst *, int);
 extern int m_move_aggress(struct monst *, coordxy, coordxy);
 extern boolean closed_door(coordxy, coordxy);
