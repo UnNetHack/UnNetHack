@@ -2047,8 +2047,17 @@ dosacrifice(void)
         /* There's now an atheist option to win the game */
         u.uconduct.gnostic++;
 #endif
+#if 0
         if (!highaltar) {
             offer_too_soon(altaralign);
+#endif
+        if (!Is_astralevel(&u.uz)) {
+            if (Hallucination) {
+                You_feel("homesick.");
+            } else {
+                You_feel("an urge to return to the surface.");
+            }
+            return 1;
             return ECMD_TIME;
         } else {
             offer_real_amulet(otmp, altaralign);
