@@ -2601,7 +2601,7 @@ create_altar(altar *a, struct mkroom *croom)
 {
     schar sproom;
     coordxy x = -1, y = -1;
-    unsigned int amask;
+    aligntyp amask;
     boolean croom_is_temple = TRUE;
 
     if (croom) {
