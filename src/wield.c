@@ -262,6 +262,8 @@ void
 setuqwep(struct obj *obj)
 {
     setworn(obj, W_QUIVER);
+    /* no extra handling needed; this used to include a call to
+       update_inventory() but that's already performed by setworn() */
 }
 
 void

@@ -229,9 +229,10 @@ Boots_on(void)
     default:
         warning(unknown_type, c_boots, uarmf->otyp);
     }
-    /* could be NULL here (levitation boots put on over a sink) */
-    if (uarmf) {
+    /* uarmf could be Null here (levitation boots put on over a sink) */
+    if (uarmf && !uarmf->known) {
         uarmf->known = 1; /* boots' +/- evident because of status line AC */
+        update_inventory();
     }
     if (uarmf && !is_racial_armor(uarmf)) {
         u.uconduct.non_racial_armor++;
@@ -384,9 +385,9 @@ Cloak_on(void)
         ABON(A_CHA) += 1;
         flags.botl = 1;
     }
-    /* no known instance of !uarmc here but play it safe */
-    if (uarmc) {
+    if (uarmc && !uarmc->known) { /* no known instance of !uarmc here */
         uarmc->known = 1; /* cloak's +/- evident because of status line AC */
+        update_inventory();
     }
     /* racial armor bonus */
     if (uarmc && !is_racial_armor(uarmc)) {
@@ -535,9 +536,10 @@ Helmet_on(void)
     default:
         warning(unknown_type, c_helmet, uarmh->otyp);
     }
-    /* uarmh could be NULL due to uchangealign() */
-    if (uarmh) {
+    /* uarmh could be Null due to uchangealign() */
+    if (uarmh && !uarmh->known) {
         uarmh->known = 1; /* helmet's +/- evident because of status line AC */
+        update_inventory();
     }
     if (uarmh && !is_racial_armor(uarmh)) {
         u.uconduct.non_racial_armor++;
@@ -636,8 +638,9 @@ Gloves_on(void)
         warning(unknown_type, c_gloves, uarmg->otyp);
     }
     /* no known instance of !uarmg here but play it safe */
-    if (uarmg) {
+    if (!uarmg->known) {
         uarmg->known = 1; /* gloves' +/- evident because of status line AC */
+        update_inventory();
     }
     if (uarmg && !is_racial_armor(uarmg)) {
         u.uconduct.non_racial_armor++;
@@ -751,9 +754,9 @@ Shield_on(void)
     default: warning(unknown_type, c_shield, uarms->otyp);
     }
  */
-    /* no known instance of !uarmgs here but play it safe */
-    if (uarms) {
+    if (!uarms->known) {
         uarms->known = 1; /* shield's +/- evident because of status line AC */
+        update_inventory();
     }
     if (uarms && !is_racial_armor(uarms)) {
         u.uconduct.non_racial_armor++;
@@ -798,9 +801,9 @@ Shirt_on(void)
     default: warning(unknown_type, c_shirt, uarmu->otyp);
     }
  */
-    /* no known instances of !uarmu here but play it safe */
-    if (uarmu) {
+    if (!uarmu->known) {
         uarmu->known = 1; /* shirt's +/- evident because of status line AC */
+        update_inventory();
     }
     if (uarmu && !is_racial_armor(uarmu)) {
         u.uconduct.non_racial_armor++;
@@ -836,6 +839,13 @@ lucky_fedora(void)
 static int
 Armor_on(void)
 {
+    if (!uarm) { /* no known instances of !uarm here but play it safe */
+        return 0;
+    }
+    if (!uarm->known) {
+        uarm->known = 1; /* suit's +/- evident because of status line AC */
+        update_inventory();
+    }
     if (uarm && Is_glowing_dragon_armor(uarm->otyp)) {
         begin_burn(uarm, FALSE);
         if (!Blind) {

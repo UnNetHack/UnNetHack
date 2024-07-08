@@ -1440,6 +1440,12 @@ see_objects(void)
             newsym(obj->ox, obj->oy);
         }
     }
+
+    /* Qt's "paper doll" subset of persistent inventory shows map tiles
+       for objects which aren't on the floor so not handled by above loop;
+       inventory which includes glyphs should also be affected, so do this
+       for all interfaces in case any feature that for persistent inventory */
+    update_inventory();
 }
 
 /*

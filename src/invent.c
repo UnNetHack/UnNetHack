@@ -556,6 +556,9 @@ hold_another_object(struct obj *obj, const char *drop_fmt, const char *drop_arg,
             if (hold_msg || drop_fmt) {
                 prinv(hold_msg, obj, oquan);
             }
+            /* obj made it into inventory and is staying there */
+            update_inventory();
+            (void) encumber_msg();
         }
     }
     return obj;
@@ -2033,6 +2036,8 @@ learn_unseen_invent(void)
 void
 update_inventory(void)
 {
+    int save_suppress_price;
+
     if (!program_state.in_moveloop) { /* not covered by suppress_map_output */
         return;
     }
@@ -2047,7 +2052,10 @@ update_inventory(void)
      * because curses uses that to disable a previous perm_invent window
      * (after toggle via 'O'; perhaps the options code should handle that).
      */
+    save_suppress_price = iflags.suppress_price;
+    iflags.suppress_price = 0;
     (*windowprocs.win_update_inventory)();
+    iflags.suppress_price = save_suppress_price;
 }
 
 static char

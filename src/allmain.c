@@ -248,6 +248,12 @@ moveloop(boolean resuming)
     touch_whereis();
 #endif
 
+    /* for perm_invent preset at startup, display persistent inventory after
+       invent is fully populated and the in_moveloop flag has been set */
+    if (iflags.perm_invent) {
+        update_inventory();
+    }
+
     for (;;) {
         get_nh_event();
 #ifdef POSITIONBAR

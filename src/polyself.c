@@ -420,6 +420,7 @@ do_merge:
                 uarm = (struct obj *)0;
                 /* save/restore hack */
                 uskin->owornmask |= I_SPECIAL;
+                update_inventory();
             }
         } else if (iswere) {
             if (is_were(youmonst.data)) {

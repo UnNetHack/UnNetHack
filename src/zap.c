@@ -2531,9 +2531,10 @@ dozap(void)
     }
     if (obj && obj->spe < 0) {
         pline("%s to dust.", Tobjnam(obj, "turn"));
-        useup(obj);
+        useupall(obj); /* calls freeinv() -> update_inventory() */
+    } else {
+        update_inventory(); /* maybe used a charge */
     }
-    update_inventory(); /* maybe used a charge */
 
     return ECMD_TIME;
 }
@@ -2821,21 +2822,10 @@ zapyourself(struct obj *obj, boolean ordinary)
     case SPE_WIZARD_LOCK:
         /* similar logic to opening; invent is hit iff no trap triggered */
         if (u.utrap || !closeholdingtrap(&youmonst, &learn_it)) {
-            struct obj *otmp;
-            boolean boxing = FALSE;
-
-            /* lock carried boxes */
-            for (otmp = invent; otmp; otmp = otmp->nobj) {
-                if (Is_box(otmp)) {
-                    (void) boxlock(otmp, obj);
-                    boxing = TRUE;
-                }
-            }
-            if (boxing) {
-                update_inventory(); /* in case any box->lknown has changed */
-            }
+            boxlock_invent(obj);
         }
         break;
+
     case WAN_DIGGING:
     case SPE_DIG:
     case SPE_DETECT_UNSEEN:
@@ -2864,6 +2854,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         }
 
         /* note: `obj' reused; doesn't point at wand anymore */
+        update_inventory();
         makeknown(WAN_PROBING);
         ustatusline();
         break;
@@ -3071,6 +3062,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack, boolean all
         if (youdefend) {
             flags.botl = 1; /* potential AC change */
             find_ac();
+            /* update_inventory(); -- handled by caller */
         }
     } else if (!(obj && (obj->oartifact == ART_MAGICBANE))) { /* Magicbane doesn't cancel inventory items */
         /* select one random item to cancel */

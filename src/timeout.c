@@ -1426,6 +1426,9 @@ burn_object(anything *arg, long int timeout)
                 } else {
                     switch (obj->where) {
                     case OBJ_INVENT:
+                        /* no need_invupdate for update_inventory() necessary;
+                           useupall() -> freeinv() handles it */
+                        /* fall through */
                     case OBJ_MINVENT:
                         pline("%s %s consumed!", Yname2(obj), many ? "are" : "is");
                         break;

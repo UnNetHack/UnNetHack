@@ -606,6 +606,7 @@ o_unleash(struct obj *otmp)
         }
     }
     otmp->leashmon = 0;
+    update_inventory();
 }
 
 /* mtmp is about to die, or become untame */
@@ -625,6 +626,7 @@ m_unleash(struct monst *mtmp, boolean feedback)
         if (otmp->otyp == LEASH &&
              otmp->leashmon == (int)mtmp->m_id) {
             otmp->leashmon = 0;
+            update_inventory();
         }
     }
     mtmp->mleashed = 0;
@@ -730,6 +732,7 @@ got_target:
             mtmp->mleashed = 1;
             obj->leashmon = (int) mtmp->m_id;
             mtmp->msleeping = 0;
+            update_inventory();
         }
     } else {
         /* applying a leash which is currently in use */
@@ -741,6 +744,7 @@ got_target:
         } else {
             mtmp->mleashed = 0;
             obj->leashmon = 0;
+            update_inventory();
             You("remove the leash from %s%s.", spotmon ? "your " : "", l_monnam(mtmp));
         }
     }
@@ -784,10 +788,11 @@ next_to_u(void)
                         if (otmp->cursed) {
                             return FALSE;
                         }
-                        You_feel("%s leash go slack.",
-                                 (number_leashed() > 1) ? "a" : "the");
                         mtmp->mleashed = 0;
                         otmp->leashmon = 0;
+                        update_inventory();
+                        You_feel("%s leash go slack.",
+                                 (number_leashed() > 1) ? "a" : "the");
                     }
                 }
             }
@@ -1337,6 +1342,7 @@ use_candle(struct obj **optr)
         useupall(obj);
         /* candelabrum's weight is changing */
         otmp->owt = weight(otmp);
+        update_inventory();
     }
 }
 
