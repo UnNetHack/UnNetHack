@@ -23,15 +23,17 @@
 #include "sp_lev.h"
 #include "rect.h"
 
-
+/* from mkmap.c */
 extern void mkmap(lev_init *);
+
+/* from sp_lev.c */
+extern void create_altar(altar *, struct mkroom *);
+extern void create_monster(monster *, struct mkroom *);
 
 static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
 static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
 static int noncoalignment(aligntyp);
-static void create_monster(monster *, struct mkroom *);
 static void create_object(object *, struct mkroom *);
-static void create_altar(altar *, struct mkroom *);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static void create_trap(spltrap *, struct mkroom *);
@@ -1380,298 +1382,6 @@ pm_to_humidity(struct permonst *pm)
 }
 
 /*
- * Convert a special level alignment mask (an alignment mask with possible
- * extra values/flags) to a "normal" alignment mask (no extra flags).
- *
- * When random: there is an 80% chance that the altar will be co-aligned.
- */
-static unsigned int
-sp_amask_to_amask(unsigned int sp_amask)
-{
-    unsigned int amask;
-
-    if (sp_amask == AM_SPLEV_CO) {
-        amask = Align2amask(u.ualignbase[A_ORIGINAL]);
-    } else if (sp_amask == AM_SPLEV_NONCO) {
-        amask = Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]));
-    } else if (sp_amask == AM_SPLEV_RANDOM) {
-        amask = induced_align(80);
-    } else {
-        amask = sp_amask & AM_MASK;
-    }
-
-    return amask;
-}
-
-static void
-create_monster(monster *m, struct mkroom *croom)
-{
-    struct monst *mtmp;
-    coordxy x, y;
-    char class;
-    aligntyp amask;
-    coord cc;
-    struct permonst *pm;
-    unsigned g_mvflags;
-
-    if (m->class >= 0) {
-        class = (char) def_char_to_monclass((char)m->class);
-    } else {
-        class = 0;
-    }
-
-    if (class == MAXMCLASSES) {
-        panic("create_monster: unknown monster class '%c'", m->class);
-    }
-
-    amask = sp_amask_to_amask(m->sp_amask);
-
-    if (!class) {
-        pm = (struct permonst *) 0;
-    } else if (m->id != NON_PM) {
-        pm = &mons[m->id];
-        g_mvflags = (unsigned) mvitals[monsndx(pm)].mvflags;
-        if ((pm->geno & G_UNIQ) && (g_mvflags & G_EXTINCT)) {
-            return;
-        } else if (g_mvflags & G_GONE) { /* genocided or extinct */
-            pm = (struct permonst *) 0; /* make random monster */
-        }
-    } else {
-        pm = mkclass(class, G_NOGEN);
-        /* if we can't get a specific monster type (pm == 0) then the
-           class has been genocided, so settle for a random monster */
-    }
-    if (In_mines(&u.uz) && pm && your_race(pm) &&
-        (Race_if(PM_DWARF) || Race_if(PM_GNOME)) && rn2(3))
-        pm = (struct permonst *) 0;
-
-    if (pm) {
-        int loc = pm_to_humidity(pm);
-        /* If water-liking monster, first try is without DRY */
-        get_location_coord(&x, &y, loc|NO_LOC_WARN, croom, m->coord);
-        if (x == -1 && y == -1) {
-            loc |= DRY;
-            get_location_coord(&x, &y, loc, croom, m->coord);
-        }
-    } else {
-        get_location_coord(&x, &y, DRY, croom, m->coord);
-    }
-
-    /* try to find a close place if someone else is already there */
-    if (MON_AT(x, y) && enexto(&cc, x, y, pm)) {
-        x = cc.x,  y = cc.y;
-    }
-
-    if (m->align != -(MAX_REGISTERS+2)) {
-        mtmp = mk_roamer(pm, Amask2align(amask), x, y, m->peaceful);
-    } else if (PM_ARCHEOLOGIST <= m->id && m->id <= PM_WIZARD) {
-        mtmp = mk_mplayer(pm, x, y, FALSE);
-    } else {
-        mtmp = makemon(pm, x, y, NO_MM_FLAGS);
-    }
-
-    if (mtmp) {
-        x = mtmp->mx, y = mtmp->my; /* sanity precaution */
-        m->x = x, m->y = y;
-        /* handle specific attributes for some special monsters */
-        if (m->name.str) {
-            mtmp = christen_monst(mtmp, m->name.str);
-        }
-
-        /*
-         * This doesn't complain if an attempt is made to give a
-         * non-mimic/non-shapechanger an appearance or to give a
-         * shapechanger a non-monster shape, it just refuses to comply.
-         */
-        if (m->appear_as.str && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)) {
-            int i;
-
-            switch (m->appear) {
-            case M_AP_NOTHING:
-                warning(
-                    "create_monster: mon has an appearance, \"%s\", but no type",
-                    m->appear_as.str);
-                break;
-
-            case M_AP_FURNITURE:
-                for (i = 0; i < MAXPCHARS; i++) {
-                    if (!strcmp(defsyms[i].explanation,
-                                m->appear_as.str)) {
-                        break;
-                    }
-                }
-                if (i == MAXPCHARS) {
-                    warning(
-                        "create_monster: can't find feature \"%s\"",
-                        m->appear_as.str);
-                } else {
-                    mtmp->m_ap_type = M_AP_FURNITURE;
-                    mtmp->mappearance = i;
-                }
-                break;
-
-            case M_AP_OBJECT:
-                for (i = 0; i < NUM_OBJECTS; i++) {
-                    if (OBJ_NAME(objects[i]) &&
-                        !strcmp(OBJ_NAME(objects[i]), m->appear_as.str)) {
-                        break;
-                    }
-                }
-                if (i == NUM_OBJECTS) {
-                    warning(
-                        "create_monster: can't find object \"%s\"",
-                        m->appear_as.str);
-                } else {
-                    mtmp->m_ap_type = M_AP_OBJECT;
-                    mtmp->mappearance = i;
-                    /* try to avoid placing mimic boulder on a trap */
-                    if (i == BOULDER && m->x < 0 && m_bad_boulder_spot(x, y)) {
-                        int retrylimit = 10;
-
-                        remove_monster(x, y);
-                        do {
-                            x = m->x;
-                            y = m->y;
-                            get_location(&x, &y, DRY, croom);
-                            if (MON_AT(x, y) && enexto(&cc, x, y, pm)) {
-                                x = cc.x, y = cc.y;
-                            }
-                        } while (m_bad_boulder_spot(x, y) && --retrylimit > 0);
-                        place_monster(mtmp, x, y);
-                        /* if we didn't find a good spot
-                           then mimic something else */
-                        if (!retrylimit) {
-                            set_mimic_sym(mtmp);
-                        }
-                    }
-                }
-                break;
-
-            case M_AP_MONSTER:
-            {
-                int mndx;
-                if (!strcmpi(m->appear_as.str, "random")) {
-                    mndx = select_newcham_form(mtmp);
-                } else {
-                    mndx = name_to_mon(m->appear_as.str);
-                }
-
-                if (mndx == NON_PM ||
-                     (is_vampshifter(mtmp) && !validvamp(mtmp, &mndx, S_HUMAN))) {
-                    impossible("create_monster: invalid %s (\"%s\")",
-                               (mtmp->data->mlet == S_MIMIC) ? "mimic appearance" :
-                               (mtmp->data == &mons[PM_WIZARD_OF_YENDOR]) ? "Wizard appearance" :
-                               is_vampshifter(mtmp) ? "vampire shape" : "chameleon shape",
-                               m->appear_as.str);
-                } else if (&mons[mndx] == mtmp->data) {
-                    /* explicitly forcing a mimic to appear as itself */
-                    mtmp->m_ap_type = M_AP_NOTHING;
-                    mtmp->mappearance = 0;
-                } else if (mtmp->data->mlet == S_MIMIC ||
-                           mtmp->data == &mons[PM_WIZARD_OF_YENDOR]) {
-                    /* this is ordinarily only used for Wizard clones
-                       and hasn't been exhaustively tested for mimics */
-                    mtmp->m_ap_type = M_AP_MONSTER;
-                    mtmp->mappearance = mndx;
-                } else {
-                    /* chameleon or vampire */
-                    struct permonst *mdat = &mons[mndx];
-                    struct permonst *olddata = mtmp->data;
-
-                    mgender_from_permonst(mtmp, mdat);
-                    set_mon_data(mtmp, mdat);
-                    if (emits_light(olddata) != emits_light(mtmp->data)) {
-                        /* used to give light, now doesn't, or vice versa,
-                           or light's range has changed */
-                        if (emits_light(olddata)) {
-                            del_light_source(LS_MONSTER, (void *)mtmp);
-                        }
-                        if (emits_light(mtmp->data)) {
-                            new_light_source(mtmp->mx, mtmp->my,
-                                             emits_light(mtmp->data),
-                                             LS_MONSTER, (void *)mtmp);
-                        }
-                    }
-                    if (!mtmp->perminvis || pm_invisible(olddata)) {
-                        mtmp->perminvis = pm_invisible(mdat);
-                    }
-                }
-                break;
-            }
-            default:
-                warning(
-                    "create_monster: unimplemented mon appear type [%d,\"%s\"]",
-                    m->appear, m->appear_as.str);
-                break;
-            }
-            if (does_block(x, y, &levl[x][y])) {
-                block_point(x, y);
-            }
-        }
-
-        if (m->peaceful >= 0) {
-            mtmp->mpeaceful = m->peaceful;
-            /* changed mpeaceful again; have to reset malign */
-            set_malign(mtmp);
-        }
-        if (m->asleep >= 0) {
-#ifdef UNIXPC
-            /* optimizer bug strikes again */
-            if (m->asleep) {
-                mtmp->msleeping = 1;
-            } else {
-                mtmp->msleeping = 0;
-            }
-#else
-            mtmp->msleeping = m->asleep;
-#endif
-        }
-
-        if (m->seentraps) {
-            mtmp->mtrapseen = m->seentraps;
-        }
-        if (m->female) {
-            mtmp->female = 1;
-        }
-        if (m->cancelled) {
-            mtmp->mcan = 1;
-        }
-        if (m->revived) {
-            mtmp->mrevived = 1;
-        }
-        if (m->avenge) {
-            mtmp->mavenge = 1;
-        }
-        if (m->stunned) {
-            mtmp->mstun = 1;
-        }
-        if (m->confused) {
-            mtmp->mconf = 1;
-        }
-        if (m->invis) {
-            mtmp->minvis = mtmp->perminvis = 1;
-        }
-        if (m->blinded) {
-            mtmp->mcansee = 0;
-            mtmp->mblinded = (m->blinded % 127);
-        }
-        if (m->paralyzed) {
-            mtmp->mcanmove = 0;
-            mtmp->mfrozen = (m->paralyzed % 127);
-        }
-        if (m->fleeing) {
-            mtmp->mflee = 1;
-            mtmp->mfleetim = (m->fleeing % 127);
-        }
-
-        if (m->has_invent) {
-            discard_minvent(mtmp);
-            invent_carrying_monster = mtmp;
-        }
-    }
-}
-
-/*
  * Create an object in a room.
  */
 static void
@@ -1919,61 +1629,6 @@ create_object(object *o, struct mkroom *croom)
         if (dealloced && container_idx) {
             container_obj[container_idx-1] = NULL;
         }
-    }
-}
-
-/*
- * Create an altar in a room.
- */
-static void
-create_altar(altar *a, struct mkroom *croom)
-{
-    schar sproom;
-    coordxy x = -1, y = -1;
-    aligntyp amask;
-    boolean croom_is_temple = TRUE;
-    int oldtyp;
-
-    if (croom) {
-        get_free_room_loc(&x, &y, croom, a->coord);
-        if (croom->rtype != TEMPLE) {
-            croom_is_temple = FALSE;
-        }
-    } else {
-        get_location_coord(&x, &y, DRY, croom, a->coord);
-        if ((sproom = (schar) *in_rooms(x, y, TEMPLE)) != 0) {
-            croom = &rooms[sproom - ROOMOFFSET];
-        } else {
-            croom_is_temple = FALSE;
-        }
-    }
-
-    /* check for existing features */
-    oldtyp = levl[x][y].typ;
-    if (oldtyp == STAIRS || oldtyp == LADDER) {
-        return;
-    }
-
-    amask = sp_amask_to_amask(a->sp_amask);
-
-    levl[x][y].typ = ALTAR;
-    levl[x][y].altarmask = amask;
-
-    if (a->shrine < 0) {
-        a->shrine = rn2(2); /* handle random case */
-    }
-
-    if (!croom_is_temple || !a->shrine) {
-        return;
-    }
-
-    if (a->shrine) { /* Is it a shrine  or sanctum? */
-        priestini(&u.uz, croom, x, y, (a->shrine > 1));
-        levl[x][y].altarmask |= AM_SHRINE;
-        if (a->shrine == 2) { /* high altar or sanctum */
-            levl[x][y].altarmask |= AM_SANCTUM;
-        }
-        level.flags.has_temple = TRUE;
     }
 }
 
@@ -2828,7 +2483,7 @@ spo_monster(struct sp_coder *coder)
     tmpmons.name.str = (char *)0;
     tmpmons.appear = 0;
     tmpmons.appear_as.str = (char *)0;
-    tmpmons.align = -MAX_REGISTERS - 2;
+    tmpmons.sp_amask = AM_SPLEV_RANDOM;
     tmpmons.female = 0;
     tmpmons.invis = 0;
     tmpmons.cancelled = 0;
@@ -2879,7 +2534,12 @@ spo_monster(struct sp_coder *coder)
             break;
         case SP_M_V_ALIGN:
             if (OV_typ(parm) == SPOVAR_INT) {
-                tmpmons.align = OV_i(parm);
+                int align = OV_i(parm);
+                if (align >= 0) {
+                    tmpmons.sp_amask = align;
+                } else {
+                    tmpmons.sp_amask = ralign[-align - 1];
+                }
             }
             break;
         case SP_M_V_PEACEFUL:
@@ -3594,8 +3254,14 @@ spo_altar(struct sp_coder *coder)
         !OV_pop_c(coord)) return;
 
     tmpaltar.coord = OV_i(coord);
-    tmpaltar.align = OV_i(al);
+    int align = OV_i(al);
     tmpaltar.shrine = OV_i(shrine);
+
+    if (align >= 0) {
+        tmpaltar.sp_amask = align;
+    } else {
+        tmpaltar.sp_amask = ralign[-align - 1];
+    }
 
     create_altar(&tmpaltar, coder->croom);
 

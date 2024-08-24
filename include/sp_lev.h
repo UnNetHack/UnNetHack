@@ -412,7 +412,6 @@ typedef struct {
     Str_or_Len name, appear_as;
     short id;
     unsigned int sp_amask; /* splev amask */
-    aligntyp align;
     packed_coord coord;
     coordxy x, y;
     xint16 class, appear;
@@ -440,7 +439,6 @@ typedef struct {
 typedef struct {
     packed_coord coord;
     coordxy x, y;
-    aligntyp align;
     unsigned int sp_amask; /* splev amask */
     xint16 shrine;
 } altar;

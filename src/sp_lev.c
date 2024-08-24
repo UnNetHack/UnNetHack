@@ -57,9 +57,9 @@ static int noncoalignment(aligntyp);
 static boolean m_bad_boulder_spot(coordxy, coordxy);
 static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
-static void create_monster(monster *, struct mkroom *);
+void create_monster(monster *, struct mkroom *);
 static struct obj *create_object(object *, struct mkroom *);
-static void create_altar(altar *, struct mkroom *);
+void create_altar(altar *, struct mkroom *);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static struct mkroom *build_room(room *, struct mkroom *);
@@ -2091,7 +2091,7 @@ sp_amask_to_amask(unsigned int sp_amask)
     return amask;
 }
 
-static void
+void
 create_monster(monster *m, struct mkroom *croom)
 {
     struct monst *mtmp;
@@ -2596,12 +2596,12 @@ create_object(object *o, struct mkroom *croom)
 /*
  * Create an altar in a room.
  */
-static void
+void
 create_altar(altar *a, struct mkroom *croom)
 {
     schar sproom;
     coordxy x = -1, y = -1;
-    aligntyp amask;
+    unsigned int amask;
     boolean croom_is_temple = TRUE;
 
     if (croom) {
@@ -2635,7 +2635,7 @@ create_altar(altar *a, struct mkroom *croom)
         return;
     }
 
-    if (a->shrine) { /* Is it a shrine  or sanctum? */
+    if (a->shrine) { /* Is it a shrine or sanctum? */
         priestini(&u.uz, croom, x, y, (a->shrine > 1));
         levl[x][y].altarmask |= AM_SHRINE;
         if (a->shrine == 2) { /* high altar or sanctum */
