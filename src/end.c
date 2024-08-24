@@ -623,7 +623,7 @@ void
 done(int how)
 {
     boolean taken;
-    char kilbuf[BUFSZ], pbuf[BUFSZ];
+    char pbuf[BUFSZ];
     winid endwin = WIN_ERR;
     boolean bones_ok, have_windows = iflags.window_inited;
     struct obj *corpse = (struct obj *)0;
@@ -669,11 +669,6 @@ done(int how)
         }
     }
 
-    /* kilbuf: used to copy killer in case it comes from something like
-     *  xname(), which would otherwise get overwritten when we call
-     *  xname() when listing possessions
-     * pbuf: holds Sprintf'd output for raw_print and putstr
-     */
     if (how == ASCENDED || (!killer.name[0] && how == GENOCIDED)) {
         killer.format = NO_KILLER_PREFIX;
     }
@@ -681,10 +676,9 @@ done(int how)
     if (!killer.name[0] && (how == STARVING || how == BURNING)) {
         killer.format = KILLED_BY;
     }
-    /* Ignore some killer-strings, but use them for QUIT and ASCENDED */
-    Strcpy(kilbuf, ((how == PANICKED) || (how == TRICKED) || (how == ESCAPED) ||
-                    !killer.name[0] ? deaths[how] : killer.name));
-    Strcpy(killer.name, kilbuf);
+    if (!killer.name[0] || how >= PANICKED) {
+        Strcpy(killer.name, deaths[how]);
+    }
 
     if (how < PANICKED) {
         u.umortality++;
@@ -811,7 +805,7 @@ die:
         dump_blockquote_start();
         for (j = lastmsg + 1; j < DUMPMSGS + lastmsg + 1; j++) {
             i = j % DUMPMSGS;
-            if (msgs[i] && strcmp(msgs[i], "") ) {
+            if (strcmp(msgs[i], "") ) {
                 if (msgs_count[i] == 1) {
                     dump_line("  ", msgs[i]);
                 } else {
@@ -902,7 +896,7 @@ die:
             how = DIED;
             u.umortality++; /* skipped above when how==QUIT */
             /* note that killer is pointing at kilbuf */
-            Strcpy(kilbuf, "quit while already on Charon's boat");
+            Strcpy(killer.name, "quit while already on Charon's boat");
         }
     }
 #ifdef ASTRAL_ESCAPE
@@ -1025,18 +1019,15 @@ die:
         done_stopprint = 1; /* just avoid any more output */
     }
 
-/* changing kilbuf really changes killer. we do it this way because
-   killer is declared a (const char *)
- */
     if (u.uhave.amulet) {
-        Strcat(kilbuf, " (with the Amulet)");
+        Strcat(killer.name, " (with the Amulet)");
         killer_flags |= 0x1;
     } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) { /* offered Amulet to wrong deity */
-            Strcat(kilbuf, " (in celestial disgrace)");
+            Strcat(killer.name, " (in celestial disgrace)");
             killer_flags |= 0x2;
         } else if (carrying(FAKE_AMULET_OF_YENDOR)) {
-            Strcat(kilbuf, " (with a fake Amulet)");
+            Strcat(killer.name, " (with a fake Amulet)");
             killer_flags |= 0x4;
             /* don't bother counting to see whether it should be plural */
         }

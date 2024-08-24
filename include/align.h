@@ -41,9 +41,13 @@ typedef struct  align {     /* alignment & record */
 #define AM_SPLEV_NONCO  0x40 /* non-co-aligned: force alignment to not match */
 #define AM_SPLEV_RANDOM 0x80
 
-#define Amask2align(x)  ((aligntyp) ((!(x)) ? A_NONE \
-                                     : ((x) == AM_LAWFUL) ? A_LAWFUL : ((int)x) - 2))
-#define Align2amask(x)  (((x) == A_NONE) ? AM_NONE \
-                         : ((x) == A_LAWFUL) ? AM_LAWFUL : (x) + 2)
+#define Amask2align(x) \
+    ((aligntyp) ((((x) & AM_MASK) == 0) ? A_NONE :           \
+                 (((x) & AM_MASK) == AM_LAWFUL) ? A_LAWFUL : \
+           ((int) ((x) & AM_MASK)) - 2)) /* 2 => 0, 1 => -1 */
+#define Align2amask(x) \
+    ((unsigned) (((x) == A_NONE) ? AM_NONE :     \
+                 ((x) == A_LAWFUL) ? AM_LAWFUL : \
+                 ((x) + 2))) /* -1 => 1, 0 => 2 */
 
 #endif /* ALIGN_H */

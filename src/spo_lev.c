@@ -1379,6 +1379,30 @@ pm_to_humidity(struct permonst *pm)
     return loc;
 }
 
+/*
+ * Convert a special level alignment mask (an alignment mask with possible
+ * extra values/flags) to a "normal" alignment mask (no extra flags).
+ *
+ * When random: there is an 80% chance that the altar will be co-aligned.
+ */
+static unsigned int
+sp_amask_to_amask(unsigned int sp_amask)
+{
+    unsigned int amask;
+
+    if (sp_amask == AM_SPLEV_CO) {
+        amask = Align2amask(u.ualignbase[A_ORIGINAL]);
+    } else if (sp_amask == AM_SPLEV_NONCO) {
+        amask = Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]));
+    } else if (sp_amask == AM_SPLEV_RANDOM) {
+        amask = induced_align(80);
+    } else {
+        amask = sp_amask & AM_MASK;
+    }
+
+    return amask;
+}
+
 static void
 create_monster(monster *m, struct mkroom *croom)
 {
@@ -1400,12 +1424,7 @@ create_monster(monster *m, struct mkroom *croom)
         panic("create_monster: unknown monster class '%c'", m->class);
     }
 
-    amask = (m->align == AM_SPLEV_CO) ?
-            Align2amask(u.ualignbase[A_ORIGINAL]) :
-            (m->align == AM_SPLEV_NONCO) ?
-            Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL])) :
-            (m->align <= -(MAX_REGISTERS+1)) ? induced_align(80) :
-            (m->align < 0 ? ralign[-m->align-1] : m->align);
+    amask = sp_amask_to_amask(m->sp_amask);
 
     if (!class) {
         pm = (struct permonst *) 0;
@@ -1935,20 +1954,7 @@ create_altar(altar *a, struct mkroom *croom)
         return;
     }
 
-    /* Is the alignment random ?
-     * If so, it's an 80% chance that the altar will be co-aligned.
-     *
-     * The alignment is encoded as amask values instead of alignment
-     * values to avoid conflicting with the rest of the encoding,
-     * shared by many other parts of the special level code.
-     */
-
-    amask = (a->align == AM_SPLEV_CO) ?
-            Align2amask(u.ualignbase[A_ORIGINAL]) :
-            (a->align == AM_SPLEV_NONCO) ?
-            Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL])) :
-            (a->align == -(MAX_REGISTERS+1)) ? induced_align(80) :
-            (a->align < 0 ? ralign[-a->align-1] : a->align);
+    amask = sp_amask_to_amask(a->sp_amask);
 
     levl[x][y].typ = ALTAR;
     levl[x][y].altarmask = amask;

@@ -484,14 +484,19 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
     } else {
+        int amsk;
+        aligntyp algn;
+
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
-            if (!In_endgame(&u.uz)) {
-                Sprintf(buf, "%s altar",
-                        align_str(Amask2align(levl[x][y].altarmask & ~AM_SHRINE)));
-            } else {
-                Sprintf(buf, "aligned altar");
-            }
+            amsk = altarmask_at(x, y);
+            algn = Amask2align(amsk & AM_MASK);
+            Sprintf(buf, "%s %saltar",
+                    /* like endgame high priests, endgame high altars
+                       are only recognizable when immediately adjacent */
+                    (Is_astralevel(&u.uz) && !next2u(x, y) &&
+                      (amsk & AM_SANCTUM)) ? "aligned" : align_str(algn),
+                    (amsk & AM_SANCTUM) ? "high " : "");
             break;
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0) {

@@ -9,8 +9,8 @@ static boolean no_repeat = FALSE;
 static char *You_buf(int);
 
 #if defined(DUMP_LOG) && defined(DUMPMSGS)
-char msgs[DUMPMSGS][BUFSZ];
-int msgs_count[DUMPMSGS];
+char msgs[DUMPMSGS][BUFSZ] = { 0 };
+int msgs_count[DUMPMSGS] = { 0 };
 int lastmsg = -1;
 #endif
 

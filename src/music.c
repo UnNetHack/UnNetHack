@@ -255,7 +255,8 @@ do_earthquake(int force)
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *chasm;
-    int start_x, start_y, end_x, end_y;
+    int start_x, start_y, end_x, end_y, amsk;
+    aligntyp algn;
     schar filltype;
     unsigned tu_pit = 0;
 
@@ -330,9 +331,11 @@ do_earthquake(int force)
                 goto do_pit;
 
             case ALTAR:
-                if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
+                amsk = altarmask_at(x, y);
+                /* always preserve the high altars */
+                if ((amsk & AM_SANCTUM) != 0)
                     break;
-                }
+                algn = Amask2align(amsk & AM_MASK);
 
                 if (cansee(x, y)) {
                     pline_The("altar falls into a chasm.");

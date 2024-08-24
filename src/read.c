@@ -1240,7 +1240,7 @@ do_flood(coordxy x, coordxy y, genericptr_t poolcnt)
         /* Put a pool at x, y */
         levl[x][y].typ = POOL;
         del_engr_at(x, y);
-        water_damage_chain(level.objects[x][y], FALSE);
+        water_damage_chain(level.objects[x][y], TRUE);
 
         if ((mtmp = m_at(x, y)) != 0) {
             (void) minliquid(mtmp);
