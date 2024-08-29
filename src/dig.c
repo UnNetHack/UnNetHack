@@ -2256,20 +2256,13 @@ rot_corpse(anything *arg, long int timeout UNUSED)
                  obj == uwep ? "wielded " : "", cname,
                  otense(obj, "rot"), obj == uwep ? '!' : '.');
         }
-        if (obj == uwep) {
-            uwepgone(); /* now bare handed */
-            stop_occupation();
-        } else if (obj == uswapwep) {
-            uswapwepgone();
-            stop_occupation();
-        } else if (obj == uquiver) {
-            uqwepgone();
+        if (obj->owornmask) {
+            remove_worn_item(obj, TRUE);
             stop_occupation();
         }
-    } else if (obj->where == OBJ_MINVENT && obj->owornmask) {
-        if (obj == MON_WEP(obj->ocarry)) {
-            setmnotwielded(obj->ocarry, obj);
-            MON_NOWEP(obj->ocarry);
+    } else if (obj->where == OBJ_MINVENT) {
+        if (obj->owornmask && obj == MON_WEP(obj->ocarry)) {
+            setmnotwielded(obj->ocarry, obj); /* clears owornmask */
         }
     } else if (obj->where == OBJ_MIGRATING) {
         /* clear destination flag so that obfree()'s check for
