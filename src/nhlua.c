@@ -119,12 +119,8 @@ static lua_State *luapat;   /* instance for file pattern matching */
 void
 l_nhcore_init(void)
 {
-#if 1
-    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
-#else
-    /* Sample sbi for getting resource usage information. */
-    nhl_sandbox_info sbi = {NHL_SB_SAFE|NHL_SB_REPORT2, 10000000, 10000000, 0};
-#endif
+    nhl_sandbox_info sbi = { NHL_SB_SAFE, 1 * 1024 * 1024, 0,
+                             1 * 1024 * 1024 };
     if ((gl.luacore = nhl_init(&sbi)) != 0) {
         if (!nhl_loadlua(gl.luacore, NH_DATAAREA, "nhcore.lua")) {
             gl.luacore = (lua_State *) 0;
@@ -1758,7 +1754,7 @@ nhl_init(nhl_sandbox_info *sbi)
 #endif
 
 #ifdef NHL_SANDBOX
-    if (NHL_VERSION_EXPECTED != LUA_VERSION_RELEASE_NUM) {
+    if (NHL_VERSION_EXPECTED > LUA_VERSION_RELEASE_NUM) {
         panic(
              "sandbox doesn't know this Lua version: this=%d != expected=%d ",
               LUA_VERSION_RELEASE_NUM, NHL_VERSION_EXPECTED);
@@ -1868,7 +1864,7 @@ load_lua(const char *area, const char *name, nhl_sandbox_info *sbi)
 const char *
 get_lua_version(void)
 {
-    nhl_sandbox_info sbi = {NHL_SB_VERSION, 0, 0, 0};
+    nhl_sandbox_info sbi = { NHL_SB_VERSION, 1 * 1024 * 1024, 0, 1 * 1024 * 1024 };
 
     if (gl.lua_ver[0] == 0) {
         lua_State *L = nhl_init(&sbi);
