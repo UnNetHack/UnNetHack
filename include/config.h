@@ -400,6 +400,8 @@ typedef long glyph_t;
 #define RECORD_ALIGN0   /* Record initial alignment in logfile */
 #endif
 
+#define NHL_SANDBOX
+
 /*
  * Section 5:  EXPERIMENTAL STUFF
  *
