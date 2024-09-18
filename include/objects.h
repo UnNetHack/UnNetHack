@@ -364,7 +364,7 @@
     ARMOR("plate mail", (char *)0,
           1, 0, 1, 0, 44, 5, 450, 600,  3, 2, ARM_SUIT, IRON, HI_METAL),
     ARMOR("crystal plate mail", (char *)0,
-          1, 0, 1, 0, 10, 5, 450, 820,  3, 2, ARM_SUIT, GLASS, CLR_WHITE),
+          1, 0, 1, 0, 10, 5, 415, 820,  3, 2, ARM_SUIT, GLASS, CLR_WHITE),
     ARMOR("bronze plate mail", (char *)0,
           1, 0, 1, 0, 25, 5, 450, 400,  4, 0, ARM_SUIT, COPPER, HI_COPPER),
     ARMOR("splint mail", (char *)0,
