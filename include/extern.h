@@ -1150,7 +1150,7 @@ extern int dosuspend(void);
 
 extern void new_light_source(coordxy, coordxy, int, int, ANY_P *);
 extern void del_light_source(int, ANY_P *);
-extern void do_light_sources(char **);
+extern void do_light_sources(seenV **) NONNULLARG1;
 extern void show_transient_light(struct obj *, coordxy, coordxy);
 extern void transient_light_cleanup(void);
 extern struct monst *find_mid(unsigned, unsigned);

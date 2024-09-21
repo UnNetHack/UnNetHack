@@ -430,8 +430,8 @@ extern char emptystr[];
 #define SUPPRESS_NAME          0x10
 
 /* Vision */
-E NEARDATA boolean vision_full_recalc;  /* TRUE if need vision recalc */
-E NEARDATA char **viz_array;        /* could see/in sight row pointers */
+E boolean vision_full_recalc;  /* TRUE if need vision recalc */
+E seenV **viz_array; /* could see/in sight row pointers */
 
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE, WIN_STATUS;

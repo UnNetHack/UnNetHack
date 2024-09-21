@@ -298,8 +298,8 @@ const char *materialnm[] = {
 char emptystr[] = { 0 }; /* non-const */
 
 /* Vision */
-NEARDATA boolean vision_full_recalc = 0;
-NEARDATA char    **viz_array = 0;/* used in cansee() and couldsee() macros */
+boolean vision_full_recalc = 0;
+seenV **viz_array = 0;/* used in cansee() and couldsee() macros */
 
 /* Global windowing data, defined here for multi-window-system support */
 NEARDATA winid WIN_MESSAGE = WIN_ERR, WIN_STATUS = WIN_ERR;

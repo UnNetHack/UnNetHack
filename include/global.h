@@ -100,8 +100,13 @@ typedef int16_t coordxy;
 typedef int16_t xint16;
 
 #ifndef SKIP_BOOLEAN
-typedef coordxy boolean;          /* 0 or 1 */
+typedef coordxy boolean; /* 0 or 1 */
 #endif
+
+/* vision seen vectors: viz_array[][] and levl[][].seenv, which use different
+   values from each other but are close enough in size to share a type;
+   viz_array contains 8-bit bitmasks, lev->seenv is a 5-bit bitfield */
+typedef unsigned char seenV; /* no need for uint8_t */
 
 /* Type for third parameter of read(2) */
 #if defined(BSD) || defined(ULTRIX)
