@@ -219,7 +219,7 @@ trim_contents(struct obj *container, int prob1, int prob2)
              * associated light source if these are gold and get
              * removed. */
             if (!(otmp == uskin && Is_dragon_armor(uskin->otyp))) {
-#if defined(DEBUG) && defined(WIZARD)
+#if defined(DEBUG)
                 if (wizard) {
                     pline("trim_contents: %s just disappeared", doname(otmp));
                 }
@@ -231,7 +231,7 @@ trim_contents(struct obj *container, int prob1, int prob2)
             }
         }
     }
-#if defined(DEBUG) && defined(WIZARD)
+#if defined(DEBUG)
     if (wizard) {
         pline("trim_contents: %d objects obfree'd", disappeared);
     }
@@ -446,9 +446,7 @@ can_make_bones(void)
 
     if (depth(&u.uz) <= 0 || /* bulletproofing for endgame */
        (!rn2(1 + (depth(&u.uz)>>2)) /* fewer ghosts on low levels */
-#ifdef WIZARD
         && !wizard
-#endif
        )) {
         return FALSE;
     }
@@ -480,7 +478,6 @@ savebones(struct obj *corpse)
     nhfp = open_bonesfile(&u.uz, &bonesid);
     if (nhfp) {
         close_nhfile(nhfp);
-#ifdef WIZARD
         if (wizard) {
             if (yn("Bones file already exists.  Replace it?") == 'y') {
                 if (delete_bonesfile(&u.uz)) {
@@ -490,16 +487,13 @@ savebones(struct obj *corpse)
                 }
             }
         }
-#endif
         /* compression can change the file's name, so must
            wait until after any attempt to delete this file */
         compress_bonesfile();
         return;
     }
 
-#ifdef WIZARD
 make_bones:
-#endif
     unleash_all();
     /* in case these characters are not in their home bases */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -641,11 +635,9 @@ make_bones:
 
     nhfp = create_bonesfile(&u.uz, &bonesid, whynot);
     if (!nhfp) {
-#ifdef WIZARD
         if (wizard) {
             pline("%s", whynot);
         }
-#endif
         /* bones file creation problems are silent to the player.
          * Keep it that way, but place a clue into the paniclog.
          */
@@ -680,9 +672,7 @@ getbones(void)
 
     /* wizard check added by GAN 02/05/87 */
     if (rn2(3)   /* only once in three times do we find bones */
-#ifdef WIZARD
        && !wizard
-#endif
        ) {
         return 0;
     }
@@ -712,13 +702,12 @@ getbones(void)
     }
 
     if (validate(nhfp, bones, FALSE) != 0) {
-#ifdef WIZARD
         if (!wizard) {
-#endif
-        pline("Discarding unusable bones; no need to panic...");
+            pline("Discarding unusable bones; no need to panic...");
         }
+        ok = FALSE;
     } else {
-#ifdef WIZARD
+        ok = TRUE;
         if (wizard)  {
             if (yn("Get bones?") == 'n') {
                 close_nhfile(nhfp);
@@ -726,7 +715,6 @@ getbones(void)
                 return 0;
             }
         }
-#endif
         if (nhfp->structlevel) {
             /* if a bones pool digit is in use, it precedes the bonesid
                string and wasn't recorded in the file */
@@ -748,12 +736,10 @@ getbones(void)
 
             Sprintf(errbuf, "This is bones level '%s', not '%s'!",
                     oldbonesid, bonesid);
-#ifdef WIZARD
             if (wizard) {
                 pline("%s", errbuf);
                 ok = FALSE; /* won't die of trickery */
             }
-#endif
             trickery(errbuf);
         } else {
             struct monst *mtmp;
@@ -772,7 +758,7 @@ getbones(void)
                     sanitize_name(MGIVENNAME(mtmp));
                 }
                 if (mtmp->mhpmax == DEFUNCT_MONSTER) {
-#if defined(DEBUG) && defined(WIZARD)
+#if defined(DEBUG)
                     if (wizard) {
                         debug_pline("Removing defunct monster %s from bones.",
                               mtmp->data->mname);
@@ -791,7 +777,6 @@ getbones(void)
     close_nhfile(nhfp);
     sanitize_engravings();
 
-#ifdef WIZARD
     if (wizard) {
         if (yn("Unlink bones?") == 'n') {
             compress_bonesfile();
@@ -802,7 +787,6 @@ getbones(void)
             return ok;
         }
     }
-#endif
     if (!delete_bonesfile(&u.uz)) {
         /* When N games try to simultaneously restore the same
          * bones file, N-1 of them will fail to delete it
