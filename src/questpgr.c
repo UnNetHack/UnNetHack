@@ -32,7 +32,7 @@ static void deliver_by_window(const char *, int);
 static boolean skip_pager(boolean);
 static boolean com_pager_core(const char *, const char *, boolean, char **);
 
-static char qu_in_line[80], cvt_buf[64], qu_out_line[128];
+static char cvt_buf[64], qu_out_line[128];
 /* used by ldrname() and neminame(), then copied into cvt_buf */
 static char nambuf[sizeof cvt_buf];
 
@@ -369,8 +369,7 @@ convert_line(char *in_line, char *out_line)
 char *
 string_subst(char *str)
 {
-    xcrypt(str, qu_in_line);
-    convert_line(qu_in_line, qu_out_line);
+    convert_line(str, qu_out_line);
     return qu_out_line;
 }
 
