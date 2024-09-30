@@ -27,13 +27,15 @@
 extern void mkmap(lev_init *);
 
 /* from sp_lev.c */
+extern struct obj * create_object(object *o, struct mkroom *croom);
 extern void create_altar(altar *, struct mkroom *);
 extern void create_monster(monster *, struct mkroom *);
+extern void spo_end_moninvent(void);
+extern void spo_pop_container(void);
 
 static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
 static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
 static int noncoalignment(aligntyp);
-static void create_object(object *, struct mkroom *);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static void create_trap(spltrap *, struct mkroom *);
@@ -88,10 +90,6 @@ int num_lregions = 0;
 static boolean splev_init_present = FALSE;
 static boolean icedpools = FALSE;
 static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
-
-static struct obj *container_obj[MAX_CONTAINMENT];
-static int container_idx = 0;
-static struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
 
@@ -1381,257 +1379,6 @@ pm_to_humidity(struct permonst *pm)
     return loc;
 }
 
-/*
- * Create an object in a room.
- */
-static void
-create_object(object *o, struct mkroom *croom)
-{
-    struct obj *otmp;
-    coordxy x, y;
-    char c;
-    boolean named; /* has a name been supplied in level description? */
-
-    named = o->name.str ? TRUE : FALSE;
-
-    get_location_coord(&x, &y, DRY, croom, o->coord);
-
-    if (o->class >= 0) {
-        c = o->class;
-    } else {
-        c = 0;
-    }
-
-    if (!c) {
-        otmp = mkobj_at(RANDOM_CLASS, x, y, !named);
-    } else if (o->id != -1) {
-        otmp = mksobj_at(o->id, x, y, TRUE, !named);
-    } else {
-        /*
-         * The special levels are compiled with the default "text" object
-         * class characters.  We must convert them to the internal format.
-         */
-        char oclass = (char) def_char_to_objclass(c);
-
-        if (oclass == MAXOCLASSES) {
-            panic("create_object:  unexpected object class '%c'", c);
-        }
-
-        /* KMH -- Create piles of gold properly */
-        if (oclass == COIN_CLASS) {
-            otmp = mkgold(0L, x, y);
-        } else {
-            otmp = mkobj_at(oclass, x, y, !named);
-        }
-    }
-
-    if (o->spe != -127) { /* That means NOT RANDOM! */
-        otmp->spe = (schar)o->spe;
-    }
-
-    switch (o->curse_state) {
-    case 1:   bless(otmp); break;       /* BLESSED */
-    case 2:   unbless(otmp); uncurse(otmp); break;       /* uncursed */
-    case 3:   curse(otmp); break;       /* CURSED */
-    default:  break;        /* Otherwise it's random and we're happy
-                             * with what mkobj gave us! */
-    }
-
-    /*  corpsenm is "empty" if -1, random if -2, otherwise specific */
-    if (o->corpsenm != NON_PM) {
-        if (o->corpsenm == NON_PM - 1) {
-            set_corpsenm(otmp, rndmonnum());
-        } else {
-            set_corpsenm(otmp, o->corpsenm);
-        }
-    }
-    /* set_corpsenm() took care of egg hatch and corpse timers */
-
-    if (named) {
-        otmp = oname(otmp, o->name.str);
-    }
-
-    if (o->eroded) {
-        if (o->eroded < 0) {
-            otmp->oerodeproof = 1;
-        } else {
-            otmp->oeroded = (o->eroded % 4);
-            otmp->oeroded2 = ((o->eroded >> 2) % 4);
-        }
-    }
-    if (o->recharged) {
-        otmp->recharged = (o->recharged % 8);
-    }
-    if (o->locked) {
-        otmp->olocked = 1;
-    } else if (o->broken) {
-        otmp->obroken = 1;
-        otmp->olocked = 0; /* obj generation may set */
-    }
-    if (o->trapped == 0 || o->trapped == 1) {
-        otmp->otrapped = o->trapped;
-    }
-    if (o->greased) {
-        otmp->greased = 1;
-    }
-#ifdef INVISIBLE_OBJECTS
-    if (o->invis) {
-        otmp->oinvis = 1;
-    }
-#endif
-
-    if ((o->quan > 0) && objects[otmp->otyp].oc_merge) {
-        otmp->quan = o->quan;
-        otmp->owt = weight(otmp);
-    }
-
-
-    /* contents (of a container or monster's inventory) */
-    if (o->containment & SP_OBJ_CONTENT) {
-        if (!container_idx) {
-            if (!invent_carrying_monster) {
-                /*impossible("create_object: no container");*/
-                /* don't complain, the monster may be gone legally (eg. unique demon already generated)
-                   TODO: In the case of unique demon lords, they should get their inventories even when
-                   they get generated outside the des-file. Maybe another data file that determines what
-                   inventories monsters get by default?
-                 */
-                ; /* ['otmp' remains on floor] */
-            } else {
-                remove_object(otmp);
-                boolean merged = mpickobj(invent_carrying_monster, otmp);
-                if (merged) {
-                    return;
-                }
-            }
-        } else {
-            struct obj *cobj = container_obj[container_idx - 1];
-
-            remove_object(otmp);
-            if (cobj) {
-                otmp = add_to_container(cobj, otmp);
-                cobj->owt = weight(cobj);
-            } else {
-                obj_extract_self(otmp);
-                obfree(otmp, NULL);
-                return;
-            }
-        }
-    }
-    /* container */
-    if (o->containment & SP_OBJ_CONTAINER) {
-        delete_contents(otmp);
-        if (container_idx < MAX_CONTAINMENT) {
-            container_obj[container_idx] = otmp;
-            container_idx++;
-        } else {
-            impossible("create_object: too deeply nested containers.");
-        }
-    }
-
-    /* Medusa level special case: statues are petrified monsters, so they
-     * are not stone-resistant and have monster inventory.  They also lack
-     * other contents, but that can be specified as an empty container.
-     */
-    if (o->id == STATUE && Is_medusa_level(&u.uz) &&
-        o->corpsenm == NON_PM) {
-        struct monst *was;
-        struct obj *obj;
-        int wastyp;
-        int i=0; /* prevent endless loop in case makemon always fails */
-
-        /* Named random statues are of player types, and aren't stone-
-         * resistant (if they were, we'd have to reset the name as well as
-         * setting corpsenm).
-         */
-        for (wastyp = otmp->corpsenm; i < 1000; i++, wastyp = rndmonnum()) {
-            /* makemon without rndmonst() might create a group */
-            was = makemon(&mons[wastyp], 0, 0, MM_NOCOUNTBIRTH);
-            if (was) {
-                if (!resists_ston(was)) {
-                    (void) propagate(wastyp, TRUE, FALSE);
-                    break;
-                }
-                mongone(was);
-                was = NULL;
-            }
-            wastyp = rndmonnum();
-        }
-        if (was) {
-            set_corpsenm(otmp, wastyp);
-            while (was->minvent) {
-                obj = was->minvent;
-                obj->owornmask = 0;
-                obj_extract_self(obj);
-                (void) add_to_container(otmp, obj);
-            }
-            otmp->owt = weight(otmp);
-            mongone(was);
-        }
-    }
-
-#ifdef RECORD_ACHIEVE
-    /* Nasty hack here: try to determine if this is the Mines
-     * "prize" and then set record_achieve_special (maps to corpsenm)
-     * for the object.  That field will later be checked to find out if
-     * the player obtained the prize. */
-    if (otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
-        otmp->record_achieve_special = 1;
-    }
-#if 0
-    if (o->id != -1) {
-        static const char prize_warning[] = "multiple prizes on %s level";
-
-        /* if this is a specific item of the right type and it is being
-           created on the right level, flag it as the designated item
-           used to detect a special achievement (to whit, reaching and
-           exploring the target level, although the exploration part
-           might be short-circuited if a monster brings object to hero) */
-        if (Is_mineend_level(&u.uz)) {
-            if (otmp->otyp == iflags.mines_prize_type) {
-                if (!mines_prize_count++) {
-                    /* Note: the first luckstone on lev will become the prize
-                             even if its not the explicit one, but random */
-                    otmp->record_achieve_special = MINES_PRIZE;
-                    /* prevent stacking; cleared when achievement is recorded */
-                    otmp->nomerge = 1;
-                }
-            }
-        } else if (Is_sokoend_level(&u.uz)) {
-            if (otmp->otyp == iflags.soko_prize_type1) {
-                otmp->record_achieve_special = SOKO_PRIZE1;
-                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
-                if (++soko_prize_count > 1) {
-                    impossible(prize_warning, "sokoban end");
-                }
-            } else if (otmp->otyp == iflags.soko_prize_type2) {
-                otmp->record_achieve_special = SOKO_PRIZE2;
-                otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
-                if (++soko_prize_count > 1) {
-                    impossible(prize_warning, "sokoban end");
-                }
-            }
-        }
-    }
-#endif
-#endif
-
-    stackobj(otmp);
-
-    if (o->lit) {
-        begin_burn(otmp, FALSE);
-    }
-
-    if (o->buried) {
-        boolean dealloced;
-
-        (void) bury_an_obj(otmp, &dealloced);
-        if (dealloced && container_idx) {
-            container_obj[container_idx-1] = NULL;
-        }
-    }
-}
-
 void
 replace_terrain(replaceterrain *terr, struct mkroom *croom)
 {
@@ -2413,25 +2160,6 @@ spo_return(struct sp_coder *coder)
 
     opvar_free(params);
 }
-
-void
-spo_end_moninvent(struct sp_coder *coder UNUSED)
-{
-    if (invent_carrying_monster) {
-        m_dowear(invent_carrying_monster, TRUE);
-    }
-    invent_carrying_monster = NULL;
-}
-
-void
-spo_pop_container(struct sp_coder *coder UNUSED)
-{
-    if (container_idx > 0) {
-        container_idx--;
-        container_obj[container_idx] = NULL;
-    }
-}
-
 
 void
 spo_message(struct sp_coder *coder)
@@ -5138,13 +4866,6 @@ sp_level_coder(sp_lev *lvl)
 
     shuffle_alignments();
 
-    for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi++) {
-        container_obj[tmpi] = NULL;
-    }
-    container_idx = 0;
-
-    invent_carrying_monster = NULL;
-
     (void) memset((genericptr_t)&SpLev_Map[0][0], 0, sizeof SpLev_Map);
 
     level.flags.is_maze_lev = 0;
@@ -5183,8 +4904,12 @@ sp_level_coder(sp_lev *lvl)
         case SPO_FRAME_POP:  spo_frame_pop(coder); break;
         case SPO_CALL:       spo_call(coder); break;
         case SPO_RETURN:     spo_return(coder); break;
-        case SPO_END_MONINVENT: spo_end_moninvent(coder); break;
-        case SPO_POP_CONTAINER: spo_pop_container(coder); break;
+        case SPO_END_MONINVENT:
+            spo_end_moninvent();
+            break;
+        case SPO_POP_CONTAINER:
+            spo_pop_container();
+            break;
         case SPO_POP:
         {
             struct opvar *ov = splev_stack_pop(coder->stack);

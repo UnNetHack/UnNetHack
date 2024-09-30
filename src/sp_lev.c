@@ -58,7 +58,6 @@ static boolean m_bad_boulder_spot(coordxy, coordxy);
 static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 void create_monster(monster *, struct mkroom *);
-static struct obj *create_object(object *, struct mkroom *);
 void create_altar(altar *, struct mkroom *);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
@@ -92,8 +91,6 @@ static void spo_room_door(struct sp_coder *);
 static void spo_wallify(struct sp_coder *);
 static void sel_set_wallify(coordxy, coordxy, genericptr_t);
 #endif
-static void spo_end_moninvent(void);
-static void spo_pop_container(void);
 static int l_create_stairway(lua_State *, boolean);
 static void spo_endroom(struct sp_coder *);
 static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
@@ -2366,7 +2363,7 @@ create_monster(monster *m, struct mkroom *croom)
 /*
  * Create an object in a room.
  */
-static struct obj *
+struct obj *
 create_object(object *o, struct mkroom *croom)
 {
     struct obj *otmp;
@@ -2570,6 +2567,16 @@ create_object(object *o, struct mkroom *croom)
             mongone(was);
         }
     }
+
+#ifdef RECORD_ACHIEVE
+    /* Nasty hack here: try to determine if this is the Mines
+     * "prize" and then set record_achieve_special (maps to corpsenm)
+     * for the object.  That field will later be checked to find out if
+     * the player obtained the prize. */
+    if (otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
+        otmp->record_achieve_special = 1;
+    }
+#endif
 
     if (!(o->containment & SP_OBJ_CONTENT)) {
         stackobj(otmp);
@@ -3199,7 +3206,7 @@ sp_code_jmpaddr(long curpos, long jmpaddr)
 
 
 /*ARGUSED*/
-static void
+void
 spo_end_moninvent(void)
 {
     if (invent_carrying_monster) {
@@ -3209,7 +3216,7 @@ spo_end_moninvent(void)
 }
 
 /*ARGUSED*/
-static void
+void
 spo_pop_container(void)
 {
     if (container_idx > 0) {
