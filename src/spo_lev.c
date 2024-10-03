@@ -2204,7 +2204,7 @@ spo_monster(struct sp_coder *coder)
 
     struct opvar *varparam;
     struct opvar *id, *coord, *has_inv;
-    monster tmpmons;
+    monster tmpmons = { 0 };
 
     tmpmons.peaceful = -1;
     tmpmons.asleep = -1;
@@ -2224,6 +2224,8 @@ spo_monster(struct sp_coder *coder)
     tmpmons.confused = 0;
     tmpmons.seentraps = 0;
     tmpmons.has_invent = 0;
+    tmpmons.waiting = 0;
+    tmpmons.mm_flags = NO_MM_FLAGS;
 
     if (!OV_pop_i(has_inv)) {
         return;

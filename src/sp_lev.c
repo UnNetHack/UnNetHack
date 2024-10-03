@@ -3395,7 +3395,7 @@ int
 lspo_monster(lua_State *L)
 {
     int argc = lua_gettop(L);
-    monster tmpmons;
+    monster tmpmons = { 0 };
     lua_Integer mx = -1, my = -1;
     int mgend = NEUTRAL;
     char *mappear = NULL;
