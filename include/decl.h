@@ -259,8 +259,6 @@ extern long hero_seq; /* 'moves*8 + n' where n is updated each hero move during
 E NEARDATA long wailmsg;
 
 E NEARDATA boolean in_mklev;
-E NEARDATA boolean in_mk_rndvault;
-E NEARDATA boolean rndvault_failed;
 E NEARDATA boolean stoned;
 extern int unweapon;
 E NEARDATA boolean mrg_to_wielded;

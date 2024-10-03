@@ -2867,8 +2867,8 @@ spo_room(struct sp_coder *coder)
     coder->tmproomlist[coder->n_subroom] = (struct mkroom *)0;
     coder->failed_room[coder->n_subroom] = TRUE;
     coder->n_subroom++;
-    if (in_mk_rndvault && coder->opcode == SPO_ROOM && !isbigrm) {
-        rndvault_failed = TRUE;
+    if (gi.in_mk_themerooms && coder->opcode == SPO_ROOM && !isbigrm) {
+        gt.themeroom_failed = TRUE;
     }
 }
 
@@ -4123,7 +4123,7 @@ spo_region(struct sp_coder *coder)
        an actual room to be created (such rooms are used to
        control placement of migrating monster arrivals) */
     room_not_needed = (OV_i(rtype) == OROOM &&
-                       !irregular && !prefilled && !in_mk_rndvault);
+                       !irregular && !prefilled && !gi.in_mk_themerooms);
     if (room_not_needed || nroom >= MAXNROFROOMS) {
         region tmpregion;
         if (!room_not_needed) {
@@ -4173,7 +4173,7 @@ spo_region(struct sp_coder *coder)
 #endif
     }
 
-    if (in_mk_rndvault && prefilled) {
+    if (gi.in_mk_themerooms && prefilled) {
         troom->needfill = 1;
     }
 
@@ -4459,7 +4459,7 @@ redo_maploc:
         break;
     }
     if ((gy.ystart < 0) || (gy.ystart + gy.ysize > ROWNO)) {
-        if (in_mk_rndvault) {
+        if (gi.in_mk_themerooms) {
             coder->exit_script = TRUE;
             goto skipmap;
         }
@@ -4480,7 +4480,7 @@ redo_maploc:
     } else {
         coordxy x, y;
         /* random vault should never overwrite anything */
-        if (in_mk_rndvault) {
+        if (gi.in_mk_themerooms) {
             boolean isokp = TRUE;
             for (y = gy.ystart - 1; y < gy.ystart + gy.ysize + 1; y++) {
                 for (x = gx.xstart - 1; x < gx.xstart + gx.xsize + 1; x++) {
@@ -4516,7 +4516,7 @@ redo_maploc:
                             ((tmpmazepart.halign < 0) || (tmpmazepart.valign < 0)) /* rnd pos */ )
                             goto redo_maploc;
                         if (!((gx.xsize * gy.ysize) > 20)) { /* !isbig() */
-                            rndvault_failed = TRUE;
+                            gt.themeroom_failed = TRUE;
                         }
                         coder->exit_script = TRUE;
                         goto skipmap;
@@ -4565,7 +4565,7 @@ redo_maploc:
                 }
             }
         }
-        if (coder->lvl_is_joined && !in_mk_rndvault) {
+        if (coder->lvl_is_joined && !gi.in_mk_themerooms) {
             remove_rooms(gx.xstart, gy.ystart, gx.xstart + gx.xsize, gy.ystart + gy.ysize);
         }
     }
@@ -4845,7 +4845,7 @@ sp_level_coder(sp_lev *lvl)
     coder->n_subroom = 1;
     coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
-    rndvault_failed = FALSE;
+    gt.themeroom_failed = FALSE;
 
     splev_init_present = FALSE;
     icedpools = FALSE;
@@ -4888,7 +4888,7 @@ sp_level_coder(sp_lev *lvl)
             coder->exit_script = TRUE;
         }
 
-        if (rndvault_failed) {
+        if (gt.themeroom_failed) {
             coder->exit_script = TRUE;
         }
 
@@ -5602,13 +5602,13 @@ load_special_des(const char *name)
         }
         result = sp_level_loader(fd, lvl);
         (void)dlb_fclose(fd);
-        if (in_mk_rndvault) {
+        if (gi.in_mk_themerooms) {
             sp_lev_savecache(name, lvl);
         }
         if (result) {
             result = sp_level_coder(lvl);
         }
-        if (!in_mk_rndvault) {
+        if (!gi.in_mk_themerooms) {
             sp_level_free(lvl);
             Free(lvl);
         }

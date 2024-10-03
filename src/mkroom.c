@@ -836,7 +836,7 @@ somexy(struct mkroom *croom, coord *c)
         if (IS_WALL(levl[c->x][c->y].typ)) {
             continue;
         }
-        for (i=0; i<croom->nsubrooms; i++) {
+        for (i = 0; i < croom->nsubrooms; i++) {
             if (inside_room(croom->sbrooms[i], c->x, c->y)) {
                 goto you_lose;
             }

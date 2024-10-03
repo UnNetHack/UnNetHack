@@ -1385,7 +1385,7 @@ makemaz(const char *s)
 
         check_ransacked(protofile);
         Strcat(protofile, LEV_EXT);
-        in_mk_rndvault = FALSE;
+        gi.in_mk_themerooms = FALSE;
 
         if (dlb_fexists(NH_DATAAREA, lua_protofile)) {
             if (load_special_lua(lua_protofile)) {

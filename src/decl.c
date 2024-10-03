@@ -125,8 +125,6 @@ NEARDATA coord inv_pos = { 0 };
 
 NEARDATA boolean defer_see_monsters = FALSE;
 NEARDATA boolean in_mklev = FALSE;
-NEARDATA boolean in_mk_rndvault = FALSE;
-NEARDATA boolean rndvault_failed = FALSE;
 NEARDATA boolean stoned = FALSE;    /* done to monsters hit by 'c' */
 int unweapon = FALSE;
 NEARDATA boolean mrg_to_wielded = FALSE;

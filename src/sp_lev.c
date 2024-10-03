@@ -1645,6 +1645,7 @@ create_room(
      */
     do {
         coordxy xborder, yborder;
+
         wtmp = w;
         htmp = h;
         xtmp = x;
