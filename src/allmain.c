@@ -25,6 +25,8 @@ early_init(void)
 #ifdef POSITIONBAR
 static void do_positionbar();
 #endif
+static void regen_pw(int);
+static void regen_hp(int);
 static void interrupt_multi(const char *, int, int);
 
 static int prev_hp_notify;
@@ -183,24 +185,10 @@ can_regenerate(void)
     return 1;
 }
 
-void
-moveloop(boolean resuming)
+static void
+moveloop_preamble(boolean resuming)
 {
-#if defined(MICRO) || defined(WIN32)
-    char ch;
-    int abort_lev;
-#endif
-    int moveamt = 0, wtcap = 0, change = 0;
-    boolean didmove = FALSE, monscanmove = FALSE;
-    /* don't make it obvious when monsters will start speeding up */
-    int timeout_start = rnd(10000)+25000;
-    int past_clock;
-    /* for keeping track of Elbereth and correctstatus line display */
-    int was_on_elbereth = 0;
-    int is_on_elbereth = 0;
-
-    boolean can_regen = can_regenerate();
-
+    /* side-effects from the real world */
     flags.moonphase = phase_of_the_moon();
     if (flags.moonphase == FULL_MOON) {
         You("are lucky!  Full moon tonight.");
@@ -223,7 +211,6 @@ moveloop(boolean resuming)
 
     initrack();
 
-
     /* Note:  these initializers don't do anything except guarantee that
        we're linked properly.
      */
@@ -235,14 +222,19 @@ moveloop(boolean resuming)
     doredraw(); /* partial workaround to http://sourceforge.net/apps/trac/unnethack/ticket/2 */
     shop_selection_init();
 
+    if (resuming) { /* restoring old game */
+        read_engr_at(u.ux, u.uy); /* subset of pickup() */
+    }
+
     (void) encumber_msg(); /* in case they auto-picked up something */
+
     if (defer_see_monsters) {
         defer_see_monsters = FALSE;
         see_monsters();
     }
 
     u.uz0.dlevel = u.uz.dlevel;
-    youmonst.movement = NORMAL_SPEED;   /* give the hero some movement points */
+    youmonst.movement = NORMAL_SPEED; /* give the hero some movement points */
     prev_hp_notify = uhp();
 #ifdef WHEREIS_FILE
     touch_whereis();
@@ -253,537 +245,594 @@ moveloop(boolean resuming)
     if (iflags.perm_invent) {
         update_inventory();
     }
+}
 
-    for (;;) {
-        get_nh_event();
+static void
+u_calc_moveamt(int wtcap)
+{
+    int moveamt = 0;
+
+    /* calculate how much time passed. */
+    if (u.usteed && u.umoved) {
+        /* your speed doesn't augment steed's speed */
+        moveamt = mcalcmove(u.usteed);
+    } else {
+        moveamt = youmonst.data->mmove;
+
+        if (Very_fast) { /* speed boots or potion */
+            /* average movement is 1.67 times normal */
+            moveamt += NORMAL_SPEED / 2;
+            if (rn2(3) == 0) {
+                moveamt += NORMAL_SPEED / 2;
+            }
+        } else if (Fast) {
+            /* average movement is 1.33 times normal */
+            if (rn2(3) != 0) {
+                moveamt += NORMAL_SPEED / 2;
+            }
+        }
+    }
+
+    switch (wtcap) {
+    case UNENCUMBERED: break;
+    case SLT_ENCUMBER: moveamt -= (moveamt / 4); break;
+    case MOD_ENCUMBER: moveamt -= (moveamt / 2); break;
+    case HVY_ENCUMBER: moveamt -= ((moveamt * 3) / 4); break;
+    case EXT_ENCUMBER: moveamt -= ((moveamt * 7) / 8); break;
+    default: break;
+    }
+
+    youmonst.movement += moveamt;
+    if (youmonst.movement < 0) {
+        youmonst.movement = 0;
+    }
+}
+
+#if defined(MICRO) || defined(WIN32)
+static int mvl_abort_lev;
+#endif
+static int mvl_wtcap = 0;
+static int mvl_change = 0;
+
+void
+moveloop_core(void)
+{
+#if defined(MICRO) || defined(WIN32)
+    char ch;
+#endif
+    boolean didmove = FALSE, monscanmove = FALSE;
+
+    /* don't make it obvious when monsters will start speeding up */
+    int timeout_start = rnd(10000) + 25000;
+    int past_clock;
+    /* for keeping track of Elbereth and correctstatus line display */
+    int was_on_elbereth = 0;
+    int is_on_elbereth = 0;
+
+    boolean can_regen = can_regenerate();
+
+    get_nh_event();
 #ifdef POSITIONBAR
-        do_positionbar();
+    do_positionbar();
 #endif
 
-        didmove = flags.move;
-        if (didmove) {
-            /* actual time passed */
-            youmonst.movement -= NORMAL_SPEED;
+    didmove = flags.move;
+    if (didmove) {
+        /* actual time passed */
+        youmonst.movement -= NORMAL_SPEED;
 
-            do { /* hero can't move this turn loop */
-                wtcap = encumber_msg();
+        do { /* hero can't move this turn loop */
+            mvl_wtcap = encumber_msg();
 
-                flags.mon_moving = TRUE;
-                do {
-                    monscanmove = movemon();
-                    if (youmonst.movement > NORMAL_SPEED) {
-                        break;  /* it's now your turn */
+            flags.mon_moving = TRUE;
+            do {
+                monscanmove = movemon();
+                if (youmonst.movement > NORMAL_SPEED) {
+                    break;  /* it's now your turn */
+                }
+            } while (monscanmove);
+            flags.mon_moving = FALSE;
+
+            /* heaven or hell mode: player always has 1 maxhp */
+            check_uhpmax();
+
+            if (!monscanmove && youmonst.movement < NORMAL_SPEED) {
+                /* both you and the monsters are out of steam this round */
+                /* set up for a new turn */
+                struct monst *mtmp;
+                mcalcdistress();    /* adjust monsters' trap, blind, etc */
+
+                /* reallocate movement rations to monsters */
+                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+                    mtmp->movement += mcalcmove(mtmp);
+                }
+
+                /* Vanilla generates a critter every 70-ish turns.
+                 * The rate accelerates to every 50 or so below the Castle,
+                 * and 'round every 25 turns once you've done the Invocation.
+                 *
+                 * We will push it even further.  Monsters post-Invocation
+                 * will almost always appear on the stairs (if present), and
+                 * much more frequently; this, along with the extra intervene()
+                 * calls, should certainly make it seem like you're wading back
+                 * through the teeming hordes.
+                 *
+                 * Aside from that, a more general clock should be put on things;
+                 * after about 30,000 turns, the frequency rate of appearance
+                 * and (TODO) difficulty of monsters generated will slowly increase until
+                 * it reaches the point it will be at as if you were post-Invocation.
+                 *
+                 * The rate increases linearly with turns.  The rule of thumb is that
+                 * at turn x the rate is approximately (x / 30,000) times the normal
+                 * rate.  Maximal rate is 7x the normal rate.
+                 */
+                monclock = MIN_MONGEN_RATE;
+                if (u.uevent.udemigod) {
+                    monclock = MAX_MONGEN_RATE;
+                } else {
+                    past_clock = moves - timeout_start;
+                    if (past_clock > 0) {
+                        monclock = MIN_MONGEN_RATE * 30000 / (past_clock + 30000);
                     }
-                } while (monscanmove);
-                flags.mon_moving = FALSE;
-
-                /* heaven or hell mode: player always has 1 maxhp */
-                check_uhpmax();
-
-                if (!monscanmove && youmonst.movement < NORMAL_SPEED) {
-                    /* both you and the monsters are out of steam this round */
-                    /* set up for a new turn */
-                    struct monst *mtmp;
-                    mcalcdistress();    /* adjust monsters' trap, blind, etc */
-
-                    /* reallocate movement rations to monsters */
-                    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                        mtmp->movement += mcalcmove(mtmp);
+                    if (monclock > MIN_MONGEN_RATE / 2 && depth(&u.uz) > depth(&stronghold_level)) {
+                        monclock = MIN_MONGEN_RATE / 2;
                     }
-
-                    /* Vanilla generates a critter every 70-ish turns.
-                     * The rate accelerates to every 50 or so below the Castle,
-                     * and 'round every 25 turns once you've done the Invocation.
-                     *
-                     * We will push it even further.  Monsters post-Invocation
-                     * will almost always appear on the stairs (if present), and
-                     * much more frequently; this, along with the extra intervene()
-                     * calls, should certainly make it seem like you're wading back
-                     * through the teeming hordes.
-                     *
-                     * Aside from that, a more general clock should be put on things;
-                     * after about 30,000 turns, the frequency rate of appearance
-                     * and (TODO) difficulty of monsters generated will slowly increase until
-                     * it reaches the point it will be at as if you were post-Invocation.
-                     *
-                     * The rate increases linearly with turns.  The rule of thumb is that
-                     * at turn x the rate is approximately (x / 30,000) times the normal
-                     * rate.  Maximal rate is 7x the normal rate.
-                     */
+                }
+                /* make sure we don't fall off the edges */
+                if (monclock < MAX_MONGEN_RATE) {
+                    monclock = MAX_MONGEN_RATE;
+                }
+                if (monclock > MIN_MONGEN_RATE) {
                     monclock = MIN_MONGEN_RATE;
-                    if (u.uevent.udemigod) {
-                        monclock = MAX_MONGEN_RATE;
+                }
+
+                /* TODO: adj difficulty in makemon */
+                if (!rn2(monclock)) {
+                    stairway *stway;
+                    if (u.uevent.udemigod &&
+                         (stway = stairway_find_dir(TRUE)) &&
+                         rn2(10)) {
+                        (void) makemon((struct permonst *)0, stway->sx, stway->sy, MM_ADJACENTOK);
+                    } else if (u.uevent.udemigod &&
+                               (stway = stairway_find_special_dir(TRUE)) &&
+                               rn2(10)) {
+                        (void) makemon((struct permonst *)0, stway->sx, stway->sy, MM_ADJACENTOK);
                     } else {
-                        past_clock = moves - timeout_start;
-                        if (past_clock > 0) {
-                            monclock = MIN_MONGEN_RATE * 30000 / (past_clock + 30000);
-                        }
-                        if (monclock > MIN_MONGEN_RATE/2 && depth(&u.uz) > depth(&stronghold_level)) {
-                            monclock = MIN_MONGEN_RATE/2;
-                        }
+                        (void) makemon((struct permonst *)0, 0, 0, NO_MM_FLAGS);
                     }
-                    /* make sure we don't fall off the edges */
-                    if (monclock < MAX_MONGEN_RATE) {
-                        monclock = MAX_MONGEN_RATE;
-                    }
-                    if (monclock > MIN_MONGEN_RATE) {
-                        monclock = MIN_MONGEN_RATE;
-                    }
+                }
 
-                    /* TODO: adj difficulty in makemon */
-                    if (!rn2(monclock)) {
-                        stairway *stway;
-                        if (u.uevent.udemigod &&
-                             (stway = stairway_find_dir(TRUE)) &&
-                             rn2(10)) {
-                            (void) makemon((struct permonst *)0, stway->sx, stway->sy, MM_ADJACENTOK);
-                        } else if (u.uevent.udemigod &&
-                                   (stway = stairway_find_special_dir(TRUE)) &&
-                                   rn2(10)) {
-                            (void) makemon((struct permonst *)0, stway->sx, stway->sy, MM_ADJACENTOK);
-                        } else {
-                            (void) makemon((struct permonst *)0, 0, 0, NO_MM_FLAGS);
-                        }
-                    }
+                u_calc_moveamt(mvl_wtcap);
 
-                    /* calculate how much time passed. */
-                    if (u.usteed && u.umoved) {
-                        /* your speed doesn't augment steed's speed */
-                        moveamt = mcalcmove(u.usteed);
-                    } else {
-                        moveamt = youmonst.data->mmove;
+                settrack();
 
-                        if (Very_fast) { /* speed boots or potion */
-                            /* average movement is 1.67 times normal */
-                            moveamt += NORMAL_SPEED / 2;
-                            if (rn2(3) == 0) {
-                                moveamt += NORMAL_SPEED / 2;
-                            }
-                        } else if (Fast) {
-                            /* average movement is 1.33 times normal */
-                            if (rn2(3) != 0) {
-                                moveamt += NORMAL_SPEED / 2;
-                            }
-                        }
-                    }
+                monstermoves++;
+                moves++;
 
-                    switch (wtcap) {
-                    case UNENCUMBERED: break;
-                    case SLT_ENCUMBER: moveamt -= (moveamt / 4); break;
-                    case MOD_ENCUMBER: moveamt -= (moveamt / 2); break;
-                    case HVY_ENCUMBER: moveamt -= ((moveamt * 3) / 4); break;
-                    case EXT_ENCUMBER: moveamt -= ((moveamt * 7) / 8); break;
-                    default: break;
-                    }
+                /* 'moves' is misnamed; it represents turns; hero_seq is
+                a value that is distinct every time the hero moves */
+                hero_seq = moves << 3;
 
-                    youmonst.movement += moveamt;
-                    if (youmonst.movement < 0) {
-                        youmonst.movement = 0;
-                    }
-                    settrack();
+                /********************************/
+                /* once-per-turn things go here */
+                /********************************/
 
-                    monstermoves++;
-                    moves++;
-
-                    /* 'moves' is misnamed; it represents turns; hero_seq is
-                    a value that is distinct every time the hero moves */
-                    hero_seq = moves << 3;
-
-                    /********************************/
-                    /* once-per-turn things go here */
-                    /********************************/
-
-                    if (flags.bypasses) {
-                        clear_bypasses();
-                    }
-                    if (Glib) {
-                        glibr();
-                    }
-                    nh_timeout();
-                    run_regions();
+                if (flags.bypasses) {
+                    clear_bypasses();
+                }
+                if (Glib) {
+                    glibr();
+                }
+                nh_timeout();
+                run_regions();
 #ifdef DUNGEON_GROWTH
-                    dgn_growths(TRUE, TRUE);
+                dgn_growths(TRUE, TRUE);
 #endif
-                    if (u.ublesscnt) {
-                        u.ublesscnt--;
-                    }
-                    if (flags.time && !flags.run) {
-                        flags.botl = 1;
-                    }
+                if (u.ublesscnt) {
+                    u.ublesscnt--;
+                }
+                if (flags.time && !flags.run) {
+                    flags.botl = 1;
+                }
 
-                    /* One possible result of prayer is healing.  Whether or
-                     * not you get healed depends on your current hit points.
-                     * If you are allowed to regenerate during the prayer, the
-                     * end-of-prayer calculation messes up on this.
-                     * Another possible result is rehumanization, which requires
-                     * that encumbrance and movement rate be recalculated.
-                     */
-                    if (u.uinvulnerable) {
-                        /* for the moment at least, you're in tiptop shape */
-                        wtcap = UNENCUMBERED;
-                    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
-                        if (u.mh > 1) {
+                /* One possible result of prayer is healing.  Whether or
+                 * not you get healed depends on your current hit points.
+                 * If you are allowed to regenerate during the prayer, the
+                 * end-of-prayer calculation messes up on this.
+                 * Another possible result is rehumanization, which requires
+                 * that encumbrance and movement rate be recalculated.
+                 */
+                if (u.uinvulnerable) {
+                    /* for the moment at least, you're in tiptop shape */
+                    mvl_wtcap = UNENCUMBERED;
+                } else if (!Upolyd ? (u.uhp < u.uhpmax) :
+                                     (u.mh < u.mhmax || youmonst.data->mlet == S_EEL)) {
+                    /* maybe heal */
+                    regen_hp(mvl_wtcap);
+                }
+
+                /* moving around while encumbered is hard work */
+                if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
+                    if (!(mvl_wtcap < EXT_ENCUMBER ? moves%30 : moves%10)) {
+                        if (Upolyd && u.mh > 1) {
                             u.mh--;
-                            flags.botl = 1;
-                        } else if (u.mh < 1) {
-                            rehumanize();
-                        }
-                    } else if (Upolyd && u.mh < u.mhmax) {
-                        if (u.mh < 1) {
-                            rehumanize();
-                        } else if (can_regenerate() && (Regeneration ||
-                                                      (wtcap < MOD_ENCUMBER && !(moves%20)))) {
-                            flags.botl = 1;
-                            u.mh++;
-                            interrupt_multi("Hit points", u.mh, u.mhmax);
-                        }
-                    } else if (u.uhp < u.uhpmax && can_regenerate() &&
-                               (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
-                        if (u.ulevel > 9 && !(moves % 3)) {
-                            if (!marathon_mode) {
-                                int heal, Con = (int) ACURR(A_CON);
-
-                                if (Con <= 12) {
-                                    heal = 1;
-                                } else {
-                                    heal = rnd(Con);
-                                    if (heal > u.ulevel-9) {
-                                        heal = u.ulevel-9;
-                                    }
-                                }
-                                flags.botl = 1;
-                                u.uhp += heal;
-                                if (u.uhp > u.uhpmax) {
-                                    u.uhp = u.uhpmax;
-                                }
-                                interrupt_multi("Hit points", u.uhp, u.uhpmax);
-                            }
-                        } else if (Regeneration ||
-                                   (u.ulevel <= 9 &&
-                                    !(moves % ((MAXULEV+12) / (u.ulevel+2) + 1)))) {
-                            if (!marathon_mode) {
-                                flags.botl = 1;
-                                u.uhp++;
-                                interrupt_multi("Hit points", u.uhp, u.uhpmax);
-                            }
+                        } else if (!Upolyd && u.uhp > 1) {
+                            u.uhp--;
+                        } else {
+                            You("pass out from exertion!");
+                            exercise(A_CON, FALSE);
+                            fall_asleep(-10, FALSE);
                         }
                     }
+                }
 
-                    /* moving around while encumbered is hard work */
-                    if (wtcap > MOD_ENCUMBER && u.umoved) {
-                        if (!(wtcap < EXT_ENCUMBER ? moves%30 : moves%10)) {
-                            if (Upolyd && u.mh > 1) {
-                                u.mh--;
-                            } else if (!Upolyd && u.uhp > 1) {
-                                u.uhp--;
-                            } else {
-                                You("pass out from exertion!");
-                                exercise(A_CON, FALSE);
-                                fall_asleep(-10, FALSE);
+                regen_pw(mvl_wtcap);
+
+                if (!u.uinvulnerable) {
+                    if (Teleportation && !rn2(85)) {
+                        coordxy old_ux = u.ux, old_uy = u.uy;
+                        tele();
+                        if (u.ux != old_ux || u.uy != old_uy) {
+                            if (!next_to_u()) {
+                                check_leash(old_ux, old_uy);
                             }
-                        }
-                    }
-
-                    if ((u.uen < u.uenmax) &&
-                        ((wtcap < MOD_ENCUMBER &&
-                          (!(moves%((MAXULEV + 8 - u.ulevel) *
-                                    (Role_if(PM_WIZARD) ? 3 : 4) / 6))))
-                         || Energy_regeneration)) {
-                        u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
-                        if (u.uen > u.uenmax) {
-                            u.uen = u.uenmax;
-                        }
-                        flags.botl = 1;
-                        interrupt_multi("Magic energy", u.uen, u.uenmax);
-                    }
-
-                    if (!u.uinvulnerable) {
-                        if (Teleportation && !rn2(85)) {
-                            coordxy old_ux = u.ux, old_uy = u.uy;
-                            tele();
-                            if (u.ux != old_ux || u.uy != old_uy) {
-                                if (!next_to_u()) {
-                                    check_leash(old_ux, old_uy);
-                                }
 #ifdef REDO
-                                /* clear doagain keystrokes */
-                                pushch(0);
-                                savech(0);
+                            /* clear doagain keystrokes */
+                            pushch(0);
+                            savech(0);
 #endif
+                        }
+                    }
+                    /* delayed change may not be valid anymore */
+                    if ((mvl_change == 1 && !Polymorph) ||
+                        (mvl_change == 2 && u.ulycn == NON_PM))
+                        mvl_change = 0;
+                    if (Polymorph && !rn2(100)) {
+                        mvl_change = 1;
+                    } else if (u.ulycn >= LOW_PM && !Upolyd &&
+                               !rn2(80 - (20 * night()))) {
+                        mvl_change = 2;
+                    }
+                    if (mvl_change && !Unchanging) {
+                        if (multi >= 0) {
+                            if (occupation) {
+                                stop_occupation();
+                            } else {
+                                nomul(0, 0);
                             }
-                        }
-                        /* delayed change may not be valid anymore */
-                        if ((change == 1 && !Polymorph) ||
-                            (change == 2 && u.ulycn == NON_PM))
-                            change = 0;
-                        if (Polymorph && !rn2(100)) {
-                            change = 1;
-                        } else if (u.ulycn >= LOW_PM && !Upolyd &&
-                                   !rn2(80 - (20 * night()))) {
-                            change = 2;
-                        }
-                        if (change && !Unchanging) {
-                            if (multi >= 0) {
-                                if (occupation) {
-                                    stop_occupation();
-                                } else {
-                                    nomul(0, 0);
-                                }
-                                if (change == 1) {
-                                    polyself(FALSE);
-                                } else {
-                                    you_were();
-                                }
-                                change = 0;
+                            if (mvl_change == 1) {
+                                polyself(FALSE);
+                            } else {
+                                you_were();
                             }
-                        }
-                    }
-
-                    if (Searching && multi >= 0) {
-                        (void) dosearch0(1);
-                    }
-                    dosounds();
-                    do_storms();
-                    gethungry();
-                    age_spells();
-                    exerchk();
-                    invault();
-                    if (u.uhave.amulet) {
-                        amulet();
-                    }
-                    if (!rn2(40+(int)(ACURR(A_DEX)*3))) {
-                        u_wipe_engr(rnd(3));
-                    }
-                    if (u.uevent.udemigod && !u.uinvulnerable) {
-                        if (u.udg_cnt) {
-                            u.udg_cnt--;
-                        }
-                        if (!u.udg_cnt) {
-                            intervene();
-                            u.udg_cnt = rn1(200, (42+Luck));
-                        }
-                    }
-                    restore_attrib();
-                    /* underwater and waterlevel vision are done here */
-                    if (Is_waterlevel(&u.uz)) {
-                        movebubbles();
-                    } else if (Underwater) {
-                        under_water(0);
-                    }
-                    /* vision while buried done here */
-                    else if (u.uburied) {
-                        under_ground(0);
-                    }
-
-                    /* when immobile, count is in turns */
-                    if (multi < 0) {
-                        if (++multi == 0) { /* finished yet? */
-                            unmul((char *)0);
-                            /* if unmul caused a level change, take it now */
-                            if (u.utotype) {
-                                deferred_goto();
-                            }
+                            mvl_change = 0;
                         }
                     }
                 }
-            } while (youmonst.movement<NORMAL_SPEED); /* hero can't move loop */
 
-            /******************************************/
-            /* once-per-hero-took-time things go here */
-            /******************************************/
+                if (Searching && multi >= 0) {
+                    (void) dosearch0(1);
+                }
+                dosounds();
+                do_storms();
+                gethungry();
+                age_spells();
+                exerchk();
+                invault();
+                if (u.uhave.amulet) {
+                    amulet();
+                }
+                if (!rn2(40+(int)(ACURR(A_DEX) * 3))) {
+                    u_wipe_engr(rnd(3));
+                }
+                if (u.uevent.udemigod && !u.uinvulnerable) {
+                    if (u.udg_cnt) {
+                        u.udg_cnt--;
+                    }
+                    if (!u.udg_cnt) {
+                        intervene();
+                        u.udg_cnt = rn1(200, (42 + Luck));
+                    }
+                }
+                restore_attrib();
+                /* underwater and waterlevel vision are done here */
+                if (Is_waterlevel(&u.uz)) {
+                    movebubbles();
+                } else if (Underwater) {
+                    under_water(0);
+                }
+                /* vision while buried done here */
+                else if (u.uburied) {
+                    under_ground(0);
+                }
 
-            hero_seq++; /* moves*8 + n for n == 1..7 */
-
-            if (u.utrap && u.utraptype == TT_LAVA) {
-                if (!is_lava(u.ux, u.uy)) {
-                    u.utrap = 0;
-                } else if (!u.uinvulnerable) {
-                    u.utrap -= 1<<8;
-                    if (u.utrap < 1<<8) {
-                        killer.format = KILLED_BY;
-                        Strcpy(killer.name, "molten lava");
-                        You("sink below the surface and die.");
-                        done(DISSOLVED);
-                    } else if (!u.umoved) {
-                        Norep("You sink deeper into the lava.");
-                        u.utrap += rnd(4);
+                /* when immobile, count is in turns */
+                if (multi < 0) {
+                    if (++multi == 0) { /* finished yet? */
+                        unmul((char *)0);
+                        /* if unmul caused a level change, take it now */
+                        if (u.utotype) {
+                            deferred_goto();
+                        }
                     }
                 }
             }
+        } while (youmonst.movement<NORMAL_SPEED); /* hero can't move loop */
 
-        } /* actual time passed */
+        /******************************************/
+        /* once-per-hero-took-time things go here */
+        /******************************************/
 
-        /****************************************/
-        /* once-per-player-input things go here */
-        /****************************************/
-        game_loop_counter++;
+        hero_seq++; /* moves * 8 + n for n == 1..7 */
 
-        find_ac();
-        if (!flags.mv || Blind) {
-            /* redo monsters if hallu or wearing a helm of telepathy */
-            if (Hallucination) {    /* update screen randomly */
-                see_monsters();
-                see_objects();
-                see_traps();
-                if (u.uswallow) {
-                    swallowed(0);
-                }
-            } else if (Unblind_telepat) {
-                see_monsters();
-            } else if (Warning || Warn_of_mon) {
-                see_monsters();
-            }
-
-            if (vision_full_recalc) {
-                vision_recalc(0); /* vision! */
-            }
-        }
-
-        /* check changes of Elbereth at current player location */
-        is_on_elbereth = sengr_at("Elbereth", u.ux, u.uy);
-        if (was_on_elbereth != is_on_elbereth) {
-            was_on_elbereth = is_on_elbereth;
-            flags.botlx = 1;
-        }
-
-#ifdef REALTIME_ON_BOTL
-        if (iflags.showrealtime) {
-            time_t currenttime = get_realtime();
-            if (currenttime >= 3600 &&
-                 (iflags.realtime_format != REALTIME_FORMAT_SECONDS)) {
-                if (currenttime / 60 != urealtime.last_displayed_time / 60) {
-                    flags.botl = 1;
-                    urealtime.last_displayed_time = currenttime;
-                }
-            } else {
-                if (currenttime != urealtime.last_displayed_time) {
-                    flags.botl = 1;
-                    urealtime.last_displayed_time = currenttime;
+        if (u.utrap && u.utraptype == TT_LAVA) {
+            if (!is_lava(u.ux, u.uy)) {
+                u.utrap = 0;
+            } else if (!u.uinvulnerable) {
+                u.utrap -= 1<<8;
+                if (u.utrap < 1<<8) {
+                    killer.format = KILLED_BY;
+                    Strcpy(killer.name, "molten lava");
+                    You("sink below the surface and die.");
+                    done(DISSOLVED);
+                } else if (!u.umoved) {
+                    Norep("You sink deeper into the lava.");
+                    u.utrap += rnd(4);
                 }
             }
         }
-#endif
 
-        if (flags.botl || flags.botlx) {
-            bot();
-        }
+    } /* actual time passed */
 
-        if (iflags.hp_notify && (prev_hp_notify != uhp())) {
-            pline("%s", hpnotify_format_str(iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]"));
-            prev_hp_notify = uhp();
-        }
+    /****************************************/
+    /* once-per-player-input things go here */
+    /****************************************/
+    game_loop_counter++;
 
-        if (can_regen != can_regenerate()) {
-            if (!Hallucination) {
-                You_feel("%s.", (can_regen) ? "itchy" : "relief");
-            } else {
-                You_feel("%s.", (can_regen) ? (is_elf(youmonst.data) ? "magnetic" :
-                                               "tarnished") : "like you are no longer failing Organic Chemistry");
+    find_ac();
+    if (!flags.mv || Blind) {
+        /* redo monsters if hallu or wearing a helm of telepathy */
+        if (Hallucination) {    /* update screen randomly */
+            see_monsters();
+            see_objects();
+            see_traps();
+            if (u.uswallow) {
+                swallowed(0);
             }
-            can_regen = can_regenerate();
-        }
-
-        flags.move = 1;
-
-        if (multi >= 0 && occupation) {
-#if defined(MICRO) || defined(WIN32)
-            abort_lev = 0;
-            if (kbhit()) {
-                if ((ch = Getchar()) == ABORT) {
-                    abort_lev++;
-                }
-# ifdef REDO
-                else
-                    pushch(ch);
-# endif /* REDO */
-            }
-            if (!abort_lev && (*occupation)() == 0) {
-                occupation = 0;
-            }
-#else
-            if ((*occupation)() == 0) {
-                occupation = 0;
-            }
-#endif
-            if (
-#if defined(MICRO) || defined(WIN32)
-                abort_lev ||
-#endif
-                monster_nearby()) {
-                stop_occupation();
-                reset_eat();
-            }
-#if defined(MICRO) || defined(WIN32)
-            if (!(++occtime % 7)) {
-                display_nhwindow(WIN_MAP, FALSE);
-            }
-#endif
-            continue;
-        }
-
-        if ((u.uhave.amulet || Clairvoyant) &&
-            !In_endgame(&u.uz) && !BClairvoyant &&
-            !(moves % 15) && !rn2(2))
-            do_vicinity_map();
-
-#ifdef WIZARD
-        if (iflags.sanity_check || iflags.debug_fuzzer) {
-            sanity_check();
-        }
-#endif
-
-#ifdef CLIPPING
-        /* just before rhack */
-        cliparound(u.ux, u.uy);
-#endif
-
-        u.umoved = FALSE;
-
-        if (multi > 0) {
-            lookaround();
-            if (!multi) {
-                /* lookaround may clear multi */
-                flags.move = 0;
-                if (flags.time) {
-                    flags.botl = 1;
-                }
-                continue;
-            }
-            if (flags.mv) {
-                if (multi < COLNO && !--multi) {
-                    flags.travel = iflags.travel1 = flags.mv = flags.run = 0;
-                }
-                domove();
-            } else {
-                --multi;
-                rhack(save_cm);
-            }
-        } else if (multi == 0) {
-#ifdef MAIL
-            ckmailstatus();
-            maybe_hint();
-#endif
-            maybe_tutorial();
-            rhack((char *)0);
-        }
-        if (u.utotype) { /* change dungeon level */
-            deferred_goto();    /* after rhack() */
-        }
-        /* !flags.move here: multiple movement command stopped */
-        else if (flags.time && (!flags.move || !flags.mv)) {
-            flags.botl = 1;
+        } else if (Unblind_telepat) {
+            see_monsters();
+        } else if (Warning || Warn_of_mon) {
+            see_monsters();
         }
 
         if (vision_full_recalc) {
             vision_recalc(0); /* vision! */
         }
-        /* when running in non-tport mode, this gets done through domove() */
-        if ((!flags.run || iflags.runmode == RUN_TPORT) &&
-            (multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
-            if (flags.time && flags.run) {
+    }
+
+    /* check changes of Elbereth at current player location */
+    is_on_elbereth = sengr_at("Elbereth", u.ux, u.uy);
+    if (was_on_elbereth != is_on_elbereth) {
+        was_on_elbereth = is_on_elbereth;
+        flags.botlx = 1;
+    }
+
+#ifdef REALTIME_ON_BOTL
+    if (iflags.showrealtime) {
+        time_t currenttime = get_realtime();
+        if (currenttime >= 3600 &&
+             (iflags.realtime_format != REALTIME_FORMAT_SECONDS)) {
+            if (currenttime / 60 != urealtime.last_displayed_time / 60) {
+                flags.botl = 1;
+                urealtime.last_displayed_time = currenttime;
+            }
+        } else {
+            if (currenttime != urealtime.last_displayed_time) {
+                flags.botl = 1;
+                urealtime.last_displayed_time = currenttime;
+            }
+        }
+    }
+#endif
+
+    if (flags.botl || flags.botlx) {
+        bot();
+    }
+
+    if (iflags.hp_notify && (prev_hp_notify != uhp())) {
+        pline("%s", hpnotify_format_str(iflags.hp_notify_fmt ? iflags.hp_notify_fmt : "[HP%c%a=%h]"));
+        prev_hp_notify = uhp();
+    }
+
+    if (can_regen != can_regenerate()) {
+        if (!Hallucination) {
+            You_feel("%s.", (can_regen) ? "itchy" : "relief");
+        } else {
+            You_feel("%s.", (can_regen) ? (is_elf(youmonst.data) ? "magnetic" :
+                                           "tarnished") : "like you are no longer failing Organic Chemistry");
+        }
+        can_regen = can_regenerate();
+    }
+
+    flags.move = 1;
+
+    if (multi >= 0 && occupation) {
+#if defined(MICRO) || defined(WIN32)
+        mvl_abort_lev = 0;
+        if (kbhit()) {
+            if ((ch = Getchar()) == ABORT) {
+                mvl_abort_lev++;
+            }
+# ifdef REDO
+            else
+                pushch(ch);
+# endif /* REDO */
+        }
+        if (!mvl_abort_lev && (*occupation)() == 0) {
+            occupation = 0;
+        }
+#else
+        if ((*occupation)() == 0) {
+            occupation = 0;
+        }
+#endif
+        if (
+#if defined(MICRO) || defined(WIN32)
+            mvl_abort_lev ||
+#endif
+            monster_nearby()) {
+            stop_occupation();
+            reset_eat();
+        }
+#if defined(MICRO) || defined(WIN32)
+        if (!(++occtime % 7)) {
+            display_nhwindow(WIN_MAP, FALSE);
+        }
+#endif
+        return;
+    }
+
+    if ((u.uhave.amulet || Clairvoyant) &&
+        !In_endgame(&u.uz) && !BClairvoyant &&
+        !(moves % 15) && !rn2(2))
+        do_vicinity_map();
+
+#ifdef WIZARD
+    if (iflags.sanity_check || iflags.debug_fuzzer) {
+        sanity_check();
+    }
+#endif
+
+#ifdef CLIPPING
+    /* just before rhack */
+    cliparound(u.ux, u.uy);
+#endif
+
+    u.umoved = FALSE;
+
+    if (multi > 0) {
+        lookaround();
+        if (!multi) {
+            /* lookaround may clear multi */
+            flags.move = 0;
+            if (flags.time) {
                 flags.botl = 1;
             }
-            display_nhwindow(WIN_MAP, FALSE);
+            return;
+        }
+        if (flags.mv) {
+            if (multi < COLNO && !--multi) {
+                flags.travel = iflags.travel1 = flags.mv = flags.run = 0;
+            }
+            domove();
+        } else {
+            --multi;
+            rhack(save_cm);
+        }
+    } else if (multi == 0) {
+#ifdef MAIL
+        ckmailstatus();
+        maybe_hint();
+#endif
+        maybe_tutorial();
+        rhack((char *)0);
+    }
+    if (u.utotype) { /* change dungeon level */
+        deferred_goto();    /* after rhack() */
+    }
+    /* !flags.move here: multiple movement command stopped */
+    else if (flags.time && (!flags.move || !flags.mv)) {
+        flags.botl = 1;
+    }
+
+    if (vision_full_recalc) {
+        vision_recalc(0); /* vision! */
+    }
+    /* when running in non-tport mode, this gets done through domove() */
+    if ((!flags.run || iflags.runmode == RUN_TPORT) &&
+        (multi && (!flags.travel ? !(multi % 7) : !(moves % 7L)))) {
+        if (flags.time && flags.run) {
+            flags.botl = 1;
+        }
+        display_nhwindow(WIN_MAP, FALSE);
+    }
+}
+
+void
+moveloop(boolean resuming)
+{
+    moveloop_preamble(resuming);
+
+    for (;;) {
+        moveloop_core();
+    }
+}
+
+static void
+regen_pw(int wtcap)
+{
+    if ((u.uen < u.uenmax) &&
+        ((wtcap < MOD_ENCUMBER &&
+          (!(moves%((MAXULEV + 8 - u.ulevel) *
+                    (Role_if(PM_WIZARD) ? 3 : 4) / 6))))
+         || Energy_regeneration)) {
+        u.uen += rn1((int)(ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
+        if (u.uen > u.uenmax) {
+            u.uen = u.uenmax;
+        }
+        flags.botl = 1;
+        interrupt_multi("Magic energy", u.uen, u.uenmax);
+    }
+}
+
+static void
+regen_hp(int wtcap)
+{
+    if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
+        if (u.mh > 1) {
+            u.mh--;
+            flags.botl = 1;
+        } else if (u.mh < 1) {
+            rehumanize();
+        }
+    } else if (Upolyd && u.mh < u.mhmax) {
+        if (u.mh < 1) {
+            rehumanize();
+        } else if (can_regenerate() && (Regeneration ||
+                                      (wtcap < MOD_ENCUMBER && !(moves%20)))) {
+            flags.botl = 1;
+            u.mh++;
+            interrupt_multi("Hit points", u.mh, u.mhmax);
+        }
+    } else if (u.uhp < u.uhpmax && can_regenerate() &&
+               (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
+        if (u.ulevel > 9 && !(moves % 3)) {
+            if (!marathon_mode) {
+                int heal, Con = (int) ACURR(A_CON);
+
+                if (Con <= 12) {
+                    heal = 1;
+                } else {
+                    heal = rnd(Con);
+                    if (heal > u.ulevel - 9) {
+                        heal = u.ulevel - 9;
+                    }
+                }
+                flags.botl = 1;
+                u.uhp += heal;
+                if (u.uhp > u.uhpmax) {
+                    u.uhp = u.uhpmax;
+                }
+                interrupt_multi("Hit points", u.uhp, u.uhpmax);
+            }
+        } else if (Regeneration ||
+                   (u.ulevel <= 9 &&
+                    !(moves % ((MAXULEV + 12) / (u.ulevel + 2) + 1)))) {
+            if (!marathon_mode) {
+                flags.botl = 1;
+                u.uhp++;
+                interrupt_multi("Hit points", u.uhp, u.uhpmax);
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ extern char *fmt_ptr(const genericptr);
 
 extern void early_init(void);
 extern void moveloop(boolean);
+extern void moveloop_core(void);
 extern void stop_occupation(void);
 extern void display_gamewindows(void);
 extern void newgame(void);
