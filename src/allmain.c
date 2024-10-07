@@ -788,6 +788,10 @@ regen_pw(int wtcap)
 static void
 regen_hp(int wtcap)
 {
+    if (marathon_mode) {
+        return;
+    }
+
     if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
         if (u.mh > 1) {
             u.mh--;
@@ -807,32 +811,28 @@ regen_hp(int wtcap)
     } else if (u.uhp < u.uhpmax && can_regenerate() &&
                (wtcap < MOD_ENCUMBER || !u.umoved || Regeneration)) {
         if (u.ulevel > 9 && !(moves % 3)) {
-            if (!marathon_mode) {
-                int heal, Con = (int) ACURR(A_CON);
+            int heal, Con = (int) ACURR(A_CON);
 
-                if (Con <= 12) {
-                    heal = 1;
-                } else {
-                    heal = rnd(Con);
-                    if (heal > u.ulevel - 9) {
-                        heal = u.ulevel - 9;
-                    }
+            if (Con <= 12) {
+                heal = 1;
+            } else {
+                heal = rnd(Con);
+                if (heal > u.ulevel - 9) {
+                    heal = u.ulevel - 9;
                 }
-                flags.botl = 1;
-                u.uhp += heal;
-                if (u.uhp > u.uhpmax) {
-                    u.uhp = u.uhpmax;
-                }
-                interrupt_multi("Hit points", u.uhp, u.uhpmax);
             }
+            flags.botl = 1;
+            u.uhp += heal;
+            if (u.uhp > u.uhpmax) {
+                u.uhp = u.uhpmax;
+            }
+            interrupt_multi("Hit points", u.uhp, u.uhpmax);
         } else if (Regeneration ||
                    (u.ulevel <= 9 &&
                     !(moves % ((MAXULEV + 12) / (u.ulevel + 2) + 1)))) {
-            if (!marathon_mode) {
-                flags.botl = 1;
-                u.uhp++;
-                interrupt_multi("Hit points", u.uhp, u.uhpmax);
-            }
+            flags.botl = 1;
+            u.uhp++;
+            interrupt_multi("Hit points", u.uhp, u.uhpmax);
         }
     }
 }
