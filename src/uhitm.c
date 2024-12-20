@@ -613,7 +613,7 @@ should_cleave(void)
             bystanders = TRUE;
         }
     }
-    if (bystanders) {
+    if (!uwep->cursed && bystanders) {
         if (!flags.forcefight) {
             return FALSE;
         }

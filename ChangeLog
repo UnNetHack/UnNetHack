@@ -60,6 +60,7 @@
 	  - Removed artifact wish failure due to the number of existing artifacts
 	  - The Tsurugi of Muramasa grants half physical damage when carried (from EvilHack)
 	  - Prevent Cleaver from cleaving peaceful bystanders (from xNetHack)
+	  - Cursed Cleaver will attack peaceful monsters (from EvilHack)
 
 	* dungeon layout:
 	  - Disable the rogue tribute level
