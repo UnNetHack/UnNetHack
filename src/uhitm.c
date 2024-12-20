@@ -582,6 +582,45 @@ known_hitum(struct monst *mon, struct obj *weapon, int *mhit, int rollneeded, in
     return malive;
 }
 
+/** return TRUE iff no peaceful targets are found in cleaving range to the left
+ * and right of the target space
+ * assumes u.dx and u.dy have been set */
+static boolean
+should_cleave(void)
+{
+    int i;
+    boolean bystanders = FALSE;
+    /* find the direction toward primary target */
+    int dir = xytod(u.dx, u.dy);
+    if (dir > 7) {
+        impossible("should_cleave: unknown target direction");
+        return FALSE; /* better safe than sorry */
+    }
+    /* loop over dir+1 % 8 and dir+7 % 8 (the clockwise and anticlockwise
+     * directions); a monster standing at dir itself is NOT checked; also,
+     * monsters visible only with warning or as invisible markers will NOT
+     * trigger this prompt */
+    for (i = dir + 1; i <= dir + 7; i += 6) {
+        int realdir = i % 8;
+        int x = u.ux + xdir[realdir];
+        int y = u.uy + ydir[realdir];
+        struct monst *mtmp;
+        if (!isok(x, y)) {
+            continue;
+        }
+        mtmp = m_at(x, y);
+        if (mtmp && canspotmon(mtmp) && mtmp->mpeaceful) {
+            bystanders = TRUE;
+        }
+    }
+    if (bystanders) {
+        if (!flags.forcefight) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
 /* hit the monster next to you and the monsters to the left and right of it;
    return False if the primary target is killed, True otherwise */
 static boolean
@@ -683,7 +722,8 @@ hitum(struct monst *mon, struct attack *uattk)
        it can't be part of dual-wielding but we guard against that anyway;
        cleave return value reflects status of primary target ('mon') */
     if (uwep && uwep->oartifact == ART_CLEAVER &&
-         !u.twoweap && !u.uswallow && !u.ustuck && !NODIAG(u.umonnum)) {
+         !u.twoweap && !u.uswallow && !u.ustuck && !NODIAG(u.umonnum) &&
+         should_cleave()) {
         return hitum_cleave(mon, uattk);
     }
 
