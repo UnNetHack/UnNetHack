@@ -118,6 +118,9 @@ hea_abil[] = { {     1, &(HPoison_resistance), "", "" },
 static long next_check = 600L;  /* arbitrary first setting */
 static void exerper(void);
 static void postadjabil(long *);
+static const struct innate *role_abil(int);
+static const struct innate *check_innate_abil(long *, long);
+static int innately(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -616,6 +619,235 @@ postadjabil(long int *ability)
     if (ability == &(HWarning) || ability == &(HSee_invisible)) {
         see_monsters();
     }
+}
+
+static const struct innate *
+role_abil(int r)
+{
+    const struct {
+        short role;
+        const struct innate *abil;
+    } roleabils[] = {
+        { PM_ARCHEOLOGIST, arc_abil },
+        { PM_BARBARIAN, bar_abil },
+        { PM_CAVE_DWELLER, cav_abil },
+        { PM_CONVICT, con_abil },
+        { PM_HEALER, hea_abil },
+        { PM_KNIGHT, kni_abil },
+        { PM_MONK, mon_abil },
+        { PM_CLERIC, pri_abil },
+        { PM_RANGER, ran_abil },
+        { PM_ROGUE, rog_abil },
+        { PM_SAMURAI, sam_abil },
+        { PM_TOURIST, tou_abil },
+        { PM_VALKYRIE, val_abil },
+        { PM_WIZARD, wiz_abil },
+        { 0, 0 }
+    };
+    int i;
+
+    for (i = 0; roleabils[i].abil && roleabils[i].role != r; i++) {
+        continue;
+    }
+    return roleabils[i].abil;
+}
+
+static const struct innate *
+check_innate_abil(long *ability, long frommask)
+{
+    const struct innate *abil = 0;
+
+    if (frommask == FROMEXPER) {
+        abil = role_abil(Role_switch);
+    } else if (frommask == FROMRACE) {
+        switch (Race_switch) {
+        case PM_DWARF:
+            abil = dwa_abil;
+            break;
+        case PM_ELF:
+            abil = elf_abil;
+            break;
+        case PM_GNOME:
+            abil = gno_abil;
+            break;
+        case PM_ORC:
+            abil = orc_abil;
+            break;
+        case PM_HUMAN:
+            abil = hum_abil;
+            break;
+        default:
+            break;
+        }
+    }
+
+    while (abil && abil->ability) {
+        if ((abil->ability == ability) && (u.ulevel >= abil->ulevel)) {
+            return abil;
+        }
+        abil++;
+    }
+    return (struct innate *) 0;
+}
+
+/* reasons for innate ability */
+#define FROM_NONE 0
+#define FROM_ROLE 1 /* from experience at level 1 */
+#define FROM_RACE 2
+#define FROM_INTR 3 /* intrinsically (eating some corpse or prayer reward) */
+#define FROM_EXP  4 /* from experience for some level > 1 */
+#define FROM_FORM 5
+#define FROM_LYCN 6
+
+/* check whether particular ability has been obtained via innate attribute */
+static int
+innately(long *ability)
+{
+    const struct innate *iptr;
+
+    if ((iptr = check_innate_abil(ability, FROMEXPER)) != 0) {
+        return (iptr->ulevel == 1) ? FROM_ROLE : FROM_EXP;
+    }
+    if ((iptr = check_innate_abil(ability, FROMRACE)) != 0) {
+        return FROM_RACE;
+    }
+    if ((*ability & FROMOUTSIDE) != 0L) {
+        return FROM_INTR;
+    }
+    if ((*ability & FROMFORM) != 0L) {
+        return FROM_FORM;
+    }
+    return FROM_NONE;
+}
+
+int
+is_innate(int propidx)
+{
+    int innateness;
+
+    /* innately() would report FROM_FORM for this; caller wants specificity */
+    if (propidx == DRAIN_RES && ismnum(u.ulycn)) {
+        return FROM_LYCN;
+    }
+    if (propidx == FAST && Very_fast) {
+        return FROM_NONE; /* can't become very fast innately */
+    }
+    if ((innateness = innately(&u.uprops[propidx].intrinsic)) != FROM_NONE) {
+        return innateness;
+    }
+    if (propidx == JUMPING && Role_if(PM_KNIGHT) &&
+        /* knight has intrinsic jumping, but extrinsic is more versatile so
+           ignore innateness if equipment is going to claim responsibility */
+         !u.uprops[propidx].extrinsic) {
+        return FROM_ROLE;
+    }
+    if ((propidx == BLINDED && !haseyes(youmonst.data)) ||
+         (propidx == BLND_RES && (HBlnd_resist & FROMFORM) != 0)) {
+        return FROM_FORM;
+    }
+    return FROM_NONE;
+}
+
+char *
+from_what(
+    int propidx) /* special cases can have negative values */
+{
+    static char buf[BUFSZ];
+
+    buf[0] = '\0';
+    /*
+     * Restrict the source of the attributes just to debug mode for now
+     */
+    if (wizard) {
+        static const char because_of[] = " because of %s";
+
+        if (propidx >= 0) {
+            char *p;
+            struct obj *obj = (struct obj *) 0;
+            int innateness = is_innate(propidx);
+
+            /*
+             * Properties can be obtained from multiple sources and we
+             * try to pick the most significant one.  Classification
+             * priority is not set in stone; current precedence is:
+             * "from the start" (from role or race at level 1),
+             * "from outside" (eating corpse, divine reward, blessed potion),
+             * "from experience" (from role or race at level 2+),
+             * "from current form" (while polymorphed),
+             * "from timed effect" (potion or spell),
+             * "from worn/wielded equipment" (Firebrand, elven boots, &c),
+             * "from carried equipment" (mainly quest artifacts).
+             * There are exceptions.  Versatile jumping from spell or boots
+             * takes priority over knight's innate but limited jumping.
+             */
+            if ((propidx == BLINDED && u.roleplay.blindfolded)) {
+                Sprintf(buf, " from birth");
+            } else if (innateness == FROM_ROLE || innateness == FROM_RACE) {
+                Strcpy(buf, " innately");
+            } else if (innateness == FROM_INTR) { /* [].intrinsic & FROMOUTSIDE */
+                Strcpy(buf, " intrinsically");
+            } else if (innateness == FROM_EXP) {
+                Strcpy(buf, " because of your experience");
+            } else if (innateness == FROM_LYCN) {
+                Strcpy(buf, " due to your lycanthropy");
+            } else if (innateness == FROM_FORM) {
+                Strcpy(buf, " from your creature form");
+            } else if (propidx == FAST && Very_fast) {
+                Sprintf(buf, because_of,
+                        ((HFast & TIMEOUT) != 0L) ? "a potion or spell" :
+                        ((EFast & W_ARMF) != 0L &&
+                         uarmf->dknown &&
+                         objects[uarmf->otyp].oc_name_known) ? ysimple_name(uarmf) /* speed boots */ :
+                        EFast ? "worn equipment" :
+                        something);
+            } else if (wizard &&
+                       (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0) {
+                Sprintf(buf, because_of,
+                        obj->oartifact ? bare_artifactname(obj) : ysimple_name(obj));
+            } else if (propidx == BLINDED && Blindfolded_only) {
+                Sprintf(buf, because_of, ysimple_name(ublindf));
+#if 0
+            } else if (propidx == BLINDED && u.ucreamed &&
+                      BlindedTimeout == (long) u.ucreamed &&
+                      !EBlinded && !(HBlinded & ~TIMEOUT)) {
+                Sprintf(buf, "due to goop covering your %s",
+                        body_part(FACE));
+#endif
+            }
+
+            /* remove some verbosity and/or redundancy */
+            if ((p = strstri(buf, " pair of ")) != 0) {
+                copynchars(p + 1, p + 9, BUFSZ); /* overlapping buffers ok */
+            } else if (propidx == STRANGLED &&
+                       (p = strstri(buf, " of strangulation")) != 0) {
+                *p = '\0';
+            }
+        } else { /* negative property index */
+            /* if more blocking capabilities get implemented we'll need to
+               replace this with what_blocks() comparable to what_gives() */
+            switch (-propidx) {
+#if 0
+            case BLINDED:
+                /* wearing the Eyes of the Overworld overrides blindness */
+                if (BBlinded && is_art(ublindf, ART_EYES_OF_THE_OVERWORLD)) {
+                    Sprintf(buf, because_of, bare_artifactname(ublindf));
+                }
+                break;
+#endif
+            case INVIS:
+                if (u.uprops[INVIS].blocked & W_ARMC) {
+                    Sprintf(buf, because_of, ysimple_name(uarmc)); /* mummy wrapping */
+                }
+                break;
+            case CLAIRVOYANT:
+                if (wizard && (u.uprops[CLAIRVOYANT].blocked & W_ARMH)) {
+                    Sprintf(buf, because_of, ysimple_name(uarmh)); /* cornuthaum */
+                }
+                break;
+            }
+        }
+    } /*wizard*/
+    return buf;
 }
 
 void

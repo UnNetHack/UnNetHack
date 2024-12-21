@@ -124,6 +124,7 @@ extern const char * beautiful(void);
 extern int uhp(void);
 extern int uhpmax(void);
 extern boolean extremeattr(int);
+extern char *from_what(int);
 extern void uchangealign(int, int);
 
 /* ### ball.c ### */

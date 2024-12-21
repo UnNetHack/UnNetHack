@@ -9,7 +9,7 @@ static int wiz_showkills(void);    /* showborn patch */
 
 static boolean minimal_enlightenment(void);
 
-static void enlght_line(const char *, const char *, const char *);
+static void enlght_line(const char *, const char *, const char *, const char *);
 static char *enlght_combatinc(const char *, int, int, char *);
 
 /* allmain.c */
@@ -40,24 +40,59 @@ static const char
     have_been[]  = "have been ",
     have_never[] = "have never ", never[] = "never ";
 
-#define enl_msg(prefix, present, past, suffix) \
-    enlght_line(prefix, final ? past : present, suffix)
-#define you_are(attr)   enl_msg(You_, are, were, attr)
-#define you_have(attr)  enl_msg(You_, have, had, attr)
-#define you_can(attr)   enl_msg(You_, can, could, attr)
-#define you_have_been(goodthing) enl_msg(You_, have_been, were, goodthing)
-#define you_have_never(badthing) enl_msg(You_, have_never, never, badthing)
-#define you_have_X(something)   enl_msg(You_, have, (const char *)"", something)
+/* macros to simplify output of enlightenment messages; also used by
+   conduct and achievements */
+#define enl_msg(prefix, present, past, suffix, ps) \
+    enlght_line((prefix), final ? (past) : (present), (suffix), (ps))
+#define you_are(attr, ps) enl_msg(You_, are, were, (attr), (ps))
+#define you_have(attr, ps) enl_msg(You_, have, had, (attr), (ps))
+#define you_can(attr, ps) enl_msg(You_, can, could, (attr), (ps))
+#define you_have_been(goodthing) \
+    enl_msg(You_, have_been, were, (goodthing), "")
+#define you_have_never(badthing) \
+    enl_msg(You_, have_never, never, (badthing), "")
+#define you_have_X(something) \
+    enl_msg(You_, have, (const char *) "", (something), "")
+
+static void
+enlght_out(const char *buf)
+{
+    putstr(en_win, 0, buf);
+}
 
 static int want_display = FALSE;
 static void
-enlght_line(const char *start, const char *middle, const char *end)
+enlght_line(
+    const char *start,
+    const char *middle,
+    const char *end,
+    const char *ps)
 {
+#ifndef NO_ENLGHT_CONTRACTIONS
+    static const struct contrctn {
+        const char *twowords, *contrctn;
+    } contra[] = {
+        { " are not ", " aren't " },
+        { " were not ", " weren't " },
+        { " have not ", " haven't " },
+        { " had not ", " hadn't " },
+        { " can not ", " can't " },
+        { " could not ", " couldn't " },
+    };
+    int i;
+#endif
     char buf[BUFSZ];
 
-    Sprintf(buf, "%s%s%s.", start, middle, end);
+    Sprintf(buf, " %s%s%s%s.", start, middle, end, ps);
+#ifndef NO_ENLGHT_CONTRACTIONS
+    if (strstri(buf, " not ")) { /* TODO: switch to libc strstr() */
+        for (i = 0; i < SIZE(contra); ++i) {
+            (void) strsubst(buf, contra[i].twowords, contra[i].contrctn);
+        }
+    }
+#endif
     if (want_display) {
-        putstr(en_win, 0, buf);
+        enlght_out(buf);
     }
     dump_list_item(buf);
 }
@@ -126,7 +161,7 @@ enlightenment(int final, boolean want_disp)
             "the Envoy of Balance",
             "the Glory of Arioch"
         };
-        you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1]);
+        you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
     }
 
     /* heaven or hell modes */
@@ -138,7 +173,7 @@ enlightenment(int final, boolean want_disp)
         } else {
             Sprintf(buf, "%ld life left", u.ulives);
         }
-        you_have(buf);
+        you_have(buf, "");
     }
 
     if (u.lastprayed) {
@@ -148,194 +183,206 @@ enlightenment(int final, boolean want_disp)
                 u.lastprayresult == PRAY_CONV ? "converted to a new god" :
                 "prayed",
                 moves - u.lastprayed);
-        enl_msg(buf, "", "", "");
+        enl_msg(buf, "", "", "", "");
         if (u.lastprayresult == PRAY_GOOD) {
-            enl_msg("That prayer was well received", "", "", "");
+            enl_msg("That prayer was well received", "", "", "", "");
         } else if (u.lastprayresult == PRAY_BAD) {
-            enl_msg("That prayer was poorly received", "", "", "");
+            enl_msg("That prayer was poorly received", "", "", "", "");
         } else if (u.lastprayresult == PRAY_INPROG) {
-            enl_msg("That prayer ", "is ", "was ", "in progress");
+            enl_msg("That prayer ", "is ", "was ", "in progress", "");
         }
         if (u.reconciled) {
             if (u.reconciled == REC_REC) {
                 Sprintf(buf, " since reconciled with your god");
-                enl_msg("You ", "have", "had", buf);
+                enl_msg("You ", "have", "had", buf, "");
             } else if (u.reconciled == REC_MOL) {
                 Sprintf(buf, " since mollified your god");
-                enl_msg("You ", "have", "had", buf);
+                enl_msg("You ", "have", "had", buf, "");
             }
         }
     }
 
     /* note: piousness 3 matches MIN_QUEST_ALIGN (quest.h) */
     if (u.ualign.record >= 20) {
-        you_are("piously aligned");
+        you_are("piously aligned", "");
     } else if (u.ualign.record > 13) {
-        you_are("devoutly aligned");
+        you_are("devoutly aligned", "");
     } else if (u.ualign.record > 8) {
-        you_are("fervently aligned");
+        you_are("fervently aligned", "");
     } else if (u.ualign.record > 3) {
-        you_are("stridently aligned");
+        you_are("stridently aligned", "");
     } else if (u.ualign.record == 3) {
-        you_are("aligned");
+        you_are("aligned", "");
     } else if (u.ualign.record > 0) {
-        you_are("haltingly aligned");
+        you_are("haltingly aligned", "");
     } else if (u.ualign.record == 0) {
-        you_are("nominally aligned");
+        you_are("nominally aligned", "");
     } else if (u.ualign.record >= -3) {
-        you_have("strayed");
+        you_have("strayed", "");
     } else if (u.ualign.record >= -8) {
-        you_have("sinned");
+        you_have("sinned", "");
     } else {
-        you_have("transgressed");
+        you_have("transgressed", "");
     }
 #ifdef WIZARD
     if (wizard || final) {
         Sprintf(buf, " %d", u.uhunger);
-        enl_msg("Hunger level ", "is", "was", buf);
+        enl_msg("Hunger level ", "is", "was", buf, "");
         Sprintf(buf, " %d / %ld", u.ualign.record, ALIGNLIM);
-        enl_msg("Your alignment ", "is", "was", buf);
+        enl_msg("Your alignment ", "is", "was", buf, "");
         Sprintf(buf, " %d - %d",
                 min_monster_difficulty(), max_monster_difficulty());
-        enl_msg("Monster difficulty range ", "is", "was", buf);
+        enl_msg("Monster difficulty range ", "is", "was", buf, "");
         Sprintf(buf, " %d", level_difficulty());
-        enl_msg("Level difficulty ", "is", "was", buf);
+        enl_msg("Level difficulty ", "is", "was", buf, "");
     }
     if (wizard || final) {
         Sprintf(buf, " u%s", encode_base32(level_info[0].seed));
-        enl_msg("Seed ", "is", "was", buf);
+        enl_msg("Seed ", "is", "was", buf, "");
         if (is_game_pre_seeded) {
-            enl_msg("You ", "are playing", "played", " a pre-seeded game");
+            enl_msg("You ", "are playing", "played", " a pre-seeded game", "");
         }
     }
     if ((wizard || final) && (monclock > 0)) {
         Sprintf(buf, "%2.2fx", (float)MIN_MONGEN_RATE/monclock);
 
-        enl_msg("Monster generation rate ", "is ", "was ", buf);
+        enl_msg("Monster generation rate ", "is ", "was ", buf, "");
     }
     if (wizard) {
         Snprintf(buf, sizeof(buf), "Current process id is %d", getpid());
-        enl_msg("","","",buf);
+        enl_msg("", "", "", buf, "");
     }
 #endif
 
     /*** Resistances to troubles ***/
     if (Fire_resistance) {
-        you_are("fire resistant");
+        you_are("fire resistant", from_what(FIRE_RES));
     }
     if (Cold_resistance) {
-        you_are("cold resistant");
+        you_are("cold resistant", from_what(COLD_RES));
     }
     if (Sleep_resistance) {
-        you_are("sleep resistant");
+        you_are("sleep resistant", from_what(SLEEP_RES));
     }
     if (Disint_resistance) {
-        you_are("disintegration-resistant");
+        you_are("disintegration resistant", from_what(DISINT_RES));
     }
     if (Shock_resistance) {
-        you_are("shock resistant");
+        you_are("shock resistant", from_what(SHOCK_RES));
     }
     if (Poison_resistance) {
-        you_are("poison resistant");
+        you_are("poison resistant", from_what(POISON_RES));
     }
     if (Drain_resistance) {
-        you_are("level-drain resistant");
+        you_are("level-drain resistant", from_what(DRAIN_RES));
     }
     if (Sick_resistance) {
-        you_are("immune to sickness");
+        you_are("immune to sickness", from_what(SICK_RES));
     }
     if (Antimagic) {
-        you_are("magic-protected");
+        you_are("magic-protected", from_what(ANTIMAGIC));
     }
     if (Acid_resistance) {
-        you_are("acid resistant");
+        you_are("acid resistant", from_what(ACID_RES));
     }
     if (Stone_resistance) {
-        you_are("petrification resistant");
+        you_are("petrification resistant", from_what(STONE_RES));
     }
     if (Invulnerable) {
-        you_are("invulnerable");
+        you_are("invulnerable", from_what(INVULNERABLE));
     }
     if (u.uedibility) {
-        you_can("recognize detrimental food");
+        you_can("recognize detrimental food", "");
     }
 
     /*** Troubles ***/
     if (!flags.perma_hallu && Halluc_resistance) {
-        enl_msg("You resist", "", "ed", " hallucinations");
+        enl_msg("You resist", "", "ed", " hallucinations", "");
     }
     if (flags.perma_hallu) {
-        you_are("permanently hallucinating");
+        you_are("permanently hallucinating", "");
     }
     if (final) {
         if (!flags.perma_hallu && Hallucination) {
-            you_are("hallucinating");
+            you_are("hallucinating", "");
         }
         if (Stunned) {
-            you_are("stunned");
+            you_are("stunned", "");
         }
         if (Confusion) {
-            you_are("confused");
+            you_are("confused", "");
         }
         if (Blinded) {
-            you_are("blinded");
+            you_are("blinded", from_what(BLINDED));
         }
         if (Sick) {
             if (u.usick_type & SICK_VOMITABLE) {
-                you_are("sick from food poisoning");
+                you_are("sick from food poisoning", "");
             }
             if (u.usick_type & SICK_NONVOMITABLE) {
-                you_are("sick from illness");
+                you_are("sick from illness", "");
             }
         }
         if (Punished) {
-            you_are("punished");
+            you_are("punished", "");
         }
     }
     if (Stoned) {
-        you_are("turning to stone");
+        you_are("turning to stone", "");
     }
     if (Slimed) {
-        you_are("turning into slime");
+        you_are("turning into slime", "");
     }
     if (Strangled) {
-        you_are((u.uburied) ? "buried" : "being strangled");
+        if (u.uburied) {
+            you_are("buried", "");
+        } else {
+            if (final && (Strangled & I_SPECIAL)) {
+                enlght_out(" You died from strangulation.");
+            } else {
+                Strcpy(buf, "being strangled");
+                if (wizard) {
+                    Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
+                }
+                you_are(buf, from_what(STRANGLED));
+            }
+        }
     }
     if (Glib) {
-        Sprintf(buf, "slippery %s", makeplural(body_part(FINGER)));
-        you_have(buf);
+        Sprintf(buf, "slippery %s", fingers_or_gloves(TRUE));
+        you_have(buf, "");
     }
     if (Fumbling) {
-        enl_msg("You fumble", "", "d", "");
+        enl_msg("You fumble", "", "d", "", "");
     }
     if (Wounded_legs && !u.usteed) {
         Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
-        you_have(buf);
+        you_have(buf, "");
     }
 #if defined(WIZARD)
     if (Wounded_legs && u.usteed && (wizard || final)) {
         Strcpy(buf, x_monnam(u.usteed, ARTICLE_YOUR, (char *)0,
                              SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE));
         *buf = highc(*buf);
-        enl_msg(buf, " has", " had", " wounded legs");
+        enl_msg(buf, " has", " had", " wounded legs", "");
     }
 #endif
     if (Sleeping) {
-        enl_msg("You ", "fall", "fell", " asleep");
+        enl_msg("You ", "fall", "fell", " asleep", "");
     }
     if (Hunger) {
-        enl_msg("You hunger", "", "ed", " rapidly");
+        enl_msg("You hunger", "", "ed", " rapidly", "");
     }
 
     /*** Vision and senses ***/
     if (See_invisible) {
-        enl_msg(You_, "see", "saw", " invisible");
+        enl_msg(You_, "see", "saw", " invisible", "");
     }
     if (Blind_telepat) {
-        you_are("telepathic");
+        you_are("telepathic", from_what(TELEPAT));
     }
     if (Warning) {
-        you_are("warned");
+        you_are("warned", from_what(WARNING));
     }
     if (Warn_of_mon && flags.warntype) {
         Sprintf(buf, "aware of the presence of %s",
@@ -345,31 +392,31 @@ enlightenment(int final, boolean want_disp)
                 (flags.warntype & M2_WERE) ? "lycanthropes" :
                 (flags.warntype & M2_UNDEAD) ? "undead" :
                 something);
-        you_are(buf);
+        you_are(buf, from_what(WARN_OF_MON));
     } else if (Warn_of_mon && uwep) {
         const char *monster_name = get_warned_of_monster(uwep);
         if (monster_name) {
             Sprintf(buf, "aware of the presence of %s", monster_name);
-            you_are(buf);
+            you_are(buf, from_what(WARN_OF_MON));
         }
     }
     if (Undead_warning) {
-        you_are("warned of undead");
+        you_are("warned of undead", from_what(WARN_UNDEAD));
     }
     if (Searching) {
-        you_have("automatic searching");
+        you_have("automatic searching", from_what(SEARCHING));
     }
     if (Clairvoyant) {
-        you_are("clairvoyant");
+        you_are("clairvoyant", from_what(CLAIRVOYANT));
     }
     if (Infravision) {
-        you_have("infravision");
+        you_have("infravision", from_what(INFRAVISION));
     }
     if (Detect_monsters) {
-        you_are("sensing the presence of monsters");
+        you_are("sensing the presence of monsters", "");
     }
     if (u.umconf) {
-        you_are("going to confuse monsters");
+        you_are("going to confuse monsters", "");
     }
 
     /*** Appearance and behavior ***/
@@ -383,71 +430,72 @@ enlightenment(int final, boolean want_disp)
             adorn += uright->spe;
         }
         if (adorn < 0) {
-            you_are("poorly adorned");
+            you_are("poorly adorned", from_what(ADORNED));
         } else {
-            you_are("adorned");
+            you_are("adorned", from_what(ADORNED));
         }
     }
     if (Invisible) {
-        you_are("invisible");
+        you_are("invisible", from_what(INVIS));
     } else if (Invis) {
-        you_are("invisible to others");
+        you_are("invisible to others", from_what(INVIS));
     }
     /* ordinarily "visible" is redundant; this is a special case for
        the situation when invisibility would be an expected attribute */
     else if ((HInvis || EInvis || pm_invisible(youmonst.data)) && BInvis) {
-        you_are("visible");
+        you_are("visible", from_what(-INVIS));
     }
     if (Displaced) {
-        you_are("displaced");
+        you_are("displaced", from_what(DISPLACED));
     }
     if (Stealth) {
-        you_are("stealthy");
+        you_are("stealthy", from_what(STEALTH));
     }
     if (Aggravate_monster) {
-        enl_msg("You aggravate", "", "d", " monsters");
+        enl_msg("You aggravate", "", "d", " monsters",
+                from_what(AGGRAVATE_MONSTER));
     }
     if (Conflict) {
-        enl_msg("You cause", "", "d", " conflict");
+        enl_msg("You cause", "", "d", " conflict", from_what(CONFLICT));
     }
 
     /*** Transportation ***/
     if (Jumping) {
-        you_can("jump");
+        you_can("jump", from_what(JUMPING));
     }
     if (Teleportation) {
-        you_can("teleport");
+        you_can("teleport", from_what(TELEPORT));
     }
     if (Teleport_control) {
-        you_have("teleport control");
+        you_have("teleport control", from_what(TELEPORT_CONTROL));
     }
     if (Lev_at_will) {
-        you_are("levitating, at will");
+        you_are("levitating, at will", "");
     } else if (Levitation) {
-        you_are("levitating"); /* without control */
+        you_are("levitating", from_what(LEVITATION)); /* without control */
     } else if (Flying) {
-        you_can("fly");
+        you_can("fly", from_what(FLYING));
     }
     if (Wwalking) {
-        you_can("walk on water");
+        you_can("walk on water", from_what(WWALKING));
     }
     if (Swimming) {
-        you_can("swim");
+        you_can("swim", from_what(SWIMMING));
     }
     if (Breathless) {
-        you_can("survive without air");
+        you_can("survive without air", from_what(MAGICAL_BREATHING));
     } else if (Amphibious) {
-        you_can("breathe water");
+        you_can("breathe water", from_what(MAGICAL_BREATHING));
     }
     if (Passes_walls) {
-        you_can("walk through walls");
+        you_can("walk through walls", from_what(PASSES_WALLS));
     }
     /* If you die while dismounting, u.usteed is still set.  Since several
      * places in the done() sequence depend on u.usteed, just detect this
      * special case. */
     if (u.usteed && (final < 2 || strcmp(killer.name, "riding accident"))) {
         Sprintf(buf, "riding %s", y_monnam(u.usteed));
-        you_are(buf);
+        you_are(buf, "");
     }
     if (u.uswallow) {
         Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
@@ -456,32 +504,32 @@ enlightenment(int final, boolean want_disp)
             Sprintf(eos(buf), " (%u)", u.uswldtim);
         }
 #endif
-        you_are(buf);
+        you_are(buf, "");
     } else if (u.ustuck) {
         Sprintf(buf, "%s %s",
                 (Upolyd && sticks(youmonst.data)) ? "holding" : "held by",
                 a_monnam(u.ustuck));
-        you_are(buf);
+        you_are(buf, "");
     }
 
     /*** Physical attributes ***/
     if (u.uhitinc) {
-        you_have(enlght_combatinc("to hit", u.uhitinc, final, buf));
+        you_have(enlght_combatinc("to hit", u.uhitinc, final, buf), "");
     }
     if (u.udaminc) {
-        you_have(enlght_combatinc("damage", u.udaminc, final, buf));
+        you_have(enlght_combatinc("damage", u.udaminc, final, buf), "");
     }
     if (Slow_digestion) {
-        you_have("slower digestion");
+        you_have("slower digestion", from_what(SLOW_DIGESTION));
     }
     if (Regeneration && can_regenerate()) {
-        enl_msg("You regenerate", "", "d", "");
+        enl_msg("You regenerate", "", "d", "", from_what(REGENERATION));
     }
     if (!can_regenerate()) {
         if (is_elf(youmonst.data)) {
-            you_are("in direct contact with cold iron");
+            you_are("in direct contact with cold iron", "");
         } else if (is_vampiric(youmonst.data)) {
-            you_are("in direct contact with silver");
+            you_are("in direct contact with silver", "");
         }
     }
     if (u.uspellprot || Protection) {
@@ -499,27 +547,27 @@ enlightenment(int final, boolean want_disp)
         prot += u.uspellprot;
 
         if (prot < 0) {
-            you_are("ineffectively protected");
+            you_are("ineffectively protected", "");
         } else if (prot > 0) {
-            you_are("protected");
+            you_are("protected", "");
         }
     }
     if (Half_gas_damage) {
-        enl_msg(You_, "take", "took", " reduced poison gas damage");
+        enl_msg(You_, "take", "took", " reduced poison gas damage", "");
     }
     /* polymorph and other shape change */
     if (Protection_from_shape_changers) {
-        you_are("protected from shape changers");
+        you_are("protected from shape changers", from_what(PROT_FROM_SHAPE_CHANGERS));
     }
     if (Polymorph) {
-        you_are("polymorphing");
+        you_are("polymorphing", "");
     }
     if (Polymorph_control) {
-        you_have("polymorph control");
+        you_have("polymorph control", from_what(POLYMORPH_CONTROL));
     }
     if (u.ulycn >= LOW_PM) {
         Strcpy(buf, an(mons[u.ulycn].mname));
-        you_are(buf);
+        you_are(buf, "");
     }
     if (Upolyd) {
         if (u.umonnum == u.ulycn) {
@@ -532,28 +580,28 @@ enlightenment(int final, boolean want_disp)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         }
 #endif
-        you_are(buf);
+        you_are(buf, "");
     }
     if (Unchanging) {
-        you_can("not change from your current form");
+        you_can("not change from your current form", from_what(UNCHANGING));
     }
     if (Fast) {
-        you_are(Very_fast ? "very fast" : "fast");
+        you_are(Very_fast ? "very fast" : "fast", from_what(FAST));
     }
     if (Reflecting) {
-        you_have("reflection");
+        you_have("reflection", from_what(REFLECTING));
     }
     if (Free_action) {
-        you_have("free action");
+        you_have("free action", from_what(FREE_ACTION));
     }
     if (Fixed_abil) {
-        you_have("fixed abilities");
+        you_have("fixed abilities", from_what(FIXED_ABIL));
     }
     if (Lifesaved) {
-        enl_msg("Your life ", "will be", "would have been", " saved");
+        enl_msg("Your life ", "will be", "would have been", " saved", "");
     }
     if (u.twoweap) {
-        you_are("wielding two weapons at once");
+        you_are("wielding two weapons at once", "");
     }
 
     /*** Miscellany ***/
@@ -567,25 +615,25 @@ enlightenment(int final, boolean want_disp)
             Sprintf(eos(buf), " (%d)", Luck);
         }
 #endif
-        you_are(buf);
+        you_are(buf, "");
     }
 #ifdef WIZARD
     else if (wizard || final) {
-        enl_msg("Your luck ", "is", "was", " zero");
+        enl_msg("Your luck ", "is", "was", " zero", "");
     }
 #endif
     if (u.moreluck > 0) {
-        you_have("extra luck");
+        you_have("extra luck", "");
     } else if (u.moreluck < 0) {
-        you_have("reduced luck");
+        you_have("reduced luck", "");
     }
     if (has_luckitem()) {
         ltmp = stone_luck(FALSE);
         if (ltmp <= 0) {
-            enl_msg("Bad luck ", "times", "timed", " out slowly for you");
+            enl_msg("Bad luck ", "times", "timed", " out slowly for you", "");
         }
         if (ltmp >= 0) {
-            enl_msg("Good luck ", "times", "timed", " out slowly for you");
+            enl_msg("Good luck ", "times", "timed", " out slowly for you", "");
         }
     }
 
@@ -597,7 +645,7 @@ enlightenment(int final, boolean want_disp)
             Sprintf(eos(buf), " (%d)", u.ugangr);
         }
 #endif
-        enl_msg(u_gname(), " is", " was", buf);
+        enl_msg(u_gname(), " is", " was", buf, "");
     } else {
         /*
          * We need to suppress this when the game is over, because death
@@ -617,7 +665,7 @@ enlightenment(int final, boolean want_disp)
                 Sprintf(eos(buf), " (%d)", u.ublesscnt);
             }
 #endif
-            you_can(buf);
+            you_can(buf, "");
         }
     }
 
@@ -646,7 +694,7 @@ enlightenment(int final, boolean want_disp)
             }
         }
         if (p) {
-            enl_msg(You_, "have been killed ", p, buf);
+            enl_msg(You_, "have been killed ", p, buf, "");
         }
     }
     dump_list_end();
@@ -834,7 +882,7 @@ show_conduct(int final, boolean want_disp)
                 enl_msg(conducts[cdt].prefix, /* "You " */
                         conducts[cdt].presenttxt, /* "have been"    */
                         conducts[cdt].pasttxt, /* "were"    */
-                        conducts[cdt].suffix); /* "a pacifist"  */
+                        conducts[cdt].suffix, ""); /* "a pacifist"  */
             }
         } else if (intended_cdt(cdt)) {
             you_have_X(conducts[cdt].failtxt); /* "pretended to be a pacifist" */
@@ -933,7 +981,7 @@ show_conduct(int final, boolean want_disp)
 
         if (!u.uconduct.wisharti) {
             enl_msg(You_, "have not wished", "did not wish",
-                    " for any artifacts");
+                    " for any artifacts", "");
         }
     }
 

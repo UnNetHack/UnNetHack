@@ -75,7 +75,8 @@
 #define INFRAVISION     64
 #define WARN_OF_MON     65
 #define DETECT_MONSTERS     66
-#define LAST_PROP       (DETECT_MONSTERS)
+#define BLND_RES            67
+#define LAST_PROP       (BLND_RES)
 
 /*** Where the properties come from ***/
 /* Definitions were moved here from obj.h and you.h */

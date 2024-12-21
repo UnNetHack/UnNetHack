@@ -156,6 +156,10 @@
                              && !BTelepat)
 #define Unblind_telepat     (ETelepat && !BTelepat)
 
+#define HBlnd_resist u.uprops[BLND_RES].intrinsic /* from form */
+#define EBlnd_resist u.uprops[BLND_RES].extrinsic /* wielding Sunsword */
+#define Blnd_resist (HBlnd_resist || EBlnd_resist)
+
 #define HWarning        u.uprops[WARNING].intrinsic
 #define EWarning        u.uprops[WARNING].extrinsic
 #define Warning         (HWarning || EWarning)

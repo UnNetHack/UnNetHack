@@ -352,6 +352,8 @@ E NEARDATA struct you u;
 #define GLOWING_DRAGON_SCALES    STONE_DRAGON_SCALES
 #define YELLOW_DRAGON_SCALES     ACID_DRAGON_SCALES
 
+#define PM_CAVE_DWELLER PM_CAVEMAN
+#define PM_CLERIC PM_PRIEST
 
 E NEARDATA const struct monst zeromonst; /* for init of new or temp monsters */
 E NEARDATA struct monst youmonst;   /* init'd and defined in decl.c */
