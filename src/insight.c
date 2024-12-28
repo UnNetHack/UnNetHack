@@ -526,7 +526,9 @@ enlightenment(int final, boolean want_disp)
         enl_msg("You regenerate", "", "d", "", from_what(REGENERATION));
     }
     if (!can_regenerate()) {
-        if (is_elf(youmonst.data)) {
+        if (marathon_mode) {
+            enl_msg("You ", "can not", "could not", " regenerate in marathon mode", "");
+        } else if (is_elf(youmonst.data)) {
             you_are("in direct contact with cold iron", "");
         } else if (is_vampiric(youmonst.data)) {
             you_are("in direct contact with silver", "");
