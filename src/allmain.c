@@ -31,6 +31,7 @@ static void interrupt_multi(const char *, int, int);
 
 static int prev_hp_notify;
 enum monster_generation monclock;
+static boolean can_regen = TRUE;
 
 char *
 hpnotify_format_str(char *str)
@@ -239,6 +240,7 @@ moveloop_preamble(boolean resuming)
 #ifdef WHEREIS_FILE
     touch_whereis();
 #endif
+    can_regen = can_regenerate();
 
     /* for perm_invent preset at startup, display persistent inventory after
        invent is fully populated and the in_moveloop flag has been set */
@@ -308,8 +310,6 @@ moveloop_core(void)
     /* for keeping track of Elbereth and correctstatus line display */
     int was_on_elbereth = 0;
     int is_on_elbereth = 0;
-
-    boolean can_regen = can_regenerate();
 
     get_nh_event();
 #ifdef POSITIONBAR
