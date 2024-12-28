@@ -109,6 +109,73 @@ hpnotify_format_str(char *str)
     return buf;
 }
 
+struct obj *
+which_obj_prevents_regeneration(void)
+{
+    if (is_elf(youmonst.data)) {
+        if (uwep && is_iron(uwep) &&
+            !is_quest_artifact(uwep) && !uarmg) {
+            return uwep;
+        }
+        if (uarm && is_iron(uarm) && !uarmu) {
+            return uarm;
+        }
+        if (uarmu && is_iron(uarmu)) {
+            return uarmu;
+        }
+        if (uarmc && is_iron(uarmc) && !uarmu && !uarm) {
+            return uarmc;
+        }
+        if (uarmh && is_iron(uarmh) &&
+            !is_quest_artifact(uarmh)) {
+            return uarmh;
+        }
+        if (uarms && is_iron(uarms) && !uarmg) {
+            return uarms;
+        }
+        if (uarmg && is_iron(uarmg)) {
+            return uarmg;
+        }
+        if (uarmf && is_iron(uarmf)) {
+            return uarmf;
+        }
+        if (uleft && is_iron(uleft)) {
+            return uleft;
+        }
+        if (uright && is_iron(uright)) {
+            return uright;
+        }
+        if (uamul && is_iron(uamul) &&
+            !is_quest_artifact(uamul) && !uarmu && !uarm) {
+            return uamul;
+        }
+        if (ublindf && is_iron(ublindf)) {
+            return ublindf;
+        }
+        if (uchain && is_iron(uchain)) {
+            return uchain;
+        }
+        if (uswapwep && is_iron(uswapwep) && u.twoweap) {
+            return uswapwep;
+        }
+    } else if (is_vampiric(youmonst.data)) {
+        if (uwep && is_silver(uwep) && !uarmg) {
+            return uwep;
+        }
+        if (uarms && is_silver(uarms) &&
+            !is_quest_artifact(uarms) && !uarmg) {
+            return uarms;
+        }
+        if (uleft && is_silver(uleft)) {
+            return uleft;
+        }
+        if (uright && is_silver(uright)) {
+            return uright;
+        }
+    }
+    return NULL;
+}
+
 /* Elven players cannot regenerate if in direct contact with cold
  * iron, and vampiric players cannot if in direct contact with silver.
  * Make an exception for your quest artifact, though -- currently,
@@ -120,70 +187,10 @@ boolean
 can_regenerate(void)
 {
     if (marathon_mode) {
-        return 0;
+        return FALSE;
     }
-    if (is_elf(youmonst.data)) {
-        if (uwep && is_iron(uwep) &&
-            !is_quest_artifact(uwep) && !uarmg) {
-            return 0;
-        }
-        if (uarm && is_iron(uarm) && !uarmu) {
-            return 0;
-        }
-        if (uarmu && is_iron(uarmu)) {
-            return 0;
-        }
-        if (uarmc && is_iron(uarmc) && !uarmu && !uarm) {
-            return 0;
-        }
-        if (uarmh && is_iron(uarmh) &&
-            !is_quest_artifact(uarmh)) {
-            return 0;
-        }
-        if (uarms && is_iron(uarms) && !uarmg) {
-            return 0;
-        }
-        if (uarmg && is_iron(uarmg)) {
-            return 0;
-        }
-        if (uarmf && is_iron(uarmf)) {
-            return 0;
-        }
-        if (uleft && is_iron(uleft)) {
-            return 0;
-        }
-        if (uright && is_iron(uright)) {
-            return 0;
-        }
-        if (uamul && is_iron(uamul) &&
-            !is_quest_artifact(uamul) && !uarmu && !uarm) {
-            return 0;
-        }
-        if (ublindf && is_iron(ublindf)) {
-            return 0;
-        }
-        if (uchain && is_iron(uchain)) {
-            return 0;
-        }
-        if (uswapwep && is_iron(uswapwep) && u.twoweap) {
-            return 0;
-        }
-    } else if (is_vampiric(youmonst.data)) {
-        if (uwep && is_silver(uwep) && !uarmg) {
-            return 0;
-        }
-        if (uarms && is_silver(uarms) &&
-            !is_quest_artifact(uarms) && !uarmg) {
-            return 0;
-        }
-        if (uleft && is_silver(uleft)) {
-            return 0;
-        }
-        if (uright && is_silver(uright)) {
-            return 0;
-        }
-    }
-    return 1;
+
+    return (which_obj_prevents_regeneration() == NULL);
 }
 
 static void

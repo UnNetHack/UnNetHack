@@ -530,6 +530,8 @@ enlightenment(int final, boolean want_disp)
             enl_msg("You ", "can not", "could not", " regenerate in marathon mode", "");
         } else if (is_elf(youmonst.data)) {
             you_are("in direct contact with cold iron", "");
+            Sprintf(buf, " regenerate because of %s", yobjnam(which_obj_prevents_regeneration(), (char *) 0));
+            enl_msg("You ", "can not", "could not", buf, "");
         } else if (is_vampiric(youmonst.data)) {
             you_are("in direct contact with silver", "");
         }

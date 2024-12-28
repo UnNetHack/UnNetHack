@@ -26,6 +26,7 @@ extern void stop_occupation(void);
 extern void display_gamewindows(void);
 extern void newgame(void);
 extern void welcome(boolean);
+extern struct obj * which_obj_prevents_regeneration(void);
 extern boolean can_regenerate(void);
 #if defined(RECORD_REALTIME) || defined(REALTIME_ON_BOTL)
 extern time_t get_realtime(void);
