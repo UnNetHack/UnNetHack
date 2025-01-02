@@ -302,6 +302,8 @@ deletedwithboulder:
                   the_your[t->madeby_u],
                   is_pit(t->ttyp) ? "pit" : "hole");
         }
+    } else if (flags.mon_moving && IS_ALTAR(levl[x][y].typ) && cansee(x,y)) {
+        doaltarobj(obj);
     } else if (is_open_air(x, y)) {
         boolean res = obj_aireffects(obj, cansee(x, y));
         newsym(x, y);
@@ -320,7 +322,7 @@ doaltarobj(struct obj *obj)
 
     if (obj->oclass != COIN_CLASS) {
         /* KMH, conduct */
-        if (!u.uconduct.gnostic) {
+        if (!flags.mon_moving && !u.uconduct.gnostic) {
             livelog_printf(LL_CONDUCT, "eschewed atheism, by dropping %s on an altar", doname(obj));
         }
         u.uconduct.gnostic++;
