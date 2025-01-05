@@ -38,9 +38,8 @@
 #define SICK            29
 #define BLINDED         30
 #define DEAF          -100
-#define SLEEPING        31
+#define SLEEPY          31
 #define WOUNDED_LEGS    32
-#define SLEEPY        -101
 #define STONED          33
 #define STRANGLED       34
 #define HALLUC          35

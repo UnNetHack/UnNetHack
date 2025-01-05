@@ -272,6 +272,15 @@ vomiting_dialogue(void)
     }
     exercise(A_CON, FALSE);
 }
+static void
+sleep_dialogue(void)
+{
+    long i = (HSleepy & TIMEOUT);
+
+    if (i == 4) {
+        You("yawn.");
+    }
+}
 
 static NEARDATA const char * const choke_texts[] = {
     "You find it hard to breathe.",
@@ -597,6 +606,9 @@ nh_timeout(void)
     if (HPasses_walls & TIMEOUT) {
         phaze_dialogue();
     }
+    if (HSleepy & TIMEOUT) {
+        sleep_dialogue();
+    }
     if (u.mtimedone && !--u.mtimedone) {
         if (Unchanging) {
             u.mtimedone = rnd(100*youmonst.data->mlevel + 1);
@@ -741,14 +753,14 @@ nh_timeout(void)
                     stop_occupation();
                 }
                 break;
-            case SLEEPING:
+            case SLEEPY:
                 if (unconscious() || Sleep_resistance) {
-                    HSleeping += rnd(100);
-                } else if (Sleeping) {
+                    incr_itimeout(&HSleepy, rnd(100));
+                } else if (Sleepy) {
                     You("fall asleep.");
                     sleeptime = rnd(20);
                     fall_asleep(-sleeptime, TRUE);
-                    HSleeping += sleeptime + rnd(100);
+                    incr_itimeout(&HSleepy, sleeptime + rnd(100));
                 }
                 break;
             case LEVITATION:

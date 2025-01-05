@@ -1004,13 +1004,13 @@ Amulet_on(void)
         break;
 
     case AMULET_OF_RESTFUL_SLEEP: {
-        long newnap = (long) rnd(100);
-        long oldnap = (HSleeping & TIMEOUT);
+        long newnap = (long) rnd(98) + 2L,
+             oldnap = (HSleepy & TIMEOUT);
 
-        /* avoid clobbering FROMOUTSIDE bit, which might have
-           gotten set by previously eating one of these amulets */
         if (newnap < oldnap || oldnap == 0L) {
-            HSleeping = (HSleeping & ~TIMEOUT) | newnap;
+            /* avoid clobbering FROMOUTSIDE bit, which might have
+               gotten set by previously eating one of these amulets */
+            HSleepy = (HSleepy & ~TIMEOUT) | newnap;
         }
         break;
     }
@@ -1089,8 +1089,9 @@ Amulet_off(void)
 
     case AMULET_OF_RESTFUL_SLEEP:
         setworn((struct obj *)0, W_AMUL);
-        if (!ESleeping && !(HSleeping & ~TIMEOUT)) {
-            HSleeping &= ~TIMEOUT; /* clear timeout bits */
+        /* HSleepy = 0L; -- avoid clobbering FROMOUTSIDE bit */
+        if (!ESleepy && !(HSleepy & ~TIMEOUT)) {
+            HSleepy &= ~TIMEOUT; /* clear timeout bits */
         }
         return;
 

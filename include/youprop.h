@@ -133,9 +133,10 @@
 #define EWounded_legs       u.uprops[WOUNDED_LEGS].extrinsic
 #define Wounded_legs        (HWounded_legs || EWounded_legs)
 
-#define HSleeping       u.uprops[SLEEPING].intrinsic
-#define ESleeping       u.uprops[SLEEPING].extrinsic
-#define Sleeping        (HSleeping || ESleeping)
+/* Sleepy: prone to falling asleep periodically; not necessarily asleep now */
+#define HSleepy u.uprops[SLEEPY].intrinsic
+#define ESleepy u.uprops[SLEEPY].extrinsic
+#define Sleepy (HSleepy || ESleepy)
 
 #define HHunger         u.uprops[HUNGER].intrinsic
 #define EHunger         u.uprops[HUNGER].extrinsic

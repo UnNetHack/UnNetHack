@@ -568,7 +568,7 @@ NEARDATA struct objclass objects[] = {
     AMULET("amulet of ESP",           "circular",   TELEPAT,    160),
     AMULET("amulet of life saving",   "spherical",  LIFESAVED,   75),
     AMULET("amulet of strangulation", "oval",       STRANGLED,  115),
-    AMULET("amulet of restful sleep", "triangular", SLEEPING,   115),
+    AMULET("amulet of restful sleep", "triangular", SLEEPY,     115),
     AMULET("amulet versus poison",    "pyramidal",  POISON_RES, 145),
     AMULET("amulet of change",        "square",     0,          115),
     /* POLYMORPH */
