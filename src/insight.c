@@ -11,6 +11,7 @@ static boolean minimal_enlightenment(void);
 
 static void enlght_line(const char *, const char *, const char *, const char *);
 static char *enlght_combatinc(const char *, int, int, char *);
+static void enlght_halfdmg(int, int);
 
 /* allmain.c */
 extern int monclock;
@@ -134,6 +135,30 @@ enlght_combatinc(const char *inctyp, int incamt, int final, char *outbuf)
     }
     Sprintf(outbuf, "%s %s %s", an(modif), bonus, inctyp);
     return outbuf;
+}
+
+/* report half physical or half spell damage */
+static void
+enlght_halfdmg(int category, int final)
+{
+    const char *category_name;
+    char buf[BUFSZ];
+
+    switch (category) {
+    case HALF_PHDAM:
+        category_name = "physical";
+        break;
+
+    case HALF_SPDAM:
+        category_name = "spell";
+        break;
+
+    default:
+        category_name = "unknown";
+        break;
+    }
+    Sprintf(buf, " %s %s damage", (final || wizard) ? "half" : "reduced", category_name);
+    enl_msg(You_, "take", "took", buf, from_what(category));
 }
 
 /* check whether hero is wearing something that player definitely knows
@@ -585,6 +610,12 @@ enlightenment(int final, boolean want_disp)
         } else if (prot > 0) {
             you_are("protected", "");
         }
+    }
+    if (Half_physical_damage) {
+        enlght_halfdmg(HALF_PHDAM, final);
+    }
+    if (Half_spell_damage) {
+        enlght_halfdmg(HALF_SPDAM, final);
     }
     if (Half_gas_damage) {
         enl_msg(You_, "take", "took", " reduced poison gas damage", "");
