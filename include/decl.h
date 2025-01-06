@@ -690,6 +690,10 @@ struct instance_globals_l {
     char lua_copyright[LUA_COPYRIGHT_BUFSIZ];
 };
 
+struct instance_globals_o {
+    struct obj *objs_deleted;
+};
+
 struct instance_globals_t {
     /* sp_lev.c */
     boolean themeroom_failed;
@@ -710,6 +714,7 @@ extern struct instance_globals_e ge;
 extern struct instance_globals_g gg;
 extern struct instance_globals_i gi;
 extern struct instance_globals_l gl;
+extern struct instance_globals_o go;
 extern struct instance_globals_t gt;
 extern struct instance_globals_x gx;
 extern struct instance_globals_y gy;

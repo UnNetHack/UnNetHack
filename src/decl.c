@@ -372,6 +372,7 @@ struct instance_globals_e ge;
 struct instance_globals_g gg;
 struct instance_globals_i gi;
 struct instance_globals_l gl;
+struct instance_globals_o go;
 struct instance_globals_t gt;
 struct instance_globals_x gx;
 struct instance_globals_y gy;
@@ -417,6 +418,10 @@ const struct instance_globals_l g_init_l = {
     DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
 };
 
+static const struct instance_globals_o g_init_o = {
+    NULL, /* objs_deleted */
+};
+
 const struct instance_globals_t g_init_t = {
     /* sp_lev.c */
     FALSE, /* themeroom_failed */
@@ -442,6 +447,7 @@ decl_globals_init(void)
     gg = g_init_g;
     gi = g_init_i;
     gl = g_init_l;
+    go = g_init_o;
     gt = g_init_t;
     gx = g_init_x;
     gy = g_init_y;

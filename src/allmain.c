@@ -323,6 +323,8 @@ moveloop_core(void)
     do_positionbar();
 #endif
 
+    dobjsfree();
+
     didmove = flags.move;
     if (didmove) {
         /* actual time passed */

@@ -252,6 +252,18 @@ merged(struct obj **potmp, struct obj **pobj)
         }
 #endif /*0*/
 
+        /* mergable() no longer requires 'bypass' to match; if 'obj' has
+           the bypass bit set, force the combined stack to have that too;
+           primarily in case this merge is occurring because stackobj()
+           is operating on an object just dropped by a monster that was
+           zapped with polymorph, we want bypass set in order to inhibit
+           the same zap from affecting the new combined stack when it hits
+           objects at the monster's spot (but also in case we're called by
+           code that's using obj->bypass to track 'already processed') */
+        if (obj->bypass) {
+            otmp->bypass = 1;
+        }
+
         obfree(obj, otmp);   /* free(obj), bill->otmp */
         return 1;
     }
@@ -1817,7 +1829,10 @@ nextclass:
         pline("No applicable objects.");
     }
 ret:
-    bypass_objlist(*objchn, FALSE);
+    /* can't just clear bypass bit of items in objchn because the action
+       applied to selected ones might move them to a different chain */
+    /* bypass_objlist(*objchn, FALSE); */
+    clear_bypasses();
     return cnt;
 }
 
@@ -3838,11 +3853,17 @@ mergable(struct obj *otmp, struct obj *obj) /* returns TRUE if obj  & otmp can b
         return TRUE;
     }
 
-    if (obj->bypass != otmp->bypass ||
-        obj->cursed != otmp->cursed ||
+    if (obj->cursed != otmp->cursed ||
         obj->blessed != otmp->blessed) {
         return FALSE;
     }
+#if 0   /* don't require 'bypass' to match; that results in items dropped
+         * via 'D' not stacking with compatible items already on the floor;
+         * caller who wants that behavior should use 'nomerge' instead */
+    if (obj->bypass != otmp->bypass) {
+        return FALSE;
+    }
+#endif
 
     if (obj->unpaid != otmp->unpaid ||
         obj->spe != otmp->spe || obj->dknown != otmp->dknown ||
@@ -3857,9 +3878,9 @@ mergable(struct obj *otmp, struct obj *obj) /* returns TRUE if obj  & otmp can b
 #endif
         obj->greased != otmp->greased ||
         obj->oeroded != otmp->oeroded ||
-        obj->oeroded2 != otmp->oeroded2 ||
-        obj->bypass != otmp->bypass)
+        obj->oeroded2 != otmp->oeroded2) {
         return FALSE;
+    }
 
     if ((obj->oclass==WEAPON_CLASS || obj->oclass==ARMOR_CLASS) &&
         (obj->oerodeproof!=otmp->oerodeproof || obj->rknown!=otmp->rknown))

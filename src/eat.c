@@ -433,6 +433,9 @@ touchfood(struct obj *otmp)
             sellobj_state(SELL_DONTSELL);
             dropy(otmp);
             sellobj_state(SELL_NORMAL);
+            if (otmp->where == OBJ_DELETED) {
+                otmp = (struct obj *) NULL;
+            }
         } else {
             otmp->nomerge = 1; /* used to prevent merge */
             otmp = addinv(otmp);

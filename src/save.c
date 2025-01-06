@@ -369,6 +369,9 @@ savegamestate(NHFILE *nhfp)
        pointers into invent (uwep, uarmg, uamul, &c) are set to Null too */
     saveobjchn(nhfp, &invent);
     saveobjchn(nhfp, &migrating_objs); /* frees objs and sets to Null */
+    if (go.objs_deleted) {
+        dobjsfree(); /* really free deleted objects */
+    }
     savemonchn(nhfp, migrating_mons);
     if (release_data(nhfp)) {
         migrating_mons = 0;

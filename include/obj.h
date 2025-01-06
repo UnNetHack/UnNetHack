@@ -66,8 +66,11 @@ struct obj {
 #define OBJ_MIGRATING  5 /* object sent off to another level */
 #define OBJ_BURIED     6 /* object buried */
 #define OBJ_ONBILL     7 /* object on shk bill */
-#define OBJ_LUAFREE    8   /* object has been dealloc'd, but is ref'd by lua */
-#define NOBJ_STATES    9
+#define OBJ_LUAFREE    8 /* object has been dealloc'd, but is ref'd by lua */
+#define OBJ_DELETED    9 /* object is marked for deletion by dobjsfree() */
+    /* note: OBJ_xxx values are used in obj_state_names[] in mkobj.c
+       so adding, removing, or renumbering these needs to change that too */
+#define NOBJ_STATES   10
     xint16 timed;        /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);

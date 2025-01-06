@@ -2817,37 +2817,50 @@ unpaid_cost(struct obj *unp_obj, boolean include_contents)
 }
 
 static void
-add_one_tobill(struct obj *obj, boolean dummy, struct monst *shkp)
+add_one_tobill(
+    struct obj *obj,
+    boolean dummy, /* True: obj is used up so goes on bill differently */
+    struct monst *shkp)
 {
     struct eshk *eshkp;
     struct bill_x *bp;
     int bct;
+    boolean unbilled = FALSE;
 
-    if (!billable(&shkp, obj, *u.ushops, TRUE)) {
-        return;
-    }
     eshkp = ESHK(shkp);
-    if (eshkp->billct == BILLSZ) {
-        You("got that for free!");
-        return;
-    }
-
     /* normally bill_p gets set up whenever you enter the shop, but obj
        might be going onto the bill because hero just snagged it with
        a grappling hook from outside without ever having been inside */
     if (!eshkp->bill_p) {
-        eshkp->bill_p = &(eshkp->bill[0]);
+        eshkp->bill_p = &eshkp->bill[0];
+    }
+
+    if (!billable(&shkp, obj, *u.ushops, TRUE)) {
+        /* shk doesn't want it */
+        unbilled = TRUE;
+    } else if (eshkp->billct == BILLSZ) {
+        /* shk's bill is completely full */
+        You("got that for free!");
+        unbilled = TRUE;
+    }
+    /* if not on any list (probably from bill_dummy_object() which creates
+       a new OBJ_FREE object), don't leave unmanaged object hanging around */
+    if (unbilled) {
+        if (obj->where == OBJ_FREE) {
+            dealloc_obj(obj); /* change to obj->where==OBJ_DELETED */
+        }
+        return;
     }
 
     bct = eshkp->billct;
-    bp = &(eshkp->bill_p[bct]);
+    bp = &eshkp->bill_p[bct];
     bp->bo_id = obj->o_id;
     bp->bquan = obj->quan;
     if (dummy) {              /* a dummy object must be inserted into  */
-        bp->useup = 1;        /* the billobjs chain here.  crucial for */
+        bp->useup = TRUE;     /* the gb.billobjs chain here.  crucial for */
         add_to_billobjs(obj); /* eating floorfood in shop.  see eat.c  */
     } else {
-        bp->useup = 0;
+        bp->useup = FALSE;
     }
     bp->price = get_cost(obj, shkp);
     eshkp->billct++;
@@ -2867,6 +2880,13 @@ add_to_billobjs(struct obj *obj)
     obj->nobj = billobjs;
     billobjs = obj;
     obj->where = OBJ_ONBILL;
+
+    /* if hero drinks a shop-owned potion, it will have been flagged
+       in_use by dodrink/dopotion but isn't being used up yet because
+       it stays on the bill; only object sanity checking actually cares */
+    obj->in_use = 0;
+    /* ... same for bypass by destroy_items */
+    obj->bypass = 0;
 }
 
 /* recursive billing of objects within containers. */

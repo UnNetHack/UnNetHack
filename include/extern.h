@@ -1481,6 +1481,7 @@ extern void add_to_buried(struct obj *);
 extern void dealloc_obj(struct obj *);
 extern void obj_ice_effects(coordxy, coordxy, boolean);
 extern long peek_at_iced_corpse_age(struct obj *);
+extern void dobjsfree(void);
 extern int hornoplenty(struct obj *, boolean);
 extern int do_stair_travel(char);
 #ifdef WIZARD
