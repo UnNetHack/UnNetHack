@@ -2505,15 +2505,8 @@ static const char NEARDATA /* pline formats for insane_object() */
 void
 obj_sanity_check(void)
 {
-    int x, y;
-    struct obj *obj;
-
-    /*
-     * TODO:
-     *  Should check whether the obj->bypass and/or obj->nomerge bits
-     *  are set.  Those are both used for temporary purposes and should
-     *  be clear between moves.
-     */
+    coordxy x, y;
+    struct obj *obj, *otop, *prevo;
 
     objlist_sanity(fobj, OBJ_FLOOR, "floor sanity");
 
@@ -2522,13 +2515,30 @@ obj_sanity_check(void)
        the floor list so container contents are skipped here */
     for (x = 0; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
+            char at_fmt[BUFSZ];
+
+            otop = level.objects[x][y];
+            prevo = 0;
+            for (obj = otop; obj; prevo = obj, obj = prevo->nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
                 if (obj->where != OBJ_FLOOR || x == 0 || obj->ox != x || obj->oy != y) {
-                    char at_fmt[BUFSZ];
-
                     Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>", x, y, obj->ox, obj->oy);
                     insane_object(obj, at_fmt, "location sanity", (struct monst *) 0);
+
+                /* when one or more boulders are present, they should always
+                   be at the top of their pile; also never in water or lava */
+                } else if (obj->otyp == BOULDER) {
+                    if (prevo && prevo->otyp != BOULDER) {
+                        Sprintf(at_fmt, "%%s boulder@<%d,%d> %%s %%s: not on top", x, y);
+                        insane_object(obj, at_fmt, "boulder sanity", (struct monst *) 0);
+                    }
+                    if (is_pool_or_lava(x, y)) {
+                        Sprintf(at_fmt,
+                                "%%s boulder@<%d,%d> %%s %%s: on/in %s",
+                                x, y,
+                                is_pool(x, y) ? "water" : "lava");
+                        insane_object(obj, at_fmt, "boulder sanity", (struct monst *) 0);
+                    }
                 }
             }
         }
@@ -2556,6 +2566,11 @@ obj_sanity_check(void)
     }
     if (kickedobj) {
         insane_object(kickedobj, ofmt3, "kickedobj sanity", (struct monst *) 0);
+    }
+    /* returning_missile temporarily remembers thrownobj and should be
+       Null in between moves */
+    if (iflags.returning_missile) {
+        insane_object(iflags.returning_missile, ofmt3, "returning_missile sanity", (struct monst *) 0);
     }
     /* current_wand isn't removed from invent while in use, but should
        be Null between moves when we're called */
