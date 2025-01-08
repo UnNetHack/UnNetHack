@@ -744,7 +744,9 @@ add_mon_info(winid datawin, struct permonst * pm)
             Strcat(buf, " resistance");
         }
     }
-    APPENDC(intrinsic_possible(TELEPORT, pm), "teleportation");
+    if (pm != &mons[PM_QUANTUM_MECHANIC]) {
+        APPENDC(intrinsic_possible(TELEPORT, pm), "teleportation");
+    }
     APPENDC(intrinsic_possible(TELEPORT_CONTROL, pm), "teleport control");
     APPENDC(intrinsic_possible(TELEPAT, pm), "telepathy");
     //APPENDC(intrinsic_possible(INTRINSIC_GAIN_STR, pm), "strength");
