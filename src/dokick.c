@@ -692,12 +692,12 @@ kick_object_core(coordxy x, coordxy y)
             pline("%s", kickedobj->otyp == IRON_SAFE ? "CLANG!" : "THUD!");
         }
 
-        container_impact_dmg(kickedobj, x, y);
-
         if (kickedobj->otyp == IRON_SAFE) {
             /* can't kick these open or break 'em */
             return 1;
         }
+
+        container_impact_dmg(kickedobj, x, y);
 
         if (kickedobj->olocked) {
             if (!rn2(5) || (martial() && !rn2(2))) {
