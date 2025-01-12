@@ -124,6 +124,13 @@ enum cost_alteration_types {
     COST_TRANSFORM = 20, /* transformed in some way */
 };
 
+/* used by unpaid_cost(shk.h) */
+enum unpaid_cost_flags {
+    COST_NOCONTENTS = 0,
+    COST_CONTENTS   = 1,
+    COST_SINGLEOBJ  = 2,
+};
+
 /* bitmask flags for xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
 #define CXN_NORMAL        0 /* no special handling */
@@ -504,6 +511,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
 /*** some utility macros ***/
 #define yn(query) yn_function(query, ynchars, 'n')
+#define y_n(query) yn_function(query, ynchars, 'n')
 #define ynq(query) yn_function(query, ynqchars, 'q')
 #define ynaq(query) yn_function(query, ynaqchars, 'y')
 #define nyaq(query) yn_function(query, ynaqchars, 'n')
@@ -701,9 +709,9 @@ enum optset_restrictions {
  * in that environment.
  */
 #if defined(WIN_CE)
-# define CFDECLSPEC __cdecl
+# define QSORTCALLBACK __cdecl
 #else
-# define CFDECLSPEC
+# define QSORTCALLBACK
 #endif
 
 #ifdef DEBUG

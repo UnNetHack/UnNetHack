@@ -5996,4 +5996,62 @@ maybe_finish_sokoban(void)
     }
 }
 
+/* Return the string name of the trap type passed in, unless the player is
+   hallucinating, in which case return a random or hallucinatory trap name. */
+const char *
+trapname(
+    int ttyp,
+    boolean override) /* if True, ignore Hallucination */
+{
+    static const char *const halu_trapnames[] = {
+        /* riffs on actual nethack traps */
+        "bottomless pit", "polymorphism trap", "devil teleporter",
+        "falling boulder trap", "anti-anti-magic field", "weeping gas trap",
+        "queasy board", "electrified web", "owlbear trap", "sand mine",
+        "vacillating triangle",
+        /* some traps found in nethack variants */
+        "death trap", "disintegration trap", "ice trap", "monochrome trap",
+        /* plausible real-life traps */
+        "axeblade trap", "pool of boiling oil", "pool of quicksand",
+        "field of caltrops", "buzzsaw trap", "spiked floor", "revolving wall",
+        "uneven floor", "finger trap", "jack-in-a-box", "yellow snow",
+        "booby trap", "rat trap", "poisoned nail", "snare", "whirlpool",
+        "trip wire", "roach motel (tm)",
+        /* sci-fi */
+        "negative space", "tensor field", "singularity", "imperial fleet",
+        "black hole", "thermal detonator", "event horizon",
+        "entoptic phenomenon",
+        /* miscellaneous suggestions */
+        "sweet-smelling gas vent", "phone booth", "exploding runes",
+        "never-ending elevator", "slime pit", "warp zone", "illusory floor",
+        "pile of poo", "honey trap", "tourist trap",
+    };
+    static char roletrap[33]; /* [17 + 5 + 1] should suffice */
+
+    if (Hallucination && !override) {
+        int total_names = TRAPNUM + SIZE(halu_trapnames),
+            nameidx = rn2_on_display_rng(total_names + 1);
+
+        if (nameidx == total_names) {
+            boolean fem = Upolyd ? u.mfemale : flags.female;
+
+            /* inspired by "tourist trap" */
+            copynchars(roletrap,
+                       rn2(3) ? ((fem && urole.name.f) ? urole.name.f :
+                                                         urole.name.m) :
+                                rank_of(u.ulevel, Role_switch, fem),
+                       (int) (sizeof roletrap - sizeof " trap"));
+            Strcat(roletrap, " trap");
+            return lcase(roletrap);
+        } else if (nameidx >= TRAPNUM) {
+            nameidx -= TRAPNUM;
+            return halu_trapnames[nameidx];
+        } /* else use an actual trap type */
+        if (nameidx != NO_TRAP) {
+            ttyp = nameidx;
+        }
+    }
+    return defsyms[trap_to_defsym(ttyp)].explanation;
+}
+
 /*trap.c*/

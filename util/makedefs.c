@@ -1772,8 +1772,8 @@ do_objs(void)
 		    case GEM_CLASS:
 			/* avoid trouble with stupid C preprocessors */
 			if(objects[i].oc_material == GLASS) {
-			    Fprintf(ofp,"/* #define\t%s\t%d */\n",
-							objnam, i);
+                int skip = strlen("WORTHLESS_PIECE_OF_");
+			    Fprintf(ofp,"#define\t WORTHLESS_%s\t%d\n", objnam + skip, i);
 			    prefix = -1;
 			    break;
 			}
@@ -1795,6 +1795,8 @@ do_objs(void)
 	    sumerr = TRUE;
 	}
 
+	Fprintf(ofp,"#define\tFIRST_GLASS_GEM\t(WORTHLESS_WHITE_GLASS)\n");
+	Fprintf(ofp,"#define\tFIRST_REAL_GEM\t(DILITHIUM_CRYSTAL)\n");
 	Fprintf(ofp,"#define\tLAST_GEM\t(JADE)\n");
 	Fprintf(ofp,"#define\tMAXSPELL\t%d\n", nspell+1);
 	Fprintf(ofp,"#define\tNUM_OBJECTS\t%d\n", i);

@@ -524,7 +524,8 @@ struct damage {
     struct damage *next;
     long when, cost;
     coord place;
-    schar typ;
+    schar typ; /* from struct rm */
+    uchar flags; /* also from struct rm; an unsigned 5-bit field there */
 };
 
 /* for bones levels:  identify the dead character, who might have died on

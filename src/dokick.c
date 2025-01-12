@@ -804,17 +804,30 @@ kick_object_core(coordxy x, coordxy y)
     if (costly && (!costly_spot(bhitpos.x, bhitpos.y) ||
                    *in_rooms(x, y, SHOPBASE) != bhitroom)) {
         if (isgold) {
-            costly_gold(x, y, kickedobj->quan);
+            costly_gold(x, y, kickedobj->quan, FALSE);
         } else {
             (void) stolen_value(kickedobj, x, y, (boolean) shkp->mpeaceful, FALSE);
         }
+        costly = FALSE; /* already billed */
     }
 
     if (flooreffects(kickedobj, bhitpos.x, bhitpos.y, "fall")) {
         return 1;
     }
-    if (kickedobj->unpaid) {
-        subfrombill(kickedobj, shkp);
+
+    if (costly) {
+        long gtg = 0L;
+
+        /* costly + landed outside shop handled above; must be inside shop */
+        if (kickedobj->unpaid) {
+            subfrombill(kickedobj, shkp);
+        }
+
+        /* if billed for contained gold during kick, get a refund now */
+        if (Has_contents(kickedobj) &&
+             (gtg = contained_gold(kickedobj, TRUE)) > 0L) {
+            donate_gold(gtg, shkp, FALSE);
+        }
     }
     place_object(kickedobj, bhitpos.x, bhitpos.y);
     stackobj(kickedobj);

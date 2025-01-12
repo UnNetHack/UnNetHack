@@ -37,7 +37,7 @@ static boolean place_niche(struct mkroom *, int*, int*, int*);
 static void makeniche(int);
 static void make_niches(void);
 
-static int  CFDECLSPEC do_comp(const genericptr, const genericptr);
+static int QSORTCALLBACK do_comp(const genericptr, const genericptr);
 
 static void dosdoor(coordxy, coordxy, struct mkroom *, int);
 static void join(int, int, boolean);
@@ -59,7 +59,7 @@ static boolean made_branch; /* used only during level creation */
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
-static int CFDECLSPEC
+static int QSORTCALLBACK
 do_comp(const void *vx, const void *vy)
 {
 #ifdef LINT

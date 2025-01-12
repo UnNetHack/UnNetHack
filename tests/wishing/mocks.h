@@ -151,8 +151,6 @@ void subfrombill(struct obj *obj, struct monst *monst) {}
 boolean is_fshk(struct monst *monst) { return FALSE; }
 boolean costly_spot(coordxy x, coordxy y) { return FALSE; }
 long get_cost_of_shop_item(struct obj *obj) { return 0; }
-char* shk_your(char *buf, struct obj *obj) { return "shk_your"; }
-char* Shk_Your(char *buf, struct obj *obj) { return "Shk_Your"; }
 
 boolean rloco(struct obj *obj) { return FALSE; }
 

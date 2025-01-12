@@ -161,4 +161,26 @@ genl_preference_update(const char *pref UNUSED)
        they support.
        Just return in this genl one. */
 }
+
+/* insert a non-selectable, possibly highlighted line of text into a menu */
+void
+add_menu_heading(winid tmpwin, const char *buf)
+{
+    anything any = cg.zeroany;
+#if NEXT_VERSION
+    int attr = iflags.menu_headings.attr,
+        color = iflags.menu_headings.color;
+
+    /* suppress highlighting during end-of-game disclosure */
+    if (program_state.gameover) {
+        attr = ATR_NONE, color = NO_COLOR;
+    }
+
+#else
+    int attr = ATR_NONE;
+#endif
+
+    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, '\0', '\0', attr,
+             buf, MENU_UNSELECTED);
+}
 /*windows.c*/

@@ -1194,7 +1194,7 @@ hidden_gold(void)
 
     for (obj = invent; obj; obj = obj->nobj) {
         if (Has_contents(obj)) {
-            value += contained_gold(obj);
+            value += contained_gold(obj, TRUE);
         }
     }
     /* unknown gold stuck inside statues may cause some consternation... */

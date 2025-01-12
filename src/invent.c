@@ -2634,8 +2634,9 @@ sortloot_cmp(struct obj *obj1, struct obj *obj2)
     }
 
     /* Sort by shop price, ascending */
-    int price1 = get_cost_of_shop_item(obj1);
-    int price2 = get_cost_of_shop_item(obj2);
+    int nochrg = 0;
+    long price1 = get_cost_of_shop_item(obj1, &nochrg);
+    long price2 = get_cost_of_shop_item(obj2, &nochrg);
     if (price1 != price2) {
         return price1 - price2;
     }
@@ -3246,9 +3247,10 @@ dounpaid(void)
             }
         }
 
+        cost = unpaid_cost(otmp, COST_NOCONTENTS);
         pline("%s", xprname(otmp, distant_name(otmp, doname),
                             marker ? otmp->invlet : CONTAINED_SYM,
-                            TRUE, unpaid_cost(otmp, FALSE), 0L));
+                            TRUE, cost, 0L));
         return;
     }
 
@@ -3270,7 +3272,7 @@ dounpaid(void)
                         classcount++;
                     }
 
-                    totcost += cost = unpaid_cost(otmp, FALSE);
+                    totcost += cost = unpaid_cost(otmp, COST_NOCONTENTS);
                     /* suppress "(unpaid)" suffix */
                     save_unpaid = otmp->unpaid;
                     otmp->unpaid = 0;
@@ -3297,7 +3299,7 @@ dounpaid(void)
             if (Has_contents(otmp)) {
                 marker = (struct obj *) 0; /* haven't found any */
                 while (find_unpaid(otmp->cobj, &marker)) {
-                    totcost += cost = unpaid_cost(marker, FALSE);
+                    totcost += cost = unpaid_cost(marker, COST_NOCONTENTS);
                     save_unpaid = marker->unpaid;
                     marker->unpaid = 0; /* suppress "(unpaid)" suffix */
                     putstr(win, 0,

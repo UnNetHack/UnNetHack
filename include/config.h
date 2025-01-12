@@ -472,6 +472,8 @@ typedef long glyph_t;
 #define SHOW_WEIGHT
 /* End of Section 6 */
 
+#include "cstd.h"
+#include "integer.h"
 #include "global.h" /* Define everything else according to choices above */
 
 #endif /* CONFIG_H */

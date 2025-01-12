@@ -19,6 +19,13 @@ RND(int x)
     }
 }
 
+/* Temporary wrapper */
+int
+rn2_on_display_rng(int x)
+{
+    return rn2(x);
+}
+
 void
 set_random_state(unsigned int x)
 {

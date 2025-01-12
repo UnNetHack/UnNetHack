@@ -1003,7 +1003,8 @@ doname_base(struct obj *obj, boolean with_price)
 
     /* tourists get a special identification service for shop items */
     if (Role_if(PM_TOURIST)) {
-        long price = get_cost_of_shop_item(obj);
+        int nochrg = 0;
+        long price = get_cost_of_shop_item(obj, &nochrg);
         if (price > 0) {
             discover_object(obj->otyp, TRUE, FALSE);
         }
@@ -1560,14 +1561,15 @@ ring:
     if (iflags.suppress_price || program_state.restoring) {
         ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
     } else if (obj->unpaid) {
-        long quotedprice = unpaid_cost(obj, TRUE);
+        long quotedprice = unpaid_cost(obj, COST_CONTENTS);
 
         Sprintf(eos(bp), " (unpaid, %ld %s)",
                 quotedprice, currency(quotedprice));
     } else if (with_price) {
         /* price needs to be recalculated in case identification
          * changes the price e.g. with worthless glass */
-        long price = get_cost_of_shop_item(obj);
+        int nochrg = 0;
+        long price = get_cost_of_shop_item(obj, &nochrg);
         if (price > 0) {
             Sprintf(eos(bp), " (%ld %s)", price, currency(price));
         }
@@ -2362,6 +2364,50 @@ Doname2(struct obj *obj)
 
     *s = highc(*s);
     return s;
+}
+
+/* doname() for itemized buying of 'obj' from a shop */
+char *
+paydoname(struct obj *obj)
+{
+    static const char and_contents[] = " and its contents";
+    char *p;
+    unsigned save_cknown = obj->cknown;
+
+    if (Has_contents(obj)) {
+        obj->cknown = 0;
+    }
+    /* suppress invent-style price; caller will add billing-style price */
+    iflags.suppress_price++;
+    p = doname_base(obj, 0U);
+    iflags.suppress_price--;
+
+    if (Has_contents(obj)) {
+        /* buy_container() sets no_charge for a container that has just
+           been purchased so that when paydoname() is called by
+           shk_names_obj(), we'll provide "a/an <container>" instead of
+           "your <container>" */
+        if (!obj->no_charge) {
+            if (!strncmp(p, "a ", 2)) {
+                p += 2;
+            } else if (!strncmp(p, "an ", 3)) {
+                p += 3;
+            }
+            p = strprepend(p, obj->unpaid ? "an unpaid " : "your ");
+        }
+
+        if (!obj->cknown) {
+            if (obj->unpaid) {
+                if ((int) strlen(p) + sizeof and_contents - 1 < BUFSZ - PREFIX) {
+                    Strcat(p, and_contents);
+                }
+            } else {
+                p = strprepend(p, "the contents of ");
+            }
+        }
+    }
+    obj->cknown = save_cknown;
+    return p;
 }
 
 /* returns "your xname(obj)" or "Foobar's xname(obj)" or "the xname(obj)" */
