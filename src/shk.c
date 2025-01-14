@@ -484,7 +484,6 @@ call_kops(struct monst *shkp, boolean nearshop)
               (mvitals[PM_KOP_LIEUTENANT].mvflags & G_GONE) &&
               (mvitals[PM_KOP_KAPTAIN].mvflags & G_GONE));
 
-#ifdef BLACKMARKET
     if (Is_blackmarket(&u.uz)) {
         nokops = ((mvitals[PM_SOLDIER].mvflags & G_GONE) &&
                   (mvitals[PM_SERGEANT].mvflags & G_GONE) &&
@@ -493,7 +492,6 @@ call_kops(struct monst *shkp, boolean nearshop)
 
         Strcpy(kopname, "guards");
     }
-#endif /* defined(BLACKMARKET) */
 
     if (!angry_guards(!!Deaf) && nokops) {
         if (flags.verbose && !Deaf) {
@@ -513,9 +511,7 @@ call_kops(struct monst *shkp, boolean nearshop)
         choose_stairs(&sx, &sy, TRUE);
 
         if (nearshop) {
-#ifdef BLACKMARKET
             if (!Is_blackmarket(&u.uz)) {
-#endif /* BLACKMARKET */
                 /* Create swarm around you, if you merely "stepped out" */
                 if (flags.verbose) {
                     pline_The("%s appear!", kopname);
@@ -524,15 +520,12 @@ call_kops(struct monst *shkp, boolean nearshop)
                 mm.y = u.uy;
                 makekops(&mm);
                 return;
-#ifdef BLACKMARKET
             }
-#endif /* BLACKMARKET */
         }
         if (flags.verbose) {
             pline_The("%s are after you!", kopname);
         }
         /* Create swarm near down staircase (hinders return to level) */
-#ifdef BLACKMARKET
         if (Is_blackmarket(&u.uz)) {
             struct trap *trap = ftrap;
             while (trap) {
@@ -550,13 +543,6 @@ call_kops(struct monst *shkp, boolean nearshop)
                 makekops(&mm);
             }
         }
-#else /* BLACKMARKET */
-        if (isok(sx, sy)) {
-            mm.x = sx;
-            mm.y = sy;
-            makekops(&mm);
-        }
-#endif /* BLACKMARKET */
         /* Create swarm near shopkeeper (hinders return to shop) */
         mm.x = shkp->mx;
         mm.y = shkp->my;
@@ -564,7 +550,6 @@ call_kops(struct monst *shkp, boolean nearshop)
     }
 }
 
-#ifdef BLACKMARKET
 void
 blkmar_guards(struct monst *mtmp)
 {
@@ -662,8 +647,6 @@ bars_around_portal(boolean removebars)
 
 }
 
-#endif /* BLACKMARKET */
-
 /* x,y is strictly inside shop */
 char
 inside_shop(coordxy x, coordxy y)
@@ -725,13 +708,11 @@ u_left_shop(char *leavestring, boolean newlev)
     }
 
     if (rob_shop(shkp)) {
-#ifdef BLACKMARKET
         if (Is_blackmarket(&u.uz)) {
             blkmar_guards(shkp);
-        } else
-#endif
-
-        call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
+        } else {
+            call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
+        }
     }
 }
 
@@ -790,15 +771,12 @@ remote_burglary(coordxy x, coordxy y)
     }
 
     if (rob_shop(shkp)) {
-
-#ifdef BLACKMARKET
         if (Is_blackmarket(&u.uz)) {
             blkmar_guards(shkp);
-        } else
-#endif
-
-        /*[might want to set 2nd arg based on distance from shop doorway]*/
-        call_kops(shkp, FALSE);
+        } else {
+            /*[might want to set 2nd arg based on distance from shop doorway]*/
+            call_kops(shkp, FALSE);
+        }
     }
 }
 
@@ -2143,13 +2121,10 @@ proceed:
             pay(umoney < ltmp ? umoney : ltmp, shkp);
             make_happy_shk(shkp, FALSE);
         } else {
-#ifdef BLACKMARKET
             /* Blackmarket shopkeeper are not easily pacified */
             int peace_offering = (shkp->data == &mons[PM_BLACK_MARKETEER]) ?
                                  5000L : 1000L;
-#else
-            int peace_offering = 1000L;
-#endif
+
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
             pline("%s is after your hide, not your gold!",
@@ -3291,7 +3266,6 @@ get_cost(
         tmp += (tmp + 2L) / 3L;
     }
 
-#ifdef BLACKMARKET
     /* KMH, balance patch -- healthstone replaces rotting/health */
     if (Is_blackmarket(&u.uz)) {
         if (obj->oclass==RING_CLASS   || obj->oclass==AMULET_CLASS ||
@@ -3304,7 +3278,6 @@ get_cost(
             tmp *= Role_if(PM_CONVICT) ? 12 : 15;
         }
     }
-#endif /* BLACKMARKET */
 
     return tmp;
 }
@@ -5525,45 +5498,42 @@ shopdig(int fall)
 static void
 makekops(coord *mm)
 {
-    int kop_cnt[5];
-    int kop_pm[5];
-    int ik, cnt;
-    coord *mc;
+    static short k_mndx[4] = {
+        PM_KEYSTONE_KOP,
+        PM_KOP_SERGEANT,
+        PM_KOP_LIEUTENANT,
+        PM_KOP_KAPTAIN
+    };
+    int k_cnt[4], cnt, mndx, k;
 
-    kop_pm[0] = PM_KEYSTONE_KOP;
-    kop_pm[1] = PM_KOP_SERGEANT;
-    kop_pm[2] = PM_KOP_LIEUTENANT;
-    kop_pm[3] = PM_KOP_KAPTAIN;
-    kop_pm[4] = 0;
+    k_cnt[0] = cnt = abs(depth(&u.uz)) + rnd(5);
+    k_cnt[1] = (cnt / 3) + 1; /* at least one sarge */
+    k_cnt[2] = (cnt / 6);     /* maybe a lieutenant */
+    k_cnt[3] = (cnt / 9);     /* and maybe a kaptain */
 
-    cnt = abs(depth(&u.uz)) + rnd(5);
-
-#ifdef BLACKMARKET
     if (Is_blackmarket(&u.uz)) {
-        kop_pm[0] = PM_SOLDIER;
-        kop_pm[1] = PM_SERGEANT;
-        kop_pm[2] = PM_LIEUTENANT;
-        kop_pm[3] = PM_CAPTAIN;
-        kop_pm[4] = 0;
-
-        cnt = 7 + rnd(10);
+        k_mndx[0] = PM_SOLDIER;
+        k_mndx[1] = PM_SERGEANT;
+        k_mndx[2] = PM_LIEUTENANT;
+        k_mndx[3] = PM_CAPTAIN;
     }
-#endif /* BLACKMARKET */
 
-    kop_cnt[0] = cnt;
-    kop_cnt[1] = (cnt / 3) + 1;   /* at least one sarge */
-    kop_cnt[2] = (cnt / 6);       /* maybe a lieutenant */
-    kop_cnt[3] = (cnt / 9);       /* and maybe a kaptain */
+    for (k = 0; k < 4; k++) {
+        if ((cnt = k_cnt[k]) == 0) {
+            break;
+        }
 
-    mc = (coord *)alloc(cnt * sizeof(coord));
-    for (ik=0; kop_pm[ik]; ik++) {
-        if (!(mvitals[kop_pm[ik]].mvflags & G_GONE)) {
-            cnt = epathto(mc, kop_cnt[ik], mm->x, mm->y, &mons[kop_pm[ik]]);
-            while (--cnt >= 0)
-                (void) makemon(&mons[kop_pm[ik]], mc[cnt].x, mc[cnt].y, NO_MM_FLAGS);
+        mndx = k_mndx[k];
+        if (mvitals[mndx].mvflags & G_GONE) {
+            continue;
+        }
+
+        while (cnt--) {
+            if (enexto(mm, mm->x, mm->y, &mons[mndx])) {
+                (void) makemon(&mons[mndx], mm->x, mm->y, MM_NOMSG);
+            }
         }
     }
-    free((genericptr_t)mc);
 }
 
 static void
