@@ -94,7 +94,7 @@ end
 des.monster({ coord={12,09}, id="frost giant", peaceful=0, name="Hrymr", female=false, inventory=function()
    -- give him gear that is very good in terms of attack/defense, but which the
    -- hero probably doesn't want to use themselves due to its sheer weight
-   des.object({ id="two-handed sword", material="platinum", spe=8, buc="not-cursed" }) 
+   des.object({ id="two-handed sword", material="platinum", spe=4, buc="not-cursed" })
    des.object({ class="!", id="speed", buc="not-cursed" })
    des.object({ class="!", id="extra healing", buc="not-cursed" })
    des.object("boulder")
