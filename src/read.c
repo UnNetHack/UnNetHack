@@ -3083,9 +3083,9 @@ create_particular_creation(char *str, struct _create_particular_data *d)
             set_malign(mtmp);
         }
         if (d->saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
-            struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
-
-            put_saddle_on_mon(otmp, mtmp);
+            /* NULL obj arg means put_saddle_on_mon()
+             * will create the saddle itself */
+            put_saddle_on_mon((struct obj *) 0, mtmp);
         }
         if (d->invisible) {
             mon_set_minvis(mtmp);

@@ -1581,13 +1581,11 @@ _makemon(struct permonst *ptr, coordxy x, coordxy y, int mmflags)
         m_dowear(mtmp, TRUE);
 
         /* domestic animals may get a saddle */
-        if (!rn2(100) && can_saddle(mtmp) && is_domestic(ptr)) {
-            struct obj *otmp = mksobj(SADDLE, FALSE, FALSE);
-            (void) mpickobj(mtmp, otmp);
-            mtmp->misc_worn_check |= W_SADDLE;
-            otmp->owornmask = W_SADDLE;
-            otmp->leashmon = mtmp->m_id;
-            update_mon_intrinsics(mtmp, otmp, TRUE, FALSE);
+        if (!rn2(100) && is_domestic(ptr)
+            && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
+            /* NULL obj arg means put_saddle_on_mon()
+             * will create the saddle itself */
+            put_saddle_on_mon((struct obj *) 0, mtmp);
         }
     } else {
         /* no initial inventory is allowed */
