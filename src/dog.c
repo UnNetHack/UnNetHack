@@ -165,7 +165,6 @@ struct monst *
 makedog(void)
 {
     struct monst *mtmp;
-    struct obj *otmp;
     const char *petname;
     int pettype;
     static int petname_used = 0;
@@ -221,7 +220,12 @@ makedog(void)
         }
     }
 
-    mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG);
+    /* specifying NO_MINVENT prevents makemon() from having a 1% chance
+       of creating a pony with an already worn saddle; dogs and cats
+       aren't affected because they don't have any initial inventory
+       [if anybody adds stranger pets that are expected to have such,
+       they'll need to modify this] */
+    mtmp = makemon(&mons[pettype], u.ux, u.uy, MM_EDOG | NO_MINVENT);
 
     if (!mtmp) {
         return (struct monst *) 0; /* pets were genocided */
@@ -241,11 +245,16 @@ makedog(void)
     }
 #endif
 
-    flags.startingpet_mid = mtmp->m_id;
-    /* Horses already wear a saddle */
-    if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
-        otmp->dknown = otmp->bknown = otmp->rknown = 1;
-        put_saddle_on_mon(otmp, mtmp);
+    if (!flags.startingpet_mid) {
+        flags.startingpet_mid = mtmp->m_id;
+        /* initial horses start wearing a saddle */
+        if (pettype == PM_PONY) {
+            /* NULL obj arg means put_saddle_on_mon()
+             * will carry out the saddle creation */
+            put_saddle_on_mon((struct obj *) 0, mtmp);
+        }
+    } else {
+        impossible("makedog() when startingpet_mid is already non-zero?");
     }
 
     if (!*petname && pettype == PM_KITTEN && !rn2(100)) {
