@@ -403,6 +403,7 @@ struct you {
     /* These ranges can never be more than MAX_RANGE (vision.h). */
     int nv_range;       /* current night vision range */
     int xray_range;     /* current xray vision range */
+    int unblind_telepat_range;
 
     /*
      * These variables are valid globally only when punished and blind.
@@ -454,13 +455,15 @@ struct you {
     aligntyp ualignbase[CONVERT];   /* for ualign conversion record */
     schar uluck, moreluck;      /* luck and luck bonus */
     int luckturn;
-#define Luck    (u.uluck + u.moreluck)
-#define LUCKADD     3   /* added value when carrying luck stone */
-#define LUCKMAX     10  /* on moonlit nights 11 */
-#define LUCKMIN     (-10)
+#define Luck (u.uluck + u.moreluck)
+#define LUCKADD    3  /* value of u.moreluck when carrying luck stone;
+                       * +3 when blessed or uncursed, -3 when cursed */
+#define LUCKMAX   10  /* maximum value of u.uluck */
+#define LUCKMIN (-10) /* minimum value of u.uluck */
     schar uhitinc;
     schar udaminc;
     schar uac;
+#define AC_MAX    99  /* abs(u.uac) <= 99; likewise for monster AC */
     uchar uspellprot;        /* protection by SPE_PROTECTION */
     uchar usptime;           /* #moves until uspellprot-- */
     uchar uspmtime;          /* #moves between uspellprot-- */

@@ -784,7 +784,7 @@ u_init(void)
      */
     u.nv_range   =  1;
     u.xray_range = -1;
-
+    u.unblind_telepat_range = -1;
 
     /*** Role-specific initializations ***/
     switch (Role_switch) {

@@ -102,6 +102,7 @@ extern void retouch_equipment(int);
 extern void mkot_trap_warn(void);
 extern boolean is_magic_key(struct monst *, struct obj *);
 extern struct obj *has_magic_key(struct monst *);
+extern boolean is_art(struct obj *, int);
 
 /* ### attrib.c ### */
 
@@ -1595,6 +1596,7 @@ extern boolean angry_guards(boolean);
 extern void pacify_guards(void);
 extern void decide_to_shapeshift(struct monst *, int);
 extern void mon_aireffects(struct monst *);
+extern void check_gear_next_turn(struct monst *) NONNULLARG1;
 
 /* ### mondata.c ### */
 
@@ -1639,6 +1641,10 @@ extern const char *stagger(const struct permonst *, const char *);
 extern const char *on_fire(struct permonst *, struct attack *);
 extern const struct permonst *raceptr(struct monst *);
 extern boolean olfaction(struct permonst *);
+extern unsigned long cvt_adtyp_to_mseenres(uchar);
+extern unsigned long cvt_prop_to_mseenres(uchar);
+extern void monstseesu(unsigned long);
+extern void monstunseesu(unsigned long);
 extern boolean is_fleshy(const struct permonst *);
 
 /* ### monmove.c ### */
@@ -2086,6 +2092,7 @@ extern boolean autopick_testobj(struct obj *, boolean);
 extern void msgpline_add(int, char *);
 extern void msgpline_free(void);
 extern void pline(const char *, ...) PRINTF_F(1, 2);
+extern void pline_mon(struct monst *, const char *, ...) PRINTF_F(2, 3) NONNULLARG1;
 extern void custompline(unsigned, const char *, ...) PRINTF_F(2, 3);
 extern void urgent_pline(const char *, ...) PRINTF_F(1, 2);
 extern void Norep(const char *, ...) PRINTF_F(1, 2);
@@ -3120,6 +3127,7 @@ extern int dotwoweapon(void);
 extern void uwepgone(void);
 extern void uswapwepgone(void);
 extern void uqwepgone(void);
+extern void set_twoweap(boolean);
 extern void untwoweapon(void);
 extern int chwepon(struct obj *, int);
 extern int welded(struct obj *);
@@ -3196,6 +3204,7 @@ extern void clear_bypasses(void);
 extern void bypass_objlist(struct obj *, boolean);
 extern struct obj *nxt_unbypassed_obj(struct obj *);
 extern int racial_exception(struct monst *, struct obj *);
+extern void extract_from_minvent(struct monst *, struct obj *, boolean, boolean) NONNULLARG12;
 
 /* ### write.c ### */
 

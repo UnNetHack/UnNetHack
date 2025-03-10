@@ -14,7 +14,10 @@
 #define POISON_RES       6
 #define ACID_RES         7
 #define STONE_RES        8
-/* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
+    /* note: the first eight properties above are equivalent to MR_xxx bits
+     * MR_FIRE through MR_STONE, and can be directly converted to them: */
+#define res_to_mr(r) \
+    ((FIRE_RES <= (r) && (r) <= STONE_RES) ? (uchar) (1 << ((r) - 1)) : 0x00)
 #define ADORNED          9
 #define REGENERATION        10
 #define SEARCHING       11

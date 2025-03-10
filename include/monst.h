@@ -68,6 +68,26 @@ enum m_ap_types {
 #define M_AP_TYPE(m) ((m)->m_ap_type & M_AP_TYPMASK)
 #define M_AP_FLAG(m) ((m)->m_ap_type & ~M_AP_TYPMASK)
 
+enum m_seen_resistance {
+    M_SEEN_NOTHING = 0x0000,
+    M_SEEN_MAGR    = 0x0001, /* Antimagic, AD_MAGM */
+    M_SEEN_FIRE    = 0x0002, /* Fire_resistance, AD_FIRE */
+    M_SEEN_COLD    = 0x0004, /* Cold_resistance, AD_COLD */
+    M_SEEN_SLEEP   = 0x0008, /* Sleep_resistance, AD_SLEE */
+    M_SEEN_DISINT  = 0x0010, /* Disint_resistance, AD_DISN */
+    M_SEEN_ELEC    = 0x0020, /* Shock_resistance, AD_ELEC */
+    M_SEEN_POISON  = 0x0040, /* AD_DRST */
+    M_SEEN_ACID    = 0x0080, /* Acid_resistance, AD_ACID */
+    M_SEEN_REFL    = 0x0100, /* reflection, no corresponding AD_foo */
+};
+
+#define m_seenres(mon, mask) ((mon)->seen_resistance & (mask))
+#define m_setseenres(mon, mask) ((mon)->seen_resistance |= (mask))
+#define m_clearseenres(mon, mask) ((mon)->seen_resistance &= ~(mask))
+#define monstseesu_ad(adtyp) monstseesu(cvt_adtyp_to_mseenres(adtyp))
+#define monstunseesu_ad(adtyp) monstunseesu(cvt_adtyp_to_mseenres(adtyp))
+#define monstunseesu_prop(prop) monstunseesu(cvt_prop_to_mseenres(prop))
+
 struct monst {
     struct monst *nmon;
     struct permonst *data;
@@ -75,6 +95,7 @@ struct monst {
     short mnum;           /* permanent monster index number */
     short cham;           /* if shapeshifter, orig mons[] idx goes here */
     short movement;       /* movement points (derived from permonst definition and added effects */
+
     uchar m_lev;          /* adjusted difficulty level of monster */
     aligntyp malign;      /* alignment of this monster, relative to the
                              player (positive = good to kill) */
@@ -87,10 +108,11 @@ struct monst {
     uchar m_ap_type;      /* what mappearance is describing, m_ap_types */
 
     schar mtame;                /* level of tameness, implies peaceful */
+    unsigned short mintrinsics; /* low 8 correspond to mresists */
     unsigned short mextrinsics; /* low 8 correspond to mresists */
+    unsigned long seen_resistance; /* M_SEEN_x; saw you resist an effect */
     int mspec_used;             /* monster's special ability attack timeout */
 
-    int mtrapped;         /* trapped in a pit, web or bear trap */
     int mfeetfrozen;      /* monster's feet are frozen so it can't
                              move (0 = not frozen) */
     int mrevived;         /* has been revived from the dead */
@@ -101,13 +123,11 @@ struct monst {
     Bitfield(perminvis, 1);  /* intrinsic minvis value */
     Bitfield(mcan, 1);       /* has been cancelled */
     Bitfield(mburied, 1);    /* has been buried */
-#define mtemplit mburied     /* since buried isn't implemented, use bit for
-                              * monsters shown by transient light source;
-                              * only valid during bhit() execution        */
     Bitfield(mundetected, 1);/* not seen in present hiding place;
                               * implies one of M1_CONCEAL or M1_HIDE,
                               * but not mimic (that is, snake, spider,
                               * trapper, piercer, eel) */
+    Bitfield(mcansee, 1);   /* cansee 1, temp.blinded 0, blind 0 */
 
     Bitfield(mspeed, 2);    /* current speed */
     Bitfield(permspeed, 2); /* intrinsic mspeed value */
@@ -115,27 +135,32 @@ struct monst {
     Bitfield(mavenge, 1);   /* did something to deserve retaliation */
     Bitfield(mflee, 1);     /* fleeing */
 
-    Bitfield(mfleetim, 7);   /* timeout for mflee */
-    Bitfield(mcansee, 1);    /* cansee 1, temp.blinded 0, blind 0 */
-    Bitfield(mblinded, 7);   /* cansee 0, temp.blinded n, blind 0 */
+    Bitfield(mfleetim, 7);  /* timeout for mflee */
+    Bitfield(msleeping, 1); /* asleep until woken */
 
-    Bitfield(mcanmove, 1);   /* paralysis, similar to mblinded */
+    Bitfield(mblinded, 7);  /* cansee 0, temp.blinded n, blind 0 */
+    Bitfield(mstun, 1);     /* stunned (off balance) */
+
     Bitfield(mfrozen, 7);
+    Bitfield(mcanmove, 1);  /* paralysis, similar to mblinded */
 
-    Bitfield(msleeping, 1);  /* asleep until woken */
-    Bitfield(mstun, 1);      /* stunned (off balance) */
-    Bitfield(mconf, 1);      /* confused */
-    Bitfield(mpeaceful, 1);  /* does not attack unprovoked */
-    Bitfield(mleashed, 1);   /* monster is on a leash */
-    Bitfield(isshk, 1);      /* is shopkeeper */
-    Bitfield(isminion, 1);   /* is a minion */
+    Bitfield(mconf, 1);     /* confused */
+    Bitfield(mpeaceful, 1); /* does not attack unprovoked */
+    Bitfield(mtrapped, 1);  /* trapped in a pit, web or bear trap */
+    Bitfield(mleashed, 1);  /* monster is on a leash */
+    Bitfield(isshk, 1);     /* is shopkeeper */
+    Bitfield(isminion, 1);  /* is a minion */
+    Bitfield(isgd, 1);      /* is guard */
+    Bitfield(ispriest, 1);  /* is a priest */
 
-    Bitfield(isgd, 1);   /* is guard */
-    Bitfield(ispriest, 1);   /* is a priest */
-    Bitfield(iswiz, 1);  /* is the Wizard of Yendor */
-    Bitfield(wormno, 5); /* at most 31 worms on any level */
+    Bitfield(iswiz, 1);     /* is the Wizard of Yendor */
+    Bitfield(wormno, 5);    /* at most 31 worms on any level */
+    Bitfield(mtemplit, 1);  /* temporarily seen; only valid during bhit() */
+    Bitfield(meverseen, 1); /* mon has been seen at some point */
 
-#define MAX_NUM_WORMS   32  /* should be 2^(wormno bitfield size) */
+    Bitfield(mspotted, 1);  /* mon is currently seen by hero */
+
+#define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
 
     unsigned long mstrategy; /* for monsters with mflag3: current strategy */
 #ifdef NHSTDC

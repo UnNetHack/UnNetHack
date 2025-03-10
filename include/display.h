@@ -27,7 +27,7 @@
          /*  object and in range */ \
          /* FALSE if monster is wearing a tinfoil hat*/ \
          (Unblind_telepat && \
-          (mdistu(mon) <= (BOLT_LIM * BOLT_LIM)))) \
+          (mdistu(mon) <= u.unblind_telepat_range))) \
         )
 
 #define sensemon(mon) (tp_sensemon(mon) || Detect_monsters || MATCH_WARN_OF_MON(mon))

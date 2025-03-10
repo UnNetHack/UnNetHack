@@ -642,6 +642,12 @@ drop_uswapwep(void)
     dropx(obj);
 }
 
+void
+set_twoweap(boolean on_off)
+{
+    u.twoweap = on_off;
+}
+
 int
 dotwoweapon(void)
 {

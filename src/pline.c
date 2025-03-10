@@ -89,6 +89,16 @@ pline VA_DECL(const char *, line)
     VA_END();
 }
 
+void
+pline_mon(struct monst *mtmp UNUSED, const char *line, ...)
+{
+    va_list the_args;
+
+    va_start(the_args, line);
+    vpline(line, the_args);
+    va_end(the_args);
+}
+
 char prevmsg[BUFSZ];
 
 # ifdef USE_STDARG
