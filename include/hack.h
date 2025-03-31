@@ -363,6 +363,8 @@ typedef struct {
 #define def_objsyms_explain(i) objexplain[i]
 #define def_oc_syms_name(i)    oclass_names[i]
 
+#include "nhlua.h"
+
 #include "extern.h"
 #include "winprocs.h"
 #include "sys.h"
