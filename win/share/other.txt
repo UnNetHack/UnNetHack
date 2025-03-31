@@ -711,6 +711,25 @@ Z = (195, 195, 195)
   OAAAAAAAAAAAAAAB
   PON.LKJIHGFEDCBA
 }
+# tile 36 (magic platform)
+{
+  BBBBBBBBBBBBBBBB
+  BIIIIIIIIIIIIIIB
+  BIHH........HHIB
+  BIH..........HIB
+  BI............IB
+  BI............IB
+  BI............IB
+  BI.....PP.....IB
+  BI.....PP.....IB
+  BI............IB
+  BI............IB
+  BI............IB
+  BIH..........HIB
+  BIHH........HHIB
+  BIIIIIIIIIIIIIIB
+  BBBBBBBBBBBBBBBB
+}
 # tile 33 (molten lava)
 {
   DDDDDDCDDDDDDDDD
@@ -1357,7 +1376,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 70 (vertical beam)
+# tile 71 (vertical beam)
 {
   .......NN.......
   ......NN........
@@ -1623,7 +1642,7 @@ Z = (195, 195, 195)
   .......FF.......
   ................
 }
-# tile 84 (cmap 84)
+# tile 84 (swallow top left)
 {
   AAAAAAADDDDDDAAA
   AAAAADDDDDDDDDDD
@@ -1642,7 +1661,7 @@ Z = (195, 195, 195)
   AAAADDDDDD......
   AAAADDDDDD......
 }
-# tile 85 (cmap 85)
+# tile 85 (swallow top center)
 {
   AAAAAAAAAAAAAAAA
   DDAAAAAAAAAAAAAA
@@ -1661,7 +1680,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 86 (cmap 86)
+# tile 86 (swallow top right)
 {
   AAAAAAAAAAAAAAAA
   AAADDDDDAAAAAAAA
@@ -1680,7 +1699,7 @@ Z = (195, 195, 195)
   ....DDDDDDDDDDDD
   ....DDDDDDDDDDDA
 }
-# tile 87 (cmap 87)
+# tile 87 (swallow middle left)
 {
   AAAADDDDDD......
   AAAADDDDDDD.....
@@ -1699,7 +1718,7 @@ Z = (195, 195, 195)
   DDDDDDD.........
   DDCCDDD.........
 }
-# tile 88 (cmap 88)
+# tile 88 (swallow middle right)
 {
   ....DDDDDDDDDDDA
   ....DDDDDDDDDDDA
@@ -1718,7 +1737,7 @@ Z = (195, 195, 195)
   ......DDDDDDDDAA
   .......DDDDDDDAA
 }
-# tile 89 (cmap 89)
+# tile 89 (swallow bottom left)
 {
   DDDCDDD.........
   DDDCDDD.........
@@ -1737,7 +1756,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAADDDD
   AAAAAAAAAAAAAADD
 }
-# tile 90 (cmap 90)
+# tile 90 (swallow bottom center)
 {
   ................
   ................
@@ -1756,7 +1775,7 @@ Z = (195, 195, 195)
   DDDDDDDDDDDDDDDD
   DDDDDDDDDDDDDDAA
 }
-# tile 91 (cmap 91)
+# tile 91 (swallow bottom right)
 {
   ......DDDDDDDDAA
   ......DDDDDDDDDA
