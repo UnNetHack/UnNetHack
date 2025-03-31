@@ -4,12 +4,10 @@
 /*
  * Edit History:
  *
- *	Initial Creation			M.Allison   1994/01/11
- *	256 colour bmp and statue support	M.Allison   2015/04/19
+ *      Initial Creation                        M.Allison   1994/01/11
+ *      256 colour bmp and statue support       M.Allison   2015/04/19
  *
  */
-
-/* #pragma warning(4103:disable) */
 
 #ifndef __GNUC__
 #include "win32api.h"
@@ -19,45 +17,21 @@
 #include "tile.h"
 
 #include <stdint.h>
-#if defined(UINT32_MAX) && defined(INT32_MAX) && defined(UINT16_MAX)
-#define UINT8 uint8_t
-#define UINT16 uint16_t
-#define UINT32 uint32_t
-#define INT32 int32_t
+
+#if defined(_MSC_VER) && defined(_WIN64)
+#define UNALIGNED_POINTER __unaligned
 #else
-# ifdef _MSC_VER
-#define UINT8 unsigned char
-#define UINT16 unsigned short
-#define UINT32 unsigned long
-#define INT32 long
-# endif
+#define UNALIGNED_POINTER
 #endif
 
-#if (TILE_X == 32)
-#define COLORS_IN_USE 256
-#else
-/* #define COLORS_IN_USE 16 */ /* 16 colors */
 #define COLORS_IN_USE 256 /* 256 colors */
-#endif
-
 #define BITCOUNT 8
 
 extern char *tilename(int, int);
 
 #define MAGICTILENO (340 + 440 + 231 + 340)
-
-#if BITCOUNT == 4
-#define MAX_X 320		/* 2 per byte, 4 bits per pixel */
-#define MAX_Y 480
-#else
-# if (TILE_X == 32)
-#define MAX_X (32 * 40)
-#define MAX_Y ((MAGICTILENO * 32) / 40) * 2
-# else
 #define MAX_X (16 * 40)
 #define MAX_Y ((MAGICTILENO * 16) / 40) * 2
-# endif
-#endif
 
 /* GCC fix by Paolo Bonzini 1999/03/28 */
 #ifdef __GNUC__
@@ -75,8 +49,8 @@ static short leshort(short x)
 #endif
 }
 
-static INT32
-lelong(INT32 x)
+static int32_t
+lelong(int32_t x)
 {
 #ifdef __BIG_ENDIAN__
     return ((x & 0xff) << 24) | ((x & 0xff00) << 8) | ((x >> 8) & 0xff00) | ((x >> 24) & 0xff);
@@ -87,35 +61,35 @@ lelong(INT32 x)
 
 #ifdef __GNUC__
 typedef struct tagBMIH {
-    UINT32 biSize;
-    INT32 biWidth;
-    INT32 biHeight;
-    UINT16 biPlanes;
-    UINT16 biBitCount;
-    UINT32 biCompression;
-    UINT32 biSizeImage;
-    INT32 biXPelsPerMeter;
-    INT32 biYPelsPerMeter;
-    UINT32 biClrUsed;
-    UINT32 biClrImportant;
+    uint32_t biSize;
+    int32_t biWidth;
+    int32_t biHeight;
+    uint16_t biPlanes;
+    uint16_t biBitCount;
+    uint32_t biCompression;
+    uint32_t biSizeImage;
+    int32_t biXPelsPerMeter;
+    int32_t biYPelsPerMeter;
+    uint32_t biClrUsed;
+    uint32_t biClrImportant;
 } PACK BITMAPINFOHEADER;
 
 typedef struct tagBMFH {
-    UINT16 bfType;
-    UINT32 bfSize;
-    UINT16 bfReserved1;
-    UINT16 bfReserved2;
-    UINT32 bfOffBits;
+    uint16_t bfType;
+    uint32_t bfSize;
+    uint16_t bfReserved1;
+    uint16_t bfReserved2;
+    uint32_t bfOffBits;
 } PACK BITMAPFILEHEADER;
 
 typedef struct tagRGBQ {
-    UINT8 rgbBlue;
-    UINT8 rgbGreen;
-    UINT8 rgbRed;
-    UINT8 rgbReserved;
+    uint8_t rgbBlue;
+    uint8_t rgbGreen;
+    uint8_t rgbRed;
+    uint8_t rgbReserved;
 } PACK RGBQUAD;
-#define DWORD UINT32
-#define WORD UINT16
+#define DWORD uint32_t
+#define WORD uint16_t
 #define BI_RGB        0L
 #define BI_RLE8       1L
 #define BI_RLE4       2L
@@ -181,9 +155,7 @@ char bmpname[128];
 FILE *fp;
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     int i, j;
 
@@ -269,20 +241,18 @@ char *argv[];
 }
 
 static void
-build_bmfh(pbmfh)
-BITMAPFILEHEADER *pbmfh;
+build_bmfh(BITMAPFILEHEADER* pbmfh)
 {
     pbmfh->bfType = leshort(0x4D42);
     pbmfh->bfSize = lelong(BMPFILESIZE);
-    pbmfh->bfReserved1 = (UINT32) 0;
-    pbmfh->bfReserved2 = (UINT32) 0;
+    pbmfh->bfReserved1 = (uint32_t) 0;
+    pbmfh->bfReserved2 = (uint32_t) 0;
     pbmfh->bfOffBits = lelong(sizeof(bmp.bmfh) + sizeof(bmp.bmih) +
             (RGBQUAD_COUNT * sizeof(RGBQUAD)));
 }
 
 static void
-build_bmih(pbmih)
-BITMAPINFOHEADER *pbmih;
+build_bmih(UNALIGNED_POINTER BITMAPINFOHEADER* pbmih)
 {
     WORD cClrBits;
     int w,h;
@@ -332,8 +302,7 @@ BITMAPINFOHEADER *pbmih;
 }
 
 static void
-build_bmptile(pixels)
-pixel (*pixels)[TILE_X];
+build_bmptile(pixel(*pixels)[TILE_X])
 {
     int cur_x, cur_y, cur_color, apply_color;
     int x,y;

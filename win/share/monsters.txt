@@ -7589,23 +7589,23 @@ Z = (195, 195, 195)
   ...BPPPPPPPE....
   ................
 }
-# tile 365 (Minion of Huhetotl)
+# tile 398 (Schliemann)
 {
-  ...OP......PO...
-  ...OODDDDDDOOD..
-  ..DLOOCDDCOOLDD.
-  .DDDLDDDDDDLDDD.
-  .CCDDDNDDNDDDCC.
-  CCDKDDDDDDDDJCCC
-  CDDKKDDIIDDJJCCD
-  CDDKKKDAADJJDCDD
-  CCDKDDKKKJDDKCDD
-  .CCDKKDDDDKKCDDD
-  .CCDADKDDKDACDD.
-  .DDDADDDDDDADDD.
-  ....CCDDDDKKAA..
-  ...CDDDAADDDKAA.
-  ..CDDDAAA.DDDK..
+  .......JJ.......
+  ......KJJJ......
+  ....KCKKKJJJ....
+  ......ALALA.....
+  ......LLLLA.....
+  ......ALLA......
+  .....CKAAKK.AAA.
+  ....CKKKKKKKAAA.
+  ...KKKKKKKJKKAA.
+  .U.KKACKKJAKKAA.
+  U..KA.CKKJAAKA..
+  UJJLJJBPPPAALA..
+  U.....BPAPAAAA..
+  .U....BPAPAAAA..
+  .....JJA.JJA....
   ................
 }
 # tile 366 (Thoth Amon)

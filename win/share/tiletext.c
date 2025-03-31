@@ -43,15 +43,13 @@ static const int graymappings[] = {
 };
 
 void
-set_grayscale(g)
-int g;
+set_grayscale(int gs)
 {
-    grayscale = g;
+    grayscale = gs;
 }
 
 static void
-read_text_colormap(txtfile)
-FILE *txtfile;
+read_text_colormap(FILE *txtfile)
 {
     int i, r, g, b;
     char c[2];
@@ -74,8 +72,7 @@ FILE *txtfile;
 #undef FORMAT_STRING
 
 static boolean
-write_text_colormap(txtfile)
-FILE *txtfile;
+write_text_colormap(FILE *txtfile)
 {
     int i;
     char c;
@@ -103,10 +100,9 @@ FILE *txtfile;
     return TRUE;
 }
 
+/* read one tile from win/share/{monsters,objects,other}.txt */
 static boolean
-read_txttile(txtfile, pixels)
-FILE *txtfile;
-pixel (*pixels)[TILE_X];
+read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     int ph, i, j, k;
     char buf[BUFSZ], ttype[BUFSZ];
@@ -183,22 +179,11 @@ pixel (*pixels)[TILE_X];
         Fprintf(stderr, "didn't find expected '}'\n");
         return FALSE;
     }
-#ifdef _DCC
-    /* DICE again... it doesn't seem to eat whitespace after the } like
-     * it should, so we have to do so manually.
-     */
-    while ((*c = fgetc(txtfile)) != EOF && isspace((uchar) *c)) {
-        ;
-    }
-    ungetc(*c, txtfile);
-#endif
     return TRUE;
 }
 
 static void
-write_txttile(txtfile, pixels)
-FILE *txtfile;
-pixel (*pixels)[TILE_X];
+write_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     const char *p;
     const char *type;
@@ -285,9 +270,7 @@ merge_colormap()
 }
 
 boolean
-fopen_text_file(filename, type)
-const char *filename;
-const char *type;
+fopen_text_file(const char *filename, const char *type)
 {
     const char *p;
     int i;
@@ -344,22 +327,20 @@ const char *type;
 }
 
 boolean
-read_text_tile(pixels)
-pixel (*pixels)[TILE_X];
+read_text_tile(pixel (*pixels)[TILE_X])
 {
     return read_txttile(tile_file, pixels);
 }
 
 boolean
-write_text_tile(pixels)
-pixel (*pixels)[TILE_X];
+write_text_tile(pixel (*pixels)[TILE_X])
 {
     write_txttile(tile_file, pixels);
     return TRUE;
 }
 
 int
-fclose_text_file()
+fclose_text_file(void)
 {
     int ret;
 

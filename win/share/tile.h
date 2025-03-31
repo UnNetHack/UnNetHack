@@ -33,10 +33,12 @@ extern int colorsinmainmap;
 extern boolean fopen_text_file(const char *, const char *);
 extern boolean read_text_tile(pixel (*)[TILE_X]);
 extern boolean write_text_tile(pixel (*)[TILE_X]);
-extern int fclose_text_file();
+extern int fclose_text_file(void);
 
-extern void init_colormap();
-extern void merge_colormap();
+extern void set_grayscale(int);
+
+extern void init_colormap(void);
+extern void merge_colormap(void);
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
