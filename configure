@@ -4686,7 +4686,7 @@ printf "%s\n" "#define WIN32 /**/" >>confdefs.h
 
 			HOST_UNIX=#
 
-			SYSTEM="Syswinnt"
+			SYSTEM="Sysmswin"
 			SYSSRC="\${SYSMSWINSRC}"
 			SYSOBJ="\${SYSMSWINOBJ}"
 			;;
@@ -9249,8 +9249,8 @@ if test ! -f dat/opthelp -o ${srcdir}/dat/opthelp -nt dat/opthelp ; then
 if test ! -f dat/wizhelp -o ${srcdir}/dat/wizhelp -nt dat/wizhelp ; then
 	   NETHACK_LINKS="${NETHACK_LINKS} dat/wizhelp:dat/wizhelp"
 	fi
-if test ! -f include/win32api.h -o ${srcdir}/sys/winnt/win32api.h -nt include/win32api.h ; then
-	   NETHACK_LINKS="${NETHACK_LINKS} include/win32api.h:sys/winnt/win32api.h"
+if test ! -f include/win32api.h -o ${srcdir}/sys/windows/win32api.h -nt include/win32api.h ; then
+	   NETHACK_LINKS="${NETHACK_LINKS} include/win32api.h:sys/windows/win32api.h"
 	fi
 
 ac_config_links="$ac_config_links ${NETHACK_LINKS}"
@@ -10586,5 +10586,4 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
 printf "%s\n" "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
-
 

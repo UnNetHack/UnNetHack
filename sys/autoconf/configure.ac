@@ -53,7 +53,7 @@ case $host_os in
      mingw32 )		AC_DEFINE(WIN32,[],[An MS-Windows system])
 			AC_SUBST(HOST_MSWIN,[])
 			AC_SUBST(HOST_UNIX,[#])
-			SYSTEM="Syswinnt"
+			SYSTEM="Sysmswin"
 			SYSSRC="\${SYSMSWINSRC}"
 			SYSOBJ="\${SYSMSWINOBJ}"
 			;;
@@ -579,7 +579,7 @@ NETHACK_LINKS_ADD([dat/cmdhelp])
 NETHACK_LINKS_ADD([dat/history])
 NETHACK_LINKS_ADD([dat/opthelp])
 NETHACK_LINKS_ADD([dat/wizhelp])
-NETHACK_LINKS_ADD([include/win32api.h:sys/winnt/win32api.h])
+NETHACK_LINKS_ADD([include/win32api.h:sys/windows/win32api.h])
 
 AC_CONFIG_LINKS(${NETHACK_LINKS})
 
