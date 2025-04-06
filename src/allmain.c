@@ -1123,4 +1123,95 @@ interrupt_multi(const char *points, int current_points, int max_points)
     }
 }
 
+/*
+ * Argument processing helpers - for xxmain() to share
+ * and call.
+ *
+ * These should return TRUE if the argument matched,
+ * whether the processing of the argument was
+ * successful or not.
+ *
+ * Most of these do their thing, then after returning
+ * to xxmain(), the code exits without starting a game.
+ *
+ */
+
+static const struct early_opt earlyopts[] = {
+    { ARG_DEBUG, "debug", 5, TRUE },
+    { ARG_VERSION, "version", 4, TRUE },
+    { ARG_SHOWPATHS, "showpaths", 8, FALSE },
+#ifndef NODUMPENUMS
+    { ARG_DUMPENUMS, "dumpenums", 9, FALSE },
+#endif
+    { ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE },
+    { ARG_DUMPMONGEN, "dumpmongen", 10, FALSE },
+    { ARG_DUMPWEIGHTS, "dumpweights", 11, FALSE },
+#ifdef WIN32
+    { ARG_WINDOWS, "windows", 4, TRUE },
+#endif
+#if defined(CRASHREPORT)
+    { ARG_BIDSHOW, "bidshow", 7, FALSE },
+#endif
+};
+
+#ifdef WIN32
+extern int windows_early_options(const char *);
+#endif
+
+/*
+ * Returns:
+ *    0 = no match
+ *    1 = found and skip past this argument
+ *    2 = found and trigger immediate exit
+ */
+int
+argcheck(int argc, char *argv[], enum earlyarg e_arg)
+{
+    int i, idx;
+    boolean match = FALSE;
+    char *userea = (char *) 0;
+    const char *dashdash = "";
+
+    for (idx = 0; idx < SIZE(earlyopts); idx++) {
+        if (earlyopts[idx].e == e_arg) {
+            break;
+        }
+    }
+    if (idx >= SIZE(earlyopts) || argc < 1)
+        return 0;
+
+    for (i = 0; i < argc; ++i) {
+        if (argv[i][0] != '-')
+            continue;
+        if (argv[i][1] == '-') {
+            userea = &argv[i][2];
+            dashdash = "-";
+        } else {
+            userea = &argv[i][1];
+        }
+        match = match_optname(userea, earlyopts[idx].name,
+                              earlyopts[idx].minlength,
+                              earlyopts[idx].valallowed);
+        if (match) {
+            break;
+        }
+    }
+
+    if (match) {
+        const char *extended_opt = strchr(userea, ':');
+
+        if (!extended_opt) {
+            extended_opt = strchr(userea, '=');
+        }
+        switch(e_arg) {
+        case ARG_SHOWPATHS:
+            return 2;
+
+        default:
+            break;
+        }
+    };
+    return 0;
+}
+
 /*allmain.c*/

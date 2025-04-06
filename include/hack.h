@@ -138,6 +138,29 @@ enum cost_alteration_types {
 #define LOOKHERE_PICKED_SOME   1
 #define LOOKHERE_SKIP_DFEATURE 2
 
+enum earlyarg {
+    ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS
+#ifndef NODUMPENUMS
+    , ARG_DUMPENUMS
+#endif
+    , ARG_DUMPGLYPHIDS
+    , ARG_DUMPMONGEN
+    , ARG_DUMPWEIGHTS
+#ifdef WIN32
+    , ARG_WINDOWS
+#endif
+#if defined(CRASHREPORT)
+    , ARG_BIDSHOW
+#endif
+};
+
+struct early_opt {
+    enum earlyarg e;
+    const char *name;
+    int minlength;
+    boolean valallowed;
+};
+
 /* game events log */
 struct gamelog_line {
     long turn; /* turn when this happened */

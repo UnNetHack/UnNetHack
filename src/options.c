@@ -6552,6 +6552,16 @@ wc_set_window_colors(char *op)
     return 1;
 }
 
+/* set up for wizard mode if player or save file has requested it;
+   called from port-specific startup code to handle `nethack -D' or
+   OPTIONS=playmode:debug, or from dorecover()'s restgamestate() if
+   restoring a game which was saved in wizard mode */
+void
+set_playmode(void)
+{
+    // TODO porting
+}
+
 #endif  /* OPTION_LISTS_ONLY */
 
 /*options.c*/
