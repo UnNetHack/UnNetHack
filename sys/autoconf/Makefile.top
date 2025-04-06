@@ -248,7 +248,7 @@ dofiles:
 	  	-e '$$s/.*/nodlb/p' < dat/@OPTIONS_FILE@` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
 	(cd src; cp $(GAME) @EXTRA_UNSHARE@ $(DESTDIR)$(FILE_AREA_UNSHARE))
-	@HOST_MSWIN@cp $(srcdir)/sys/winnt/defaults.nh $(DESTDIR)$(FILE_AREA_UNSHARE)
+	@HOST_MSWIN@cp $(srcdir)/sys/windows/defaults.nh $(DESTDIR)$(FILE_AREA_UNSHARE)
 	@HOST_UNIX@cp $(srcdir)/sys/unix/defaults.nh $(DESTDIR)$(FILE_AREA_UNSHARE)/unnethackrc.default
 	cp util/recover$(EXEEXT) $(DESTDIR)$(FILE_AREA_UNSHARE)
 	if test -f $(srcdir)/doc/Guidebook.txt ; then \

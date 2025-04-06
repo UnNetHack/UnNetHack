@@ -224,8 +224,8 @@ rip.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/rip.uu
 petmark.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/petmark.uu
 	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/petmark.uu
 
-UnNetHack.ico: ../util/uudecode$(EXEEXT) $(srcdir)/../sys/winnt/nhico.uu
-	../util/uudecode$(EXEEXT) $(srcdir)/../sys/winnt/nhico.uu
+UnNetHack.ico: ../util/uudecode$(EXEEXT) $(srcdir)/../sys/windows/nhico.uu
+	../util/uudecode$(EXEEXT) $(srcdir)/../sys/windows/nhico.uu
 
 splash.bmp: ../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/splash.uu
 	../util/uudecode$(EXEEXT) $(srcdir)/../win/win32/splash.uu
