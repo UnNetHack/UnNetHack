@@ -206,7 +206,7 @@ typedef glyph_t nhsym;
 #ifdef WIN_CE
 #include "wceconf.h"
 #else
-#include "ntconf.h"
+#include "windconf.h"
 #endif
 #endif
 

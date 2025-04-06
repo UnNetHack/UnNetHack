@@ -6,25 +6,25 @@
          ==============================================================
                  Last revision: $Date: 2003/10/14 01:31:25 $
 
-Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
+Credit for the porting of NetHack to the Win32 Console Subsystem goes to
 the NT Porting Team started by Michael Allison.
 
 Credit for the Win32 Graphical version of NetHack (aka "NetHack for
 Windows" or NetHackW) goes to Alex Kompel who initially developed and
 contributed the port.
 
-The PC Windows porting team consisting of Michael Allison, David Cohrs, 
-Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the 
+The PC Windows porting team consisting of Michael Allison, David Cohrs,
+Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the
 tty and graphical win32 versions of NetHack 3.4.3.
 
-You can build either the TTY version of NetHack or the Windows Graphical 
+You can build either the TTY version of NetHack or the Windows Graphical
 version.  In either case you can use one of the following build
 environments:
 
-  o A copy of Microsoft Visual C V6.0 SP3 or later.  Things may work with 
+  o A copy of Microsoft Visual C V6.0 SP3 or later.  Things may work with
     an earlier version of the compiler, but the current code has not
     been tested with an earlier version.
-		
+
 	OR
 
   o A copy of Borland C 5.5.1 command line tools.  Borland has made a
@@ -41,7 +41,7 @@ environments:
         http://www.mingw.org/
     Earlier versions of MinGW will not allow you to build the Windows
     Graphical version.
-    
+
 In addition to the makefiles that allow you to build NetHack from the
 command line, there is also a set of project files and a workspace file
 that allow you to build the Windows Graphical version from Microsoft
@@ -51,7 +51,7 @@ Visual C's IDE (Integrated Development Environment.)
 FIRST STEP
 
 The first step in building either version of NetHack is to execute
-sys\winnt\nhsetup.bat.  
+sys\winnt\nhsetup.bat.
 
 From the command prompt:
 	cd sys\winnt
@@ -63,8 +63,8 @@ From a Windows explorer window:
 A "binary" directory will be created off the top of the NetHack source
 tree to house the completed build.
 
-A build subdirectory will also be created off the top of the NetHack 
-source tree, and many files appropriate for a graphical build will be 
+A build subdirectory will also be created off the top of the NetHack
+source tree, and many files appropriate for a graphical build will be
 moved there.
 
 If you wish to build from the command line, proceed to "BUILDING FROM
@@ -90,7 +90,7 @@ and bones files.
 I. Dispelling the Myths:
 
     Compiling NetHack for Win32 is not as easy as it sounds, nor as hard
-    as it looks, however it will behoove you to read this entire section 
+    as it looks, however it will behoove you to read this entire section
     through before beginning the task.
 
     We have provided a Makefile for each of the following compilers:
@@ -99,10 +99,10 @@ I. Dispelling the Myths:
         o Borland C 5.5.1
         o MinGW 2.0 (with GCC 3.2)
 
-    The Microsoft Visual C Makefile was created for use with MS NMAKE 
+    The Microsoft Visual C Makefile was created for use with MS NMAKE
     which is provided with the Microsoft compiler. The supplied Makefile
-    may work with earlier versions of the Microsoft 32-bit compiler, but 
-    that has not been tested. 
+    may work with earlier versions of the Microsoft 32-bit compiler, but
+    that has not been tested.
 
     The Borland C Makefile was created for use with Borland MAKE which
     is provided with the Borland compiler.
@@ -123,9 +123,9 @@ Setting Up
     tools are set up and running correctly.  That includes ensuring that
     all the necessary environment variables for the compiler environment
     are set correctly.  (Examples: For the Microsoft compiler by
-    executing vcvars32.bat, which is probably in the bin directory of 
-    your compilers directory tree. For the Borland Makefile, you can 
-    simply invoke the Make utility from the Makefile's directory (For 
+    executing vcvars32.bat, which is probably in the bin directory of
+    your compilers directory tree. For the Borland Makefile, you can
+    simply invoke the Make utility from the Makefile's directory (For
     the standard Borland compiler installation you can just use the
     explicit path "c:\borland\bcc55\bin\make /f Makefile.bcc".  For the
     GCC Makefile, add <mingw>\bin to your path, where <mingw> is your
@@ -141,34 +141,34 @@ Setting Up
     Graphical NetHack you need win\win32 in addition to these.
 
     Other subdirectories may also be included in your distribution, but
-    they are not necessary for building the TTY version for the Win32 
+    they are not necessary for building the TTY version for the Win32
     console subsystem.  You can delete them to save space.
 
     Required Directories for a Win32 Console NetHack:
 
                             top
                              |
-        ----------------------------------------------------/ /----- 
+        ----------------------------------------------------/ /-----
         |       |     |        |       |     |          |        |
        util    dat   doc    include   src   sys        win     binary
                                              |          |
-                                          ------      ----- 
-                                          |    |      |    
-                                       share  winnt  tty  
- 
+                                          ------      -----
+                                          |    |      |
+                                       share  winnt  tty
+
 
     Required Directories for a Win32 Graphical NetHack:
 
                             top
                              |
-        ----------------------------------------------------/ /----- 
+        ----------------------------------------------------/ /-----
         |       |     |        |       |     |          |        |
        util    dat   doc    include   src   sys        win     binary
                                              |          |
-                                          ------      ----- 
+                                          ------      -----
                                           |    |          |
-                                       share  winnt      win32 
- 
+                                       share  winnt      win32
+
     Check the file "Files" in your top level directory for an exact
     listing of what file is in which directory.  In order for the
     Makefiles to work, all the source files must be in the proper
@@ -192,7 +192,7 @@ Setting Up
     You may include all or as few of the special game features as you
     wish (they are located last in the file).
 
-4.  Edit your Makefile. 
+4.  Edit your Makefile.
 
     For building Console NetHack, ensure that GRAPHICAL is set to "N",
     or commented out. For building Graphical NetHack, set GRAPHICAL to
@@ -200,7 +200,7 @@ Setting Up
 
     Optional step:
         If you elected not to use the high-quality BSD random number
-        routines by commenting out RANDOM in ntconf.h, comment out (or
+        routines by commenting out RANDOM in windconf.h, comment out (or
         set equal to nothing) the RANDOM macro in your Makefile.
 
     If you are recompiling after patching your sources, or if you got
@@ -213,7 +213,7 @@ Compiling
 
 5.  Now that everything is set up, change your current directory to src.
 
-    For Microsoft compiler: 
+    For Microsoft compiler:
         nmake install
 
     For Borland compiler:
@@ -227,7 +227,7 @@ Compiling
     particular machine of course, but you should be able to go for lunch
     and return to find everything finished.  The less memory, and slower
     your machine, the longer the lunch you may take. :-)
-    
+
     In any case, it is likely that the command prompt window where you
     are doing the compiling will be occupied for a while.  If all goes
     well, you will get an NetHack executable.
@@ -238,7 +238,7 @@ Notes:
     your current directory to src and issue the appropriate command for
     your compiler:
 
-    For Microsoft compiler: 
+    For Microsoft compiler:
         nmake
 
     For Borland compiler:
@@ -258,7 +258,7 @@ Notes:
 
 2.  The executable produced by the TTY build is a 32-bit, flat-address
     space, non-overlayed .exe file, which should run on any true Win32
-    environment with console I/O support. 
+    environment with console I/O support.
 
     The executable built by the graphical built is a 32-bit,
     flat-address space, non-overlayed .exe file, which should run on any
@@ -275,7 +275,7 @@ NetHack, can be built using the Visual C IDE.
 I. Dispelling the Myths:
 
     Compiling NetHack using the Visual C IDE is straightforward, as long
-    as you have your compiler and tools correctly installed.  
+    as you have your compiler and tools correctly installed.
 
     It is again assumed that you already changed your directory to
     sys\winnt and executed:
@@ -309,16 +309,16 @@ Setting Up
 
                             top
                              |
-        -----------------------------------------/ /--------------- 
+        -----------------------------------------/ /---------------
         |     |    |      |     |   |      |           |       |
        util  dat  doc  include src sys    win        build    binary
                                     |      |
                                   ------   -----
-                                  |    |       |    
+                                  |    |       |
                                share  winnt  win32
- 
+
     Those last two (build and binary) are created during the building
-    process.  They are not disributed as part of the NetHack source 
+    process.  They are not disributed as part of the NetHack source
     distribution.  nhsetup.bat creates the build directory and moves a
     few files into it, including the Visual C project files.  The
     "binary" directory will house everything you need to play the game
@@ -381,18 +381,18 @@ Setting Up
     for Windows, choose the Release build.
 
 Building
-    
+
 5.  Start your build.
 
     On the Visual C menus once again, choose:
         Build | Build NetHackW.exe
-    This starts the build.  It is likely that the IDE message window 
+    This starts the build.  It is likely that the IDE message window
     where you are doing the compiling will be occupied for a while.
 
 6.  If all has gone well to this point, you should now have a NetHack
     executable called NetHackW.exe in the "binary" directory, along with
     all the support files that it needs.
- 
+
 
 RUNNING NETHACK
 
@@ -402,13 +402,13 @@ I. Checking the installation:
     were copied to the game directory.  If not, move them there
     yourself.
 
-    Edit Defaults.nh to reflect your particular setup and personal 
+    Edit Defaults.nh to reflect your particular setup and personal
     preferences, by following the comments.  As with all releases since
     3.2.1, HACKDIR defaults to the same directory as that where the
     NetHack.exe or NetHackW.exe executable resides.  You only need to
     set HACKDIR in defaults.nh if, for some reason, you wish to override
     that (be careful).
-  
+
 II. Executing the game
 
 1.  Running from the command prompt:

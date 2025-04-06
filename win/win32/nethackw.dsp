@@ -7,19 +7,19 @@
 CFG=NetHackW - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "NetHackW.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "NetHackW.mak" CFG="NetHackW - Win32 Debug"
-!MESSAGE 
+!MESSAGE
 !MESSAGE Possible choices for configuration are:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "NetHackW - Win32 Release" (based on "Win32 (x86) Application")
 !MESSAGE "NetHackW - Win32 Debug" (based on "Win32 (x86) Application")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -109,7 +109,7 @@ if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt	\
 copy ..\sys\winnt\defaults.nh ..\binary\defaults.nh
 # End Special Build Tool
 
-!ENDIF 
+!ENDIF
 
 # Begin Target
 
@@ -359,7 +359,7 @@ SOURCE=..\src\music.c
 SOURCE=..\sys\winnt\ntsound.c
 # End Source File
 # Begin Source File
- 
+
 SOURCE=..\src\o_init.c
 # End Source File
 # Begin Source File
@@ -768,7 +768,7 @@ SOURCE=..\include\nhlan.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\include\ntconf.h
+SOURCE=..\include\windconf.h
 # End Source File
 # Begin Source File
 
