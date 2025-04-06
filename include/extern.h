@@ -1997,6 +1997,7 @@ extern int query_attr(const char *);
 extern boolean parse_status_color_options(char *);
 extern void free_status_colors(void);
 #endif
+extern void set_playmode(void);
 
 /* ### pager.c ### */
 
