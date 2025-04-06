@@ -18,11 +18,11 @@ SYSUNIXSRC = $(srcdir)/../sys/share/ioctl.c $(srcdir)/../sys/share/unixtty.c \
 	$(srcdir)/../sys/unix/unixres.c
 SYSUNIXOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o recover.o
 # for Microsoft Window systems
-SYSMSWINSRC = $(srcdir)/../sys/winnt/nttty.c $(srcdir)/../sys/winnt/winnt.c \
+SYSMSWINSRC = $(srcdir)/../sys/windows/nttty.c $(srcdir)/../sys/windows/windsys.c \
 	$(srcdir)/../sys/share/pcsys.c $(srcdir)/../sys/share/pcunix.c \
 	$(srcdir)/../sys/share/pcmain.c $(srcdir)/../sys/share/random.c \
-	$(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/winnt/ntsound.c
-SYSMSWINOBJ = nttty.o winnt.o pcsys.o pcunix.o pcmain.o random.o nhlan.o ntsound.o
+	$(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/windows/ntsound.c
+SYSMSWINOBJ = nttty.o windsys.o pcsys.o pcunix.o pcmain.o random.o nhlan.o ntsound.o
 #
 SYSSRC=@SYSSRC@
 SYSOBJ=@SYSOBJ@
@@ -224,8 +224,8 @@ SYSCSRC = $(srcdir)/../sys/share/nhlan.c $(srcdir)/../sys/share/ioctl.c \
 	$(srcdir)/../sys/share/random.c $(srcdir)/../sys/share/unixtty.c \
 	$(srcdir)/../sys/atari/tos.c $(srcdir)/../sys/be/bemain.c \
 	$(srcdir)/../sys/unix/unixmain.c $(srcdir)/../sys/unix/unixres.c \
-	$(srcdir)/../sys/unix/unixunix.c $(srcdir)/../sys/winnt/nttty.c \
-	$(srcdir)/../sys/winnt/winnt.c
+	$(srcdir)/../sys/unix/unixunix.c $(srcdir)/../sys/windows/nttty.c \
+	$(srcdir)/../sys/windows/windsys.c
 
 # generated source files (tile.c is handled separately)
 GENCSRC = monstr.c vis_tab.c  #tile.c
@@ -293,10 +293,10 @@ Sysunix:	$(HOBJ) Makefile
 	$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
 	@touch Sysunix
 
-Syswinnt:	$(HOBJ) @EXTRA_UNSHARE@ Makefile
+Sysmswin:	$(HOBJ) @EXTRA_UNSHARE@ Makefile
 	@echo "Loading ..."
 	@$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
-	@touch Syswinnt
+	@touch Sysmswin
 
 Sys3B2:	$(HOBJ) Makefile
 	@echo "Loading ..."
@@ -351,14 +351,14 @@ DUMB.Setup:	../include/extern.h
 	@NHKEYDLL_GCC@$(CC) $(LFLAGS) -shared -Wl,--export-all-symbols \
 	@NHKEYDLL_GCC@	-Wl,--add-stdcall-alias -o $@ $<
 
-nhdefkey.o: $(srcdir)/../sys/winnt/nhdefkey.c
-	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/winnt/nhdefkey.c
+nhdefkey.o: $(srcdir)/../sys/windows/nhdefkey.c
+	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/windows/nhdefkey.c
 
-nh340key.o: $(srcdir)/../sys/winnt/nh340key.c
-	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/winnt/nh340key.c
+nh340key.o: $(srcdir)/../sys/windows/nh340key.c
+	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/windows/nh340key.c
 
-nhraykey.o: $(srcdir)/../sys/winnt/nhraykey.c
-	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/winnt/nhraykey.c
+nhraykey.o: $(srcdir)/../sys/windows/nhraykey.c
+	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/windows/nhraykey.c
 
 all:	$(GAME)
 
@@ -538,12 +538,12 @@ unixunix.o: $(srcdir)/../sys/unix/unixunix.c $(HACK_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/unix/unixunix.c
 unixres.o: $(srcdir)/../sys/unix/unixres.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../sys/unix/unixres.c
-ntsound.o: $(srcdir)/../sys/winnt/ntsound.c $(HACK_H) #../include/win32api.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../sys/winnt/ntsound.c
-nttty.o: $(srcdir)/../sys/winnt/nttty.c $(HACK_H) #../include/win32api.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../sys/winnt/nttty.c
-winnt.o: $(srcdir)/../sys/winnt/winnt.c $(HACK_H) #../include/win32api.h
-	$(CC) $(CFLAGS) -c $(srcdir)/../sys/winnt/winnt.c
+ntsound.o: $(srcdir)/../sys/windows/ntsound.c $(HACK_H) #../include/win32api.h
+	$(CC) $(CFLAGS) -c $(srcdir)/../sys/windows/ntsound.c
+nttty.o: $(srcdir)/../sys/windows/nttty.c $(HACK_H) #../include/win32api.h
+	$(CC) $(CFLAGS) -c $(srcdir)/../sys/windows/nttty.c
+windsys.o: $(srcdir)/../sys/windows/windsys.c $(HACK_H) #../include/win32api.h
+	$(CC) $(CFLAGS) -c $(srcdir)/../sys/windows/windsys.c
 getline.o: $(srcdir)/../win/tty/getline.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/tty/getline.c
 termcap.o: $(srcdir)/../win/tty/termcap.c $(HACK_H) ../include/tcap.h

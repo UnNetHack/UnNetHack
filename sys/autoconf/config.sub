@@ -211,7 +211,7 @@ case $os in
 		basic_machine=`echo $1 | sed -e 's/86-.*/86-sequent/'`
 		;;
 	-windowsnt*)
-		os=`echo $os | sed -e 's/windowsnt/winnt/'`
+		os=`echo $os | sed -e 's/windowsnt/windsys/'`
 		;;
 	-psos*)
 		os=-psos
