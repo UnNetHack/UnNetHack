@@ -112,14 +112,14 @@ WINBEOBJ =
 #
 # files for a native MS-Windows port
 # (tile.c is included in the defn. for WINCSRC, below)
-WINMSSRC = $(srcdir)/../win/win32/mswproc.c $(srcdir)/../win/win32/winhack.c \
+WINMSSRC = $(srcdir)/../win/win32/mswproc.c $(srcdir)/../win/win32/NetHackW.c \
 	 $(srcdir)/../win/win32/mhdlg.c $(srcdir)/../win/win32/mhaskyn.c \
 	 $(srcdir)/../win/win32/mhfont.c $(srcdir)/../win/win32/mhinput.c \
          $(srcdir)/../win/win32/mhmain.c $(srcdir)/../win/win32/mhmsgwnd.c \
 	 $(srcdir)/../win/win32/mhsplash.c $(srcdir)/../win/win32/mhstatus.c \
 	 $(srcdir)/../win/win32/mhtext.c $(srcdir)/../win/win32/mhmenu.c \
          $(srcdir)/../win/win32/mhmap.c $(srcdir)/../win/win32/mhrip.c
-WINMSOBJ = mswproc.o winhack.o mhdlg.o mhaskyn.o mhfont.o mhinput.o mhmain.o \
+WINMSOBJ = mswproc.o NetHackW.o mhdlg.o mhaskyn.o mhfont.o mhinput.o mhmain.o \
 	mhmsgwnd.o mhsplash.o mhstatus.o mhtext.o mhmenu.o mhmap.o mhrip.o \
 	winres.o nhwin.a
 WINMSCFLAGS=-I$(srcdir)/../win/win32 -D_WIN32_IE=0x0400
@@ -391,12 +391,12 @@ qttableview.moc: ../include/qttableview.h
 	(cd ../util; make tile2bmp$(EXEEXT))
 	(cd ../dat; $(MAKE) tiles.bmp)
 
-winres.o: $(srcdir)/../win/win32/winhack.rc ../dat/tiles.bmp
+winres.o: $(srcdir)/../win/win32/NetHackW.rc ../dat/tiles.bmp
 	(cd ../util; make uudecode$(EXEEXT))
 	(cd ../dat; $(MAKE) mnsel.bmp mnselcnt.bmp mnunsel.bmp rip.bmp)
 	(cd ../dat; $(MAKE) petmark.bmp UnNetHack.ico splash.bmp)
 	$(WINDRES) -o$@ --include-dir=../dat -DNODEBUG -i \
-		$(srcdir)/../win/win32/winhack.rc
+		$(srcdir)/../win/win32/NetHackW.rc
 
 # UnNetHack windows library for modules needed by more than one windows
 # interface.
@@ -674,10 +674,10 @@ mswproc.o: $(srcdir)/../win/win32/mswproc.c $(HACK_H) ../include/dlb.h \
 		../win/win32/mhrip.h ../win/win32/mhmain.h \
 		../win/win32/mhfont.h ../win/win32/resource.h
 	$(CC) $(CFLAGS) $(WINMSCFLAGS) -c $(srcdir)/../win/win32/mswproc.c
-winhack.o: $(srcdir)/../win/win32/winhack.c ../win/win32/winMS.h $(HACK_H) \
+NetHackW.o: $(srcdir)/../win/win32/NetHackW.c ../win/win32/winMS.h $(HACK_H) \
 		../include/dlb.h ../win/win32/resource.h ../win/win32/mhmain.h \
 		../win/win32/mhmap.h
-	$(CC) $(CFLAGS) $(WINMSCFLAGS) -c $(srcdir)/../win/win32/winhack.c
+	$(CC) $(CFLAGS) $(WINMSCFLAGS) -c $(srcdir)/../win/win32/NetHackW.c
 mhdlg.o: $(srcdir)/../win/win32/mhdlg.c ../win/win32/winMS.h $(HACK_H) \
 		../include/func_tab.h ../win/win32/resource.h \
 		../win/win32/mhdlg.h

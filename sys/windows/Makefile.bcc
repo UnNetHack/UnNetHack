@@ -214,14 +214,14 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 WINPORT	= $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
 	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
 	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
-	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)NetHackW.o
 WINPHDR	= $(WIN32)\mhaskyn.h $(WIN32)\mhdlg.h $(WIN32)\mhfont.h \
 	$(WIN32)\mhinput.h $(WIN32)\mhmain.h $(WIN32)\mhmap.h $(WIN32)\mhmenu.h \
 	$(WIN32)\mhmsg.h $(WIN32)\mhmsgwnd.h $(WIN32)\mhrip.h $(WIN32)\mhstatus.h \
 	$(WIN32)\mhtext.h $(WIN32)\resource.h $(WIN32)\winMS.h
 WINDLLS	=
 WINPFLAG= -DTILES -DMSWIN_GRAPHICS
-NHRES	= $(O)winhack.res
+NHRES	= $(O)NetHackW.res
 WINPINC	= -I$(WIN32)
 !ELSE
 WINPORT	= $(O)nttty.o
@@ -601,11 +601,11 @@ tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
 !IF "$(GRAPHICAL)"=="Y"
-$(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
+$(NHRES): $(TILEBMP16) $(WIN32)\NetHackW.rc $(WIN32)\mnsel.bmp \
 	$(WIN32)\mnselcnt.bmp $(WIN32)\mnunsel.bmp \
 	$(WIN32)\petmark.bmp $(WIN32)\NetHack.ico $(WIN32)\rip.bmp \
 	$(WIN32)\splash.bmp
-	@$(rc) -r -fo$@ -i$(WIN32) -i$(bccinc) -dNDEBUG $(WIN32)\winhack.rc
+	@$(rc) -r -fo$@ -i$(WIN32) -i$(bccinc) -dNDEBUG $(WIN32)\NetHackW.rc
 !ELSE
 $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 	@$(rc) -r -fo$@ -i$(NTSYS) -i$(bccinc) -dNDEBUG $(NTSYS)\console.rc
