@@ -220,4 +220,31 @@ get_current_feature_ver(void)
     return FEATURE_NOTICE_VER(VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 }
 
+/*ARGUSED*/
+const char *
+copyright_banner_line(int indx)
+{
+#ifdef COPYRIGHT_BANNER_A
+    if (indx == 1) {
+        return COPYRIGHT_BANNER_A;
+    }
+#endif
+#ifdef COPYRIGHT_BANNER_B
+    if (indx == 2) {
+        return COPYRIGHT_BANNER_B;
+    }
+#endif
+
+    if (indx == 3) {
+        return COPYRIGHT_BANNER_C;
+    }
+
+#ifdef COPYRIGHT_BANNER_D
+    if (indx == 4) {
+        return COPYRIGHT_BANNER_D;
+    }
+#endif
+    return "";
+}
+
 /*version.c*/

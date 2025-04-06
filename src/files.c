@@ -50,7 +50,9 @@ extern int errno;
 /* ALI: For compatibility */
 #ifndef FILE_AREAS
 #define compress(file)      compress_area(NULL, file)
+#define nh_compress(file)      compress_area(NULL, file)
 #define uncompress(file)    uncompress_area(NULL, file)
+#define nh_uncompress(file)    uncompress_area(NULL, file)
 #endif
 
 #if defined(MSDOS) || defined(OS2) || defined(TOS) || defined(WIN32)
