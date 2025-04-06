@@ -6,7 +6,7 @@
 #
 #
 #   NetHack 3.4.x Makefile for Borland C++ V5.5.1 and above and Borland's MAKE
-#  
+#
 #   Win32 Compilers Tested:
 #                              - Borland C++ 5.5.1 for Win32
 #
@@ -31,7 +31,7 @@
 #              .l                   lex    (such as flex)
 #
 #
-#   If you have any questions read the sys/winnt/Install.nt file included 
+#   If you have any questions read the sys/winnt/Install.nt file included
 #   with the distribution.
 #
 #   --
@@ -76,10 +76,10 @@ implib = $(bccbin)\tlib
 
 cflags = -c -D_X86_=1 -DWINVER=$(MAKE_WINVER) -q -I$(bccinc) -w-pia -w-rch -w-csu -w-par -w-aus
 cdebug = -y -v -O2
-cvarsmt  = -DWIN32 -D_WIN32 -D_MT 
-lflags  = 
+cvarsmt  = -DWIN32 -D_WIN32 -D_MT
+lflags  =
 !IF "$(DEBUG)" == "Y"
-linkdebug = /v /m /s 
+linkdebug = /v /m /s
 cdebug = -v -y -Q
 !ELSE
 linkdebug = /C /Gn
@@ -93,10 +93,10 @@ startobjg = $(bcclib)\c0w32.obj
 verlflags = /Gn /Gz /q -L$(bcclib) /c  /ap /Tpe /V$(APPVER)
 startobjg = $(startobj)
 !ENDIF
-libsmt  = $(bcclib)\cw32mt.lib $(bcclib)\import32.lib 
+libsmt  = $(bcclib)\cw32mt.lib $(bcclib)\import32.lib
 
 #
-#  Set the gamedir according to your preference.  
+#  Set the gamedir according to your preference.
 #  It must be present prior to compilation.
 
 !IF "$(GRAPHICAL)" == "Y"
@@ -119,7 +119,7 @@ SSYS  = ..\sys\share # Shared system files
 NTSYS = ..\sys\winnt # NT Win32 specific files
 TTY   = ..\win\tty   # window port files (tty)
 WIN32 = ..\win\win32 # window port files (Win32)
-WSHR  = ..\win\share # Tile support files 
+WSHR  = ..\win\share # Tile support files
 
 #
 #  Object directory.
@@ -132,10 +132,10 @@ OBJ     = o
 #==========================================
 # Exe File Info.
 #==========================================
- 
+
 # Yacc/Lex ... if you got 'em.
 #
-# If you have yacc and lex programs (or work-alike such as bison 
+# If you have yacc and lex programs (or work-alike such as bison
 # and flex), uncomment the upper two macros.
 #
 
@@ -224,7 +224,7 @@ WINPFLAG= -DTILES -DMSWIN_GRAPHICS
 NHRES	= $(O)winhack.res
 WINPINC	= -I$(WIN32)
 !ELSE
-WINPORT	= $(O)nttty.o    
+WINPORT	= $(O)nttty.o
 WINPHDR	=
 WINDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
 WINPFLAG= -DWIN32CON
@@ -273,7 +273,7 @@ LFLAGSU	= $(LFLAGSBASE)
 # - Game build
 #==========================================
 
-LFLAGSBASE = $(linkdebug) $(conflags) 
+LFLAGSBASE = $(linkdebug) $(conflags)
 CFLAGS	 = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 NHLFLAGS1 = /Gn /v /m /s /Gz /q /c
 lflags	= $(LFLAGSBASE) $(NHLFLAGS1)
@@ -408,32 +408,32 @@ PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
 #
 
 VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o
-VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o    
-VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o  
-VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o 
-VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o  
-VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
-VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
-VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
-VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o  
-VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
-VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
-VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
-VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
-VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
-VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
-VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o    
-VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o     
-VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o    
-VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o  
-VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o   
-VOBJ23 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o   
-VOBJ24 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o   
-VOBJ25 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o    
-VOBJ26 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o    
-VOBJ27 = $(O)worn.o     $(O)write.o    $(O)zap.o     
+VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o
+VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o
+VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o
+VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
+VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
+VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o
+VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o
+VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o
+VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o
+VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o
+VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o
+VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o
+VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
+VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o
+VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o
+VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o
+VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o
+VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o
+VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o
+VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o
+VOBJ23 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
+VOBJ24 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ25 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
+VOBJ26 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
+VOBJ27 = $(O)worn.o     $(O)write.o    $(O)zap.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -470,7 +470,7 @@ CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
 		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
 		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
-		$(INCL)\ntconf.h $(INCL)\nhlan.h
+		$(INCL)\windconf.h $(INCL)\nhlan.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h \
 		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
@@ -697,7 +697,7 @@ $(GAMEDIR)\nhraykey.dll : $(O)nhraykey.o
 #
 #  Secondary Targets.
 #
-    
+
 #==========================================
 # Makedefs Stuff
 #==========================================
@@ -819,7 +819,7 @@ $(U)lev_yacc.c $(INCL)\lev_comp.h : $(U)lev_comp.y
 	   @echo $(U)lev_comp.y has changed.
 	   @echo To update $(U)lev_yacc.c and $(INCL)\lev_comp.h run $(YACC).
 	   @echo ---
-	   @echo For now, we will copy the prebuilt lev_yacc.c and 
+	   @echo For now, we will copy the prebuilt lev_yacc.c and
 	   @echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
 	   @copy $(SSYS)\lev_yacc.c $(U)lev_yacc.c >nul
 	   @copy $(SSYS)\lev_comp.h $(INCL)\lev_comp.h >nul
@@ -837,7 +837,7 @@ $(U)lev_$(LEX).c: $(U)lev_comp.l
 !	ELSE
 	   @echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
 	   @echo ---
-	   @echo For now, we will copy the prebuilt lev_lex.c 
+	   @echo For now, we will copy the prebuilt lev_lex.c
 	   @echo from $(SSYS) into $(UTIL) and use it.
 	   @copy $(SSYS)\lev_lex.c $@ >nul
 	   @echo /**/ >>$@
@@ -872,10 +872,10 @@ $(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
 	   @del $(YTABH)
 	   chdir $(SRC)
 !	ELSE
-	   @echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and 
+	   @echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and
 	   @echo $(INCL)\dgn_comp.h run $(YACC).
 	   @echo ---
-	   @echo For now, we will copy the prebuilt $(U)dgn_yacc.c and 
+	   @echo For now, we will copy the prebuilt $(U)dgn_yacc.c and
 	   @echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
 	   @copy $(SSYS)\dgn_yacc.c $(U)dgn_yacc.c >nul
 	   @copy $(SSYS)\dgn_comp.h $(INCL)\dgn_comp.h >nul
@@ -893,7 +893,7 @@ $(U)dgn_$(LEX).c: $(U)dgn_comp.l
 !	ELSE
 	   @echo $(U)dgn_comp.l has changed. To update $@ run $(LEX).
 	   @echo ---
-	   @echo For now, we will copy the prebuilt dgn_lex.c 
+	   @echo For now, we will copy the prebuilt dgn_lex.c
 	   @echo from $(SSYS) into $(UTIL) and use it.
 	   @copy $(SSYS)\dgn_lex.c $@ >nul
 	   @echo /**/ >>$@
@@ -922,7 +922,7 @@ $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o $(SRC)\uuid.lib
 
 $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 	@$(cc) $(CFLAGS) -o$@ $(SRC)\dlb.c
-	
+
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(cc) $(CFLAGS) -o$@ $(UTIL)\dlb_main.c
 
@@ -1127,7 +1127,7 @@ $(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
 $(O)mapimail.o: $(HACK_H) $(INCL)\nhlan.h $(NTSYS)\mapimail.c
 	@$(cc) $(CFLAGS) -DMAPI_VERBOSE  -o$@ $(NTSYS)\mapimail.c
 
-# 
+#
 # util dependencies
 #
 
@@ -1135,10 +1135,10 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	@$(cc) $(CFLAGS) -o$@ $(U)panic.c
 
 #
-# The rest are stolen from sys/unix/Makefile.src, 
+# The rest are stolen from sys/unix/Makefile.src,
 # with the following changes:
 #   * ../include changed to $(INCL)
-#   * slashes changed to back-slashes 
+#   * slashes changed to back-slashes
 #   * -c (which is included in CFLAGS) substituted
 #	with -o$@
 #   * $(CC) changed to $(cc)
@@ -1375,4 +1375,3 @@ $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)
 
 # end of file
-

@@ -1,9 +1,8 @@
-/*  SCCS Id: @(#)ntconf.h   3.4 2002/03/10  */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef NTCONF_H
-#define NTCONF_H
+#ifndef WINDCONF_H
+#define WINDCONF_H
 
 /* #define SHELL */ /* nt use of pcsys routines caused a hang */
 
@@ -194,4 +193,4 @@ extern int set_win32_option(const char *, const char *);
 #define MOUSEMASK (LEFTBUTTON | RIGHTBUTTON | MIDBUTTON)
 #endif /* WIN32CON */
 
-#endif /* NTCONF_H */
+#endif /* WINDCONF_H */
