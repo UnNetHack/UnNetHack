@@ -2069,7 +2069,7 @@ remove_object(struct obj *otmp)
     coordxy y = otmp->oy;
 
     if (otmp->where != OBJ_FLOOR) {
-        panic("remove_object: obj not on floor");
+        panic("remove_object: obj where=%d, not on floor", otmp->where);
     }
     extract_nexthere(otmp, &level.objects[x][y]);
     extract_nobj(otmp, &fobj);
@@ -2157,7 +2157,7 @@ obj_extract_self(struct obj *obj)
         extract_nobj(obj, &billobjs);
         break;
     default:
-        panic("obj_extract_self");
+        panic("obj_extract_self, where=%d", obj->where);
         break;
     }
 }
@@ -2397,13 +2397,13 @@ dobjsfree(void)
     struct obj *otmp;
 
     while (go.objs_deleted) {
-        otmp = go.objs_deleted->nobj;
-        if (go.objs_deleted->where != OBJ_DELETED) {
-            panic("dobjsfree: obj where is not OBJ_DELETED");
+        otmp = go.objs_deleted;
+        go.objs_deleted = otmp->nobj;
+        if (otmp->where != OBJ_DELETED) {
+            panic("dobjsfree: obj where=%d, not OBJ_DELETED", otmp->where);
         }
-        obj_extract_self(go.objs_deleted);
-        dealloc_obj_real(go.objs_deleted);
-        go.objs_deleted = otmp;
+        obj_extract_self(otmp);
+        dealloc_obj_real(otmp);
     }
 }
 
