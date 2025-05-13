@@ -4476,6 +4476,9 @@ newcham(
             }
         }
     }
+    if (mtmp == u.usteed) {
+        poly_steed(mtmp, olddata);
+    }
 
     return 1;
 }

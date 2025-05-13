@@ -444,11 +444,14 @@ extern char *noit_Monnam(struct monst *);
 extern char *noname_monnam(struct monst *, int);
 extern char *m_monnam(struct monst *);
 extern char *y_monnam(struct monst *);
+extern char *YMonnam(struct monst *) NONNULLARG1;
 extern char *Adjmonnam(struct monst *, const char *);
 extern char *Amonnam(struct monst *);
 extern char *a_monnam(struct monst *);
 extern char *distant_monnam(struct monst *, int, char *);
 extern char *mon_nam_too(struct monst *, struct monst *);
+extern char *monverbself(struct monst *, char *,
+                         const char *, const char *) NONNULLARG123;
 extern char *minimal_monnam(struct monst *, boolean);
 extern const char *rndmonnam(void);
 extern const char *hcolor(const char *);
@@ -2119,6 +2122,7 @@ extern void self_invis_message(void);
 extern void init_uasmon(void);
 extern void set_uasmon(void);
 extern void float_vs_flight(void);
+extern void steed_vs_stealth(void);
 extern void change_sex(void);
 extern void polyself(boolean);
 extern int polymon(int);
@@ -2701,6 +2705,7 @@ extern void exercise_steed(void);
 extern void kick_steed(void);
 extern void dismount_steed(int);
 extern void place_monster(struct monst *, coordxy, coordxy);
+extern void poly_steed(struct monst *, struct permonst *) NONNULLARG12;
 extern boolean stucksteed(boolean);
 
 /* ### sys.c ### */

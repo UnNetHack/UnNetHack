@@ -1681,6 +1681,7 @@ rndghostname(void)
  * a_monnam:    a newt      it  an invisible orc    Fido
  * m_monnam:    newt        xan orc         Fido
  * y_monnam:    your newt     your xan  your invisible orc  Fido
+ * YMonnam:     Your newt     Your xan  Your invisible orc      Fido
  */
 
 /* Bug: if the monster is a priest or shopkeeper, not every one of these
@@ -1966,6 +1967,17 @@ y_monnam(struct monst *mtmp)
     return x_monnam(mtmp, prefix, (char *)0, suppression_flag, FALSE);
 }
 
+/* y_monnam() for start of sentence */
+char *
+YMonnam(struct monst *mtmp)
+{
+    char *bp = y_monnam(mtmp);
+
+    *bp = highc(*bp);
+    return bp;
+}
+
+
 char *
 Adjmonnam(struct monst *mtmp, const char *adj)
 {
@@ -2037,6 +2049,42 @@ mon_nam_too(struct monst *mon, struct monst *other_mon)
         }
     }
     return outbuf;
+}
+
+/* construct "<monnamtext> <verb> <othertext> {him|her|it}self" which might
+   be distorted by Hallu; if that's plural, adjust monnamtext and verb */
+char *
+monverbself(
+    struct monst *mon,
+    char *monnamtext, /* modifiable 'mbuf' with adequate room at end */
+    const char *verb,
+    const char *othertext)
+{
+    char *verbs, selfbuf[40]; /* sizeof "themselves" suffices */
+
+    /* "himself"/"herself"/"itself", maybe "themselves" if hallucinating */
+    Strcpy(selfbuf, mon_nam_too(mon, mon));
+    /* verb starts plural; this will yield singular except for "themselves" */
+    verbs = vtense(selfbuf, verb);
+    if (!strcmp(verb, verbs)) { /* a match indicates that it stayed plural */
+        monnamtext = makeplural(monnamtext);
+        /* for "it", makeplural() produces "them" but we want "they" */
+        if (!strcmpi(monnamtext, genders[3].he)) {
+            boolean capitaliz = (monnamtext[0] == highc(monnamtext[0]));
+
+            Strcpy(monnamtext, genders[3].him);
+            if (capitaliz) {
+                monnamtext[0] = highc(monnamtext[0]);
+            }
+        }
+    }
+    Strcat(strcat(monnamtext, " "), verbs);
+    if (othertext && *othertext) {
+        Strcat(strcat(monnamtext, " "), othertext);
+    }
+    Strcat(strcat(monnamtext, " "), selfbuf);
+
+    return monnamtext;
 }
 
 /* for debugging messages, where data might be suspect and we aren't

@@ -1678,21 +1678,8 @@ steedintrap(struct trap *trap, struct obj *otmp)
 
     case POLY_TRAP:
         if (!resists_magm(steed) && !resist(steed, WAND_CLASS, 0, NOTELL)) {
-            struct permonst *mdat = steed->data;
-
-            (void) newcham(steed, NULL, FALSE, FALSE);
-            if (!can_saddle(steed) || !can_ride(steed)) {
-                dismount_steed(DISMOUNT_POLY);
-            } else {
-                char buf[BUFSZ];
-                Strcpy(buf, x_monnam(steed, ARTICLE_YOUR, NULL, SUPPRESS_SADDLE, FALSE));
-
-                if (mdat != steed->data) {
-                    (void) strsubst(buf, "your ", "your new ");
-                }
-                You("have to adjust yourself in the saddle on %s.", buf);
-            }
-
+            /* newcham() will probably end up calling poly_steed() */
+            (void) newcham(steed, (struct permonst *) 0, FALSE, TRUE);
         }
         steedhit = TRUE;
         break;

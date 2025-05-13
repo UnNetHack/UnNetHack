@@ -95,8 +95,25 @@ float_vs_flight(void)
     } else {
         BLevitation &= ~I_SPECIAL;
     }
+
+    /* riding blocks stealth unless hero+steed fly, so a change in flying
+       might cause a change in stealth */
+    steed_vs_stealth();
+
     flags.botl = TRUE;
 }
+
+/* riding blocks stealth unless hero+steed fly */
+void
+steed_vs_stealth(void)
+{
+    if (u.usteed && !Flying && !Levitation) {
+        BStealth |= FROMOUTSIDE;
+    } else {
+        BStealth &= ~FROMOUTSIDE;
+    }
+}
+
 
 /** Returns true if the player monster is genocided. */
 boolean

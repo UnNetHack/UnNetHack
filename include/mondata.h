@@ -41,6 +41,7 @@
 #define is_swimmer(ptr)     (((ptr)->mflags1 & M1_SWIM) != 0L)
 #define breathless(ptr)     (((ptr)->mflags1 & M1_BREATHLESS) != 0L)
 #define amphibious(ptr)     (((ptr)->mflags1 & (M1_AMPHIBIOUS | M1_BREATHLESS)) != 0L)
+#define cant_drown(ptr)     (is_swimmer(ptr) || amphibious(ptr) || breathless(ptr))
 #define passes_walls(ptr)   (((ptr)->mflags1 & M1_WALLWALK) != 0L)
 #define amorphous(ptr)      (((ptr)->mflags1 & M1_AMORPHOUS) != 0L)
 #define noncorporeal(ptr)   ((ptr)->mlet == S_GHOST)
