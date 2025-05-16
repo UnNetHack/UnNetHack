@@ -1119,8 +1119,9 @@ give_spell(void)
      * receiving the book for it, unless it's already well known.
      * The chance is not influenced by whether hero is illiterate.
      */
-    if (otmp->otyp != SPE_BLANK_PAPER && !rn2(4) &&
-         (spe_knowledge = known_spell(otmp->otyp)) != spe_Fresh) {
+    if (otmp->otyp != SPE_BLANK_PAPER &&
+        (!rn2(4) || Role_if(PM_CAVEMAN)) &&
+        (spe_knowledge = known_spell(otmp->otyp)) != spe_Fresh) {
         /* force_learn_spell() should only return '\0' if the book
            is blank paper or the spell is known and has retention
            of spe_Fresh, so no 'else' case is needed here */
@@ -1145,6 +1146,10 @@ give_spell(void)
         }
         obfree(otmp, (struct obj *) 0); /* discard the book */
     } else {
+        if (Role_if(PM_CAVEMAN)) {
+            obfree(otmp, (struct obj *) 0); /* discard the book */
+            otmp = mkobj(WAND_CLASS, FALSE);
+        }
         otmp->dknown = 1; /* not bknown */
         /* discovering blank paper will make it less likely to
            be given again; small chance to arbitrarily discover

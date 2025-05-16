@@ -29,6 +29,7 @@
 	* Role differentiation:
 	  - Cave dwellers reading magic triggers short confusion
 	  - Cave dwellers gain sickness resistance at experience level 10
+	  - When praying Cave dwellers get spell knowledge instead of a spellbook
 
 	* Ported NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging
