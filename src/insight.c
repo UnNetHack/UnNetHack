@@ -473,6 +473,9 @@ enlightenment(int final, boolean want_disp)
     if (u.umconf) {
         you_are("going to confuse monsters", "");
     }
+    if (flags.confused_reading) {
+        you_are("confused from reading magic", "");
+    }
 
     /*** Appearance and behavior ***/
     if (Adornment) {

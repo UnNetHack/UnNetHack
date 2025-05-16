@@ -1999,6 +1999,10 @@ role_init(void)
     flags.vegan |= flags.ascet;
     flags.vegetarian |= flags.vegan;
 
+    if (Role_if(PM_CAVEMAN)) {
+        flags.confused_reading = TRUE;
+    }
+
     /* Artifacts are fixed in hack_artifacts() */
 
     /* Success! */

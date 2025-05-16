@@ -26,6 +26,9 @@
 	* Race changes:
 	  - Allow player vampires to be neutral
 
+	* Role differentiation:
+	  - Cave dwellers reading magic triggers short confusion
+
 	* Ported NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging
 	  - Statues as monster symbols

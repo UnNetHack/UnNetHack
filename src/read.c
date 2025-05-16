@@ -484,6 +484,10 @@ doread(void)
                && scroll->oclass != SPBOOK_CLASS) {
         pline(silly_thing_to, "read");
         return 0;
+    } else if (flags.confused_reading && (scroll->otyp != SPE_BOOK_OF_THE_DEAD &&
+                                          scroll->otyp != SPE_BLANK_PAPER)) {
+        pline("Trying to read the mystic symbols leaves you confounded.");
+        make_confused(HConfusion + rnd(10), FALSE);
     } else if (u.roleplay.illiterate && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
         pline("Unfortunately you cannot read.");
         return 0;
