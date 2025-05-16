@@ -40,6 +40,7 @@ const struct innate {
                    {   0, 0, 0, 0 } },
 
     cav_abil[] = { {     7, &(HFast), "quick", "slow" },
+                   {  10, &(HSick_resistance), "hardy", "wimpy" },
                    {  15, &(HWarning), "sensitive", "" },
                    {   0, 0, 0, 0 } },
 
