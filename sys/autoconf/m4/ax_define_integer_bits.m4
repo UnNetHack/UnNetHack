@@ -1,5 +1,5 @@
 # ===========================================================================
-#  http://www.gnu.org/software/autoconf-archive/ax_define_integer_bits.html
+#  https://www.gnu.org/software/autoconf-archive/ax_define_integer_bits.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -44,7 +44,7 @@
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 6
+#serial 7
 
 AU_ALIAS([AC_DEFINE_INTEGER_BITS], [AX_DEFINE_INTEGER_BITS])
 AC_DEFUN([AX_DEFINE_INTEGER_BITS],
