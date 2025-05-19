@@ -118,6 +118,7 @@ AC_CHECK_TOOL(WINDRES,windres,no)
 NETHACK_PROG_COMPRESS
 
 dnl  ----- Check for libraries
+AM_CONDITIONAL([LUAJIT], [test "yes" = 'no']) dnl workaround for bug in ax_lua.m4
 AX_PROG_LUA([5.4])
 AX_LUA_HEADERS
 AX_LUA_LIBS
