@@ -2481,14 +2481,8 @@ doturn(void)
          * to cast--the spell while having lost the book ID to amnesia.
          * (It also used to tell spelleffects() to cast at self?)
          */
-        int sp_no;
-
-        for (sp_no = 0; sp_no < MAXSPELL; ++sp_no) {
-            if (spl_book[sp_no].sp_id == NO_SPELL) {
-                break;
-            } else if (spl_book[sp_no].sp_id == SPE_TURN_UNDEAD) {
-                return spelleffects(sp_no, FALSE);
-            }
+        if (known_spell(SPE_TURN_UNDEAD)) {
+            return spelleffects(SPE_TURN_UNDEAD, FALSE);
         }
         You("don't know how to turn undead!");
         return 0;

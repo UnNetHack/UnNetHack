@@ -639,9 +639,9 @@ docast(void)
     int spell_no;
 
     if (getspell(&spell_no)) {
-        return spelleffects(spell_no, FALSE);
+        return spelleffects(spl_book[spell_no].sp_id, FALSE);
     }
-    return 0;
+    return ECMD_FAIL;
 }
 
 const char *
@@ -767,8 +767,9 @@ spell_backfire(int spell)
 }
 
 int
-spelleffects(int spell, boolean atme)
+spelleffects(int spell_otyp, boolean atme)
 {
+    int spell = spell_idx(spell_otyp);
     int energy, damage, chance, n, intell;
     int skill, role_skill;
     boolean confused = (Confusion != 0);
