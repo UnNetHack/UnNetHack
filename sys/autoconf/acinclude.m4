@@ -49,7 +49,11 @@ AC_DEFUN([NETHACK_WIN_ENABLE],[AC_ARG_ENABLE($1-graphics,
   [enable_$1_graphics="$enableval"], [enable_$1_graphics="$2"])
   AC_MSG_CHECKING([$1-graphics])
   if test "$enable_$1_graphics" != "no"; then
-    nethack_wins="$1 $nethack_wins"
+    if test "$1" = "pdcurses"; then
+      nethack_wins="$1 curses"
+    else
+      nethack_wins="$1 $nethack_wins"
+    fi
     AC_MSG_RESULT([yes])
   else
     AC_MSG_RESULT([no])
