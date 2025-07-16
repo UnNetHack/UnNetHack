@@ -213,7 +213,7 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
 
     oldcrsr = curs_set(1);
     do {
-        ret = wgetch(win);
+        ret = curses_read_char();
         if (ret == ERR || ret == '\0') {
             ret = '\n';
         }
@@ -530,7 +530,12 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         wmove(win, my, mx);
         curs_set(1);
         wrefresh(win);
-        ch = getch();
+        curses_got_input(); /* despite its name, before rather than after... */
+#ifdef PDCURSES
+        ch = wgetch(win);
+#else
+        ch = curses_read_char();
+#endif
         curs_set(0);
         switch (ch) {
         case '\033': /* DOESCAPE */

@@ -1909,8 +1909,7 @@ static uchar get_glyph_char(int glyph, int *oclass)
 extern const char * compress_str(const char *);
 #else
 const char*
-compress_str(str) /* copied from win/tty/wintty.c */
-const char *str;
+compress_str(const char *str) /* copied from win/tty/wintty.c */
 {
     static char cbuf[BUFSZ];
     /* compress in case line too long */
