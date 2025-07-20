@@ -7597,7 +7597,6 @@ printf '%s\n' "$as_me: Using PDCurses backend: $PDCURSES_BACKEND" >&6;}
     WINSRC="${WINSRC} \$(WINCURSESSRC)"
     WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
     WINLIB="${WINLIB} \$(WINCURSESLIB)"
-    CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
 
 printf '%s\n' "#define CURSES_GRAPHICS /**/" >>confdefs.h
 ],

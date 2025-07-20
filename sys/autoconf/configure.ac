@@ -214,6 +214,11 @@ if test "$enable_pdcurses_graphics" != "no"; then
 
     if test "$PDCURSES_BACKEND" = "sdl2"; then
         PDCURSES_BACKEND_LIB="-lSDL2 -lSDL2_ttf"
+        CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
+    elif test "$PDCURSES_BACKEND" = "wingui"; then
+        PDCURSES_BACKEND_LIB="-lgdi32 -lwinmm -lcomdlg32"
+        CFLAGS="$CFLAGS -DPDC_FORCE_UTF8"
+        CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
     else
         AC_MSG_ERROR([PDCurses backend ${PDCURSES_BACKEND} is currently not supported])
     fi
@@ -221,7 +226,6 @@ if test "$enable_pdcurses_graphics" != "no"; then
     WINSRC="${WINSRC} \$(WINCURSESSRC)"
     WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
     WINLIB="${WINLIB} \$(WINCURSESLIB)"
-    CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
     AC_DEFINE(CURSES_GRAPHICS, [], [Console output])],
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
