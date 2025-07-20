@@ -913,6 +913,10 @@ curses_init_options(void)
     } else if (iflags.supports_utf8 && !iflags.cursesgraphics) {
         switch_graphics(UTF8_GRAPHICS);
 #endif
+#ifdef __PDCURSESMOD__
+    } else if (iflags.supports_utf8) {
+        switch_graphics(UTF8_GRAPHICS);
+#endif
     } else if (iflags.DECgraphics || iflags.UTF8graphics || iflags.cursesgraphics) {
         switch_graphics(CURS_GRAPHICS);
     } else {

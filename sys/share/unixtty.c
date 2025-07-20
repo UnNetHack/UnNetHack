@@ -459,6 +459,9 @@ error VA_DECL(const char *,s)
 void
 check_utf8_console(void)
 {
+#if defined(__PDCURSESMOD__) && defined(PDC_WIDE)
+    iflags.supports_utf8 = TRUE;
+#else
     struct termios original;
     /* store current tty settings */
     if (tcgetattr(STDIN_FILENO, &original) == -1) {
@@ -510,5 +513,6 @@ check_utf8_console(void)
         perror("check_utf8_console restore terminal settings");
         exit(EXIT_FAILURE);
     }
+#endif
 }
 #endif
