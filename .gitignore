@@ -1,15 +1,20 @@
+
 *.swp
 *.swo
 *.exe
 compile
 
+
 # /
 /Makefile
+/config.cache
 /config.log
 /config.status
 /tags
 /TAGS
 /.svn
+/liblua
+/pdcursesmod
 
 
 # /dat/
