@@ -7590,6 +7590,12 @@ printf '%s\n' "$as_me: Using PDCurses backend: $PDCURSES_BACKEND" >&6;}
 
     if test "$PDCURSES_BACKEND" = "sdl2"; then
         PDCURSES_BACKEND_LIB="-lSDL2 -lSDL2_ttf"
+        CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
+        printf '%s\n' "#define PDCURSES_BACKEND_SDL2 1" >>confdefs.h
+    elif test "$PDCURSES_BACKEND" = "wingui"; then
+        PDCURSES_BACKEND_LIB="-lgdi32 -lwinmm -lcomdlg32"
+        CFLAGS="$CFLAGS -DPDC_FORCE_UTF8"
+        printf '%s\n' "#define PDCURSES_BACKEND_WINGUI 1" >>confdefs.h
     else
         as_fn_error $? "PDCurses backend ${PDCURSES_BACKEND} is currently not supported" "$LINENO" 5
     fi
@@ -7599,7 +7605,7 @@ printf '%s\n' "$as_me: Using PDCurses backend: $PDCURSES_BACKEND" >&6;}
     WINLIB="${WINLIB} \$(WINCURSESLIB)"
 
 printf '%s\n' "#define CURSES_GRAPHICS /**/" >>confdefs.h
-],
+
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
 fi
@@ -9299,7 +9305,7 @@ else
 
 fi
 
-if test "$host_os" != mingw32; then
+if test "$host_os" != mingw32 || test "$enable_pdcurses_graphics" != "no"; then
 	if test "$enable_tty_graphics" != "no" || test "$enable_curses_graphics" != "no" || test "$enable_pdcurses_graphics" != "no"; then
 	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable utf8-glyphs" >&5
 printf %s "checking whether to enable utf8-glyphs... " >&6; }

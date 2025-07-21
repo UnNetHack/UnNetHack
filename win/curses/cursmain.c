@@ -182,9 +182,10 @@ curses_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
        /* VERSION_STRING */
 # else
 #  ifdef VERSION_STRING
-    sprintf(window_title, "%s %s", "NetHack", VERSION_STRING);
+    sprintf(window_title, "%s %s", "UnNetHack", VERSION_STRING);
 #  else
-    sprintf(window_title, "%s", "NetHack");
+    char buf[BUFSZ] = { 0 };
+    sprintf(window_title, "%s", getversionstring(buf));
 #  endif
        /* VERSION_STRING */
 # endif/* DEF_GAME_NAME */

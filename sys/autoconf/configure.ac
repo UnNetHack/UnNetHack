@@ -215,10 +215,11 @@ if test "$enable_pdcurses_graphics" != "no"; then
     if test "$PDCURSES_BACKEND" = "sdl2"; then
         PDCURSES_BACKEND_LIB="-lSDL2 -lSDL2_ttf"
         CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
+        AC_DEFINE(PDCURSES_BACKEND_SDL2, [], [PDCurses backend])
     elif test "$PDCURSES_BACKEND" = "wingui"; then
         PDCURSES_BACKEND_LIB="-lgdi32 -lwinmm -lcomdlg32"
         CFLAGS="$CFLAGS -DPDC_FORCE_UTF8"
-        CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
+        AC_DEFINE(PDCURSES_BACKEND_WINGUI, [], [PDCurses backend])
     else
         AC_MSG_ERROR([PDCurses backend ${PDCURSES_BACKEND} is currently not supported])
     fi
@@ -226,7 +227,7 @@ if test "$enable_pdcurses_graphics" != "no"; then
     WINSRC="${WINSRC} \$(WINCURSESSRC)"
     WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
     WINLIB="${WINLIB} \$(WINCURSESLIB)"
-    AC_DEFINE(CURSES_GRAPHICS, [], [Console output])],
+    AC_DEFINE(CURSES_GRAPHICS, [], [Console output])
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
 fi
@@ -495,7 +496,7 @@ else
 	AC_SUBST(SYSCF_COMMENT,[#])
 fi
 
-if test "$host_os" != mingw32; then
+if test "$host_os" != mingw32 || test "$enable_pdcurses_graphics" != "no"; then
 	if test "$enable_tty_graphics" != "no" || test "$enable_curses_graphics" != "no" || test "$enable_pdcurses_graphics" != "no"; then
 		NETHACK_ARG(utf8-glyphs,[Enable UTF-8 glyphs in TTY],UTF8_GLYPHS,yes)
 		if test "$enable_utf8_glyphs" != "no" ; then

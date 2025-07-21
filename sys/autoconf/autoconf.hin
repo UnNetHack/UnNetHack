@@ -227,6 +227,12 @@
 /* Compare High Score entries by user id instead of user name */
 #undef PERS_IS_UID
 
+/* PDCurses backend */
+#undef PDCURSES_BACKEND_SDL2
+
+/* PDCurses backend */
+#undef PDCURSES_BACKEND_WINGUI
+
 /* QWERTZ keyboard layout support */
 #undef QWERTZ
 
