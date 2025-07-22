@@ -6,7 +6,7 @@
 /* Global declarations */
 
 int curses_read_char(void);
-void curses_toggle_color_attr(WINDOW * win, int color, int attr, int onoff);
+void curses_toggle_color_attr(WINDOW * win, int color, attr_t attr, int onoff);
 void curses_bail(const char *mesg);
 winid curses_get_wid(int type);
 char *curses_copy_of(const char *s);
@@ -27,8 +27,8 @@ void curses_view_file(const char *filename, boolean must_exist);
 #endif
 void curses_rtrim(char *str);
 int curses_get_count(int first_digit);
-int curses_convert_attr(int attr);
-int curses_read_attrs(char *attrs);
+attr_t curses_convert_attr(int attr);
+attr_t curses_read_attrs(char *attrs);
 int curses_convert_keys(int key);
 int curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod);
 

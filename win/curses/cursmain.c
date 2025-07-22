@@ -486,7 +486,7 @@ curses_start_menu(winid wid)
 /*
 add_menu(winid wid, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, boolean preselected)
+                                attr_t attr, char *str, boolean preselected)
                 -- Add a text line str to the given menu window.  If identifier
                    is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
@@ -660,7 +660,7 @@ curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph,
 {
     int ch, color;
     unsigned int special;
-    int attr = -1;
+    attr_t attr = -1;
 
     /* map glyph to character and color */
     mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y, 0);

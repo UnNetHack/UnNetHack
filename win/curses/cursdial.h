@@ -18,7 +18,7 @@ int curses_character_input_dialog(const char *prompt, const char *choices,
 int curses_ext_cmd(void);
 void curses_create_nhmenu(winid wid);
 void curses_add_nhmenu_item(winid wid, int glyph, const ANY_P * identifier,
-                            char accelerator, char group_accel, int attr,
+                            char accelerator, char group_accel, attr_t attr,
                             const char *str, boolean presel);
 # ifdef MENU_COLOR
 boolean curses_get_menu_coloring(const char *, int *, attr_t *);

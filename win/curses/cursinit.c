@@ -1130,7 +1130,7 @@ curses_debug_show_colors(void)
         }
 #endif
 
-        int attr = A_NORMAL;
+        attr_t attr = A_NORMAL;
         if (c != NO_COLOR) {
             attr = curses_color_attr(c, 0);
         }

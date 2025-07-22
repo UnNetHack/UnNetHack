@@ -18,7 +18,7 @@ typedef struct nhmi {
     anything identifier;        /* Value returned if item selected */
     char accelerator;           /* Character used to select item from menu */
     char group_accel;           /* Group accelerator for menu item, if any */
-    int attr;                   /* Text attributes for item */
+    attr_t attr;                /* Text attributes for item */
     const char *str;            /* Text of menu item */
     boolean presel;             /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
@@ -520,7 +520,7 @@ curses_create_nhmenu(winid wid)
 
 void
 curses_add_nhmenu_item(winid wid, int glyph, const ANY_P * identifier,
-                       char accelerator, char group_accel, int attr,
+                       char accelerator, char group_accel, attr_t attr,
                        const char *str, boolean presel)
 {
     char *new_str;
