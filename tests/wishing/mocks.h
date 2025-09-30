@@ -144,13 +144,14 @@ void discover_object(int number, boolean bool1, boolean bool2) {}
 
 struct monst* shop_keeper(char c) { return NULL; }
 long contained_cost(struct obj *obj, struct monst *monst, long number, boolean bool1, boolean bool2) { return 0; }
-long unpaid_cost(struct obj *obj, boolean b) { return 0; }
+long unpaid_cost(struct obj *obj, uchar c) { return 0; }
 void addtobill(struct obj *obj, boolean bool1, boolean bool2, boolean bool3) {}
 void splitbill(struct obj *obj1, struct obj *obj2) {}
 void subfrombill(struct obj *obj, struct monst *monst) {}
 boolean is_fshk(struct monst *monst) { return FALSE; }
 boolean costly_spot(coordxy x, coordxy y) { return FALSE; }
-long get_cost_of_shop_item(struct obj *obj) { return 0; }
+long get_cost_of_shop_item(struct obj *obj, int *nochrg) { return 0; }
+char * shk_your(char *buf, struct obj *obj) { return NULL; }
 
 boolean rloco(struct obj *obj) { return FALSE; }
 
@@ -220,7 +221,8 @@ const char *glow_color(int i) { return NULL; }
 const char *glow_verb(int i, boolean b) { return NULL; }
 
 boolean is_pool(coordxy i1, coordxy i2) { return FALSE; }
-boolean is_lava(coordxy i1, coordxy i3) { return FALSE; }
+boolean is_lava(coordxy i1, coordxy i2) { return FALSE; }
+boolean is_pool_or_lava(coordxy i1, coordxy i2) { return FALSE; }
 void feel_newsym(coordxy x, coordxy y) {}
 void reset_utrap(boolean b) {}
 
