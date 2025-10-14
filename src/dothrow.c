@@ -1065,7 +1065,14 @@ toss_up(struct obj *obj, boolean hitsroof)
         if (breaktest(obj)) {
             pline("%s hits the %s.", Doname2(obj), ceiling(u.ux, u.uy));
             breakmsg(obj, !Blind);
-            return breakobj(obj, u.ux, u.uy, TRUE, TRUE) ? FALSE : TRUE;
+            /* crackable armor will return True for breaktest() but will
+               usually return False for breakobj() */
+            if (!breakobj(obj, u.ux, u.uy, TRUE, TRUE)) {
+                hitfloor(obj, FALSE);
+                thrownobj = 0;
+                return TRUE;
+            }
+            return FALSE;
         }
         action = "hits";
     } else {
