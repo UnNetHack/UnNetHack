@@ -1831,16 +1831,10 @@ dmonsfree(void)
     for (mtmp = &fmon; *mtmp;) {
         freetmp = *mtmp;
         if (DEADMONSTER(freetmp) && !freetmp->isgd) {
-            count++;
-            if (count > iflags.purge_monsters) {
-                describe_level(buf);
-                impossible("dmonsfree: %d removed doesn't match %d pending on %s",
-                        count, iflags.purge_monsters, buf);
-            }
-
             *mtmp = freetmp->nmon;
             freetmp->nmon = NULL;
             dealloc_monst(freetmp);
+            count++;
         } else {
             mtmp = &(freetmp->nmon);
         }
