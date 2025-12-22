@@ -89,6 +89,7 @@
 	  - Redesigned Valkyrie home, filler and goal levels (from xNetHack)
 	  - Redesigned Archeologist quest (from xNetHack)
 	  - Added the Windowless Tower, a new entry level for Vlad's tower (from dNetHack)
+	  - In the Mines most levels above Minetown are lit, most levels below are dark
 
 	* Sokoban:
 	  - Sokoban's level difficulty is equal to Sokoban's entrance level

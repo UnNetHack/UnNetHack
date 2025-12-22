@@ -71,6 +71,7 @@ static boolean generate_way_out_method(coordxy nx, coordxy ny,
 static void l_push_wid_hei_table(lua_State *, int, int);
 static boolean good_stair_loc(coordxy, coordxy);
 static void ensure_way_out(void);
+void adjust_mines_lightning(lev_init *);
 
 #if 0
 /* macosx complains that these are unused */
@@ -3181,6 +3182,7 @@ splev_initlev(lev_init *linit)
     case LVLINIT_MINES:
         if (linit->lit == BOOL_RANDOM) {
             linit->lit = rn2(2);
+            adjust_mines_lightning(linit);
         }
         if (linit->filling > -1) {
             lvlfill_solid(linit->filling, 0);
@@ -6734,6 +6736,24 @@ load_special_lua(const char *name)
     gc.coder = NULL;
 
     return result;
+}
+
+void
+adjust_mines_lightning(lev_init *linit)
+{
+    if (In_mines(&u.uz)) {
+        s_level *minetownslev = find_level("minetn");
+        int distance = depth(&u.uz) - depth(&minetownslev->dlevel);
+
+        if (distance == 0) {
+            /* in minetown, don't change */
+            return;
+        }
+
+        /* 90% chance of lit level above Minetown, 10% chance of lit level below Minetown */
+        int factor = distance > 0 ? 1 : 9;
+        linit->lit = rnf(factor, 10);
+    }
 }
 
 /*sp_lev.c*/

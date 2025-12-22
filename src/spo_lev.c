@@ -32,6 +32,7 @@ extern void create_altar(altar *, struct mkroom *);
 extern void create_monster(monster *, struct mkroom *);
 extern void spo_end_moninvent(void);
 extern void spo_pop_container(void);
+extern void adjust_mines_lightning(lev_init *);
 
 static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
 static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
@@ -1854,6 +1855,7 @@ splev_initlev(lev_init *linit)
     case LVLINIT_MINES:
         if (linit->lit == -1) {
             linit->lit = rn2(2);
+            adjust_mines_lightning(linit);
         }
         if (linit->filling > -1) {
             lvlfill_solid(linit->filling, 0);
