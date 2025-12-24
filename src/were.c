@@ -69,6 +69,7 @@ were_beastie(int pm)
     case PM_WOLF:
     case PM_WARG:
     case PM_WINTER_WOLF:
+    case PM_WINTER_WOLF_CUB:
         return PM_WEREWOLF;
     default:
         break;
