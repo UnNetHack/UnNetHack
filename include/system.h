@@ -70,30 +70,8 @@ typedef long off_t;
 
 #endif /* !__cplusplus && !__GO32__ */
 
-/* You may want to change this to fit your system, as this is almost
- * impossible to get right automatically.
- * This is the type of signal handling functions.
- */
-#if !defined(OS2) && (defined(_MSC_VER) || defined(__TURBOC__) || defined(__SC__) || defined(WIN32))
-# define SIG_RET_TYPE void (__cdecl *)(int)
-#endif
 #ifndef SIG_RET_TYPE
-# if defined(NHSTDC) || defined(POSIX_TYPES) || defined(OS2) || defined(__DECC)
-#  ifdef LINUX
-#   define SIG_RET_TYPE sighandler_t
-#  else
-#   define SIG_RET_TYPE void (*)()
-#  endif
-# endif
-#endif
-#ifndef SIG_RET_TYPE
-# if defined(ULTRIX) || defined(SUNOS4) || defined(SVR3) || defined(SVR4)
-/* SVR3 is defined automatically by some systems */
-#  define SIG_RET_TYPE void (*)()
-# endif
-#endif
-#ifndef SIG_RET_TYPE    /* BSD, SIII, SVR2 and earlier, Sun3.5 and earlier */
-# define SIG_RET_TYPE int (*)()
+#define SIG_RET_TYPE void (*)(int)
 #endif
 
 #if !defined(__cplusplus) && !defined(__GO32__)
