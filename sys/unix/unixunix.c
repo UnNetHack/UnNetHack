@@ -324,8 +324,7 @@ regularize(char *s)
 #include <poll.h>
 
 void
-msleep(msec)
-unsigned msec; /* milliseconds */
+msleep(unsigned msec) /* milliseconds */
 {
     struct pollfd unused;
     int msecs = msec;		/* poll API is signed */
