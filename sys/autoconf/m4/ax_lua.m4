@@ -394,7 +394,7 @@ AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
         return n * fact(n-1)
       end
     end
-    print("fact(5) is " .. fact(5))'`]
+    print("fact(5) is " .. fact(5))' | tr -d '[:cntrl:]'`]
   AS_IF([test "$_ax_lua_factorial" = 'fact(5) is 120'],
     [$2], [$3])
 ])
@@ -425,7 +425,7 @@ AC_DEFUN([_AX_LUA_CHK_VER],
       print("yes")
     else
       print("no")
-    end'`]
+    end' | tr -d '[:cntrl:]'`]
     AS_IF([test "x$_ax_lua_good_version" = "xyes"],
       [$4], [$5])
 ])
