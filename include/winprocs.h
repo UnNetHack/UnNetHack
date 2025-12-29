@@ -5,6 +5,20 @@
 #ifndef WINPROCS_H
 #define WINPROCS_H
 
+#include "botl.h"
+#ifndef CLR_MAX
+#include "color.h"
+#endif
+
+enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses,
+              wp_chainin, wp_chainout, wp_safestartup, wp_shim,
+              wp_hup, wp_guistubs, wp_ttystubs,
+#ifdef OUTDATED_STUFF
+              wp_mac, wp_Gem, wp_Gnome, wp_amii, wp_amiv,
+#endif
+              wp_trace	// XXX do we need this?  should chainin/out get an id? TBD
+};
+
 struct window_procs {
     const char *name;
     unsigned long wincap;   /* window port capability options supported */
@@ -22,6 +36,7 @@ struct window_procs {
     void (*win_destroy_nhwindow)(winid);
     void (*win_curs)(winid, int, int);
     void (*win_putstr)(winid, int, const char *);
+    void (*win_putmixed)(winid, int, const char *);
 #ifdef FILE_AREAS
     void (*win_display_file)(const char *, const char *, boolean);
 #else
@@ -91,6 +106,7 @@ extern NEARDATA struct window_procs windowprocs;
 #define destroy_nhwindow (*windowprocs.win_destroy_nhwindow)
 #define curs (*windowprocs.win_curs)
 #define putstr (*windowprocs.win_putstr)
+#define putmixed (*windowprocs.win_putmixed)
 #define display_file (*windowprocs.win_display_file)
 #ifdef FILE_AREAS
 #define display_file_area(area, file, complain) display_file(area, file, complain)
@@ -143,6 +159,9 @@ extern NEARDATA struct window_procs windowprocs;
 #define outrip (*windowprocs.win_outrip)
 #define preference_update (*windowprocs.win_preference_update)
 
+#define WPID(name) #name, wp_##name
+#define WPIDMINUS(name) "-" #name, wp_##name
+
 /*
  * WINCAP
  * Window port preference capability bits.
@@ -189,10 +208,12 @@ extern NEARDATA struct window_procs windowprocs;
 #define WC2_FLUSH_STATUS          0x0080L /* 08 call status_update(BL_FLUSH)
                                            *    after updating status window fields */
 #define WC2_RESET_STATUS          0x0100L /* 09 call status_update(BL_RESET) to
-                                           *    indicate 'draw everything'      */
-#define WC2_WINDOWBORDERS         0x0800L /* 12 display borders on nh windows   */
-#define WC2_PETATTR               0x1000L /* 13 attributes for hilite_pet       */
+                                           *    indicate 'draw everything' */
+#define WC2_WINDOWBORDERS         0x0800L /* 12 display borders on nh windows */
+#define WC2_PETATTR               0x1000L /* 13 attributes for hilite_pet */
 #define WC2_GUICOLOR              0x2000L /* 14 display colours outside map win */
+/* pline() can overload the display attributes argument passed to putstr()
+   with one or more flags and at most one of bold/blink/inverse/&c */
 #define WC2_URGENT_MESG           0x4000L /* 15 putstr(WIN_MESSAGE) supports urgency
                                            *    via non-display attribute flag  */
 #define WC2_SUPPRESS_HIST         0x8000L /* 16 putstr(WIN_MESSAGE) supports history
@@ -261,5 +282,82 @@ struct wc_Opt {
  * init function whether the window system is coming or going. */
 #define WININIT      0
 #define WININIT_UNDO 1
+
+/*
+ * window port routines available in sys/share/safeproc.c
+ */
+extern struct window_procs *get_safe_procs(int);
+extern void safe_init_nhwindows(int *, char **);
+extern void safe_player_selection(void);
+extern void safe_askname(void);
+extern void safe_get_nh_event(void);
+extern void safe_exit_nhwindows(const char *);
+extern void safe_suspend_nhwindows(const char *);
+extern void safe_resume_nhwindows(void);
+extern winid safe_create_nhwindow(int);
+extern void safe_clear_nhwindow(winid);
+extern void safe_display_nhwindow(winid, boolean);
+extern void safe_destroy_nhwindow(winid);
+extern void safe_curs(winid, int, int);
+extern void safe_putstr(winid, int, const char *);
+extern void safe_putmixed(winid, int, const char *);
+extern void safe_display_file(const char *, boolean);
+extern void safe_start_menu(winid, unsigned long);
+extern void safe_add_menu(winid, int, int, const ANY_P *,
+                          char, char, int, int, const char *,
+                          unsigned int);
+extern void safe_end_menu(winid, const char *);
+extern int safe_select_menu(winid, int, MENU_ITEM_P **);
+extern char safe_message_menu(char, int, const char *);
+extern void safe_mark_synch(void);
+extern void safe_wait_synch(void);
+#ifdef CLIPPING
+extern void safe_cliparound(int, int);
+#endif
+#ifdef POSITIONBAR
+extern void safe_update_positionbar(char *);
+#endif
+extern void safe_print_glyph(winid, coordxy, coordxy, int);
+extern void safe_raw_print(const char *);
+extern void safe_raw_print_bold(const char *);
+extern int safe_nhgetch(void);
+extern int safe_nh_poskey(coordxy *, coordxy *, int *);
+extern void safe_nhbell(void);
+extern int safe_doprev_message(void);
+extern char safe_yn_function(const char *, const char *, char);
+extern void safe_getlin(const char *, char *);
+extern int safe_get_ext_cmd(void);
+extern void safe_number_pad(int);
+extern void safe_delay_output(void);
+#ifdef CHANGE_COLOR
+extern void safe_change_color(int, long, int);
+#ifdef MAC
+extern void safe_change_background(int);
+extern short safe_set_font_name(winid, char *);
+#endif
+extern char *safe_get_color_string(void);
+#endif
+extern void safe_start_screen(void);
+extern void safe_end_screen(void);
+extern void safe_outrip(winid, int, time_t);
+extern void safe_preference_update(const char *);
+extern char *safe_getmsghistory(boolean);
+extern void safe_putmsghistory(const char *, boolean);
+extern void safe_status_init(void);
+extern void safe_status_finish(void);
+extern void safe_status_enablefield(int, const char *, const char *,
+                                    boolean);
+extern void safe_status_update(int, genericptr_t, int, int, int,
+                               unsigned long *);
+extern boolean safe_can_suspend(void);
+extern void stdio_raw_print(const char *);
+extern void stdio_nonl_raw_print(const char *);
+extern void stdio_raw_print_bold(const char *);
+extern void stdio_wait_synch(void);
+extern void safe_update_inventory(int);
+#ifdef NEXT_VERSION
+extern win_request_info *safe_ctrl_nhwindow(winid, int, win_request_info *);
+#endif
+extern int stdio_nhgetch(void);
 
 #endif /* WINPROCS_H */

@@ -123,7 +123,7 @@
 #include "hack.h"
 
 static void show_mon_or_warn(coordxy, coordxy, int);
-static void display_monster(coordxy, coordxy, struct monst *, int, coordxy);
+static void display_monster(coordxy, coordxy, struct monst *, int, boolean);
 static int swallow_to_glyph(int, int);
 static void display_warning(struct monst *);
 

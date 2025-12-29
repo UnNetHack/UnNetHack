@@ -15,7 +15,7 @@ static void pass_one(schar, schar);
 static void pass_two(schar, schar);
 static void pass_three(schar, schar);
 static void join_map(schar, schar);
-static void finish_map(schar, schar, coordxy, coordxy);
+static void finish_map(schar, schar, boolean, boolean);
 static void remove_room(unsigned);
 static void backfill(schar, schar);
 void mkmap(lev_init *);

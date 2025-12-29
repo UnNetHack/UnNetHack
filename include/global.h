@@ -99,8 +99,13 @@ typedef int16_t coordxy;
  */
 typedef int16_t xint16;
 
+#ifdef __MINGW32__
+/* Resolve conflict with Qt 5 and MinGW-w32 */
+typedef unsigned char boolean; /* 0 or 1 */
+#else
 #ifndef SKIP_BOOLEAN
 typedef coordxy boolean; /* 0 or 1 */
+#endif
 #endif
 
 /* vision seen vectors: viz_array[][] and levl[][].seenv, which use different

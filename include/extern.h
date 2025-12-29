@@ -1716,7 +1716,6 @@ extern int dosuspend(void);
 #  endif
 # endif /* TOS */
 # ifdef WIN32
-extern char *get_username(int *);
 extern void nt_regularize(char *);
 extern int (*nt_kbhit)(void);
 extern void Delay(int);
@@ -3139,6 +3138,12 @@ extern char genl_message_menu(char, int, const char *);
 extern void genl_preference_update(const char *);
 extern void add_menu_heading(winid, const char *) NONNULLARG2;
 extern void add_menu_str(winid, const char *) NONNULLARG2;
+extern void genl_status_init(void);
+extern void genl_status_finish(void);
+extern void genl_status_enablefield(int, const char *, const char *,
+                                    boolean) NONNULLPTRS;
+extern void genl_status_update(int, genericptr_t, int, int, int,
+                               unsigned long *) NONNULLARG2;
 
 /* ### wizard.c ### */
 
