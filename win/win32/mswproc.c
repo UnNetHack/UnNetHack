@@ -62,6 +62,8 @@ COLORREF status_fg_color = RGB(0xFF, 0xFF, 0xFF);
 COLORREF message_bg_color = RGB(0, 0, 0);
 COLORREF message_fg_color = RGB(0xFF, 0xFF, 0xFF);
 
+strbuf_t raw_print_strbuf = { 0 };
+
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
     "MSWIN",
@@ -1198,7 +1200,8 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
 */
 void mswin_wait_synch()
 {
-	logDebug("mswin_wait_synch()\n");
+    logDebug("mswin_wait_synch()\n");
+    mswin_raw_print_flush();
 }
 
 /*
@@ -1249,6 +1252,49 @@ void mswin_print_glyph(winid wid, coordxy x, coordxy y, int glyph)
 		SendMessage( GetNHApp()->windowlist[wid].win,
 		         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PRINT_GLYPH, (LPARAM)&data );
 	}
+}
+
+/*
+ * mswin_raw_print_accumulate() accumulate the given text into
+ *   raw_print_strbuf.
+ */
+void mswin_raw_print_accumulate(const char * str, boolean bold);
+
+void
+mswin_raw_print_accumulate(const char * str, boolean bold)
+{
+    nhUse(bold); // ignored for now
+
+    if (raw_print_strbuf.str != NULL) {
+        strbuf_append(&raw_print_strbuf, "\n");
+    }
+    strbuf_append(&raw_print_strbuf, str);
+}
+
+/*
+ * mswin_raw_print_flush() - display any text found in raw_print_strbuf in a
+ *   dialog box and clear raw_print_strbuf.
+ */
+void
+mswin_raw_print_flush(void)
+{
+    if (raw_print_strbuf.str != NULL) {
+        int wlen = strlen(raw_print_strbuf.str) + 1;
+        if (strcmp(raw_print_strbuf.str, "\n") != 0
+#ifdef _MSC_VER
+            || IsDebuggerPresent()
+#endif
+                                  ) {
+            TCHAR * wbuf = (TCHAR *) alloc(wlen * sizeof(TCHAR));
+            if (wbuf != NULL) {
+                NHMessageBox(GetNHApp()->hMainWnd,
+                            NH_A2W(raw_print_strbuf.str, wbuf, wlen),
+                            MB_ICONINFORMATION | MB_OK);
+                free(wbuf);
+            }
+        }
+        strbuf_empty(&raw_print_strbuf);
+    }
 }
 
 /*
