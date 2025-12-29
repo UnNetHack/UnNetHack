@@ -177,10 +177,37 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	return 0;
 }
 
+extern void free_menu_data(void);
+
+void
+free_winmain_stuff(void)
+{
+#ifdef NEXT_VERSION
+    int cnt;
+
+    for (cnt = 0; cnt < MAX_CMDLINE_PARAM; ++cnt) {
+        if (argv[cnt]) {
+            free((genericptr_t) argv[cnt]), argv[cnt] = 0;
+        }
+    }
+    if (_nethack_app.saved_text)
+        free((genericptr_t) _nethack_app.saved_text),
+            _nethack_app.saved_text = 0;
+    for (cnt = 0; cnt < MAXWINDOWS; ++cnt) {
+        if (windowdata[cnt].address) {
+            if (!windowdata[cnt].isstatic) {
+                free(windowdata[cnt].address);
+            }
+            windowdata[cnt].address = 0;
+        }
+    }
+    free_menu_data();
+#endif
+}
 
 PNHWinApp GetNHApp()
 {
-	return &_nethack_app;
+    return &_nethack_app;
 }
 
 TCHAR* _get_cmd_arg(TCHAR* pCmdLine)
