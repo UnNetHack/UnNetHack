@@ -44,10 +44,6 @@ extern void nethack_exit(int);
 #define nethack_exit exit
 #endif
 
-#ifdef WIN32
-extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
-#endif
-
 #if defined(MSWIN_GRAPHICS)
 extern void mswin_destroy_reg();
 #endif

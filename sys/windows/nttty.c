@@ -1021,7 +1021,7 @@ VA_DECL(const char *, fmt)
 /* fatal error */
 /*VARARGS1*/
 void
-error
+consoletty_error
 VA_DECL(const char *,s)
 {
     char buf[BUFSZ];

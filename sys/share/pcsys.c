@@ -28,7 +28,7 @@
 #endif
 
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 void nethack_exit(int);
 #else
 #define nethack_exit exit
@@ -45,11 +45,7 @@ extern unsigned short __far __cdecl _movefpaused;
 #define     __MOVE_PAUSE_CACHE	  4   /* Represents the cache memory */
 #endif /* MOVERLAY */
 
-#ifdef WIN32CON
-extern int GUILaunched;    /* from nttty.c */
-#endif
-
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO)
 
 void
 flushout()
@@ -135,64 +131,6 @@ dosh()
 #endif /* MICRO */
 
 /*
- * Add a backslash to any name not ending in /, \ or :	 There must
- * be room for the \
- */
-void
-append_slash(name)
-char *name;
-{
-	char *ptr;
-
-	if (!*name)
-		return;
-	ptr = name + (strlen(name) - 1);
-	if (*ptr != '\\' && *ptr != '/' && *ptr != ':') {
-		*++ptr = '\\';
-		*++ptr = '\0';
-	}
-	return;
-}
-
-#ifdef WIN32
-boolean getreturn_enabled;
-#endif
-
-void
-getreturn(str)
-const char *str;
-{
-#ifdef WIN32
-	if (!getreturn_enabled) return;
-#endif
-#ifdef TOS
-	msmsg("Hit <Return> %s.", str);
-#else
-	msmsg("Hit <Enter> %s.", str);
-#endif
-	while (Getchar() != '\n') ;
-	return;
-}
-
-#ifndef WIN32CON
-void
-msmsg
-VA_DECL(const char *, fmt)
-{
-    VA_START(fmt);
-    VA_INIT(fmt, const char *);
-# if defined(MSDOS) && defined(NO_TERMS)
-    if (iflags.grmode)
-        gr_finish();
-# endif
-    Vprintf(fmt, VA_ARGS);
-    flushout();
-    VA_END();
-    return;
-}
-#endif
-
-/*
  * Follow the PATH, trying to fopen the file.
  */
 #ifdef TOS
@@ -253,7 +191,7 @@ const char *name, *mode;
 	return (FILE *)0;
 }
 
-#if defined(MICRO) || defined(WIN32) || defined(OS2)
+#if defined(MICRO) || defined(OS2)
 void nethack_exit(code)
 int code;
 {
@@ -275,9 +213,7 @@ static void msexit()
 
 	flushout();
 #ifndef TOS
-# ifndef WIN32
 	enable_ctrlP(); 	/* in case this wasn't done */
-# endif
 #endif
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 	chdir(orgdir);		/* chdir, not chdirx */
@@ -291,16 +227,6 @@ static void msexit()
 		restore_colors();
 # endif
 #endif
-#ifdef WIN32CON
-	/* Only if we started from the GUI, not the command prompt,
-	 * we need to get one last return, so the score board does
-	 * not vanish instantly after being created.
-	 * GUILaunched is defined and set in nttty.c.
-	 */
-	synch_cursor();
-	if (GUILaunched) getreturn("to end");
-	synch_cursor();
-#endif
 	return;
 }
-#endif /* MICRO || WIN32 || OS2 */
+#endif /* MICRO || OS2 */

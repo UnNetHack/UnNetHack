@@ -1,13 +1,22 @@
-/*	SCCS Id: @(#)winnt.c	 3.4	 $Date: 2003/10/26 15:58:22 $		  */
+/* NetHack 3.7	windsys.c	$NHDT-Date: 1710949760 2024/03/20 15:49:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  *  WIN32 system functions.
  *
+ *  Included in both console-based and window-based clients on the windows platform.
+ *
  *  Initial Creation: Michael Allison - January 31/93
  *
  */
+
+#ifdef __MINGW32__
+#include <windows.h>
+#else
+#include "win10.h"
+#include "winos.h"
+#endif
 
 #define NEED_VARARGS
 #include "hack.h"
@@ -15,13 +24,13 @@
 #ifndef __BORLANDC__
 #include <direct.h>
 #endif
-#include <ctype.h>
-#include "win32api.h"
-#ifdef WIN32CON
+#ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
-#ifdef WIN32
+#include <inttypes.h>
 
+#ifdef WIN32
+#include <versionhelpers.h>
 
 /*
  * The following WIN32 API routines are used in this file.
@@ -35,137 +44,167 @@
  *
  */
 
+/* runtime cursor display control switch */
+boolean win32_cursorblink;
 
 /* globals required within here */
-HANDLE ffhandle = (HANDLE)0;
+HANDLE ffhandle = (HANDLE) 0;
 WIN32_FIND_DATA ffd;
+extern int GUILaunched;
+boolean getreturn_enabled;
+int redirect_stdout;
+
+#ifdef WIN32CON
+typedef HWND(WINAPI *GETCONSOLEWINDOW)(void);
+#if 0
+static HWND GetConsoleHandle(void);
+static HWND GetConsoleHwnd(void);
+#endif /* 0 */
+#endif /* WIN32CON */
+#if !defined(TTY_GRAPHICS)
+extern void backsp(void);
+#endif
+int windows_console_custom_nhgetch(void);
+extern void safe_routines(void);
+int windows_early_options(const char *window_opt);
+unsigned long sys_random_seed(void);
+#if 0
+static int max_filename(void);
+#endif
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
- * For the tty port it is tty_kbhit() [from nttty.c]
+ * For the tty port it is tty_kbhit() [from consoletty.c]
  * For the win32 port it is win32_kbhit() [from winmain.c]
  * It is initialized to point to def_kbhit [in here] for safety.
  */
 
 int def_kbhit(void);
-int (*nt_kbhit)() = def_kbhit;
+int (*nt_kbhit)(void) = def_kbhit;
+
+#ifndef WIN32CON
+/* this is used as a printf() replacement when the window
+ * system isn't initialized yet
+ */
+void msmsg
+VA_DECL(const char *, fmt)
+{
+    VA_START(fmt);
+    VA_INIT(fmt, const char *);
+    VA_END();
+    return;
+}
+#endif  /* WIN32CON */
 
 char
-switchar()
+switchar(void)
 {
- /* Could not locate a WIN32 API call for this- MJA */
-	return '-';
+    /* Could not locate a WIN32 API call for this- MJA */
+    return '-';
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
-	char tmppath[4];
-	DWORD SectorsPerCluster = 0;
-	DWORD BytesPerSector = 0;
-	DWORD FreeClusters = 0;
-	DWORD TotalClusters = 0;
+    char tmppath[4];
+    DWORD SectorsPerCluster = 0;
+    DWORD BytesPerSector = 0;
+    DWORD FreeClusters = 0;
+    DWORD TotalClusters = 0;
 
-	tmppath[0] = *path;
-	tmppath[1] = ':';
-	tmppath[2] = '\\';
-	tmppath[3] = '\0';
-	GetDiskFreeSpace(tmppath, &SectorsPerCluster,
-			&BytesPerSector,
-			&FreeClusters,
-			&TotalClusters);
-	return (long)(SectorsPerCluster * BytesPerSector *
-			FreeClusters);
+    tmppath[0] = *path;
+    tmppath[1] = ':';
+    tmppath[2] = '\\';
+    tmppath[3] = '\0';
+    GetDiskFreeSpace(tmppath, &SectorsPerCluster, &BytesPerSector,
+                     &FreeClusters, &TotalClusters);
+    return (long) (SectorsPerCluster * BytesPerSector * FreeClusters);
 }
 
 /*
  * Functions to get filenames using wildcards
  */
 int
-findfirst(path)
-char *path;
+findfirst(char *path)
 {
     if (ffhandle) {
         FindClose(ffhandle);
-        ffhandle = (HANDLE)0;
+        ffhandle = (HANDLE) 0;
     }
-    ffhandle = FindFirstFile(path,&ffd);
-    return
-        (ffhandle == INVALID_HANDLE_VALUE) ? 0 : 1;
+    ffhandle = FindFirstFile(path, &ffd);
+    return (ffhandle == INVALID_HANDLE_VALUE) ? 0 : 1;
 }
 
 int
-findnext()
+findnext(void)
 {
-	return FindNextFile(ffhandle,&ffd) ? 1 : 0;
+    return FindNextFile(ffhandle, &ffd) ? 1 : 0;
 }
 
 char *
-foundfile_buffer()
+foundfile_buffer(void)
 {
-	return &ffd.cFileName[0];
+    return &ffd.cFileName[0];
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *file)
 {
-	if (findfirst(file)) {
-		return ((long)ffd.nFileSizeLow);
-	} else
-		return -1L;
+    if (findfirst(file)) {
+        return ((long) ffd.nFileSizeLow);
+    } else
+        return -1L;
 }
 
 /*
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(char *str)
 {
-	char *ptr;
-	char drive;
-	if ((ptr = index(str, ':')) != (char *)0)
-	{
-		drive = toupper(*(ptr - 1));
-		_chdrive((drive - 'A') + 1);
-	}
+    char *ptr;
+    char drive;
+    if ((ptr = strchr(str, ':')) != (char *) 0) {
+        drive = toupper((uchar) *(ptr - 1));
+        (void) _chdrive((drive - 'A') + 1);
+    }
 }
 
+#if 0
 static int
-max_filename()
+max_filename(void)
 {
-	DWORD maxflen;
-	int status=0;
+    DWORD maxflen;
+    int status = 0;
 
-	status = GetVolumeInformation((LPTSTR)0,(LPTSTR)0, 0
-			,(LPDWORD)0,&maxflen,(LPDWORD)0,(LPTSTR)0,0);
-	if (status) return maxflen;
-	else return 0;
+    status = GetVolumeInformation((LPTSTR) 0, (LPTSTR) 0, 0, (LPDWORD) 0,
+                                  &maxflen, (LPDWORD) 0, (LPTSTR) 0, 0);
+    if (status)
+        return maxflen;
+    else
+        return 0;
 }
+#endif
 
 int
-def_kbhit()
+def_kbhit(void)
 {
-	return 0;
+    return 0;
 }
 
 /*
  * Strip out troublesome file system characters.
  */
 
-void
-nt_regularize(s)	/* normalize file name */
-char *s;
+void nt_regularize(char* s) /* normalize file name */
 {
-	unsigned char *lp;
+    unsigned char *lp;
 
-	for (lp = s; *lp; lp++)
-	    if ( *lp == '?' || *lp == '"' || *lp == '\\' ||
-		 *lp == '/' || *lp == '>' || *lp == '<'  ||
-		 *lp == '*' || *lp == '|' || *lp == ':'  || (*lp > 127))
-			*lp = '_';
+    for (lp = (unsigned char *) s; *lp; lp++)
+        if (*lp == '?' || *lp == '"' || *lp == '\\' || *lp == '/'
+            || *lp == '>' || *lp == '<' || *lp == '*' || *lp == '|'
+            || *lp == ':' || (*lp > 127))
+            *lp = '_';
 }
 
 /*
