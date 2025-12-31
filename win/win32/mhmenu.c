@@ -1295,178 +1295,189 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     DeleteDC(tileDC);
     return TRUE;
 }
+
 /*-----------------------------------------------------------------------------*/
-BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
+
+BOOL
+onListChar(HWND hWnd, HWND hwndList, WORD ch)
 {
-	int i = 0;
-	PNHMenuWindow data;
-	int curIndex, topIndex, pageSize;
-	boolean is_accelerator = FALSE;
+    int i = 0;
+    PNHMenuWindow data;
+    int curIndex, topIndex, pageSize;
+    boolean is_accelerator = FALSE;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+    data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-	switch( ch ) {
-	case MENU_FIRST_PAGE:
-		i = 0;
-		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
-		ListView_EnsureVisible(hwndList, i, FALSE);
-	return -2;
+    is_accelerator = FALSE;
+    for (i = 0; i < data->menu.size; i++) {
+        if (data->menu.items[i].accelerator == ch) {
+            is_accelerator = TRUE;
+            break;
+        }
+    }
 
-	case MENU_LAST_PAGE:
-		i = max(0, data->menu.size-1);
-		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
-		ListView_EnsureVisible(hwndList, i, FALSE);
-	return -2;
+    /* Don't use switch if input matched an accelerator.  Sometimes
+     * accelerators can conflict with menu actions.  For example, when
+     * engraving the extra choice of using fingers matches MENU_UNSELECT_ALL.
+     */
+    if (is_accelerator) {
+        goto accelerator;
+    }
 
-	case MENU_NEXT_PAGE:
-		topIndex = ListView_GetTopIndex( hwndList );
-		pageSize = ListView_GetCountPerPage( hwndList );
-        curIndex = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+    switch (ch) {
+    case MENU_FIRST_PAGE:
+        i = 0;
+        ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+        ListView_EnsureVisible(hwndList, i, FALSE);
+        return -2;
+
+    case MENU_LAST_PAGE:
+        i = max(0, data->menu.size - 1);
+        ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+        ListView_EnsureVisible(hwndList, i, FALSE);
+        return -2;
+
+    case MENU_NEXT_PAGE:
+        topIndex = ListView_GetTopIndex(hwndList);
+        pageSize = ListView_GetCountPerPage(hwndList);
+        curIndex = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
         /* Focus down one page */
-		i = min(curIndex+pageSize, data->menu.size-1);
-		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+        i = min(curIndex + pageSize, data->menu.size - 1);
+        ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
         /* Scrollpos down one page */
-        i = min(topIndex+(2*pageSize - 1), data->menu.size-1);
-		ListView_EnsureVisible(hwndList, i, FALSE);
-	return -2;
+        i = min(topIndex + (2 * pageSize - 1), data->menu.size - 1);
+        ListView_EnsureVisible(hwndList, i, FALSE);
+        return -2;
 
-	case MENU_PREVIOUS_PAGE:
-		topIndex = ListView_GetTopIndex( hwndList );
-		pageSize = ListView_GetCountPerPage( hwndList );
-        curIndex = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+    case MENU_PREVIOUS_PAGE:
+        topIndex = ListView_GetTopIndex(hwndList);
+        pageSize = ListView_GetCountPerPage(hwndList);
+        curIndex = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
         /* Focus up one page */
-		i = max(curIndex-pageSize, 0);
-		ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+        i = max(curIndex - pageSize, 0);
+        ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
         /* Scrollpos up one page */
-		i = max(topIndex-pageSize, 0);
-		ListView_EnsureVisible(hwndList, i, FALSE);
-	break;
+        i = max(topIndex - pageSize, 0);
+        ListView_EnsureVisible(hwndList, i, FALSE);
+        break;
 
-	case MENU_SELECT_ALL:
-		if( data->how == PICK_ANY ) {
-			reset_menu_count(hwndList, data);
-            for (i=0; i<data->menu.size; i++ ) {
+    case MENU_SELECT_ALL:
+        if (data->how == PICK_ANY) {
+            reset_menu_count(hwndList, data);
+            for (i = 0; i < data->menu.size; i++) {
                 SelectMenuItem(hwndList, data, i, -1);
             }
-			return -2;
-		}
-	break;
+            return -2;
+        }
+        break;
 
-	case MENU_UNSELECT_ALL:
-		if( data->how == PICK_ANY ) {
-			reset_menu_count(hwndList, data);
-            for (i=0; i<data->menu.size; i++) {
-				SelectMenuItem(hwndList, data, i, 0);
-			}
-			return -2;
-		}
-	break;
-
-	case MENU_INVERT_ALL:
-		if( data->how == PICK_ANY ) {
-			reset_menu_count(hwndList, data);
-            for (i=0; i<data->menu.size; i++ ) {
-				SelectMenuItem(
-					hwndList,
-					data,
-					i,
-					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-				);
-			}
-			return -2;
-		}
-	break;
-
-	case MENU_SELECT_PAGE:
-		if( data->how == PICK_ANY ) {
-			int from, to;
-			reset_menu_count(hwndList, data);
-			topIndex = ListView_GetTopIndex( hwndList );
-			pageSize = ListView_GetCountPerPage( hwndList );
-			from = max(0, topIndex);
-			to = min(data->menu.size, from+pageSize);
-            for (i=from; i<to; i++ ) {
-				SelectMenuItem(hwndList, data, i, -1);
-			}
-			return -2;
-		}
-	break;
-
-	case MENU_UNSELECT_PAGE:
-		if( data->how == PICK_ANY ) {
-			int from, to;
-			reset_menu_count(hwndList, data);
-			topIndex = ListView_GetTopIndex( hwndList );
-			pageSize = ListView_GetCountPerPage( hwndList );
-			from = max(0, topIndex);
-			to = min(data->menu.size, from+pageSize);
-            for (i=from; i<to; i++) {
-				SelectMenuItem(hwndList, data, i, 0);
-			}
-			return -2;
-		}
-	break;
-
-	case MENU_INVERT_PAGE:
-		if( data->how == PICK_ANY ) {
-			int from, to;
-			reset_menu_count(hwndList, data);
-			topIndex = ListView_GetTopIndex( hwndList );
-			pageSize = ListView_GetCountPerPage( hwndList );
-			from = max(0, topIndex);
-			to = min(data->menu.size, from+pageSize);
-            for (i=from; i<to; i++ ) {
-				SelectMenuItem(
-					hwndList,
-					data,
-					i,
-					NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-				);
-			}
-			return -2;
-		}
-	break;
-
-	case MENU_SEARCH:
-	    if( data->how==PICK_ANY || data->how==PICK_ONE ) {
-			char buf[BUFSZ];
-
-			reset_menu_count(hwndList, data);
-			if( mswin_getlin_window("Search for:", buf, BUFSZ)==IDCANCEL ) {
-				strcpy(buf, "\033");
-			}
-			SetFocus(hwndList);	// set focus back to the list control
-			if (!*buf || *buf == '\033') return -2;
+    case MENU_UNSELECT_ALL:
+        if (data->how == PICK_ANY) {
+            reset_menu_count(hwndList, data);
             for (i = 0; i < data->menu.size; i++) {
-				if( NHMENU_IS_SELECTABLE(data->menu.items[i])
-					&& strstr(data->menu.items[i].str, buf) ) {
-					if (data->how == PICK_ANY) {
-						SelectMenuItem(
-							hwndList,
-							data,
-							i,
-							NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-						);
-					} else if( data->how == PICK_ONE ) {
-						SelectMenuItem(
-							hwndList,
-							data,
-							i,
-							-1
-						);
-						ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
-						ListView_EnsureVisible(hwndList, i, FALSE);
-						break;
-					}
-				}
-			}
-		} else {
-			mswin_nhbell();
-	    }
-	return -2;
+                SelectMenuItem(hwndList, data, i, 0);
+            }
+            return -2;
+        }
+        break;
 
-	case ' ':
-    {
+    case MENU_INVERT_ALL:
+        if (data->how == PICK_ANY) {
+            reset_menu_count(hwndList, data);
+            for (i = 0; i < data->menu.size; i++) {
+                if (menuitem_invert_test(0, data->menu.items[i].itemflags,
+                                         NHMENU_IS_SELECTED(data->menu.items[i])))
+                    SelectMenuItem(hwndList, data, i,
+                               NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                                                                       : -1);
+            }
+            return -2;
+        }
+        break;
+
+    case MENU_SELECT_PAGE:
+        if (data->how == PICK_ANY) {
+            int from, to;
+            reset_menu_count(hwndList, data);
+            topIndex = ListView_GetTopIndex(hwndList);
+            pageSize = ListView_GetCountPerPage(hwndList);
+            from = max(0, topIndex);
+            to = min(data->menu.size, from + pageSize);
+            for (i = from; i < to; i++) {
+                SelectMenuItem(hwndList, data, i, -1);
+            }
+            return -2;
+        }
+        break;
+
+    case MENU_UNSELECT_PAGE:
+        if (data->how == PICK_ANY) {
+            int from, to;
+            reset_menu_count(hwndList, data);
+            topIndex = ListView_GetTopIndex(hwndList);
+            pageSize = ListView_GetCountPerPage(hwndList);
+            from = max(0, topIndex);
+            to = min(data->menu.size, from + pageSize);
+            for (i = from; i < to; i++) {
+                SelectMenuItem(hwndList, data, i, 0);
+            }
+            return -2;
+        }
+        break;
+
+    case MENU_INVERT_PAGE:
+        if (data->how == PICK_ANY) {
+            int from, to;
+            reset_menu_count(hwndList, data);
+            topIndex = ListView_GetTopIndex(hwndList);
+            pageSize = ListView_GetCountPerPage(hwndList);
+            from = max(0, topIndex);
+            to = min(data->menu.size, from + pageSize);
+            for (i = from; i < to; i++) {
+                if (menuitem_invert_test(0, data->menu.items[i].itemflags,
+                                         NHMENU_IS_SELECTED(data->menu.items[i])))
+                    SelectMenuItem(hwndList, data, i,
+                               NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                                                                       : -1);
+            }
+            return -2;
+        }
+        break;
+
+    case MENU_SEARCH:
+        if (data->how == PICK_ANY || data->how == PICK_ONE) {
+            char buf[BUFSZ];
+
+            reset_menu_count(hwndList, data);
+            if (mswin_getlin_window("Search for:", buf, BUFSZ) == IDCANCEL) {
+                strcpy(buf, "\033");
+            }
+            if (data->is_active)
+                SetFocus(hwndList); // set focus back to the list control
+            if (!*buf || *buf == '\033')
+                return -2;
+            for (i = 0; i < data->menu.size; i++) {
+                if (NHMENU_IS_SELECTABLE(data->menu.items[i])
+                    && strstr(data->menu.items[i].str, buf)) {
+                    if (data->how == PICK_ANY) {
+                        SelectMenuItem(
+                            hwndList, data, i,
+                            NHMENU_IS_SELECTED(data->menu.items[i]) ? 0 : -1);
+                    } else if (data->how == PICK_ONE) {
+                        SelectMenuItem(hwndList, data, i, -1);
+                        ListView_SetItemState(hwndList, i, LVIS_FOCUSED,
+                                              LVIS_FOCUSED);
+                        ListView_EnsureVisible(hwndList, i, FALSE);
+                        break;
+                    }
+                }
+            }
+        } else {
+            mswin_nhbell();
+        }
+        return -2;
+
+    case ' ': {
         if (GetNHApp()->regNetHackMode) {
             /* NetHack mode: Scroll down one page,
                ends menu when on last page. */
@@ -1475,333 +1486,308 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
             si.cbSize = sizeof(SCROLLINFO);
             si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
             GetScrollInfo(hwndList, SB_VERT, &si);
-            if ((si.nPos + (int)si.nPage) > (si.nMax - si.nMin)) {
+            if ((si.nPos + (int) si.nPage) > (si.nMax - si.nMin)) {
                 /* We're at the bottom: dismiss. */
                 data->done = 1;
-			    data->result = 0;
+                data->result = 0;
                 return -2;
             }
             /* We're not at the bottom: page down. */
-		    topIndex = ListView_GetTopIndex( hwndList );
-		    pageSize = ListView_GetCountPerPage( hwndList );
-            curIndex = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
+            topIndex = ListView_GetTopIndex(hwndList);
+            pageSize = ListView_GetCountPerPage(hwndList);
+            curIndex = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
             /* Focus down one page */
-		    i = min(curIndex+pageSize, data->menu.size-1);
-		    ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
+            i = min(curIndex + pageSize, data->menu.size - 1);
+            ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
             /* Scrollpos down one page */
-            i = min(topIndex+(2*pageSize - 1), data->menu.size-1);
-		    ListView_EnsureVisible(hwndList, i, FALSE);
+            i = min(topIndex + (2 * pageSize - 1), data->menu.size - 1);
+            ListView_EnsureVisible(hwndList, i, FALSE);
 
-        	return -2;
+            return -2;
         } else {
-		    /* Windows mode: ends menu for PICK_ONE/PICK_NONE
-		       select item for PICK_ANY */
-		    if( data->how==PICK_ONE || data->how==PICK_NONE ) {
-			    data->done = 1;
-			    data->result = 0;
-			    return -2;
-		    } else if( data->how==PICK_ANY ) {
-			    i = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
-			    if( i>=0 ) {
-				    SelectMenuItem(
-					    hwndList,
-					    data,
-					    i,
-					    NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-				    );
-			    }
-		    }
+            /* Windows mode: ends menu for PICK_ONE/PICK_NONE
+               select item for PICK_ANY */
+            if (data->how == PICK_ONE || data->how == PICK_NONE) {
+                data->done = 1;
+                data->result = 0;
+                return -2;
+            } else if (data->how == PICK_ANY) {
+                i = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
+                if (i >= 0) {
+                    SelectMenuItem(
+                        hwndList, data, i,
+                        NHMENU_IS_SELECTED(data->menu.items[i]) ? 0 : -1);
+                }
+            }
         }
+    } break;
+
+    accelerator:
+    default:
+        if (strchr(data->menu.gacc, ch)
+            && !(ch == '0' && data->menu.counting)) {
+            /* matched a group accelerator */
+            if (data->how == PICK_ANY || data->how == PICK_ONE) {
+                reset_menu_count(hwndList, data);
+                for (i = 0; i < data->menu.size; i++) {
+                    if (NHMENU_IS_SELECTABLE(data->menu.items[i])
+                        && data->menu.items[i].group_accel == ch) {
+                        if (data->how == PICK_ANY) {
+                            SelectMenuItem(
+                                hwndList, data, i,
+                                NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                                                                        : -1);
+                        } else if (data->how == PICK_ONE) {
+                            SelectMenuItem(hwndList, data, i, -1);
+                            data->result = 0;
+                            data->done = 1;
+                            return -2;
+                        }
+                    }
+                }
+                return -2;
+            } else {
+                mswin_nhbell();
+                return -2;
+            }
+        }
+
+        if (isdigit((uchar) ch)) {
+            int count;
+            i = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
+            if (i >= 0) {
+                count = data->menu.items[i].count;
+                if (count == -1)
+                    count = 0;
+                count *= 10L;
+                count += (int) (ch - '0');
+                if (count != 0) /* ignore leading zeros */ {
+                    data->menu.counting = TRUE;
+                    data->menu.items[i].count = min(100000, count);
+                    ListView_RedrawItems(hwndList, i,
+                                         i); /* update count mark */
+                }
+            }
+            return -2;
+        }
+
+        if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+            || is_accelerator) {
+            if (data->how == PICK_ANY || data->how == PICK_ONE) {
+                topIndex = ListView_GetTopIndex(hwndList);
+                if( topIndex < 0 || topIndex > data->menu.size ) break; // impossible?
+                int iter = topIndex;
+                do {
+                    i = iter % data->menu.size;
+                    if (data->menu.items[i].accelerator == ch) {
+                        if (data->how == PICK_ANY) {
+                            SelectMenuItem(
+                                hwndList, data, i,
+                                NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                                                                        : -1);
+                            ListView_SetItemState(hwndList, i, LVIS_FOCUSED,
+                                                  LVIS_FOCUSED);
+                            ListView_EnsureVisible(hwndList, i, FALSE);
+                            return -2;
+                        } else if (data->how == PICK_ONE) {
+                            SelectMenuItem(hwndList, data, i, -1);
+                            data->result = 0;
+                            data->done = 1;
+                            return -2;
+                        }
+                    }
+                } while( (++iter % data->menu.size) != topIndex );
+            }
+        }
+        break;
     }
-	break;
 
-	default:
-		if( strchr(data->menu.gacc, ch) &&
-			!(ch=='0' && data->menu.counting) ) {
-			/* matched a group accelerator */
-			if (data->how == PICK_ANY || data->how == PICK_ONE) {
-				reset_menu_count(hwndList, data);
-                for (i = 0; i < data->menu.size; i++ ) {
-					if( NHMENU_IS_SELECTABLE(data->menu.items[i]) &&
-						data->menu.items[i].group_accel == ch ) {
-						if( data->how == PICK_ANY ) {
-							SelectMenuItem(
-								hwndList,
-								data,
-								i,
-								NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-							);
-						} else if( data->how == PICK_ONE ) {
-							SelectMenuItem(
-								hwndList,
-								data,
-								i,
-								-1
-							);
-							data->result = 0;
-							data->done = 1;
-							return -2;
-						}
-					}
-				}
-				return -2;
-			} else {
-				mswin_nhbell();
-				return -2;
-			}
-		}
-
-		if (isdigit(ch)) {
-			int count;
-			i = ListView_GetNextItem(hwndList, -1,	LVNI_FOCUSED);
-			if( i>=0 ) {
-				count = data->menu.items[i].count;
-				if( count==-1 ) count=0;
-				count *= 10L;
-				count += (int)(ch - '0');
-				if (count != 0)	/* ignore leading zeros */ {
-					data->menu.counting = TRUE;
-					data->menu.items[i].count = min(100000, count);
-					ListView_RedrawItems( hwndList, i, i ); /* update count mark */
-				}
-			}
-			return -2;
-		}
-
-		is_accelerator = FALSE;
-		for (i = 0; i < data->menu.size; i++) {
-			if( data->menu.items[i].accelerator == ch ) {
-				is_accelerator = TRUE;
-				break;
-			}
-		}
-
-		if( (ch>='a' && ch<='z') ||
-			(ch>='A' && ch<='Z') || is_accelerator) {
-			if (data->how == PICK_ANY || data->how == PICK_ONE) {
-				for (i = 0; i < data->menu.size; i++) {
-					if( data->menu.items[i].accelerator == ch ) {
-						if( data->how == PICK_ANY ) {
-							SelectMenuItem(
-								hwndList,
-								data,
-								i,
-								NHMENU_IS_SELECTED(data->menu.items[i])? 0 : -1
-							);
-							ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
-							ListView_EnsureVisible(hwndList, i, FALSE);
-							return -2;
-						} else if( data->how == PICK_ONE ) {
-							SelectMenuItem(
-								hwndList,
-								data,
-								i,
-								-1
-							);
-							data->result = 0;
-							data->done = 1;
-							return -2;
-						}
-					}
-				}
-			}
-		}
-	break;
-	}
-
-	reset_menu_count(hwndList, data);
-	return -1;
+    reset_menu_count(hwndList, data);
+    return -1;
 }
 /*-----------------------------------------------------------------------------*/
-void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
+void
+mswin_menu_window_size(HWND hWnd, LPSIZE sz)
 {
-    TEXTMETRIC tm;
-	HWND control;
-	HGDIOBJ saveFont;
-	HDC hdc;
-	PNHMenuWindow data;
-	int i;
-	RECT rt, wrt;
-	int extra_cx;
+    HWND control;
+    PNHMenuWindow data;
+    RECT rt, wrt;
+    int extra_cx;
 
-	GetClientRect(hWnd, &rt);
-	sz->cx = rt.right - rt.left;
-	sz->cy = rt.bottom - rt.top;
+    data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (data) {
+        control = GetMenuControl(hWnd);
 
-	GetWindowRect(hWnd, &wrt);
-	extra_cx = (wrt.right-wrt.left) - sz->cx;
+        /* get the control size */
+        GetClientRect(control, &rt);
+        sz->cx = rt.right - rt.left;
+        sz->cy = rt.bottom - rt.top;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
-	if(data) {
-		control = GetMenuControl(hWnd);
-		hdc = GetDC(control);
+        /* calculate "extra" space around the control */
+        GetWindowRect(hWnd, &wrt);
+        extra_cx = (wrt.right - wrt.left) - sz->cx;
 
-		if( data->type==MENU_TYPE_MENU ) {
-			/* Calculate the width of the list box. */
-			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
-			GetTextMetrics(hdc, &tm);
-            for (i = 0; i < data->menu.size; i++) {
-				LONG menuitemwidth = 0;
-				int column;
-				char *p, *p1;
-
-				p1 = data->menu.items[i].str;
-				p = strchr(data->menu.items[i].str, '\t');
-				column = 0;
-				for (;;) {
-					TCHAR wbuf[BUFSZ];
-					RECT tabRect;
-					SetRect ( &tabRect, 0, 0, 1, 1 );
-					if (p != NULL) *p = '\0'; /* for time being, view tab field as zstring */
-					DrawText(hdc,
-						NH_A2W(p1, wbuf, BUFSZ),
-						strlen(p1),
-						&tabRect,
-						DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_SINGLELINE
-					);
-					/* it probably isn't necessary to recompute the tab width now, but do so
-					 * just in case, honoring the previously computed value
-					 */
-					menuitemwidth += max(data->menu.tab_stop_size[column],
-					    tabRect.right - tabRect.left);
-					if (p != NULL) *p = '\t';
-					else /* last string so, */ break;
-					/* add the separation only when not the last item */
-					/* in the last item, we break out of the loop, in the statement just above */
-					menuitemwidth += TAB_SEPARATION;
-					++column;
-					p1 = p + 1;
-					p = strchr(p1, '\t');
-				}
-
-				sz->cx = max(sz->cx,
-					(LONG)(2*TILE_X + menuitemwidth + tm.tmAveCharWidth*12 + tm.tmOverhang));
-			}
-			SelectObject(hdc, saveFont);
-		} else {
-			/* Calculate the width of the text box. */
-			RECT text_rt;
-			saveFont = SelectObject(hdc, mswin_get_font(NHW_MENU, ATR_NONE, hdc, FALSE));
-			GetTextMetrics(hdc, &tm);
-			SetRect(&text_rt, 0, 0, sz->cx, sz->cy);
-			DrawText(hdc, data->text.text, _tcslen(data->text.text), &text_rt, DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX);
-			sz->cx = max(sz->cx, text_rt.right - text_rt.left + 5*tm.tmAveCharWidth + tm.tmOverhang);
-			SelectObject(hdc, saveFont);
-		}
-		sz->cx += extra_cx;
-
-		ReleaseDC(control, hdc);
-	}
+        if (data->type == MENU_TYPE_MENU) {
+            sz->cx = data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL);
+        } else {
+            /* Use the width of the text box */
+            sz->cx = data->text.text_box_size.cx
+                     + 2 * GetSystemMetrics(SM_CXVSCROLL);
+        }
+        sz->cx += extra_cx;
+    } else {
+        /* uninitilized window */
+        GetClientRect(hWnd, &rt);
+        sz->cx = rt.right - rt.left;
+        sz->cy = rt.bottom - rt.top;
+    }
 }
 /*-----------------------------------------------------------------------------*/
-void SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
+void
+SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 {
     int i;
 
-    if (item<0 || item>=data->menu.size ) {
+    if (item < 0 || item >= data->menu.size) {
         return;
     }
 
     if (data->how == PICK_ONE && count != 0) {
-        for (i=0; i<data->menu.size; i++) {
+        for (i = 0; i < data->menu.size; i++) {
             if (item != i && data->menu.items[i].count != 0) {
                 data->menu.items[i].count = 0;
-                ListView_RedrawItems( hwndList, i, i );
-            }
+                ListView_RedrawItems(hwndList, i, i);
+            };
         }
     }
 
     data->menu.items[item].count = count;
-    ListView_RedrawItems( hwndList, item, item );
+    ListView_RedrawItems(hwndList, item, item);
     reset_menu_count(hwndList, data);
 }
 /*-----------------------------------------------------------------------------*/
-void reset_menu_count(HWND hwndList, PNHMenuWindow data)
+void
+reset_menu_count(HWND hwndList, PNHMenuWindow data)
 {
-	int i;
-	data->menu.counting = FALSE;
-	if( IsWindow(hwndList) ) {
-		i = ListView_GetNextItem((hwndList), -1, LVNI_FOCUSED);
-		if( i>=0 ) ListView_RedrawItems( hwndList, i, i );
-	}
+    int i;
+    data->menu.counting = FALSE;
+    if (IsWindow(hwndList)) {
+        i = ListView_GetNextItem((hwndList), -1, LVNI_FOCUSED);
+        if (i >= 0) {
+            ListView_RedrawItems(hwndList, i, i);
+        }
+    }
 }
 /*-----------------------------------------------------------------------------*/
 /* List window Proc */
-LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK
+NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	BOOL bUpdateFocusItem;
+    HWND hWndParent = GetParent(hWnd);
+    BOOL bUpdateFocusItem;
 
-	bUpdateFocusItem = FALSE;
+    /* we will redraw focused item whenever horizontal scrolling occurs
+       since "Count: XXX" indicator is garbled by scrolling */
+    bUpdateFocusItem = FALSE;
 
-	switch(message) {
+    switch (message) {
+    case WM_KEYDOWN:
+        if (wParam == VK_LEFT || wParam == VK_RIGHT) {
+            bUpdateFocusItem = TRUE;
+        }
+        break;
 
-	/* filter keyboard input for the control */
-	case WM_KEYDOWN:
-	case WM_KEYUP: {
-		MSG msg;
-		BOOL processed;
-
-		processed = FALSE;
-		if( PeekMessage(&msg, hWnd, WM_CHAR, WM_CHAR, PM_REMOVE) ) {
-			if( onListChar(GetParent(hWnd), hWnd, (char)msg.wParam)==-2 ) {
-				processed = TRUE;
-			}
-		}
-		if( processed ) return 0;
-
-		if( wParam==VK_LEFT || wParam==VK_RIGHT )
-			bUpdateFocusItem = TRUE;
-	} break;
+    case WM_CHAR: /* filter keyboard input for the control */
+        if (wParam > 0 && wParam < 256
+            && onListChar(GetParent(hWnd), hWnd, (char) wParam) == -2) {
+            return 0;
+        } else {
+            return 1;
+        }
+        break;
 
     case WM_SIZE:
     case WM_HSCROLL:
         bUpdateFocusItem = TRUE;
         break;
 
-	}
+    case WM_SETFOCUS:
+        if (GetParent(hWnd) != GetNHApp()->hPopupWnd) {
+            SetFocus(GetNHApp()->hMainWnd);
+        }
+        return FALSE;
 
-	if(	bUpdateFocusItem ) {
-		int i;
-		RECT rt;
+    case WM_MSNH_COMMAND:
+        if (wParam == MSNH_MSG_RANDOM_INPUT) {
+            char c = randomkey();
+            if (c == '\n') {
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
+            } else if (c == '\033') {
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDCANCEL, 0), 0);
+            } else {
+                PostMessage(hWnd, WM_CHAR, c, 0);
+            }
+            return 0;
+        }
+        break;
 
-		/* invalidate the focus rectangle */
-		i = ListView_GetNextItem(hWnd, -1,	LVNI_FOCUSED);
-		if( i!=-1 ) {
-			ListView_GetItemRect(hWnd, i, &rt, LVIR_BOUNDS);
-			InvalidateRect(hWnd, &rt, TRUE);
-		}
-	}
+    }
 
-	if ( wndProcListViewOrig ) {
-		return CallWindowProc(wndProcListViewOrig, hWnd, message, wParam, lParam);
-	} else {
-		return 0;
+    /* update focused item */
+    if (bUpdateFocusItem) {
+        int i;
+        RECT rt;
+
+        /* invalidate the focus rectangle */
+        i = ListView_GetNextItem(hWnd, -1, LVNI_FOCUSED);
+        if (i != -1) {
+            ListView_GetItemRect(hWnd, i, &rt, LVIR_BOUNDS);
+            InvalidateRect(hWnd, &rt, TRUE);
+        }
+    }
+
+    /* call ListView control window proc */
+    if (wndProcListViewOrig) {
+        return CallWindowProc(wndProcListViewOrig, hWnd, message, wParam,
+                              lParam);
+    } else {
+        return 0;
     }
 }
 /*-----------------------------------------------------------------------------*/
 /* Text control window proc - implements scrolling without a cursor */
-LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK
+NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	switch(message) {
+    HWND hWndParent = GetParent(hWnd);
+    HDC hDC;
+    RECT rc;
 
-	case WM_KEYDOWN:
-		switch (wParam)
-        {
-    	/* close on space in Windows mode
+    switch (message) {
+    case WM_ERASEBKGND:
+        hDC = (HDC) wParam;
+        GetClientRect(hWnd, &rc);
+        FillRect(hDC, &rc, text_bg_brush
+                               ? text_bg_brush
+                               : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
+        return 0;
+
+    case WM_KEYDOWN:
+        switch (wParam) {
+        /* close on space in Windows mode
            page down on space in NetHack mode */
-        case VK_SPACE:
-        {
+        case VK_SPACE: {
             SCROLLINFO si;
 
             si.cbSize = sizeof(SCROLLINFO);
             si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
             GetScrollInfo(hWnd, SB_VERT, &si);
             /* If nethackmode and not at the end of the list */
-            if (GetNHApp()->regNetHackMode &&
-                    (si.nPos + (int)si.nPage) <= (si.nMax - si.nMin)) {
+            if (GetNHApp()->regNetHackMode
+                && (si.nPos + (int) si.nPage) <= (si.nMax - si.nMin)) {
                 SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             } else {
-                PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
             }
             return 0;
         }
@@ -1817,15 +1803,52 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case VK_DOWN:
             SendMessage(hWnd, EM_SCROLL, SB_LINEDOWN, 0);
             return 0;
+        }
+        break;
 
-		}
-	break;
+    case WM_CHAR:
+        switch (wParam) {
+        case MENU_FIRST_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_TOP, 0);
+            return 0;
+        case MENU_LAST_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_BOTTOM, 0);
+            return 0;
+        case MENU_NEXT_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
+            return 0;
+        case MENU_PREVIOUS_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEUP, 0);
+            return 0;
+        }
+        break;
 
-	}
+    /* edit control needs to know nothing of its focus */
+    case WM_SETFOCUS:
+        HideCaret(hWnd);
+        return 0;
 
-	if( editControlWndProc )
-		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);
-	else
-		return 0;
+    case WM_MSNH_COMMAND:
+        if (wParam == MSNH_MSG_RANDOM_INPUT) {
+            char c = randomkey();
+            if (c == '\n') {
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
+            } else if (c == '\033') {
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDCANCEL, 0), 0);
+            } else {
+                PostMessage(hWnd, WM_CHAR, c, 0);
+            }
+            return 0;
+        }
+        break;
+
+    }
+
+    if (editControlWndProc) {
+        return CallWindowProc(editControlWndProc, hWnd, message, wParam,
+                              lParam);
+    } else {
+        return 0;
+    }
 }
 /*-----------------------------------------------------------------------------*/

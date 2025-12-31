@@ -1162,18 +1162,23 @@ int select_menu(windid window, int how, menu_item **selected)
                    select_menu() will be called for the window at
                    create_nhwindow() time.
 */
-int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
+int
+mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 {
-	int nReturned = -1;
+    int nReturned = -1;
 
-	logDebug("mswin_select_menu(%d, %d)\n", wid, how);
+    logDebug("mswin_select_menu(%d, %d)\n", wid, how);
 
-	if ((wid >= 0) &&
-		(wid < MAXWINDOWS) &&
-		(GetNHApp()->windowlist[wid].win != NULL))
-	{
-		nReturned = mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, how, selected);
-	}
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
+        nReturned = mswin_menu_window_select_menu(
+            GetNHApp()->windowlist[wid].win, how, selected,
+            !(iflags.perm_invent && wid == WIN_INVEN
+              && how == PICK_NONE) /* don't activate inventory window if
+                                      perm_invent is on */
+            );
+    }
     return nReturned;
 }
 
