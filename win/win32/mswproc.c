@@ -812,29 +812,34 @@ void mswin_clear_nhwindow(winid wid)
                 -- Calling display_nhwindow(WIN_MESSAGE,???) will do a
                    --more--, if necessary, in the tty window-port.
 */
-void mswin_display_nhwindow(winid wid, BOOLEAN_P block)
+void
+mswin_display_nhwindow(winid wid, BOOLEAN_P block)
 {
-	logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
-	if (GetNHApp()->windowlist[wid].win != NULL)
-	{
-		if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
-			MENU_ITEM_P* p;
-			mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, PICK_NONE, &p);
-		} if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
-			mswin_display_text_window(GetNHApp()->windowlist[wid].win);
-		} if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
-			mswin_display_RIP_window(GetNHApp()->windowlist[wid].win);
-		} else {
-			if( !block ) {
-				UpdateWindow(GetNHApp()->windowlist[wid].win);
-			} else {
-				if ( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
-					(void) mswin_nhgetch();
-				}
-			}
-		}
-		SetFocus(GetNHApp()->hMainWnd);
-	}
+    logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
+    if (GetNHApp()->windowlist[wid].win != NULL) {
+        ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
+        mswin_layout_main_window(GetNHApp()->windowlist[wid].win);
+        if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
+            MENU_ITEM_P *p;
+            mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win,
+                                          PICK_NONE, &p, TRUE);
+        }
+        if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
+            mswin_display_text_window(GetNHApp()->windowlist[wid].win);
+        }
+        if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
+            mswin_display_RIP_window(GetNHApp()->windowlist[wid].win);
+        } else {
+            if (!block) {
+                UpdateWindow(GetNHApp()->windowlist[wid].win);
+            } else {
+                if (GetNHApp()->windowlist[wid].type == NHW_MAP) {
+                    (void) mswin_nhgetch();
+                }
+            }
+        }
+        SetFocus(GetNHApp()->hMainWnd);
+    }
 }
 
 
