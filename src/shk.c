@@ -4361,12 +4361,19 @@ sellobj(struct obj *obj, coordxy x, coordxy y)
         if (sell_how == SELL_NORMAL || auto_credit) {
             c = sell_response = 'y';
         } else if (sell_response != 'n') {
+            boolean was_no_charge = obj->no_charge;
+
             pline("%s cannot pay you at present.", Shknam(shkp));
             Sprintf(qbuf,
                     "Will you accept %ld %s in credit for ",
                     tmpcr, currency(tmpcr));
+            /* temporarily set no_charge to prevent doname() from
+               triggering tourist identification of the item before
+               the player has decided whether to accept credit */
+            obj->no_charge = 1;
             c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
                                (obj->quan == 1L) ? "that" : "those"));
+            obj->no_charge = was_no_charge;
             if (c == 'a') {
                 c = 'y';
                 auto_credit = TRUE;
