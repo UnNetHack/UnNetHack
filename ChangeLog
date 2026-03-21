@@ -30,6 +30,7 @@
 	  - Cave dwellers reading magic triggers short confusion
 	  - Cave dwellers gain sickness resistance at experience level 10
 	  - When praying Cave dwellers get spell knowledge instead of a spellbook
+	  - Rangers and Cave dwellers can tame wolves and winter wolves (suggested by Umbire)
 
 	* Ported NetHack 3.6 improvements, non exhaustive list:
 	  - Automatic fuzzer for debugging

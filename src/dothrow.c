@@ -1700,7 +1700,9 @@ befriend_with_obj(struct permonst *data, struct obj *obj)
     }
 
     if ((Role_if(PM_RANGER) || Role_if(PM_CAVEMAN)) &&
-         (data == &mons[PM_WINTER_WOLF_CUB])) {
+         (data == &mons[PM_WINTER_WOLF_CUB] ||
+          data == &mons[PM_WINTER_WOLF] ||
+          data == &mons[PM_WOLF])) {
         return TRUE;
     }
 #endif
