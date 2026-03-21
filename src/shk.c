@@ -5505,7 +5505,7 @@ shopdig(int fall)
 static void
 makekops(coord *mm)
 {
-    static short k_mndx[4] = {
+    short k_mndx[4] = {
         PM_KEYSTONE_KOP,
         PM_KOP_SERGEANT,
         PM_KOP_LIEUTENANT,
