@@ -3525,7 +3525,6 @@ do_break_wand(struct obj *obj)
     boolean affects_objects;
     boolean shop_damage = FALSE;
     boolean fillmsg = FALSE;
-    int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
     boolean is_fragile = (objdescr_is(obj, "balsa") || objdescr_is(obj, "glass"));
 
