@@ -1876,6 +1876,8 @@ extern void synch_cursor(void);
 
 extern void init_objects(void);
 extern int find_skates(void);
+/* objdescr_is() contains a test for NULL arg1, so can't be NONNULLARG12 */
+extern boolean objdescr_is(struct obj *, const char *) NONNULLARG2;
 extern void oinit(void);
 extern void savenames(NHFILE *) NONNULLARG1;
 extern void restnames(NHFILE *) NONNULLARG1;

@@ -3456,21 +3456,43 @@ use_grapple (struct obj *obj)
     return 1;
 }
 
-#define BY_OBJECT   ((struct monst *)0)
+static void
+discard_broken_wand(void)
+{
+    struct obj *obj;
+
+    obj = current_wand;     /* [see dozap() and destroy_item()] */
+    current_wand = 0;
+    if (obj) {
+        delobj(obj);
+    }
+    nomul(0, 0);
+}
+
+static void
+broken_wand_explode(struct obj *obj, int dmg, int expltype)
+{
+    explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
+    makeknown(obj->otyp); /* explode describes the effect */
+    discard_broken_wand();
+}
 
 /* return 1 if the wand is broken, hence some time elapsed */
 static int
 do_break_wand(struct obj *obj)
 {
+#define BY_OBJECT ((struct monst *) 0)
     static const char nothing_else_happens[] = "But nothing else happens...";
-    int i, x, y;
+    int i;
+    coordxy x, y;
     struct monst *mon;
     int dmg, damage;
-    boolean affects_objects, is_fragile;
+    boolean affects_objects;
     boolean shop_damage = FALSE;
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], the_wand[BUFSZ], buf[BUFSZ];
+    boolean is_fragile = (objdescr_is(obj, "balsa") || objdescr_is(obj, "glass"));
 
     Strcpy(the_wand, yname(obj));
     safe_qbuf(confirm, "Are you really sure you want to break ", "?",
@@ -3479,14 +3501,15 @@ do_break_wand(struct obj *obj)
         return 0;
     }
 
-    is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
-
     if (nohands(youmonst.data)) {
         You_cant("break %s without hands!", the_wand);
-        return 0;
+        return ECMD_OK;
+    } else if (!freehand()) {
+        Your("%s are occupied!", makeplural(body_part(HAND)));
+        return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
         You("don't have the strength to break %s!", the_wand);
-        return 0;
+        return ECMD_OK;
     }
     pline("Raising %s high above your %s, you %s it in two!",
           the_wand, body_part(HEAD), is_fragile ? "snap" : "break");
@@ -3505,7 +3528,8 @@ do_break_wand(struct obj *obj)
 
     if (!zappable(obj)) {
         pline("%s", nothing_else_happens);
-        goto discard_broken_wand;
+        discard_broken_wand();
+        return ECMD_TIME;
     }
     /* successful call to zappable() consumes a charge; put it back */
     obj->spe++;
@@ -3527,7 +3551,8 @@ do_break_wand(struct obj *obj)
     case WAN_NOTHING:
         if (obj->dknown && objects[obj->otyp].oc_name_known) {
             pline("Suddenly, and without warning, nothing happens.");
-            goto discard_broken_wand;
+            discard_broken_wand();
+            return ECMD_TIME;
         }
         /* fall through */
 
@@ -3535,7 +3560,8 @@ do_break_wand(struct obj *obj)
         if (obj->dknown && objects[obj->otyp].oc_name_known) {
             /* potential wrest wish wasted */
             pline("You really wish you hadn't done that.");
-            goto discard_broken_wand;
+            discard_broken_wand();
+            return ECMD_TIME;
         }
         /* fall through */
 
@@ -3544,7 +3570,8 @@ do_break_wand(struct obj *obj)
     case WAN_ENLIGHTENMENT:
     case WAN_SECRET_DOOR_DETECTION:
         pline("%s", nothing_else_happens);
-        goto discard_broken_wand;
+        discard_broken_wand();
+        return ECMD_TIME;
 
     case WAN_OPENING:
         /* make trap door if you broke a wand of opening */
@@ -3563,18 +3590,18 @@ do_break_wand(struct obj *obj)
                 }
             }
         }
-        goto discard_broken_wand;
+        discard_broken_wand();
+        return ECMD_TIME;
 
     case WAN_DEATH:
     case WAN_LIGHTNING:
-        dmg *= 4;
-        goto wanexpl;
+        broken_wand_explode(obj, dmg * 4, EXPL_MAGICAL);
+        // goto wan_expl
+        return ECMD_TIME;
 
     case WAN_FIRE:
-        expltype = EXPL_FIERY;
-        dmg *= 2;
-        explode(u.ux, u.uy,
-                (obj->otyp - WAN_FIRE), dmg, WAND_CLASS, expltype);
+        broken_wand_explode(obj, dmg * 2, EXPL_FIERY);
+
         /* make fire trap if you broke a wand of fire */
         if ((obj->spe > 2) && rn2(obj->spe - 2) && !u.uswallow &&
             !On_stairs(u.ux, u.uy) && (!IS_FURNITURE(levl[u.ux][u.uy].typ) &&
@@ -3591,13 +3618,11 @@ do_break_wand(struct obj *obj)
                 }
             }
         }
-        goto discard_broken_wand;
+        discard_broken_wand();
+        return ECMD_TIME;
 
     case WAN_COLD:
-        expltype = EXPL_FROSTY;
-        dmg *= 2;
-        explode(u.ux, u.uy,
-                (obj->otyp - WAN_COLD), dmg, WAND_CLASS, expltype);
+        broken_wand_explode(obj, dmg * 2, EXPL_FROSTY);
         /* make ice trap if you broke a wand of cold */
         if ((obj->spe > 2) && rn2(obj->spe - 2) && !u.uswallow &&
             !On_stairs(u.ux, u.uy) && (!IS_FURNITURE(levl[u.ux][u.uy].typ) &&
@@ -3614,13 +3639,12 @@ do_break_wand(struct obj *obj)
                 }
             }
         }
-        goto discard_broken_wand;
+        discard_broken_wand();
+        return ECMD_TIME;
 
     case WAN_MAGIC_MISSILE:
-wanexpl:
-        explode(u.ux, u.uy,
-                (obj->otyp - WAN_MAGIC_MISSILE), dmg, WAND_CLASS, expltype);
-        makeknown(obj->otyp); /* explode described the effect */
+        broken_wand_explode(obj, dmg, EXPL_MAGICAL);
+
         /* make magic trap if you broke a wand of magic missile */
         if ((obj->spe > 2) && rn2(obj->spe - 2) && !u.uswallow &&
             !On_stairs(u.ux, u.uy) && (!IS_FURNITURE(levl[u.ux][u.uy].typ) &&
@@ -3637,7 +3661,7 @@ wanexpl:
                 }
             }
         }
-        goto discard_broken_wand;
+        return ECMD_TIME;
 
     case WAN_STRIKING:
         /* we want this before the explosion instead of at the very end */
@@ -3844,14 +3868,9 @@ wanexpl:
         litroom(TRUE, obj); /* only needs to be done once */
     }
 
-discard_broken_wand:
-    obj = current_wand;     /* [see dozap() and destroy_item()] */
-    current_wand = 0;
-    if (obj) {
-        delobj(obj);
-    }
-    nomul(0, 0);
-    return 1;
+    discard_broken_wand();
+    return ECMD_TIME;
+#undef BY_OBJECT
 }
 
 static boolean

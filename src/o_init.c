@@ -307,6 +307,26 @@ find_skates(void)
     return -1;  /* not 0, or caller would try again each move */
 }
 
+/* Return TRUE if the provided string matches the unidentified description of
+ * the provided object. */
+boolean
+objdescr_is(struct obj *obj, const char *descr)
+{
+    const char *objdescr;
+
+    if (!obj) {
+        impossible("objdescr_is: null obj");
+        return FALSE;
+    }
+
+    objdescr = OBJ_DESCR(objects[obj->otyp]);
+    if (!objdescr) {
+        return FALSE; /* no obj description, no match */
+    }
+
+    return !strcmp(objdescr, descr);
+}
+
 /* level dependent initialization */
 void
 oinit(void)
