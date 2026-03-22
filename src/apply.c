@@ -503,7 +503,7 @@ use_whistle(struct obj *obj)
         }
         wake_nearby();
         if (obj->otyp == TIN_WHISTLE) {
-            makeknown_msg(obj->otyp);
+            makeknown_msg(obj->otyp, FALSE);
         }
         if (obj->cursed) {
             vault_summon_gd();
@@ -570,7 +570,7 @@ use_magic_whistle(struct obj *obj)
         }
     }
 
-    makeknown_msg(obj->otyp);
+    makeknown_msg(obj->otyp, FALSE);
 }
 
 boolean
@@ -1595,7 +1595,7 @@ dorub(void)
             update_inventory();
         } else if (rn2(2)) {
             You("%s smoke.", !Blind ? "see a puff of" : "smell");
-            makeknown_msg(MAGIC_LAMP);
+            makeknown_msg(MAGIC_LAMP, FALSE);
             makeknown(OIL_LAMP);
         } else {
             pline("%s", nothing_happens);

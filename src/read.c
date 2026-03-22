@@ -42,7 +42,7 @@ learn_scroll_typ(short scrolltyp, boolean verbose)
 {
     if (!objects[scrolltyp].oc_name_known) {
         if (verbose) {
-            makeknown_msg(scrolltyp);
+            makeknown_msg(scrolltyp, FALSE);
         } else {
             makeknown(scrolltyp);
         }

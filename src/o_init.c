@@ -463,7 +463,7 @@ undiscover_object(int oindx)
 }
 
 void
-makeknown_msg(int otyp)
+makeknown_msg(int otyp, boolean past_tense)
 {
     boolean was_known, now_known;
     char oclass = objects[otyp].oc_class;
@@ -477,9 +477,13 @@ makeknown_msg(int otyp)
         if (otyp == LENSES ||
             (oclass == ARMOR_CLASS &&
              (osubtyp == ARM_BOOTS || osubtyp == ARM_GLOVES))) {
-            pline("They must be %s!", simple_typename(otyp));
+            pline(past_tense ? "They must have been %s!"
+                             : "They must be %s!",
+                  simple_typename(otyp));
         } else {
-            pline("It must be %s!", an(simple_typename(otyp)));
+            pline(past_tense ? "It must have been %s!"
+                             : "It must be %s!",
+                  an(simple_typename(otyp)));
         }
     }
 }

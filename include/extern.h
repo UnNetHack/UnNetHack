@@ -1885,7 +1885,7 @@ extern void discover_object(int, boolean, boolean);
 extern void undiscover_object(int);
 extern int dodiscovered(void);
 extern void dragons_init(void);
-extern void makeknown_msg(int);
+extern void makeknown_msg(int, boolean);
 extern int doclassdisco(void);
 extern void rename_disco(void);
 

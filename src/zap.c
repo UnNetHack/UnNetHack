@@ -2807,7 +2807,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         if (Punished) {
             learn_it = TRUE;
             Your("chain quivers for a moment.");
-            makeknown_msg(WAN_OPENING);
+            makeknown_msg(WAN_OPENING, FALSE);
             unpunish();
         }
         /* invent is hit iff hero doesn't escape from a trap */
