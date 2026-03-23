@@ -303,7 +303,7 @@ deletedwithboulder:
                   is_pit(t->ttyp) ? "pit" : "hole");
         }
     } else if (flags.mon_moving && IS_ALTAR(levl[x][y].typ) && cansee(x,y)) {
-        doaltarobj(obj);
+        doaltarobj(obj, u_at(x, y));
     } else if (is_open_air(x, y)) {
         boolean res = obj_aireffects(obj, cansee(x, y));
         newsym(x, y);
@@ -314,7 +314,7 @@ deletedwithboulder:
 
 /** obj is an object dropped on an altar */
 void
-doaltarobj(struct obj *obj)
+doaltarobj(struct obj *obj, boolean player_on_altar)
 {
     if (Blind) {
         return;
@@ -347,7 +347,7 @@ doaltarobj(struct obj *obj)
     }
 
     /* Also BUC one level deep inside containers */
-    if (Has_contents(obj) && !obj->olocked) {
+    if (player_on_altar && Has_contents(obj) && !obj->olocked) {
         int blessed = 0;
         int cursed = 0;
         struct obj *otmp, *cobj, *nobj;
@@ -782,7 +782,7 @@ dropx(struct obj *obj)
             return;
         }
         if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
-            doaltarobj(obj); /* set bknown */
+            doaltarobj(obj, TRUE); /* set bknown */
         }
     }
     dropy(obj);

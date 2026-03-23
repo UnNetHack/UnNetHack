@@ -505,7 +505,7 @@ hitfloor(
         return;
     }
     if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
-        doaltarobj(obj);
+        doaltarobj(obj, TRUE);
     } else if (verbosely) {
         pline("%s %s the %s.", Doname2(obj), otense(obj, "hit"),
                 surface(u.ux, u.uy));

@@ -176,7 +176,7 @@ void dealloc_mextra(struct monst *m) {}
 struct obj *hold_another_object(struct obj *o, const char *s1, const char *s2, const char *s3) { return NULL; }
 boolean can_reach_floor(boolean b) { return FALSE; }
 void hitfloor(struct obj *o, boolean b) {}
-void doaltarobj(struct obj *o) {}
+void doaltarobj(struct obj *o, boolean player_on_altar) {}
 const char *surface(coordxy i1, coordxy i2) { return NULL; }
 void dropy(struct obj *o) {}
 
