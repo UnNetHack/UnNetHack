@@ -213,8 +213,8 @@ typedef struct strbuf {
 #include "monsym.h"
 #include "mkroom.h"
 #include "objclass.h"
-#include "youprop.h"
 #include "wintype.h"
+#include "youprop.h"
 #include "context.h"
 #include "timeout.h"
 
@@ -346,16 +346,17 @@ typedef struct {
 } NHFILE;
 
 #include "rect.h"
+#include "sym.h"
 #include "region.h"
 #include "trap.h"
 #include "flag.h"
-#include "decl.h"
 #include "rm.h"
 #include "selvar.h"
 #include "display.h"
 #include "vision.h"
 #include "engrave.h"
 #include "botl.h"
+#include "decl.h"
 
 /* Symbol offsets */
 #define SYM_NOTHING 0

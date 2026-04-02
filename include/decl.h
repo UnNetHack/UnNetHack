@@ -653,7 +653,42 @@ extern NEARDATA struct cmd Cmd;
 #define LUA_VER_BUFSIZ 20
 #define LUA_COPYRIGHT_BUFSIZ 120
 
+struct display_hints {
+#ifdef NEXT_VERSION
+    boolean botl;            /* partially redo status line */
+    boolean botlx;           /* print an entirely new bottom line */
+#endif
+    boolean time_botl;       /* context.botl for 'time' (moves) only */
+};
+extern struct display_hints disp;
+
+/*
+ * 'gX' -- instance_globals holds engine state that does not need to be
+ * persisted upon game exit.  The initialization state is well defined
+ * and set in decl.c during early early engine initialization.
+ *
+ * Unlike instance_flags, values in the structure can be of any type.
+ *
+ * Pulled from other files to be grouped in one place.  Some comments
+ * which came with them don't make much sense out of their original context.
+ */
+
+struct instance_globals_b {
+    /* botl.c */
+    struct istat_s blstats[2][MAXBLSTATS];
+    boolean blinit;
+#ifdef STATUS_HILITES
+    long bl_hilite_moves;
+#endif
+
+    /* new */
+    boolean bot_disabled;
+};
+
 struct instance_globals_c {
+    /* botl.c */
+    unsigned long cond_hilites[BL_ATTCLR_MAX];
+    int condmenu_sortorder;
     /* sp_lev.c */
     struct sp_coder *coder;
 };
@@ -694,6 +729,11 @@ struct instance_globals_l {
     char lua_copyright[LUA_COPYRIGHT_BUFSIZ];
 };
 
+struct instance_globals_n {
+    /* botl.c */
+    int now_or_before_idx; /* 0..1 for array[2][] first index */
+};
+
 struct instance_globals_o {
     struct obj *objs_deleted;
 };
@@ -701,6 +741,16 @@ struct instance_globals_o {
 struct instance_globals_t {
     /* sp_lev.c */
     boolean themeroom_failed;
+};
+
+struct instance_globals_u {
+    /* botl.c */
+    boolean update_all;
+};
+
+struct instance_globals_v {
+    /* botl.c */
+    boolean valset[MAXBLSTATS];
 };
 
 struct instance_globals_x {
@@ -713,14 +763,18 @@ struct instance_globals_y {
     coordxy ystart, ysize;
 };
 
+extern struct instance_globals_b gb;
 extern struct instance_globals_c gc;
 extern struct instance_globals_e ge;
 extern struct instance_globals_g gg;
 extern struct instance_globals_i gi;
 extern struct instance_globals_k gk;
 extern struct instance_globals_l gl;
+extern struct instance_globals_n gn;
 extern struct instance_globals_o go;
 extern struct instance_globals_t gt;
+extern struct instance_globals_u gu;
+extern struct instance_globals_v gv;
 extern struct instance_globals_x gx;
 extern struct instance_globals_y gy;
 

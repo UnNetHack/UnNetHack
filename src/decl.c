@@ -367,14 +367,18 @@ decl_init(void)
     return;
 }
 
+struct instance_globals_b gb;
 struct instance_globals_c gc;
 struct instance_globals_e ge;
 struct instance_globals_g gg;
 struct instance_globals_i gi;
 struct instance_globals_k gk;
 struct instance_globals_l gl;
+struct instance_globals_n gn;
 struct instance_globals_o go;
 struct instance_globals_t gt;
+struct instance_globals_u gu;
+struct instance_globals_v gv;
 struct instance_globals_x gx;
 struct instance_globals_y gy;
 
@@ -385,7 +389,28 @@ const struct const_globals cg = {
     DUMMY, /* zeroNhRect */
 };
 
+struct display_hints disp = { 0 };
+
+static const struct instance_globals_b g_init_b = {
+    /* botl.c */
+    { { { NULL, NULL, 0L, FALSE, FALSE, 0, ANY_INVALID, { 0 }, { 0 }, NULL, 0, 0, 0
+#ifdef STATUS_HILITES
+            , UNDEFINED_PTR, UNDEFINED_PTR
+#endif
+    } }
+    }, /* blstats */
+    FALSE, /* blinit */
+#ifdef STATUS_HILITES
+    0L, /* bl_hilite_moves */
+#endif
+    FALSE, /* bot_disabled */
+};
+
 const struct instance_globals_c g_init_c = {
+    /* botl.c */
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0 }, /* cond_hilites */
+    0, /* condmenu_sortorder */
     UNDEFINED_PTR, /* coder */
 };
 
@@ -423,6 +448,11 @@ const struct instance_globals_l g_init_l = {
     DUMMY,   /* lua_copyright[LUA_COPYRIGHT_BUFSIZ] */
 };
 
+static const struct instance_globals_n g_init_n = {
+    /* botl.c */
+    0, /* now_or_before_idx */
+};
+
 static const struct instance_globals_o g_init_o = {
     NULL, /* objs_deleted */
 };
@@ -430,6 +460,12 @@ static const struct instance_globals_o g_init_o = {
 const struct instance_globals_t g_init_t = {
     /* sp_lev.c */
     FALSE, /* themeroom_failed */
+};
+
+static const struct instance_globals_v g_init_v = {
+    /* botl.c */
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, /* valset */
 };
 
 const struct instance_globals_x g_init_x = {
@@ -447,14 +483,17 @@ const struct instance_globals_y g_init_y = {
 void
 decl_globals_init(void)
 {
+    gb = g_init_b;
     gc = g_init_c;
     ge = g_init_e;
     gg = g_init_g;
     gi = g_init_i;
     gk = g_init_k;
     gl = g_init_l;
+    gn = g_init_n;
     go = g_init_o;
     gt = g_init_t;
+    gv = g_init_v;
     gx = g_init_x;
     gy = g_init_y;
 }

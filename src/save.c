@@ -1378,6 +1378,9 @@ freedynamicdata(void)
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     free_status_colors();
 #endif
+#ifdef STATUS_HILITES
+    clear_status_hilites();
+#endif
     zero_nhfile(&tnhfp);    /* also sets fd to -1 */
     tnhfp.mode = FREEING;
     free_invbuf();  /* let_to_name (invent.c) */

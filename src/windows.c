@@ -183,4 +183,15 @@ add_menu_heading(winid tmpwin, const char *buf)
     add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, '\0', '\0', attr,
              buf, MENU_UNSELECTED);
 }
+
+/* insert a non-selectable, unhighlighted line of text into a menu */
+void
+add_menu_str(winid tmpwin, const char *buf)
+{
+    anything any = zeroany;
+
+    add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, '\0', '\0', ATR_NONE,
+             buf, MENU_ITEMFLAGS_NONE);
+}
+
 /*windows.c*/

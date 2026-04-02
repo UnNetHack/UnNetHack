@@ -157,6 +157,7 @@ extern void fix_ghostly_obj(struct obj *) NONNULLARG1;
 
 /* ### botl.c ### */
 
+extern void timebot(void);
 extern int xlev_to_rank(int);
 extern int title_to_mon(const char *, int *, int *);
 extern void max_rank_sz(void);
@@ -168,6 +169,19 @@ extern const char *rank(void);
 extern const char *rank_of(int, short, boolean);
 extern const char* botl_realtime(void);
 extern void bot(void);
+#ifdef STATUS_HILITES
+extern boolean parse_status_hl1(char *, boolean);
+extern void clear_status_hilites(void);
+extern void reset_status_hilites(void);
+extern int count_status_hilites(void);
+extern boolean status_hilite_menu(void);
+extern struct color_option get_hilite_color(enum statusfields);
+extern struct color_option get_condition_hilite_color(const char *);
+extern void condopt(int, boolean *, boolean);
+extern int parse_cond_option(boolean, char *);
+extern boolean cond_menu(void);
+extern boolean opt_next_cond(int, char *);
+#endif
 #ifdef DUMP_LOG
 extern void bot1str(char *);
 extern void bot2str(char *);
@@ -2145,6 +2159,7 @@ extern short mixtype(struct obj *, struct obj *);
 
 /* ### pray.c ### */
 
+extern boolean critically_low_hp(boolean);
 #ifdef USE_TRAMPOLI
 extern int prayer_done(void);
 #endif
@@ -3116,6 +3131,7 @@ extern void choose_windows(const char *);
 extern char genl_message_menu(char, int, const char *);
 extern void genl_preference_update(const char *);
 extern void add_menu_heading(winid, const char *) NONNULLARG2;
+extern void add_menu_str(winid, const char *) NONNULLARG2;
 
 /* ### wizard.c ### */
 

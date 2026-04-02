@@ -1846,10 +1846,8 @@ flush_screen(int cursor_on_u)
     flushing = 0;
     if (flags.botl || flags.botlx) {
         bot();
-#if NEXT_VERSION
-    } else if (iflags.time_botl) {
+    } else if (disp.time_botl) {
         timebot();
-#endif
     }
 }
 

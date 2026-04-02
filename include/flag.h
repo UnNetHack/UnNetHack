@@ -309,8 +309,12 @@ struct instance_flags {
     boolean sanity_no_check; /* skip next sanity check */
     boolean debug_overwrite_stairs; /* debug: allow overwriting stairs */
     boolean mon_polycontrol;    /* debug: control monster polymorphs */
+    boolean in_dumplog;    /* doing the dumplog right now? */
     boolean in_parse;      /* is a command being parsed? */
 #endif
+    boolean status_updates;   /* allow updates to bottom status lines;
+                               * disable to avoid excessive noise when using
+                               * a screen reader (use ^X to review status) */
 #ifdef TTY_GRAPHICS
     char prevmsg_window;    /* type of old message window to use */
 #endif
@@ -324,6 +328,9 @@ struct instance_flags {
 #endif
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
     boolean use_status_colors; /* use color in status line; only if wc_color */
+#endif
+#ifdef STATUS_HILITES
+    long hilite_delta;  /* number of turns for temporary status highlights */
 #endif
 #ifdef MICRO
     boolean BIOS;       /* use IBM or ST BIOS calls when appropriate */

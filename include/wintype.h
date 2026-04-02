@@ -55,7 +55,9 @@ enum any_types {
     ANY_ULPTR,       /* pointer to unsigned long */
     ANY_STR,         /* pointer to null-terminated char string */
     ANY_NFUNC,       /* pointer to function taking no args, returning int */
-    ANY_MASK32       /* 32-bit mask (stored as unsigned long) */
+    ANY_MASK32,      /* 32-bit mask (stored as unsigned long) */
+
+    ANY_INVALID      /* leave this last */
 };
 
 /* menu return list */
