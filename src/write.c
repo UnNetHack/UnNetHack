@@ -158,7 +158,7 @@ dowrite(struct obj *pen)
     }
 
     if ((bp = strstri(nm, " armour")) != 0) {
-        (void)strncpy(bp, " armor ", 7);    /* won't add '\0' */
+        memcpy(bp, " armor ", 7);    /* won't add '\0' */
         (void)mungspaces(bp + 1);   /* remove the extra space */
     }
 

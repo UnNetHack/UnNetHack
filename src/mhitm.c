@@ -657,40 +657,40 @@ hitmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
             Strcpy(magr_name, Monnam(magr));
             switch (mattk->aatyp) {
             case AT_BITE:
-                Sprintf(buf, "%s bites", magr_name);
+                Snprintf(buf, sizeof buf, "%s bites", magr_name);
                 break;
             case AT_STNG:
-                Sprintf(buf, "%s stings", magr_name);
+                Snprintf(buf, sizeof buf, "%s stings", magr_name);
                 break;
             case AT_BUTT:
-                Sprintf(buf, "%s butts", magr_name);
+                Snprintf(buf, sizeof buf, "%s butts", magr_name);
                 break;
             case AT_TUCH:
                 if (is_weeping(magr->data)) {
-                    Sprintf(buf, "%s is touching", magr_name);
+                    Snprintf(buf, sizeof buf, "%s is touching", magr_name);
                 } else {
-                    Sprintf(buf, "%s touches", magr_name);
+                    Snprintf(buf, sizeof buf, "%s touches", magr_name);
                 }
                 break;
             case AT_CLAW:
                 if (is_weeping(magr->data)) {
-                    Sprintf(buf, "%s is hitting", magr_name);
+                    Snprintf(buf, sizeof buf, "%s is hitting", magr_name);
                 } else {
-                    Sprintf(buf, "%s hits", magr_name);
+                    Snprintf(buf, sizeof buf, "%s hits", magr_name);
                 }
                 break;
             case AT_TENT:
-                Sprintf(buf, "%s tentacles suck",
-                        s_suffix(magr_name));
+                Snprintf(buf, sizeof buf, "%s tentacles suck",
+                         s_suffix(magr_name));
                 break;
             case AT_HUGS:
                 if (magr != u.ustuck) {
-                    Sprintf(buf, "%s squeezes", magr_name);
+                    Snprintf(buf, sizeof buf, "%s squeezes", magr_name);
                     break;
                 }
                 /* fall through */
             default:
-                Sprintf(buf, "%s hits", magr_name);
+                Snprintf(buf, sizeof buf, "%s hits", magr_name);
             }
             pline("%s %s.", buf, mon_nam_too(mdef, magr));
 

@@ -88,7 +88,7 @@ curses_add_inv(
         unsigned dummy = 0; /* Not used */
         int color = 0;
         int symbol = 0;
-        mapglyph(glyph, &symbol, &color, &dummy, 0, 0, 0);
+        mapglyph(glyph, (glyph_t*)&symbol, &color, &dummy, 0, 0, 0);
         attr_t glyphclr = curses_color_attr(color, 0);
         wattron(win, glyphclr);
         wprintw(win, "%c ", symbol);

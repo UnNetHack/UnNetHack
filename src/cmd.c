@@ -123,7 +123,6 @@ extern int dowield(); /**/
 extern int dowieldquiver(); /**/
 extern int dozap(); /**/
 extern int doorganize(); /**/
-extern int dovanquished(); /**/
 
 #ifdef DUMP_LOG
 extern int dump_screenshot(); /**/
@@ -140,7 +139,6 @@ static int doprev_message(void);
 static int timed_occupation(void);
 static int doextcmd(void);
 static int domonability(void);
-static int dooverview_or_wiz_where(void);
 static int dotravel(void);
 static int doautoexplore(void);
 static int doautofight(void);
@@ -772,27 +770,6 @@ enter_explore_mode(void)
             pline("Resuming normal game.");
         }
     }
-    return 0;
-}
-
-/* #vanquished command */
-static int dovanquished(void)
-{
-    list_vanquishedonly();
-    return 0;
-}
-
-static int
-dooverview_or_wiz_where(void)
-{
-/*
- #ifdef WIZARD
-    if (wizard) {
-        return wiz_where();
-    } else
- #endif
- */
-    dooverview();
     return 0;
 }
 
@@ -1638,7 +1615,6 @@ do_naming_ddocall(void)
 #endif
 
 #if 0
-    {C('o'), TRUE, dooverview_or_wiz_where, NULL}, /* depending on wizard status */
     {C('v'), TRUE, tutorial_redisplay, NULL},
     {M('n'), TRUE, ddocall, NULL},
     {M('N'), TRUE, ddocall, NULL},
@@ -2244,6 +2220,7 @@ misc_stats(winid win, long int *total_count, long int *total_size)
     }
 }
 
+__attribute__((unused))
 static int
 wiz_mazewalkmap(void)
 {
@@ -3516,6 +3493,7 @@ isok(coordxy x, coordxy y)
 }
 
 /* #herecmdmenu command */
+__attribute__((unused))
 static int
 doherecmdmenu(void)
 {
@@ -3525,6 +3503,7 @@ doherecmdmenu(void)
 }
 
 /* #therecmdmenu command, a way to test there_cmd_menu without mouse */
+__attribute__((unused))
 static int
 dotherecmdmenu(void)
 {
@@ -4033,6 +4012,7 @@ parse(void)
 }
 
 #ifdef UNIX
+__attribute__((unused))
 static
 void
 end_of_input(void)
@@ -4264,6 +4244,7 @@ doautoexplore(void)
 }
 
 /** Chooses a suitable monster and fights it. */
+__attribute__((unused))
 static int
 doautofight(void)
 {

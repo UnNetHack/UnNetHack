@@ -1497,7 +1497,7 @@ checkfile(struct obj *obj, char *inp, struct permonst *pm, boolean user_typed_na
        (note: strncpy() only terminates output string if the specified
        count is bigger than the length of the substring being copied) */
     if (!strncmp(dbase_str, "moist towel", 11)) {
-        (void) strncpy(dbase_str += 2, "wet", 3); /* skip "mo" replace "ist" */
+        (void) snprintf(dbase_str += 2, 4, "wet"); /* skip "mo" replace "ist" */
     }
 
     /* Make sure the name is non-empty. */
@@ -2520,12 +2520,12 @@ do_look(int mode, coord *click_cc)
                 firstmatch = look_buf;
                 if (*firstmatch) {
                     Snprintf(temp_buf, sizeof temp_buf, " (%s)", firstmatch);
-                    (void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
+                    Snprintf(out_str + strlen(out_str), BUFSZ - strlen(out_str), "%s", temp_buf);
                     found = 1; /* we have something to look up */
                 }
                 if (monbuf[0]) {
                     Snprintf(temp_buf, sizeof temp_buf, " [seen: %s]", monbuf);
-                    (void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
+                    Snprintf(out_str + strlen(out_str), BUFSZ - strlen(out_str), "%s", temp_buf);
                 }
             }
         }
@@ -2829,16 +2829,16 @@ dowhatdoes_core(char q, char *cbuf)
             }
             if (ctrl && buf[2] == '\t') {
                 buf = bufr + 1;
-                (void) strncpy(buf, "^?      ", 8);
+                memcpy(buf, "^?      ", 8);
                 buf[1] = ctrl;
             } else if (meta && buf[3] == '\t') {
                 buf = bufr + 2;
-                (void) strncpy(buf, "M-?     ", 8);
+                memcpy(buf, "M-?     ", 8);
                 buf[2] = meta;
             } else if (buf[1] == '\t') {
                 buf = bufr;
                 buf[0] = q;
-                (void) strncpy(buf+1, "       ", 7);
+                memcpy(buf+1, "       ", 7);
             }
             (void) dlb_fclose(fp);
             Strcpy(cbuf, buf);

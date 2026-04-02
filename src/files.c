@@ -766,22 +766,43 @@ int nhclose(int fd)
 void
 set_whereisfile(void)
 {
-    char *p = (char *) strstr(whereis_file, "%n");
+    char *p = strstr(whereis_file, "%n");
     if (p) {
-        int new_whereis_len = strlen(whereis_file)+strlen(plname)-2; /* %n */
-        char *new_whereis_fn = (char *) alloc((unsigned)(new_whereis_len+1));
+        size_t name_len = strlen(plname);
+
+        /* compute prefix and suffix lengths */
+        size_t prefix_len = (size_t)(p - whereis_file);
+        size_t suffix_len = strlen(p + 2); /* after "%n" */
+
+        size_t new_whereis_len = prefix_len + name_len + suffix_len;
+        char *new_whereis_fn = (char *) alloc(new_whereis_len + 1);
+        if (!new_whereis_fn) {
+            return;
+        }
+
         char *q = new_whereis_fn;
-        strncpy(q, whereis_file, p-whereis_file);
-        q += p-whereis_file;
-        strncpy(q, plname, strlen(plname) + 1);
+
+        /* copy prefix */
+        memcpy(q, whereis_file, prefix_len);
+        q += prefix_len;
+
+        /* copy player name */
+        memcpy(q, plname, name_len);
         regularize(q);
-        q[strlen(plname)] = '\0';
-        q += strlen(q);
-        p += 2;   /* skip "%n" */
-        strncpy(q, p, strlen(p));
+        q += strlen(q); /* in case regularize modifies length */
+
+        /* copy suffix */
+        p += 2; /* skip "%n" */
+        memcpy(q, p, suffix_len);
+        q += suffix_len;
+
+        /* null terminate */
         new_whereis_fn[new_whereis_len] = '\0';
-        Sprintf(whereis_file, "%s", new_whereis_fn);
-        free(new_whereis_fn); /* clean up the pointer */
+
+        /* safe write back */
+        Snprintf(whereis_file, sizeof(whereis_file), "%s", new_whereis_fn);
+
+        free(new_whereis_fn);
     }
 }
 
@@ -1259,11 +1280,10 @@ open_savefile(void)
         nhfp->ftype = NHF_SAVEFILE;
         nhfp->mode = READING;
         if (nhfp->structlevel) {
-            const char *fq_save;
-            fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 #ifdef FILE_AREAS
             nhfp->fd = open_area(FILE_AREA_SAVE, SAVEF, O_RDONLY | O_BINARY, 0);
 #else
+            const char *fq_save;
             fq_save = fqname(SAVEF, SAVEPREFIX, 0);
 # ifdef MAC
             nhfp->fd = macopen(fq_save, O_RDONLY | O_BINARY, SAVE_TYPE);

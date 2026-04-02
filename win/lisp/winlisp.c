@@ -15,6 +15,7 @@
 #include "winlisp.h"
 #include "func_tab.h"
 
+#include "hack.h"
 #include "dlb.h"
 #ifdef SHORT_FILENAMES
 #include "patchlev.h"
@@ -337,7 +338,6 @@ struct window_procs lisp_procs = {
      {							\
        int nhi;						\
        printf ("\"");					\
-       if (s)						\
 	 for (nhi=0;nhi<strlen(s);nhi++)		\
 	   {						\
 	     if (s[nhi] == 34 				\
@@ -395,6 +395,7 @@ special_glyph_to_string(unsigned special)
     return "none";
 }
 
+__attribute__((unused))
 static const char*
 wintype_to_string(int type)
 {
@@ -443,7 +444,10 @@ read_int(
   int rv;
   printf ("%s> ", prompt);
   fflush(stdout);
-  fgets (line, BUFSZ, stdin);
+  if (fgets (line, BUFSZ, stdin) == NULL) {
+    *i = -1;
+    return 0;
+  }
   rv = sscanf (line, "%d", i);
   if (rv != 1) *i = -1;
   return rv;
@@ -618,7 +622,7 @@ lisp_player_selection(void)
 		any.a_int = i+1;	/* must be non-zero */
 		add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				"Quit", MENU_UNSELECTED);
-		Sprintf(pbuf, "Pick a role for your %s", plbuf);
+        Snprintf(pbuf, sizeof(pbuf), "Pick a role for your %s", plbuf);
 		end_menu(win, pbuf);
 		n = select_menu(win, PICK_ONE, &selected);
 		destroy_nhwindow(win);
@@ -687,7 +691,7 @@ lisp_player_selection(void)
 		    any.a_int = i+1;	/* must be non-zero */
 		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
+            Snprintf(pbuf, sizeof(pbuf), "Pick the race of your %s", plbuf);
 		    end_menu(win, pbuf);
 		    n = select_menu(win, PICK_ONE, &selected);
 		    destroy_nhwindow(win);
@@ -757,7 +761,7 @@ lisp_player_selection(void)
 		    any.a_int = i+1;	/* must be non-zero */
 		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
+            Snprintf(pbuf, sizeof(pbuf), "Pick the gender of your %s", plbuf);
 		    end_menu(win, pbuf);
 		    n = select_menu(win, PICK_ONE, &selected);
 		    destroy_nhwindow(win);
@@ -826,7 +830,7 @@ lisp_player_selection(void)
 		    any.a_int = i+1;	/* must be non-zero */
 		    add_menu(win, NO_GLYPH, MENU_DEFCNT, &any , 'q', 0, ATR_NONE,
 				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
+            Snprintf(pbuf, sizeof(pbuf), "Pick the alignment of your %s", plbuf);
 		    end_menu(win, pbuf);
 		    n = select_menu(win, PICK_ONE, &selected);
 		    destroy_nhwindow(win);
@@ -1905,6 +1909,7 @@ void lisp_end_screen(void)
 {
 }
 
+__attribute__((unused))
 static void
 get_death_text(char buf[BUFSZ] UNUSED)
 {

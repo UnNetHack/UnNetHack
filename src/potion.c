@@ -1478,11 +1478,11 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             char buf[BUFSZ];
 
             if (hit_saddle && saddle) {
-                Sprintf(buf, "%s saddle",
-                        s_suffix(x_monnam(mon, ARTICLE_THE, (char *) 0,
+                Snprintf(buf, sizeof buf, "%s saddle",
+                         s_suffix(x_monnam(mon, ARTICLE_THE, (char *) 0,
                                           (SUPPRESS_IT | SUPPRESS_SADDLE), FALSE)));
             } else if (has_head(mon->data)) {
-                Sprintf(buf, "%s %s", s_suffix(mnam), (notonhead ? "body" : "head"));
+                Snprintf(buf, sizeof buf, "%s %s", s_suffix(mnam), (notonhead ? "body" : "head"));
             } else {
                 Strcpy(buf, mnam);
             }
@@ -2525,8 +2525,8 @@ dodip(void)
 
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
-        Sprintf(qbuf, "%s%s into the fountain?", Dip_,
-                flags.verbose ? obuf : shortestname);
+        Snprintf(qbuf, sizeof qbuf, "%s%s into the fountain?", Dip_,
+                 flags.verbose ? obuf : shortestname);
         /* "Dip <the object> into the fountain?" */
         if (yn(qbuf) == 'y') {
             dipfountain(obj);
@@ -2535,8 +2535,8 @@ dodip(void)
     } else if (is_pool(u.ux, u.uy) || is_swamp(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
-        Sprintf(qbuf, "%s%s into the %s?", Dip_,
-                flags.verbose ? obuf : shortestname, pooltype);
+        Snprintf(qbuf, sizeof qbuf, "%s%s into the %s?", Dip_,
+                 flags.verbose ? obuf : shortestname, pooltype);
         /* "Dip <the object> into the {pool, moat, &c}?" */
         if (yn(qbuf) == 'y') {
             if (Levitation) {
@@ -2563,7 +2563,7 @@ dodip(void)
     }
 
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
-    Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
+    Snprintf(qbuf, sizeof qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
     potion = getobj(beverages, qbuf);
     if (!potion) {
         return 0;

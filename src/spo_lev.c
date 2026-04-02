@@ -36,7 +36,6 @@ extern void adjust_mines_lightning(lev_init *);
 
 static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
 static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
-static int noncoalignment(aligntyp);
 static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static void create_trap(spltrap *, struct mkroom *);
@@ -1316,68 +1315,6 @@ spill_terrain(spill *sp, struct mkroom *croom)
         }
         lastdir = k;
     }
-}
-
-
-/*
- * Create a monster in a room.
- */
-static int
-noncoalignment(aligntyp alignment)
-{
-    int k;
-
-    k = rn2(2);
-    if (!alignment) {
-        return k ? -1 : 1;
-    }
-    return k ? -alignment : 0;
-}
-
-/* attempt to screen out locations where a mimic-as-boulder shouldn't occur */
-static boolean
-m_bad_boulder_spot(coordxy x, coordxy y)
-{
-    struct rm *lev;
-
-    /* avoid trap locations */
-    if (t_at(x, y)) {
-        return TRUE;
-    }
-    /* try to avoid locations which already have a boulder (this won't
-       actually work; we get called before objects have been placed...) */
-    if (sobj_at(BOULDER, x, y)) {
-        return TRUE;
-    }
-    /* avoid closed doors */
-    lev = &levl[x][y];
-    if (IS_DOOR(lev->typ) && (lev->doormask & (D_CLOSED | D_LOCKED)) != 0) {
-        return TRUE;
-    }
-    /* spot is ok */
-    return FALSE;
-}
-
-static int
-pm_to_humidity(struct permonst *pm)
-{
-    int loc = DRY;
-    if (!pm) {
-        return loc;
-    }
-    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm)) {
-        loc = WET;
-    }
-    if (is_flyer(pm) || is_floater(pm)) {
-        loc |= (HOT | WET);
-    }
-    if (passes_walls(pm) || noncorporeal(pm)) {
-        loc |= SOLID;
-    }
-    if (flaming(pm)) {
-        loc |= HOT;
-    }
-    return loc;
 }
 
 void

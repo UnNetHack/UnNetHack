@@ -2809,7 +2809,7 @@ use_container(
     boolean more_containers) /**< TRUE iff #loot multiple and this isn't last one */
 {
     struct obj *otmp, *obj = *objp;
-    boolean quantum_cat = FALSE,
+    boolean quantum_cat = FALSE, cursed_mbag,
             loot_out = FALSE, loot_in = FALSE;
     char qbuf[BUFSZ], emptymsg[BUFSZ], pbuf[QBUFSZ];
     long loss = 0L;
@@ -2850,8 +2850,8 @@ use_container(
         abort_looting = TRUE;
         return 1;
     }
-    current_container = obj;    /* for use by in/out_container */
 
+    current_container = obj;    /* for use by in/out_container */
     /*
      * From here on out, all early returns go through 'containerdone:'.
      */
@@ -2866,22 +2866,14 @@ use_container(
         return used;
     }
 
-    /* Count the number of contained objects. Sometimes toss objects if */
-    /* a cursed magic bag.                          */
-    struct obj *curr;
-    for (curr = obj->cobj; curr; curr = otmp) {
-        otmp = curr->nobj;
-        if (Is_mbag(obj) && obj->cursed && !rn2(13)) {
-            obj_extract_self(curr);
-            loss += mbag_item_gone(held, curr);
-            used = 1;
-        } else {
-            cnt++;
-        }
-    }
-
-    if (loss) { /* magic bag lost some shop goods */
+    cursed_mbag = Is_mbag(current_container)
+        && current_container->cursed
+        && Has_contents(current_container);
+    if (cursed_mbag
+        && (loss = boh_loss(current_container, held)) != 0) {
+        used = ECMD_TIME;
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
+        current_container->owt = weight(current_container);
     }
     obj->owt = weight(obj); /* in case any items were lost */
 

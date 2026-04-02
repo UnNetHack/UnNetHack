@@ -392,9 +392,10 @@ void
 linux_mapon(void)
 {
 # ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
-		write(1, "\033(B", 3);
-	}
+    if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+        ssize_t ret = write(1, "\033(B", 3);
+        (void)ret;
+    }
 # endif
 }
 
@@ -402,9 +403,10 @@ void
 linux_mapoff(void)
 {
 # ifdef TTY_GRAPHICS
-	if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
-		write(1, "\033(U", 3);
-	}
+    if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+        ssize_t ret = write(1, "\033(U", 3);
+        (void)ret;
+    }
 # endif
 }
 

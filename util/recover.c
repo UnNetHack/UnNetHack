@@ -314,7 +314,7 @@ restore_savefile(char *basename, const char *directory)
             if (lfd >= 0) {
                 /* any or all of these may not exist */
                 levc = (xint8) lev;
-                write(sfd, (genericptr_t) &levc, sizeof(levc));
+                (void) write(sfd, (genericptr_t) &levc, sizeof(levc));
                 copy_bytes(lfd, sfd);
                 Close(lfd);
                 (void) unlink(lock);

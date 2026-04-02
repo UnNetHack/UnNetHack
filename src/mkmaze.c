@@ -523,6 +523,7 @@ static boolean was_waterlevel; /* ugh... this shouldn't be needed */
 /* fix up Baalzebub's lair, which depicts a level-sized beetle;
    its legs are walls within solid rock--regular wallification
    classifies them as superfluous and gets rid of them */
+__attribute__((unused))
 static void
 baalz_fixup(void)
 {

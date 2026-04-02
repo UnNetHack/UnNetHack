@@ -1363,7 +1363,7 @@ parsebindings(char *bindings)
     char *bind;
     char key;
     int i;
-    boolean ret = FALSE;
+    boolean ret = TRUE; /* assume success */
 
     /* break off first binding from the rest; parse the rest */
     if ((bind = index(bindings, ',')) != 0) {
@@ -1388,7 +1388,7 @@ parsebindings(char *bindings)
 
     /* is it a special key? */
     if (bind_specialkey(key, bind)) {
-        return TRUE;
+        return ret;
     }
 
     /* is it a menu command? */
@@ -1400,7 +1400,7 @@ parsebindings(char *bindings)
             } else {
                 add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
             }
-            return TRUE;
+            return ret;
         }
     }
 
@@ -1409,7 +1409,8 @@ parsebindings(char *bindings)
         config_error_add("Unknown key binding command '%s'", bind);
         return FALSE;
     }
-    return TRUE;
+
+    return ret;
 }
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -1444,9 +1445,9 @@ parse_color_option(char *start)
     return result;
 }
 
-const struct percent_color_option *hp_colors = NULL;
-const struct percent_color_option *pw_colors = NULL;
-const struct text_color_option *text_colors = NULL;
+struct percent_color_option *hp_colors = NULL;
+struct percent_color_option *pw_colors = NULL;
+struct text_color_option *text_colors = NULL;
 
 struct percent_color_option *
 add_percent_option(struct percent_color_option *new_option, struct percent_color_option *list_head)
@@ -2049,7 +2050,7 @@ parse_monster_color(char *str)
         return FALSE;
     }
 
-    strncpy(buf, str, BUFSZ);
+    snprintf(buf, BUFSZ, "%s", str);
     cs = strchr(buf, ':');
     if (!cs) {
         return FALSE;
@@ -2115,7 +2116,7 @@ parse_extended_option(
         return FALSE;
     }
 
-    strncpy(buf, str, BUFSZ);
+    snprintf(buf, BUFSZ, "%s", str);
 
     /* remove comment*/
     cs = strrchr(buf, '#');

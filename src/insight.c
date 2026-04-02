@@ -3,10 +3,6 @@
 
 #include "hack.h"
 
-#ifdef WIZARD
-static int wiz_showkills(void);    /* showborn patch */
-#endif
-
 static boolean minimal_enlightenment(void);
 
 static void enlght_line(const char *, const char *, const char *, const char *);
@@ -17,16 +13,9 @@ static void enlght_halfdmg(int, int);
 extern int monclock;
 
 /* #vanquished command */
-static int dovanquished(void)
+int dovanquished(void)
 {
     list_vanquishedonly();
-    return 0;
-}
-
-static int
-dooverview_or_wiz_where(void)
-{
-    dooverview();
     return 0;
 }
 

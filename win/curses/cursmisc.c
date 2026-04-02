@@ -286,9 +286,28 @@ curses_break_str(const char *str, int width, int line_num)
     char *retstr;
     int curline = 0;
     int strsize = (int) strlen(str) + 1;
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) && !defined(_MSC_VER)
     char substr[strsize];
     char curstr[strsize];
     char tmpstr[strsize];
+
+    strcpy(substr, str);
+#else
+#ifndef BUFSZ
+#define BUFSZ 256
+#endif
+    char substr[BUFSZ * 2];
+    char curstr[BUFSZ * 2];
+    char tmpstr[BUFSZ * 2];
+
+    if (strsize > (BUFSZ * 2) - 1) {
+        paniclog("curses", "curses_break_str() string too long.");
+        strncpy(substr, str, (BUFSZ * 2) - 2);
+        substr[(BUFSZ * 2) - 1] = '\0';
+    } else {
+        strcpy(substr, str);
+    }
+#endif
 
     strcpy(substr, str);
 

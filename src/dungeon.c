@@ -1172,7 +1172,7 @@ dunlev(d_level *lev)
 
 /* return the lowest level number for *this* dungeon */
 xint16
-dunlevs_in_dungeon(d_level *lev)
+dunlevs_in_dungeon(const d_level *lev)
 {
     return dungeons[lev->dnum].num_dunlevs;
 }
@@ -1836,7 +1836,7 @@ at_dgn_entrance(const char *s)
 
 /* is `lev' part of Vlad's tower? */
 boolean
-In_V_tower(d_level *lev)
+In_V_tower(const d_level *lev)
 {
     return (boolean)(lev->dnum == tower_dnum);
 }

@@ -783,7 +783,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         while ((ranklen + namelen) > maxlen)
             ranklen--; /* Still doesn't fit, strip rank */
     }
-    sprintf(buf, "%-*s the %-*s", namelen, plname, ranklen, rank);
+    Snprintf(buf, sizeof buf, "%-*s the %-*s", namelen, plname, ranklen, rank);
     draw_bar(TRUE, hp, hpmax, buf);
     wmove(win, y++, x);
     wprintw(win, "%s", dungeons[u.uz.dnum].dname);

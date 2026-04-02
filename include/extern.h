@@ -643,7 +643,7 @@ extern xint16 ledger_no(d_level *);
 extern xint16 maxledgerno(void);
 extern schar depth(d_level *);
 extern xint16 dunlev(d_level *);
-extern xint16 dunlevs_in_dungeon(d_level *);
+extern xint16 dunlevs_in_dungeon(const d_level *);
 extern xint16 ledger_to_dnum(xint16);
 extern xint16 ledger_to_dlev(xint16);
 extern xint16 deepest_lev_reached(boolean);
@@ -682,7 +682,7 @@ extern boolean In_sheol(d_level *);
 extern branch *dungeon_branch(const char *);
 extern boolean at_dgn_entrance(const char *);
 extern boolean In_hell(d_level *);
-extern boolean In_V_tower(d_level *);
+extern boolean In_V_tower(const d_level *);
 extern boolean On_W_tower_level(d_level *);
 extern boolean In_W_tower(coordxy, coordxy, d_level *);
 extern void find_hell(d_level *);
@@ -1059,6 +1059,7 @@ extern int doattributes(void);
 extern void enlightenment(int, boolean);
 extern int doconduct(void);
 extern void show_conduct(int, boolean);
+extern int dovanquished(void);
 
 /* ### invent.c ### */
 
@@ -2296,7 +2297,7 @@ extern boolean create_particular(void);
 #endif
 extern void drop_boulder_on_player(boolean, boolean, boolean, boolean);
 extern int drop_boulder_on_monster(int, int, boolean, boolean);
-extern boolean create_particular_from_buffer(const char*);
+extern boolean create_particular_from_buffer(char*);
 
 /* ### rect.c ### */
 

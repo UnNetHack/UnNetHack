@@ -224,8 +224,9 @@ main(int argc, char *argv[])
             int len = strlen(plname);
             /* append the current role, if any, so that last dash is ours */
             if (++len < sizeof plname) {
-                (void)strncat(strcat(plname, "-"),
-                        pl_character, sizeof plname - len - 1);
+                char buffer[PL_NSIZ + PL_CSIZ + 1];
+                snprintf(buffer, sizeof(buffer), "%s-%s", plname, pl_character);
+                copynchars(plname, buffer, sizeof(plname) - 1);
             }
         }
     plnamesuffix();		/* strip suffix from name; calls askname() */

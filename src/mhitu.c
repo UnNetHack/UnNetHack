@@ -6,7 +6,6 @@
 
 static struct obj *mon_currwep = (struct obj *) 0;
 
-static void urustm(struct monst *, struct obj *);
 static boolean u_slip_free(struct monst *, struct attack *);
 static int passiveum(struct permonst *, struct monst *, struct attack *);
 

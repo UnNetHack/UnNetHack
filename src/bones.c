@@ -205,7 +205,9 @@ trim_contents(struct obj *container, int prob1, int prob2)
 {
     struct obj *otmp;
     struct obj *onext;
-    int disappeared=0;
+#if defined(DEBUG)
+    int disappeared = 0;
+#endif
 
     for (otmp = container; otmp; otmp = onext) {
         onext = otmp->nobj;
@@ -227,7 +229,9 @@ trim_contents(struct obj *container, int prob1, int prob2)
                 setnotworn(otmp);
                 obj_extract_self(otmp);
                 obfree(otmp, (struct obj *)0);  /* dealloc_obj() isn't sufficient */
+#if defined(DEBUG)
                 disappeared++; /* only counts explicitly obfree'd objects */
+#endif
             }
         }
     }

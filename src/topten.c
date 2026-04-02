@@ -656,16 +656,11 @@ topten(int how)
     t0->maxhp = u.uhpmax;
     t0->deaths = u.umortality;
     t0->uid = uid;
-    (void) strncpy(t0->plrole, urole.filecode, ROLESZ);
-    t0->plrole[ROLESZ] = '\0';
-    (void) strncpy(t0->plrace, urace.filecode, ROLESZ);
-    t0->plrace[ROLESZ] = '\0';
-    (void) strncpy(t0->plgend, genders[flags.female].filecode, ROLESZ);
-    t0->plgend[ROLESZ] = '\0';
-    (void) strncpy(t0->plalign, aligns[1-u.ualign.type].filecode, ROLESZ);
-    t0->plalign[ROLESZ] = '\0';
-    (void) strncpy(t0->name, plname, NAMSZ);
-    t0->name[NAMSZ] = '\0';
+    copynchars(t0->plrole, urole.filecode, ROLESZ);
+    copynchars(t0->plrace, urace.filecode, ROLESZ);
+    copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
+    copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
+    copynchars(t0->name, plname, NAMSZ);
     t0->death[0] = '\0';
     switch (killer.format) {
     case KILLED_BY_AN:
@@ -1166,7 +1161,7 @@ outentry(int rank, struct toptenentry *t1, boolean so)
             dump(" ", linebuf[0]==' ' ? linebuf+1 : linebuf);
 #endif
         }
-        Sprintf(linebuf, "%15s %s", "", linebuf3);
+        Snprintf(linebuf, sizeof(linebuf), "%15s %s", "", linebuf3);
         lngr = strlen(linebuf);
     }
     /* beginning of hp column not including padding */

@@ -4847,10 +4847,11 @@ untrap(boolean force)
                     trap_skipped = TRUE;
                     deal_with_floor_trap = FALSE;
                 } else {
-                    Sprintf(qbuf, "There %s and %s here. %s %s?",
-                            (boxcnt == 1) ? "is a container" : "are containers",
-                            an(trapdescr),
-                            ttmp->ttyp == WEB ? "Remove" : "Disarm", the_trap);
+                    Snprintf(qbuf, sizeof(qbuf),
+                             "There %s and %s here. %s %s?",
+                             (boxcnt == 1) ? "is a container" : "are containers",
+                             an(trapdescr),
+                             ttmp->ttyp == WEB ? "Remove" : "Disarm", the_trap);
                     switch (ynq(qbuf)) {
                     case 'q': return 0;
                     case 'n': trap_skipped = TRUE;

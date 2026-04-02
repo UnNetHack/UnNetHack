@@ -246,8 +246,7 @@ livelog_bones_killed(struct monst *mtmp)
         name = MGIVENNAME(mtmp);
     }
 
-    if (name &&
-        mtmp->former_rank && strlen(mtmp->former_rank) > 0) {
+    if (name && strlen(mtmp->former_rank) > 0) {
         /* $player killed the $bones_monst of $bones_killed the former
          * $bones_rank on $turns on dungeon level $dlev! */
         snprintf(strbuf, STRBUF_LEN,

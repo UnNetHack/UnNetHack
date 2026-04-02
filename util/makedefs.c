@@ -1483,7 +1483,13 @@ new_id(char *code)
         return FALSE;
     }
 
-    strncpy(&qt_hdr.id[qt_hdr.n_hdr][0], code, LEN_HDR);
+    {
+        int i;
+        for (i = 0; i < LEN_HDR - 1 && code[i] != '\0'; i++) {
+            qt_hdr.id[qt_hdr.n_hdr][i] = code[i];
+        }
+        qt_hdr.id[qt_hdr.n_hdr][i] = '\0';
+    }
     msg_hdr[qt_hdr.n_hdr].n_msg = 0;
     qt_hdr.offset[qt_hdr.n_hdr++] = 0L;
     return TRUE;
@@ -1699,9 +1705,8 @@ static	char	temp[32];
 static char *
 limit(char *name, int pref)
 {
-	(void) strncpy(temp, name, pref ? 26 : 30);
-	temp[pref ? 26 : 30] = 0;
-	return temp;
+    (void) snprintf(temp, sizeof(temp), "%.*s", pref ? 26 : 30, name);
+    return temp;
 }
 
 void

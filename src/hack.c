@@ -4016,7 +4016,7 @@ nomul(int nval, const char *txt)
     u.usleep = 0;
     multi = nval;
     if (txt && txt[0]) {
-        (void) strncpy(multi_txt, txt, BUFSZ);
+        (void) snprintf(multi_txt, BUFSZ, "%s", txt);
     } else {
         (void) memset(multi_txt, 0, BUFSZ);
     }

@@ -628,8 +628,8 @@ engrave(const char *engraving, boolean fingers)
     const char *everb;  /* Present tense of engraving type */
     const char *eloc;   /* Where to engrave in the ground */
     const char *eground; /* Type of the ground (ie dust/floor/...) */
-    char *sp;    /* Place holder for space count of engr text */
-    int len;     /* # of nonspace chars of new engraving text */
+    char *sp;   /* Place holder for space count of engr text */
+    size_t len; /* # of nonspace chars of new engraving text */
     int maxelen; /* Max allowable length of engraving text */
     struct engr *oep = engr_at(u.ux, u.uy);
     /* The current engraving */
@@ -1425,7 +1425,11 @@ engrave(const char *engraving, boolean fingers)
         Strcpy(buf, oep->engr_txt);
     }
 
-    (void) strncat(buf, ebuf, (BUFSZ - (int)strlen(buf) - 1));
+    len = strlen(buf);
+    if (len < BUFSZ - 1) {
+        (void) snprintf(buf + len, BUFSZ - len, "%s", ebuf);
+    }
+
     /* Put the engraving onto the map */
 #ifdef ELBERETH_CONDUCT
     {
