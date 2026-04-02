@@ -427,6 +427,7 @@ typedef long glyph_t;
 #endif
 
 #define STATUS_COLORS /* Shachaf & Oren Ben-Kiki */
+#define STATUS_HILITES /* NetHack 3.7 status field highlighting */
 
 #define DUNGEON_GROWTH /* Makes the dungeons feel a bit more living - Pasi Kallinen*/
 /*#define AUTOPICKUP_EXCEPTIONS */ /* exceptions to autopickup */

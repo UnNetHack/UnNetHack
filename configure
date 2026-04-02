@@ -784,6 +784,7 @@ enable_redo
 enable_clipping
 enable_menu_color
 enable_status_color
+enable_status_hilites
 enable_auto_open
 enable_bones_pool
 enable_user_sounds
@@ -1487,6 +1488,7 @@ Optional Features:
   --enable-clipping       Allow smaller screens (default=yes)
   --enable-menu-color     TTY graphics menu color (default=yes)
   --enable-status-color   TTY graphics status color (default=yes)
+  --enable-status-hilites Status field highlighting (default=yes)
   --enable-auto-open      Open doors by walking into them (default=yes)
   --enable-bones-pool     Multiple bones per level (default=yes)
   --enable-user-sounds    Allow user-defined mapping from messages to sounds)
@@ -8547,6 +8549,25 @@ printf '%s\n' "$enable_status_color" >&6; }
    if test "$enable_status_color" != "no" ; then
 
 printf '%s\n' "#define STATUS_COLORS /**/" >>confdefs.h
+
+   fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable status-hilites" >&5
+printf %s "checking whether to enable status-hilites... " >&6; }
+   # Check whether --enable-status-hilites was given.
+if test ${enable_status_hilites+y}
+then :
+  enableval=$enable_status_hilites;
+else case e in #(
+  e) enable_status_hilites="yes" ;;
+esac
+fi
+
+   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $enable_status_hilites" >&5
+printf '%s\n' "$enable_status_hilites" >&6; }
+   if test "$enable_status_hilites" != "no" ; then
+
+printf '%s\n' "#define STATUS_HILITES /**/" >>confdefs.h
 
    fi
 

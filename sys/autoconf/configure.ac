@@ -387,6 +387,7 @@ NETHACK_ARG(clipping,[Allow smaller screens],CLIPPING,yes)
 NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
 if test "$enable_tty_graphics" != "no"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
+NETHACK_ARG(status-hilites,[Status field highlighting],STATUS_HILITES,yes)
 fi
 NETHACK_ARG(auto-open,[Open doors by walking into them],AUTO_OPEN,yes)
 # NETHACK_ARG(noartifactwish,[Prevent wishing for special artifacts],
