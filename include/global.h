@@ -340,6 +340,7 @@ typedef glyph_t nhsym;
 #define Sprintf  (void) sprintf
 #define Strcat   (void) strcat
 #define Strcpy   (void) strcpy
+#define Strlen(s) Strlen_(s,__func__,__LINE__)
 #ifdef NEED_VARARGS
 #define Vprintf  (void) vprintf
 #define Vfprintf (void) vfprintf

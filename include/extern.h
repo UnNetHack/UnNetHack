@@ -15,6 +15,8 @@ extern long *alloc(unsigned int);
 #endif
 extern char *fmt_ptr(const genericptr);
 
+#include "hacklib.h"
+
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
@@ -161,7 +163,7 @@ extern void max_rank_sz(void);
 #ifdef SCORE_ON_BOTL
 extern long botl_score(void);
 #endif
-extern int describe_level(char *);
+extern int describe_level(char *, int);
 extern const char *rank(void);
 extern const char *rank_of(int, short, boolean);
 extern const char* botl_realtime(void);
@@ -966,49 +968,9 @@ extern boolean OBJ_AT(coordxy, coordxy);
 
 /* ### hacklib.c ### */
 
-extern boolean digit(char);
-extern boolean letter(char);
-extern char highc(char);
-extern char lowc(char);
-extern char *lcase(char *);
-extern char *ucase(char *);
-extern char *upstart(char *);
-extern char *mungspaces(char *);
-extern char *trimspaces(char *);
-extern char *strip_newline(char *);
-extern char *eos(char *);
 extern void sanitizestr(char *);
-extern boolean str_end_is(const char *, const char *);
-extern int str_lines_maxlen(const char *);
-extern char *strkitten(char *, char);
-extern void copynchars(char *, const char *, int);
-extern char *strcasecpy(char *, const char *);
-extern char *s_suffix(const char *);
-extern char *ing_suffix(const char *);
-extern char *xcrypt(const char *, char *);
-extern boolean onlyspace(const char *);
-extern char *tabexpand(char *);
-extern char *visctrl(char);
-extern char *strsubst(char *, const char *, const char *);
-extern int strNsubst(char *, const char *, const char *, int);
-extern const char *ordin(int);
-extern char *sitoa(int);
-extern int sgn(int);
 extern int rounddiv(long, int);
-extern int dist2(int, int, int, int);
-extern int isqrt(int);
 extern int ilog2(int);
-extern int distmin(int, int, int, int);
-extern boolean online2(int, int, int, int);
-extern boolean pmatch(const char *, const char *);
-extern boolean pmatchi(const char *, const char *);
-#ifndef STRNCMPI
-extern int strncmpi(const char *, const char *, int);
-#endif
-#ifndef STRSTRI
-extern char *strstri(const char *, const char *);
-#endif
-extern boolean fuzzymatch(const char *, const char *, const char *, boolean);
 extern void init_random(unsigned int);
 extern void reseed_random(void);
 extern void set_random_state(unsigned int);
@@ -1034,24 +996,23 @@ extern char *iso8601_duration(long);
 extern char* format_duration(long);
 extern char *get_formatted_time(time_t, const char *);
 extern time_t current_epoch(void);
-extern void strbuf_init(strbuf_t *);
-extern void strbuf_append(strbuf_t *, const char *);
-extern void strbuf_reserve(strbuf_t *, int);
-extern void strbuf_empty(strbuf_t *);
-extern void strbuf_nl_to_crlf(strbuf_t *);
 extern int swapbits(int, int, int);
 extern void shuffle_int_array(int *, int);
 extern void strip_brackets(char *);
-/* note: the snprintf CPP wrapper includes the "fmt" argument in "..."
-   (__VA_ARGS__) to allow for zero arguments after fmt */
-#define Snprintf(str, size, ...) \
-    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
-extern void nh_snprintf(const char *func, int line, char *str, size_t size,
-                        const char *fmt, ...);
-#define FITSint(x) FITSint_(x, __func__, __LINE__)
-extern int FITSint_(long long, const char *, int);
-#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
-extern unsigned FITSuint_(unsigned long long, const char *, int);
+
+/* ### strutil.c ### */
+
+extern void strbuf_init(strbuf_t *) NONNULLARG1;
+extern void strbuf_append(strbuf_t *, const char *) NONNULLPTRS;
+extern void strbuf_reserve(strbuf_t *, int) NONNULLARG1;
+extern void strbuf_empty(strbuf_t *) NONNULLARG1;
+extern void strbuf_nl_to_crlf(strbuf_t *) NONNULLARG1;
+extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
+extern boolean pmatch(const char *, const char *) NONNULLPTRS;
+extern boolean pmatchi(const char *, const char *) NONNULLPTRS;
+/*
+extern boolean pmatchz(const char *, const char *) NONNULLPTRS;
+*/
 
 /* ### insight.c ### */
 
