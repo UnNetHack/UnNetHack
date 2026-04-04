@@ -1841,7 +1841,7 @@ dmonsfree(void)
     }
 
     if (count != iflags.purge_monsters) {
-        describe_level(buf);
+        describe_level(buf, 2);
         impossible("dmonsfree: %d removed doesn't match %d pending on %s",
                    count, iflags.purge_monsters, buf);
     }
@@ -2039,7 +2039,7 @@ dealloc_monst(struct monst *mon)
 
     buf[0] = '\0';
     if (mon->nmon) {
-        describe_level(buf);
+        describe_level(buf, 2);
         panic("dealloc_monst with nmon on %s", buf);
     }
     if (mon->mextra)

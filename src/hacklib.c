@@ -146,6 +146,38 @@ eos(char *s)
     return s;
 }
 
+/* determine whether 'str' starts with 'chkstr', possibly ignoring case;
+ * panics on huge strings */
+boolean
+str_start_is(
+    const char *str,
+    const char *chkstr,
+    boolean caseblind)
+{
+    char t1, t2;
+    int n = LARGEST_INT;
+
+    while (--n) {
+        if (!*str) {
+            return (*chkstr == 0); /* chkstr >= str */
+        } else if (!*chkstr) {
+            return TRUE; /* chkstr < str */
+        }
+        t1 = caseblind ? lowc(*str) : *str;
+        t2 = caseblind ? lowc(*chkstr) : *chkstr;
+        str++, chkstr++;
+        if (t1 != t2) {
+            return FALSE;
+        }
+    }
+#if 0
+    if (n == 0) {
+        panic("string too long");
+    }
+#endif
+    return TRUE;
+}
+
 /* determine whether 'str' ends in 'chkstr' */
 boolean
 str_end_is(const char *str, const char *chkstr)

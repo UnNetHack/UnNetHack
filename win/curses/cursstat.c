@@ -564,7 +564,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     y++;
     wmove(win, y, x);
 
-    describe_level(buf);
+    describe_level(buf, 1);
 
     wprintw(win, "%s", buf);
 
@@ -683,7 +683,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
         print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
 
     waddch(win, ' ');
-    describe_level(buf);
+    describe_level(buf, 1);
 
     wprintw(win, "%s", buf);
 

@@ -3,9 +3,10 @@
 
 #include "hack.h"
 
-extern const char *hu_stat[];   /* defined in eat.c */
+extern const char *const hu_stat[]; /* defined in eat.c */
 
-const char * const enc_stat[] = {
+/* also used in insight.c */
+const char *const enc_stat[] = {
     "",
     "Burdened",
     "Stressed",
@@ -17,6 +18,27 @@ const char * const enc_stat[] = {
 static void bot1(void);
 static void bot2(void);
 static void bot3(void);
+
+char *
+get_strength_str(void)
+{
+    static char buf[32];
+    int st = ACURR(A_STR);
+
+    if (st > 18) {
+        if (st > STR18(100)) {
+            Sprintf(buf, "%2d", st - 100);
+        } else if (st < STR18(100)) {
+            Sprintf(buf, "18/%02d", st - 18);
+        } else {
+            Sprintf(buf, "18/**");
+        }
+    } else {
+        Sprintf(buf, "%-1d", st);
+    }
+
+    return buf;
+}
 
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
 
@@ -166,25 +188,42 @@ static NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 int
 xlev_to_rank(int xlev)
 {
+    /*
+     *   1..2  => 0
+     *   3..5  => 1
+     *   6..9  => 2
+     *  10..13 => 3
+     *      ...
+     *  26..29 => 7
+     *    30   => 8
+     * Conversion is precise but only partially reversible.
+     */
     return (xlev <= 2) ? 0 : (xlev <= 30) ? ((xlev + 2) / 4) : 8;
 }
 
-#if 0   /* not currently needed */
 /* convert rank index (0..8) to experience level (1..30) */
 int
-rank_to_xlev(rank)
-int rank;
+rank_to_xlev(int rank)
 {
-    return (rank <= 0) ? 1 : (rank <= 8) ? ((rank * 4) - 2) : 30;
+    /*
+     *  0 =>  1..2
+     *  1 =>  3..5
+     *  2 =>  6..9
+     *  3 => 10..13
+     *      ...
+     *  7 => 26..29
+     *  8 =>   30
+     * We return the low end of each range.
+     */
+    return (rank < 1) ? 1 : (rank < 2) ? 3
+           : (rank < 8) ? ((rank * 4) - 2) : 30;
 }
-#endif
 
 const char *
 rank_of(int lev, short int monnum, boolean female)
 {
     const struct Role *role;
     int i;
-
 
     /* Find the role */
     for (role = roles; role->name.m; role++) {
@@ -215,7 +254,6 @@ rank_of(int lev, short int monnum, boolean female)
     return ("Player");
 }
 
-
 const char *
 rank(void)
 {
@@ -227,32 +265,34 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
 {
     int i, j;
 
-
     /* Loop through each of the roles */
     for (i = 0; roles[i].name.m; i++) {
+        /* loop through each of the rank titles for role #i */
         for (j = 0; j < 9; j++) {
-            if (roles[i].rank[j].m && !strncmpi(str,
-                                                roles[i].rank[j].m, strlen(roles[i].rank[j].m))) {
+            if (roles[i].rank[j].m && str_start_is(str, roles[i].rank[j].m, TRUE)) {
                 if (rank_indx) {
                     *rank_indx = j;
                 }
                 if (title_length) {
-                    *title_length = strlen(roles[i].rank[j].m);
+                    *title_length = Strlen(roles[i].rank[j].m);
                 }
                 return roles[i].malenum;
             }
-            if (roles[i].rank[j].f && !strncmpi(str,
-                                                roles[i].rank[j].f, strlen(roles[i].rank[j].f))) {
+            if (roles[i].rank[j].f && str_start_is(str, roles[i].rank[j].f, TRUE)) {
                 if (rank_indx) {
                     *rank_indx = j;
                 }
                 if (title_length) {
-                    *title_length = strlen(roles[i].rank[j].f);
+                    *title_length = Strlen(roles[i].rank[j].f);
                 }
                 return ((roles[i].femalenum != NON_PM) ?
                         roles[i].femalenum : roles[i].malenum);
             }
         }
+    }
+
+    if (title_length) {
+        *title_length = 0;
     }
 
     return NON_PM;
@@ -261,7 +301,9 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
 void
 max_rank_sz(void)
 {
-    int i, r, maxr = 0;
+    int i;
+    size_t r, maxr = 0;
+
     for (i = 0; i < 9; i++) {
         if (urole.rank[i].m && (r = strlen(urole.rank[i].m)) > maxr) {
             maxr = r;
@@ -270,7 +312,7 @@ max_rank_sz(void)
             maxr = r;
         }
     }
-    mrank_sz = maxr;
+    mrank_sz = (int) maxr;
     return;
 }
 
@@ -278,7 +320,7 @@ max_rank_sz(void)
 long
 botl_score(void)
 {
-    int deepest = deepest_lev_reached(FALSE);
+    long deepest = (long) deepest_lev_reached(FALSE);
     long umoney = money_cnt(invent) + hidden_gold();
 
     if ((umoney -= u.umoney0) < 0L) {
@@ -385,19 +427,9 @@ bot1()
     if ((i - j) > 0) {
         Sprintf(nb = eos(nb), "%*s", i-j, " "); /* pad with spaces */
     }
-    if (ACURR(A_STR) > 18) {
-        if (ACURR(A_STR) > STR18(100)) {
-            Sprintf(nb = eos(nb), "St:%2d ", ACURR(A_STR)-100);
-        } else if (ACURR(A_STR) < STR18(100)) {
-            Sprintf(nb = eos(nb), "St:18/%02d ", ACURR(A_STR)-18);
-        } else {
-            Sprintf(nb = eos(nb), "St:18/** ");
-        }
-    } else {
-        Sprintf(nb = eos(nb), "St:%-1d ", ACURR(A_STR));
-    }
     Sprintf(nb = eos(nb),
-            "Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+            "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+            get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS), ACURR(A_CHA));
     Sprintf(nb = eos(nb), (u.ualign.type == A_CHAOTIC) ? "  Chaotic" :
             (u.ualign.type == A_NEUTRAL) ? "  Neutral" : "  Lawful");
@@ -426,35 +458,52 @@ bot1(void)
 
 /* provide the name of the current level for display by various ports */
 int
-describe_level(char *buf)
+describe_level(
+    char *buf, /* output buffer */
+    int dflgs) /* 1: append trailing space; 2: include dungeon branch name */
 {
+    boolean addspace = (dflgs & 1) != 0,  /* (used to be unconditional) */
+            addbranch = (dflgs & 2) != 0; /* False: status, True: livelog */
     int ret = 1;
 
-    /* TODO:    Add in dungeon name */
     if (Is_knox(&u.uz)) {
         Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
+        addbranch = FALSE;
     } else if (In_quest(&u.uz)) {
         Sprintf(buf, "Home %d ", dunlev(&u.uz));
     } else if (Is_blackmarket(&u.uz)) {
         Sprintf(buf, "Blackmarket ");
+        addbranch = FALSE;
     } else if (Is_town_level(&u.uz)) {
         Sprintf(buf, "Town ");
+        addbranch = FALSE;
     } else if (Is_minetown_level(&u.uz)) {
         Sprintf(buf, "Mine Town:%-2d ", depth(&u.uz));
     } else if (In_endgame(&u.uz)) {
         /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
         (void) endgame_level_name(buf, depth(&u.uz));
-        Strcat(buf, " ");
-    } else {
-        char *dgn_name = dungeons[u.uz.dnum].dname;
-        if (!strncmpi(dgn_name, "The ", 4)) {
-            dgn_name += 4;
+        if (!addbranch) {
+            (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
         }
+        addbranch = FALSE;
+    } else {
         /* ports with more room may expand this one */
-        Sprintf(buf, "%s:%-2d ",
-                iflags.show_dgn_name ? dgn_name : "Dlvl",
-                depth(&u.uz));
+        if (!addbranch) {
+            char *dgn_name = dungeons[u.uz.dnum].dname;
+            Sprintf(buf, "%s:%-2d", /* "Dlvl:n" (grep fodder) */
+                    iflags.show_dgn_name ? dgn_name : "Dlvl",
+                    depth(&u.uz));
+        } else {
+            Sprintf(buf, "level %d", depth(&u.uz));
+        }
         ret = 0;
+    }
+    if (addbranch) {
+        Sprintf(eos(buf), ", %s", dungeons[u.uz.dnum].dname);
+        (void) strsubst(buf, "The ", "the ");
+    }
+    if (addspace) {
+        Strcat(buf, " ");
     }
     return ret;
 }
@@ -521,7 +570,6 @@ void bot2str(char *newbot2)
 
 #else
 
-
 #endif
 {
 #ifndef DUMP_LOG
@@ -540,7 +588,7 @@ void bot2str(char *newbot2)
     if (hp < 0) {
         hp = 0;
     }
-    (void) describe_level(newbot2);
+    (void) describe_level(newbot2, 1);
     Sprintf(nb = eos(newbot2), "%c:%-2ld", oc_syms[COIN_CLASS],
             money_cnt(invent)
             );
@@ -592,7 +640,6 @@ void bot2str(char *newbot2)
                 (long)weight_cap());
     }
 #endif
-
 
     if (flags.time) {
         Sprintf(nb = eos(nb), " T:%ld", moves);
