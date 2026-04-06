@@ -2574,6 +2574,131 @@ get_hilite(
     return rule;
 }
 
+/* ======================================================================= */
+/*  STATUS_HILITES helper functions for unnethack                          */
+/* ======================================================================= */
+
+/*
+ * get_hilite_color - evaluate hilite rules for a field and return
+ * a color_option suitable for use with start_color_option/end_color_option.
+ * Returns {NO_COLOR, 0} if no hilite applies.
+ */
+struct color_option
+get_hilite_color(enum statusfields fld)
+{
+    struct color_option result = {NO_COLOR, 0};
+    int coloridx = NO_COLOR;
+    int idx = gn.now_or_before_idx;
+    int prev_idx = 1 - idx;
+    int chg, pc;
+
+    if (!iflags.hilite_delta || fld < 0 || fld >= MAXBLSTATS) {
+        return result;
+    }
+
+    if (!has_hilite(fld)) {
+        return result;
+    }
+
+    chg = compare_blstats(&gb.blstats[prev_idx][fld], &gb.blstats[idx][fld]);
+
+    /* compute percentage if applicable */
+    pc = 0;
+    if (gb.blstats[idx][fld].percent_matters && initblstats[fld].idxmax >= 0) {
+        int fldmax = initblstats[fld].idxmax;
+        if (fldmax == BL_EXP) {
+            pc = exp_percentage();
+        } else if (fldmax >= 0 && fldmax < MAXBLSTATS) {
+            pc = percentage(&gb.blstats[idx][fld], &gb.blstats[idx][fldmax]);
+        }
+    }
+
+    (void) get_hilite(idx, fld, (genericptr_t) &gb.blstats[idx][fld].a,
+                      chg, pc, &coloridx);
+
+    if (coloridx != NO_COLOR) {
+        int clr, attr;
+        split_clridx(coloridx, &clr, &attr);
+        result.color = clr;
+        /* convert HL_* attributes to attr_bits */
+        if (attr & HL_BOLD) {
+            result.attr_bits |= (1 << ATR_BOLD);
+        }
+        if (attr & HL_DIM) {
+            result.attr_bits |= (1 << ATR_DIM);
+        }
+        if (attr & HL_ITALIC) {
+            result.attr_bits |= (1 << ATR_ITALIC);
+        }
+        if (attr & HL_INVERSE) {
+            result.attr_bits |= (1 << ATR_INVERSE);
+        }
+        if (attr & HL_BLINK) {
+            result.attr_bits |= (1 << ATR_BLINK);
+        }
+#ifdef ATR_ULINE
+        if (attr & HL_ULINE) {
+            result.attr_bits |= (1 << ATR_ULINE);
+        }
+#endif
+    }
+    return result;
+}
+
+/*
+ * get_condition_hilite_color - check condition hilites for a given
+ * condition text. Returns a color_option.
+ */
+struct color_option
+get_condition_hilite_color(const char *condtext)
+{
+    struct color_option result = {NO_COLOR, 0};
+    int i;
+
+    if (!iflags.hilite_delta) {
+        return result;
+    }
+
+    for (i = 0; i < SIZE(conditions); i++) {
+        if (fuzzymatch(conditions[i].text[0], condtext, " -_", TRUE)
+            || fuzzymatch(conditions[i].text[1], condtext, " -_", TRUE)) {
+            unsigned long mask = conditions[i].mask;
+            int j;
+
+            /* check color */
+            for (j = 0; j < CLR_MAX; j++) {
+                if (gc.cond_hilites[j] & mask) {
+                    result.color = j;
+                    break;
+                }
+            }
+            /* check attributes */
+            if (gc.cond_hilites[HL_ATTCLR_BOLD] & mask) {
+                result.attr_bits |= (1 << ATR_BOLD);
+            }
+            if (gc.cond_hilites[HL_ATTCLR_DIM] & mask) {
+                result.attr_bits |= (1 << ATR_DIM);
+            }
+            if (gc.cond_hilites[HL_ATTCLR_ITALIC] & mask) {
+                result.attr_bits |= (1 << ATR_ITALIC);
+            }
+            if (gc.cond_hilites[HL_ATTCLR_INVERSE] & mask) {
+                result.attr_bits |= (1 << ATR_INVERSE);
+            }
+            if (gc.cond_hilites[HL_ATTCLR_BLINK] & mask) {
+                result.attr_bits |= (1 << ATR_BLINK);
+            }
+#ifdef ATR_ULINE
+            if (gc.cond_hilites[HL_ATTCLR_ULINE] & mask) {
+                result.attr_bits |= (1 << ATR_ULINE);
+            }
+#endif
+            break;
+        }
+    }
+    return result;
+}
+
 #undef has_hilite
 #undef Is_Temp_Hilite
 
