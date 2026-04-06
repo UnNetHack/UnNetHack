@@ -2605,8 +2605,8 @@ edibility_prompts(struct obj *otmp)
     }
     if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
         /* causes sleep, for long enough to be dangerous */
-        Snprintf(buf, sizeof buf, "%s like %s might have been poisoned.", foodsmell,
-                 foodsmell, it_or_they);
+        Snprintf(buf, sizeof buf, "%s like %s might have been poisoned.  %s", foodsmell,
+                it_or_they, eat_it_anyway);
         return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
     }
     if (cadaver && !vegetarian(&mons[mnum]) &&
