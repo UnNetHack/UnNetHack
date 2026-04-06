@@ -165,6 +165,8 @@ extern void max_rank_sz(void);
 extern long botl_score(void);
 #endif
 extern int describe_level(char *, int);
+extern void status_initialize(boolean);
+extern void status_finish(void);
 extern const char *rank(void);
 extern const char *rank_of(int, short, boolean);
 extern const char* botl_realtime(void);
@@ -177,6 +179,7 @@ extern int count_status_hilites(void);
 extern boolean status_hilite_menu(void);
 extern struct color_option get_hilite_color(enum statusfields);
 extern struct color_option get_condition_hilite_color(const char *);
+extern void update_blstats(void);
 extern void condopt(int, boolean *, boolean);
 extern int parse_cond_option(boolean, char *);
 extern boolean cond_menu(void);

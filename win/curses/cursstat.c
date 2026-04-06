@@ -18,7 +18,8 @@ typedef struct nhs {
 
 static attr_t get_trouble_color(const char *);
 static void draw_trouble_str(const char *);
-static void print_statdiff(const char *append, nhstat *, int, int);
+static void print_statdiff(const char *append, nhstat *, int, int,
+                           enum statusfields);
 static void get_playerrank(char *);
 static int hpen_color(boolean, int, int);
 static void draw_bar(boolean, int, int, const char *);
@@ -40,6 +41,25 @@ struct color_option percentage_color_of(int value, int max,
 extern const struct text_color_option *text_colors;
 extern const struct percent_color_option *hp_colors;
 extern const struct percent_color_option *pw_colors;
+#endif
+
+#if defined(STATUS_HILITES) || defined(STATUS_COLORS)
+/* Convert a color_option to a curses attr_t. */
+static attr_t
+color_option_to_curses_attr(struct color_option *co)
+{
+    attr_t attr = 0;
+    int count;
+
+    if (co->color != NO_COLOR) {
+        attr |= curses_color_attr(co->color, 0);
+    }
+    for (count = 0; (1 << count) <= co->attr_bits; count++) {
+        if (count != ATR_NONE && (co->attr_bits & (1 << count)))
+            attr |= curses_convert_attr(count);
+    }
+    return attr;
+}
 #endif
 
 /* Whether or not we have printed status window content at least once.
@@ -100,6 +120,17 @@ get_trouble_color(const char *stat)
 {
     attr_t res = curses_color_attr(CLR_GRAY, 0);
     const struct statcolor *clr;
+
+#ifdef STATUS_HILITES
+    /* STATUS_HILITES take priority over STATUS_COLORS */
+    if (iflags.hilite_delta && stat) {
+        struct color_option hilite_color = get_condition_hilite_color(stat);
+        if (hilite_color.color != NO_COLOR || hilite_color.attr_bits) {
+            return color_option_to_curses_attr(&hilite_color);
+        }
+    }
+#endif
+
     for (clr = default_colors; clr->txt; clr++) {
         if (stat && !strcmp(clr->txt, stat)) {
 #ifdef STATUS_COLORS
@@ -115,19 +146,7 @@ get_trouble_color(const char *stat)
                 return curses_color_attr(CLR_GRAY, 0);
             }
 
-            if (stat_color.color != NO_COLOR) {
-                res = curses_color_attr(stat_color.color, 0);
-            }
-
-            res = curses_color_attr(stat_color.color, 0);
-            int count;
-            for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
-                if (count != ATR_NONE &&
-                    (stat_color.attr_bits & (1 << count)))
-                    res |= curses_convert_attr(count);
-            }
-
-            return res;
+            return color_option_to_curses_attr(&stat_color);
 #else
             return curses_color_attr(clr->color, 0);
 #endif
@@ -162,11 +181,25 @@ get_playerrank(char *rank)
    type is generally STAT_OTHER (generic "do nothing special"),
    but is used if the stat needs to be handled in a special way. */
 static void
-print_statdiff(const char *append, nhstat *stat, int new, int type)
+print_statdiff(const char *append, nhstat *stat, int new, int type,
+               enum statusfields fld)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
 
     int color = CLR_GRAY;
+#ifdef STATUS_HILITES
+    attr_t hilite_attr = 0;
+    boolean use_hilite = FALSE;
+
+    /* STATUS_HILITES take priority for persistent (non-change) coloring */
+    if (iflags.hilite_delta && fld >= 0 && fld < MAXBLSTATS) {
+        struct color_option hilite_color = get_hilite_color(fld);
+        if (hilite_color.color != NO_COLOR || hilite_color.attr_bits) {
+            hilite_attr = color_option_to_curses_attr(&hilite_color);
+            use_hilite = TRUE;
+        }
+    }
+#endif
 
     /* Turncount isn't highlighted, or it would be highlighted constantly. */
     if (type != STAT_TIME && new != stat->value) {
@@ -188,7 +221,20 @@ print_statdiff(const char *append, nhstat *stat, int new, int type)
         color = stat->highlight_color;
     }
 
-    attr_t attr = curses_color_attr(color, 0);
+    attr_t attr;
+#ifdef STATUS_HILITES
+    /* When STATUS_HILITES rules exist for this field, they own the
+       up/down/always decision (via compare_blstats) and carry any
+       configured attrs such as inverse.  Bypass the legacy per-field
+       change-flash so the user's rules aren't overridden. */
+    if (use_hilite) {
+        attr = hilite_attr;
+    } else
+#endif
+    {
+        attr = curses_color_attr(color, 0);
+    }
+
     wattron(win, attr);
     wprintw(win, "%s", append);
     if (type == STAT_STR && new > 18) {
@@ -321,25 +367,25 @@ static attr_t
 hpen_color_attr(boolean is_hp, int cur, int max)
 {
     struct color_option stat_color;
-    int count;
-    attr_t attr = 0;
+
+#ifdef STATUS_HILITES
+    /* STATUS_HILITES take priority over STATUS_COLORS */
+    if (iflags.hilite_delta) {
+        struct color_option hilite_color =
+            get_hilite_color(is_hp ? BL_HP : BL_ENE);
+        if (hilite_color.color != NO_COLOR || hilite_color.attr_bits) {
+            return color_option_to_curses_attr(&hilite_color);
+        }
+    }
+#endif
+
     if (!iflags.use_status_colors) {
         return curses_color_attr(CLR_GRAY, 0);
     }
 
     stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
 
-    if (stat_color.color != NO_COLOR) {
-        attr |= curses_color_attr(stat_color.color, 0);
-    }
-
-    for (count = 0; (1 << count) <= stat_color.attr_bits; count++) {
-        if (count != ATR_NONE && (stat_color.attr_bits & (1 << count))) {
-            attr |= curses_convert_attr(count);
-        }
-    }
-
-    return attr;
+    return color_option_to_curses_attr(&stat_color);
 }
 #endif
 
@@ -351,6 +397,15 @@ hpen_color_attr(boolean is_hp, int cur, int max)
 static int
 hpen_color(boolean is_hp, int cur, int max)
 {
+#ifdef STATUS_HILITES
+    if (iflags.hilite_delta) {
+        struct color_option hilite_color =
+            get_hilite_color(is_hp ? BL_HP : BL_ENE);
+        if (hilite_color.color != NO_COLOR) {
+            return hilite_color.color;
+        }
+    }
+#endif
 #ifdef STATUS_COLORS
     if (iflags.use_status_colors) {
         struct color_option stat_color;
@@ -442,6 +497,10 @@ void
 curses_update_stats(void)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
+
+#ifdef STATUS_HILITES
+    update_blstats();
+#endif
 
     /* Clear the window */
     werase(win);
@@ -543,19 +602,19 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     draw_bar(TRUE, hp, hpmax, buf);
 
     /* Attributes */
-    print_statdiff(" St:", &prevstr, ACURR(A_STR), STAT_STR);
-    print_statdiff(" Dx:", &prevdex, ACURR(A_DEX), STAT_OTHER);
-    print_statdiff(" Co:", &prevcon, ACURR(A_CON), STAT_OTHER);
-    print_statdiff(" In:", &prevint, ACURR(A_INT), STAT_OTHER);
-    print_statdiff(" Wi:", &prevwis, ACURR(A_WIS), STAT_OTHER);
-    print_statdiff(" Ch:", &prevcha, ACURR(A_CHA), STAT_OTHER);
+    print_statdiff(" St:", &prevstr, ACURR(A_STR), STAT_STR, BL_STR);
+    print_statdiff(" Dx:", &prevdex, ACURR(A_DEX), STAT_OTHER, BL_DX);
+    print_statdiff(" Co:", &prevcon, ACURR(A_CON), STAT_OTHER, BL_CO);
+    print_statdiff(" In:", &prevint, ACURR(A_INT), STAT_OTHER, BL_IN);
+    print_statdiff(" Wi:", &prevwis, ACURR(A_WIS), STAT_OTHER, BL_WI);
+    print_statdiff(" Ch:", &prevcha, ACURR(A_CHA), STAT_OTHER, BL_CH);
 
     wprintw(win, (u.ualign.type == A_CHAOTIC ? " Chaotic" :
                   u.ualign.type == A_NEUTRAL ? " Neutral" : " Lawful"));
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
-        print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER);
+        print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER, BL_SCORE);
     }
 #endif /* SCORE_ON_BOTL */
 
@@ -568,7 +627,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
 
     wprintw(win, "%s", buf);
 
-    print_statdiff("$", &prevau, money_cnt(invent), STAT_GOLD);
+    print_statdiff("$", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
 
     /* HP/Pw use special coloring rules */
     attr_t hpattr, pwattr;
@@ -592,24 +651,24 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     wprintw(win, "%d(%d)", u.uen, u.uenmax);
     wattroff(win, pwattr);
 
-    print_statdiff(" AC:", &prevac, u.uac, STAT_AC);
+    print_statdiff(" AC:", &prevac, u.uac, STAT_AC, BL_AC);
 
     if (Upolyd) {
-        print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+        print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER, BL_HD);
     }
 #ifdef EXP_ON_BOTL
     else if (flags.showexp) {
-        print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER);
+        print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER, BL_XP);
         /* use waddch, we don't want to highlight the '/' */
         waddch(win, '/');
-        print_statdiff("", &prevexp, u.uexp, STAT_OTHER);
+        print_statdiff("", &prevexp, u.uexp, STAT_OTHER, BL_EXP);
     }
 #endif
     else
-        print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
+        print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER, BL_XP);
 
     if (flags.time) {
-        print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, moves, STAT_TIME, BL_TIME);
     }
 
     if (iflags.showrealtime) {
@@ -644,9 +703,9 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wmove(win, y, x);
     wprintw(win, "HP:");
     draw_bar(TRUE, hp, hpmax, NULL);
-    print_statdiff(" AC:", &prevac, u.uac, STAT_AC);
+    print_statdiff(" AC:", &prevac, u.uac, STAT_AC, BL_AC);
     if (Upolyd) {
-        print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+        print_statdiff(" HD:", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER, BL_HD);
     }
 #ifdef EXP_ON_BOTL
     else if (flags.showexp) {
@@ -659,7 +718,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
                 levelchange = 2;
             }
         }
-        print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER);
+        print_statdiff(" Xp:", &prevlevel, u.ulevel, STAT_OTHER, BL_XP);
         /* use waddch, we don't want to highlight the '/' */
         waddch(win, '(');
 
@@ -675,12 +734,12 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
                 prevexp.value = (xp_left - 1);
             }
         }
-        print_statdiff("", &prevexp, xp_left, STAT_AC);
+        print_statdiff("", &prevexp, xp_left, STAT_AC, BL_EXP);
         waddch(win, ')');
     }
 #endif
     else
-        print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
+        print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER, BL_XP);
 
     waddch(win, ' ');
     describe_level(buf, 1);
@@ -693,16 +752,16 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wprintw(win, "Pw:");
     draw_bar(FALSE, u.uen, u.uenmax, NULL);
 
-    print_statdiff(" $", &prevau, money_cnt(invent), STAT_GOLD);
+    print_statdiff(" $", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
-        print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER);
+        print_statdiff(" S:", &prevscore, botl_score(), STAT_OTHER, BL_SCORE);
     }
 #endif /* SCORE_ON_BOTL */
 
     if (flags.time) {
-        print_statdiff(" T:", &prevtime, moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, moves, STAT_TIME, BL_TIME);
     }
 
     if (iflags.showrealtime) {
@@ -731,24 +790,24 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     x -= stat_length;
     int orig_x = x;
     wmove(win, y, x);
-    print_statdiff(" Co:", &prevcon, ACURR(A_CON), STAT_OTHER);
+    print_statdiff(" Co:", &prevcon, ACURR(A_CON), STAT_OTHER, BL_CO);
     x -= stat_length;
     wmove(win, y, x);
-    print_statdiff(" Dx:", &prevdex, ACURR(A_DEX), STAT_OTHER);
+    print_statdiff(" Dx:", &prevdex, ACURR(A_DEX), STAT_OTHER, BL_DX);
     x -= str_length;
     wmove(win, y, x);
-    print_statdiff(" St:", &prevstr, ACURR(A_STR), STAT_STR);
+    print_statdiff(" St:", &prevstr, ACURR(A_STR), STAT_STR, BL_STR);
 
     x = orig_x;
     y++;
     wmove(win, y, x);
-    print_statdiff(" Ch:", &prevcha, ACURR(A_CHA), STAT_OTHER);
+    print_statdiff(" Ch:", &prevcha, ACURR(A_CHA), STAT_OTHER, BL_CH);
     x -= stat_length;
     wmove(win, y, x);
-    print_statdiff(" Wi:", &prevwis, ACURR(A_WIS), STAT_OTHER);
+    print_statdiff(" Wi:", &prevwis, ACURR(A_WIS), STAT_OTHER, BL_WI);
     x -= str_length;
     wmove(win, y, x);
-    print_statdiff(" In:", &prevint, ACURR(A_INT), STAT_OTHER);
+    print_statdiff(" In:", &prevint, ACURR(A_INT), STAT_OTHER, BL_IN);
 }
 
 /* Personally I never understood the point of a vertical status bar. But removing the
@@ -792,17 +851,17 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
 
     /* Attributes. Old  vertical order is preserved */
-    print_statdiff("Strength:      ", &prevstr, ACURR(A_STR), STAT_STR);
+    print_statdiff("Strength:      ", &prevstr, ACURR(A_STR), STAT_STR, BL_STR);
     wmove(win, y++, x);
-    print_statdiff("Intelligence:  ", &prevint, ACURR(A_INT), STAT_OTHER);
+    print_statdiff("Intelligence:  ", &prevint, ACURR(A_INT), STAT_OTHER, BL_IN);
     wmove(win, y++, x);
-    print_statdiff("Wisdom:        ", &prevwis, ACURR(A_WIS), STAT_OTHER);
+    print_statdiff("Wisdom:        ", &prevwis, ACURR(A_WIS), STAT_OTHER, BL_WI);
     wmove(win, y++, x);
-    print_statdiff("Dexterity:     ", &prevdex, ACURR(A_DEX), STAT_OTHER);
+    print_statdiff("Dexterity:     ", &prevdex, ACURR(A_DEX), STAT_OTHER, BL_DX);
     wmove(win, y++, x);
-    print_statdiff("Constitution:  ", &prevcon, ACURR(A_CON), STAT_OTHER);
+    print_statdiff("Constitution:  ", &prevcon, ACURR(A_CON), STAT_OTHER, BL_CO);
     wmove(win, y++, x);
-    print_statdiff("Charisma:      ", &prevcha, ACURR(A_CHA), STAT_OTHER);
+    print_statdiff("Charisma:      ", &prevcha, ACURR(A_CHA), STAT_OTHER, BL_CH);
     wmove(win, y++, x);
     wprintw(win,   "Alignment:     ");
     wprintw(win, (u.ualign.type == A_CHAOTIC ? "Chaotic" :
@@ -818,7 +877,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     }
     wmove(win, y++, x);
 
-    print_statdiff("Gold:          ", &prevau, money_cnt(invent), STAT_GOLD);
+    print_statdiff("Gold:          ", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
     wmove(win, y++, x);
 
     /* HP/Pw use special coloring rules */
@@ -846,32 +905,32 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wattroff(win, pwattr);
     wmove(win, y++, x);
 
-    print_statdiff("Armor Class:   ", &prevac, u.uac, STAT_AC);
+    print_statdiff("Armor Class:   ", &prevac, u.uac, STAT_AC, BL_AC);
     wmove(win, y++, x);
 
     if (Upolyd) {
-        print_statdiff("Hit Dice:      ", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+        print_statdiff("Hit Dice:      ", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER, BL_HD);
     }
 #ifdef EXP_ON_BOTL
     else if (flags.showexp) {
-        print_statdiff("Experience:    ", &prevlevel, u.ulevel, STAT_OTHER);
+        print_statdiff("Experience:    ", &prevlevel, u.ulevel, STAT_OTHER, BL_XP);
         /* use waddch, we don't want to highlight the '/' */
         waddch(win, '/');
-        print_statdiff("", &prevexp, u.uexp, STAT_OTHER);
+        print_statdiff("", &prevexp, u.uexp, STAT_OTHER, BL_EXP);
     }
 #endif
     else
-        print_statdiff("Level:         ", &prevlevel, u.ulevel, STAT_OTHER);
+        print_statdiff("Level:         ", &prevlevel, u.ulevel, STAT_OTHER, BL_XP);
     wmove(win, y++, x);
 
     if (flags.time) {
-        print_statdiff("Time:          ", &prevtime, moves, STAT_TIME);
+        print_statdiff("Time:          ", &prevtime, moves, STAT_TIME, BL_TIME);
         wmove(win, y++, x);
     }
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
-        print_statdiff("Score:         ", &prevscore, botl_score(), STAT_OTHER);
+        print_statdiff("Score:         ", &prevscore, botl_score(), STAT_OTHER, BL_SCORE);
         wmove(win, y++, x);
     }
 #endif /* SCORE_ON_BOTL */

@@ -891,7 +891,11 @@ display_gamewindows(void)
 {
     curses_stupid_hack = 0;
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
-    WIN_STATUS = create_nhwindow(NHW_STATUS);
+    if (VIA_WINDOWPORT()) {
+        status_initialize(FALSE);
+    } else {
+        WIN_STATUS = create_nhwindow(NHW_STATUS);
+    }
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
 

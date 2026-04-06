@@ -142,6 +142,45 @@ apply_color_option(
     end_color_option(color_option);
 }
 
+#ifdef STATUS_HILITES
+/* Append a labeled field value to the status line buffer and render it
+   with hilite_delta coloring. Uses start_color_option/end_color_option
+   which require STATUS_COLORS && TEXTCOLOR (always true when we get here
+   since botl_hilite_field lives inside that #if block). */
+static void
+botl_hilite_field(char *buf, const char *label, const char *value,
+                  enum statusfields fld, int statusline)
+{
+    struct color_option co;
+
+    if (!iflags.hilite_delta || !iflags.use_color) {
+        Strcat(buf, label);
+        Strcat(buf, value);
+        return;
+    }
+
+    co = get_hilite_color(fld);
+    if (co.color == NO_COLOR && !co.attr_bits) {
+        Strcat(buf, label);
+        Strcat(buf, value);
+        return;
+    }
+
+    /* Output everything so far (including label) plain */
+    Strcat(buf, label);
+    curs(WIN_STATUS, 1, statusline - 1);
+    putstr(WIN_STATUS, 0, buf);
+    flags.botlx = 0;
+
+    /* Append the value and output with color */
+    Strcat(buf, value);
+    curs(WIN_STATUS, 1, statusline - 1);
+    start_color_option(co);
+    putstr(WIN_STATUS, 0, buf);
+    end_color_option(co);
+}
+#endif /* STATUS_HILITES */
+
 void
 add_colored_text(const char *text, char *newbot2, int statusline)
 {
@@ -436,7 +475,13 @@ bot1()
         tmp[filledbar] = '\0';
         if (iflags.use_color) {
             /* draw in color mode */
-            apply_color_option(percentage_color_of(uhp(), uhpmax(), hp_colors), tmp, 1);
+            struct color_option bar_co;
+#ifdef STATUS_HILITES
+            bar_co = get_hilite_color(BL_HP);
+            if (bar_co.color == NO_COLOR && !bar_co.attr_bits)
+#endif
+            bar_co = percentage_color_of(uhp(), uhpmax(), hp_colors);
+            apply_color_option(bar_co, tmp, 1);
         } else {
             /* draw in inverse mode */
             curs(WIN_STATUS, 1, 0);
@@ -457,15 +502,39 @@ bot1()
     if ((i - j) > 0) {
         Sprintf(nb = eos(nb), "%*s", i-j, " "); /* pad with spaces */
     }
-    Sprintf(nb = eos(nb),
-            "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
-            get_strength_str(),
-            ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS), ACURR(A_CHA));
-    Sprintf(nb = eos(nb), (u.ualign.type == A_CHAOTIC) ? "  Chaotic" :
+#ifdef STATUS_HILITES
+    if (iflags.hilite_delta) {
+        char vbuf[BUFSZ];
+        botl_hilite_field(newbot1, "St:", get_strength_str(), BL_STR, 1);
+        Sprintf(vbuf, "%-1d", ACURR(A_DEX));
+        botl_hilite_field(newbot1, " Dx:", vbuf, BL_DX, 1);
+        Sprintf(vbuf, "%-1d", ACURR(A_CON));
+        botl_hilite_field(newbot1, " Co:", vbuf, BL_CO, 1);
+        Sprintf(vbuf, "%-1d", ACURR(A_INT));
+        botl_hilite_field(newbot1, " In:", vbuf, BL_IN, 1);
+        Sprintf(vbuf, "%-1d", ACURR(A_WIS));
+        botl_hilite_field(newbot1, " Wi:", vbuf, BL_WI, 1);
+        Sprintf(vbuf, "%-1d", ACURR(A_CHA));
+        botl_hilite_field(newbot1, " Ch:", vbuf, BL_CH, 1);
+    } else
+#endif
+    {
+        Sprintf(nb = eos(newbot1),
+                "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
+                get_strength_str(),
+                ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS), ACURR(A_CHA));
+    }
+    Sprintf(eos(newbot1), (u.ualign.type == A_CHAOTIC) ? "  Chaotic" :
             (u.ualign.type == A_NEUTRAL) ? "  Neutral" : "  Lawful");
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
-        Sprintf(nb = eos(nb), " S:%ld", botl_score());
+        char vbuf[BUFSZ];
+        Sprintf(vbuf, "%ld", botl_score());
+#ifdef STATUS_HILITES
+        botl_hilite_field(newbot1, " S:", vbuf, BL_SCORE, 1);
+#else
+        Sprintf(eos(newbot1), " S:%s", vbuf);
+#endif
     }
 #endif
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -619,6 +688,14 @@ void bot2str(char *newbot2)
         hp = 0;
     }
     (void) describe_level(newbot2, 1);
+#ifdef STATUS_HILITES
+    if (iflags.hilite_delta) {
+        char label[4], vbuf[BUFSZ];
+        Sprintf(label, "%c:", oc_syms[COIN_CLASS]);
+        Sprintf(vbuf, "%-2ld", money_cnt(invent));
+        botl_hilite_field(newbot2, label, vbuf, BL_GOLD, 2);
+    } else
+#endif
     Sprintf(nb = eos(newbot2), "%c:%-2ld", oc_syms[COIN_CLASS],
             money_cnt(invent)
             );
@@ -668,32 +745,64 @@ void bot2str(char *newbot2)
 #else
     Sprintf(nb = eos(nb), " Pw:%d(%d)", u.uen, u.uenmax);
 #endif
-    Sprintf(nb = eos(nb), " AC:%-2d", u.uac);
-    if (Upolyd) {
-        Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
-    }
+#ifdef STATUS_HILITES
+    if (iflags.hilite_delta) {
+        char vbuf[BUFSZ];
+        Sprintf(vbuf, "%-2d", u.uac);
+        botl_hilite_field(newbot2, " AC:", vbuf, BL_AC, 2);
+        if (Upolyd) {
+            Sprintf(vbuf, "%d", mons[u.umonnum].mlevel);
+            botl_hilite_field(newbot2, " HD:", vbuf, BL_HD, 2);
+        }
 #ifdef EXP_ON_BOTL
-    else if (flags.showexp) {
-        Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel, u.uexp);
-    }
+        else if (flags.showexp) {
+            Sprintf(vbuf, "%u", u.ulevel);
+            botl_hilite_field(newbot2, " Xp:", vbuf, BL_XP, 2);
+            Sprintf(vbuf, "/%-1ld", u.uexp);
+            botl_hilite_field(newbot2, "", vbuf, BL_EXP, 2);
+        }
 #endif
-    else
-        Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
+        else {
+            Sprintf(vbuf, "%u", u.ulevel);
+            botl_hilite_field(newbot2, " Exp:", vbuf, BL_XP, 2);
+        }
+    } else
+#endif
+    {
+        Sprintf(nb = eos(newbot2), " AC:%-2d", u.uac);
+        if (Upolyd) {
+            Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
+        }
+#ifdef EXP_ON_BOTL
+        else if (flags.showexp) {
+            Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel, u.uexp);
+        }
+#endif
+        else
+            Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
+    }
 
 #ifdef SHOW_WEIGHT
     if (flags.showweight) {
-        Sprintf(nb = eos(nb), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
+        Sprintf(eos(newbot2), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
     }
 #endif
 
     if (flags.time) {
-        Sprintf(nb = eos(nb), " T:%ld", moves);
+#ifdef STATUS_HILITES
+        if (iflags.hilite_delta) {
+            char vbuf[BUFSZ];
+            Sprintf(vbuf, "%ld", moves);
+            botl_hilite_field(newbot2, " T:", vbuf, BL_TIME, 2);
+        } else
+#endif
+        Sprintf(eos(newbot2), " T:%ld", moves);
     }
 
 #ifdef REALTIME_ON_BOTL
     if (iflags.showrealtime) {
-        Sprintf(nb = eos(nb), " %s", botl_realtime());
+        Sprintf(eos(newbot2), " %s", botl_realtime());
     }
 #endif
     if (iflags.statuslines < 3) {
@@ -805,22 +914,133 @@ bot3(void)
     }
 }
 
+#ifdef STATUS_HILITES
+static struct istat_s initblstats[MAXBLSTATS]; /* forward decl; defined below */
+static int compare_blstats(struct istat_s *, struct istat_s *);
+
+/* Per-field temporary-hilite bookkeeping for the simplified tty/curses
+   render path (upstream's .time/.chg mechanism in struct istat_s lives
+   behind the VIA_WINDOWPORT() gate which neither tty nor curses use).
+   hilite_until_moves[fld] is the move count up to (and including) which
+   the last up/down/changed transition should keep being shown; 0 means
+   no active temporary hilite.  hilite_sign[fld] encodes the direction:
+   <0 = down, >0 = up, 0 = no change. */
+static long hilite_until_moves[MAXBLSTATS];
+static int  hilite_sign[MAXBLSTATS];
+
+/* Populate the "current" half of the dual blstats buffer with live game
+   state and toggle gn.now_or_before_idx so that get_hilite_color() can
+   compute chg = compare_blstats(prev, curr) correctly. This is a minimal
+   subset of bot_via_windowport() covering the fields we hilite on. */
+void
+update_blstats(void)
+{
+    static boolean blstats_initialized = FALSE;
+    static long last_update_seq = -1L;
+    static boolean have_run_once = FALSE;
+    int idx, i;
+    long money;
+
+    /* Gate: run at most once per hero sub-move.  curses/tty redraw the
+       status bar several times in a row (bot1/2/3 each trigger a
+       putstr which re-enters curses_update_stats, plus curses_putch
+       and curses_decrement_highlights); toggling on every call would
+       flip prev/curr unpredictably and leave compare_blstats() with
+       zero deltas. */
+    if (have_run_once && hero_seq == last_update_seq) {
+        return;
+    }
+    last_update_seq = hero_seq;
+    have_run_once = TRUE;
+
+    /* init_blstats() is normally gated behind VIA_WINDOWPORT(); for the
+       tty/curses render path we trigger it lazily on first use so both
+       buffers inherit proper .anytype/.fld from initblstats[]. */
+    if (!blstats_initialized) {
+        for (i = 0; i <= 1; i++) {
+            int j;
+            for (j = 0; j < MAXBLSTATS; j++) {
+                struct hilite_s *keep = gb.blstats[i][j].thresholds;
+                gb.blstats[i][j] = initblstats[j];
+                gb.blstats[i][j].a = zeroany;
+                gb.blstats[i][j].rawval = zeroany;
+                gb.blstats[i][j].thresholds = keep;
+                if (gb.blstats[i][j].valwidth && !gb.blstats[i][j].val) {
+                    gb.blstats[i][j].val = (char *) alloc(gb.blstats[i][j].valwidth);
+                    gb.blstats[i][j].val[0] = '\0';
+                }
+            }
+        }
+        blstats_initialized = TRUE;
+    }
+
+    /* toggle */
+    idx = 1 - gn.now_or_before_idx;
+    gn.now_or_before_idx = idx;
+
+    gb.blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
+    gb.blstats[idx][BL_DX].a.a_int = ACURR(A_DEX);
+    gb.blstats[idx][BL_CO].a.a_int = ACURR(A_CON);
+    gb.blstats[idx][BL_IN].a.a_int = ACURR(A_INT);
+    gb.blstats[idx][BL_WI].a.a_int = ACURR(A_WIS);
+    gb.blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
+
+#ifdef SCORE_ON_BOTL
+    gb.blstats[idx][BL_SCORE].a.a_long = flags.showscore ? botl_score() : 0L;
+#endif
+
+    i = Upolyd ? u.mh : u.uhp;
+    if (i < 0) i = 0;
+    gb.blstats[idx][BL_HP].rawval.a_int = i;
+    gb.blstats[idx][BL_HP].a.a_int = min(i, 9999);
+    i = Upolyd ? u.mhmax : u.uhpmax;
+    gb.blstats[idx][BL_HPMAX].rawval.a_int = i;
+    gb.blstats[idx][BL_HPMAX].a.a_int = min(i, 9999);
+
+    if ((money = money_cnt(invent)) < 0L) money = 0L;
+    gb.blstats[idx][BL_GOLD].rawval.a_long = money;
+    gb.blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
+
+    gb.blstats[idx][BL_ENE].rawval.a_int = u.uen;
+    gb.blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
+    gb.blstats[idx][BL_ENEMAX].rawval.a_int = u.uenmax;
+    gb.blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 9999);
+
+    gb.blstats[idx][BL_AC].a.a_int = u.uac;
+    gb.blstats[idx][BL_HD].a.a_int = Upolyd ? (int) mons[u.umonnum].mlevel : 0;
+    gb.blstats[idx][BL_XP].a.a_int = u.ulevel;
+    gb.blstats[idx][BL_EXP].a.a_long = u.uexp;
+    gb.blstats[idx][BL_TIME].a.a_long = moves;
+    gb.blstats[idx][BL_HUNGER].a.a_int = (int) u.uhs;
+    gb.blstats[idx][BL_CAP].a.a_int = near_capacity();
+
+    /* Record per-field temporary-hilite windows.  For each watched
+       field, if the value changed this turn, remember the direction
+       and the move at which the temporary hilite should expire. */
+    {
+        int f;
+        long until = moves + (iflags.hilite_delta > 0 ? iflags.hilite_delta : 0);
+        for (f = 0; f < MAXBLSTATS; f++) {
+            int d = compare_blstats(&gb.blstats[1 - idx][f],
+                                    &gb.blstats[idx][f]);
+            if (d != 0) {
+                hilite_sign[f] = (d > 0) ? 1 : -1;
+                hilite_until_moves[f] = until;
+            }
+        }
+    }
+}
+#endif /* STATUS_HILITES */
+
 void
 bot(void)
 {
 #ifdef STATUS_HILITES
-    if (iflags.hilite_delta) {
-        bot_via_windowport();
-    }
+    update_blstats();
 #endif
     bot1();
     bot2();
     bot3();
-#ifdef STATUS_HILITES
-    if (iflags.hilite_delta) {
-        gn.now_or_before_idx = 1 - gn.now_or_before_idx;
-    }
-#endif
     flags.botl = flags.botlx = 0;
 }
 
@@ -1807,26 +2027,30 @@ evaluate_and_notify_windowport(
     gu.update_all = FALSE;
 }
 
-#ifdef NEXT_VERSION
 void
 status_initialize(
     boolean reassessment) /* True: just recheck fields without other init */
 {
+#ifdef NEXT_VERSION
     enum statusfields fld;
     boolean fldenabl;
     int i;
     const char *fieldfmt, *fieldname;
+#endif
 
     if (!reassessment) {
         if (gb.blinit) {
             impossible("2nd status_initialize with full init.");
         }
         init_blstats();
+#ifdef NEXT_VERSION
         (*windowprocs.win_status_init)();
+#endif
         gb.blinit = TRUE;
     } else if (!gb.blinit) {
         panic("status 'reassess' before init");
     }
+#ifdef NEXT_VERSION
     for (i = 0; i < MAXBLSTATS; ++i) {
         fld = initblstats[i].fld;
         fldenabl = (fld == BL_SCORE) ? flags.showscore
@@ -1842,6 +2066,7 @@ status_initialize(
                    : initblstats[i].fldfmt;
         status_enablefield(fld, fieldname, fieldfmt, fldenabl);
     }
+#endif
     gu.update_all = TRUE;
     flags.botlx = TRUE;
 }
@@ -1851,9 +2076,12 @@ status_finish(void)
 {
     int i;
 
+#ifdef NEXT_VERSION
     /* call the window port cleanup routine first */
-    if (windowprocs.win_status_finish)
+    if (windowprocs.win_status_finish) {
         (*windowprocs.win_status_finish)();
+    }
+#endif
 
     /* free memory that we alloc'd now */
     for (i = 0; i < MAXBLSTATS; ++i) {
@@ -1883,7 +2111,6 @@ status_finish(void)
 #endif /* STATUS_HILITES */
     }
 }
-#endif
 
 static void
 init_blstats(void)
@@ -2601,6 +2828,19 @@ get_hilite_color(enum statusfields fld)
     }
 
     chg = compare_blstats(&gb.blstats[prev_idx][fld], &gb.blstats[idx][fld]);
+
+    /* Extend temporary (up/down/changed) hilites for 'statushilites'
+       turns past the transition: while the remembered expiry window
+       is still active for this field, keep reporting the change so
+       the matching BL_TH_UPDOWN rule stays selected. */
+    if (hilite_until_moves[fld] != 0L && moves <= hilite_until_moves[fld]) {
+        if (chg == 0 && hilite_sign[fld] != 0) {
+            chg = hilite_sign[fld];
+        }
+    } else if (hilite_until_moves[fld] != 0L) {
+        hilite_until_moves[fld] = 0L;
+        hilite_sign[fld] = 0;
+    }
 
     /* compute percentage if applicable */
     pc = 0;
