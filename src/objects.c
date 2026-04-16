@@ -583,10 +583,10 @@ NEARDATA struct objclass objects[] = {
     AMULET((char *)0,                 "elliptic",   0, 0),
     OBJECT(OBJ("cheap plastic imitation of the Amulet of Yendor",
                "Amulet of Yendor"), BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, PLASTIC), 0,
-           AMULET_CLASS, 0, 0, 20,    0, 0, 0, 0, 0,  1, HI_MITHRIL),
+           AMULET_CLASS, 0, 0, 20,    0, 0, 0, 0, 0,  1, CLR_BRIGHT_MAGENTA),
     OBJECT(OBJ("Amulet of Yendor", /* note: description == name */
                "Amulet of Yendor"), BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, MITHRIL), 0,
-           AMULET_CLASS, 0, 0, 20, 30000, 0, 0, 0, 0, 20, HI_MITHRIL),
+           AMULET_CLASS, 0, 0, 20, 30000, 0, 0, 0, 0, 20, CLR_BRIGHT_MAGENTA),
 #undef AMULET
 
 /* tools ... */

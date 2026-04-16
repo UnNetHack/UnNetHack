@@ -61,6 +61,7 @@
 	  - Gem alchemy (from dNetHack)
 	  - Wielding Vorpal Blade protects against decapitation attacks (from EvilHack)
 	  - Renamed wand of secret door detection to wand of detection
+	  - The Amulet of Yendor (and fakes) are colored bright magenta (from xNetHack)
 
 	* artifact changes:
 	  - Removed artifact wish failure due to the number of existing artifacts
