@@ -958,27 +958,51 @@ curses_add_statuses(WINDOW *win, boolean align_right,
         *x = mx;
     }
 
-#define statprob(str, trouble)                                  \
-    curses_add_status(win, align_right, vertical, x, y, str, trouble)
-
-    /* Hunger */
-    statprob(hu_stat[u.uhs], u.uhs != 1); /* 1 is NOT_HUNGRY (not defined here) */
-
-    /* General troubles */
-    statprob("Conf",     Confusion);
-    statprob("Blind",    Blind);
-    statprob("Stun",     Stunned);
-    statprob("Hallu",    Hallucination);
-    statprob("Ill",      (u.usick_type & SICK_NONVOMITABLE));
-    statprob("FoodPois", (u.usick_type & SICK_VOMITABLE));
-    statprob("Slime",    Slimed);
-
-    /* Encumbrance */
     int enc = near_capacity();
-    statprob(enc_stat[enc], enc > UNENCUMBERED);
 
-    if (sengr_at("Elbereth", u.ux, u.uy)) {
-        statprob("Elbereth", !Blind);
+    /* Honor cond_menu / OPTIONS=cond_<name> toggles for fields that
+       have a condtests[] entry; bl_cond_ignored bypasses the gate
+       (Hunger, Capacity and Elbereth aren't in condtests[]). */
+#define statprob(idx, str, trouble)                                       \
+    do {                                                                  \
+        if ((idx) == bl_cond_ignored || condtests[(idx)].enabled) {       \
+            curses_add_status(win, align_right, vertical, x, y,           \
+                              (str), (trouble));                          \
+        }                                                                 \
+    } while (0)
+
+    /* Same set and order as tty's bot2str()/bot3str(). */
+    statprob(bl_stone,    "Stone",    Stoned);
+    statprob(bl_slime,    "Slime",    Slimed);
+    statprob(bl_strngl,   "Strngl",   Strangled);
+    statprob(bl_foodpois, "FoodPois", (u.usick_type & SICK_VOMITABLE));
+    statprob(bl_termill,  "Ill",      (u.usick_type & SICK_NONVOMITABLE));
+
+    /* 1 is NOT_HUNGRY (not defined here). */
+    statprob(bl_cond_ignored, hu_stat[u.uhs], u.uhs != NOT_HUNGRY);
+    statprob(bl_cond_ignored, enc_stat[enc],  enc > UNENCUMBERED);
+
+    statprob(bl_blind, "Blind", Blind);
+    statprob(bl_stun,  "Stun",  Stunned);
+    statprob(bl_conf,  "Conf",  Confusion);
+    statprob(bl_hallu, "Hallu", Hallucination);
+
+    /* levitation and flying are mutually exclusive; riding is not */
+    if (Levitation) {
+        statprob(bl_lev, "Lev", Levitation);
+    } else {
+        statprob(bl_fly, "Fly", Flying);
+    }
+    statprob(bl_ride,        "Ride",   u.usteed != NULL);
+    statprob(bl_feet_frozen, "Frozen", u.ufeetfrozen > 0);
+
+    int engr_type;
+    if ((engr_type = sengr_at("Elbereth", u.ux, u.uy))) {
+        /* keep in sync with bot2str() in botl.c */
+        boolean feelable_engraving = (engr_type == ENGRAVE || engr_type == BURN) && can_reach_floor(FALSE);
+        if (!Blind || feelable_engraving) {
+            statprob(bl_cond_ignored, "Elbereth", 1);
+        }
     }
 #undef statprob
 }
