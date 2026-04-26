@@ -90,7 +90,7 @@ static struct Bool_Opt
     {"checkpoint", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef CURSES_GRAPHICS
-    {"classic_status", &iflags.classic_status, TRUE, SET_IN_FILE},
+    {"classic_status", &iflags.classic_status, FALSE, SET_IN_FILE},
 #endif
     {"clicklook", &iflags.clicklook, FALSE, SET_IN_FILE },
     {"cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME},
