@@ -551,6 +551,10 @@ bot1(void)
     bot1str(newbot1);
 #endif
     curs(WIN_STATUS, 1, 0);
+    /* bot1str has already updated cw->data to match newbot1, so force
+       botlx=0 to make this trailing putstr a no-op (when nothing differs)
+       or diff-only (when something does). */
+    flags.botlx = 0;
     putstr(WIN_STATUS, 0, newbot1);
     flags.botlx = save_botlx;
 }
@@ -854,6 +858,8 @@ bot2(void)
     int save_botlx = flags.botlx;
 #endif
     curs(WIN_STATUS, 1, 1);
+    /* See bot1(): botlx = 0 */
+    flags.botlx = 0;
     putstr(WIN_STATUS, 0, newbot2);
     flags.botlx = save_botlx;
 }
@@ -909,6 +915,8 @@ bot3(void)
         bot3str(newbot3);
 
         curs(WIN_STATUS, 1, 2);
+        /* See bot1(): botlx = 0 */
+        flags.botlx = 0;
         putstr(WIN_STATUS, 0, newbot3);
         flags.botlx = save_botlx;
     }
