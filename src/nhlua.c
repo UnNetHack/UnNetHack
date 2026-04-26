@@ -2502,7 +2502,11 @@ nhlL_newstate(nhl_sandbox_info *sbi, const char *name)
         nud->sid = ++gl.lua_sid;
     }
 
+#if LUA_VERSION_NUM >= 505
+    lua_State *L = lua_newstate(nhl_alloc, nud, 0);
+#else
     lua_State *L = lua_newstate(nhl_alloc, nud);
+#endif
     if (!L) {
         panic("NULL lua_newstate");
     }
