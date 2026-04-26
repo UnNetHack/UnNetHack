@@ -627,7 +627,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
 
     wprintw(win, "%s", buf);
 
-    print_statdiff("$", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
+    print_statdiff("$:", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
 
     /* HP/Pw use special coloring rules */
     attr_t hpattr, pwattr;
@@ -752,7 +752,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wprintw(win, "Pw:");
     draw_bar(FALSE, u.uen, u.uenmax, NULL);
 
-    print_statdiff(" $", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
+    print_statdiff(" $:", &prevau, money_cnt(invent), STAT_GOLD, BL_GOLD);
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
