@@ -612,8 +612,17 @@ describe_level(
 }
 
 static void
-botl_text(int condition, const char *text, char *botl, int statusline)
+botl_text(enum blconditions condition_idx, int condition,
+          const char *text, char *botl, int statusline)
 {
+    /* When condition_idx is a real condtests[] entry, honor the
+       cond_menu / OPTIONS=cond_<name> toggle for it.
+       bl_cond_ignored bypasses the gate (used e.g. for Hunger and
+       Capacity which have no condtests[] entries). */
+    if (condition_idx != bl_cond_ignored
+        && !condtests[condition_idx].enabled) {
+        return;
+    }
     if (condition) {
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
         add_colored_text(text, botl, statusline);
@@ -624,10 +633,15 @@ botl_text(int condition, const char *text, char *botl, int statusline)
 }
 
 static void
-botl_text_or_blanks(int condition, const char *text, char *botl, int statusline)
+botl_text_or_blanks(enum blconditions condition_idx, int condition,
+                    const char *text, char *botl, int statusline)
 {
+    if (condition_idx != bl_cond_ignored
+        && !condtests[condition_idx].enabled) {
+        return;
+    }
     if (condition) {
-        botl_text(condition, text, botl, statusline);
+        botl_text(condition_idx, condition, text, botl, statusline);
     } else {
         char *nb = eos(botl);
         int i = strlen(text) + 1;
@@ -810,34 +824,34 @@ void bot2str(char *newbot2)
     }
 #endif
     if (iflags.statuslines < 3) {
-        botl_text(Stoned,    "Stone",  newbot2, 1);
-        botl_text(Slimed,    "Slime",  newbot2, 1);
-        botl_text(Strangled, "Strngl", newbot2, 1);
-        botl_text(Sick && (u.usick_type & SICK_VOMITABLE),    "FoodPois", newbot2, 1);
-        botl_text(Sick && (u.usick_type & SICK_NONVOMITABLE), "Ill",      newbot2, 1);
-        botl_text(u.uhs != NOT_HUNGRY, hu_stat[u.uhs], newbot2, 1);
-        botl_text(cap > UNENCUMBERED, enc_stat[cap], newbot2, 1);
-        botl_text(Blind,         "Blind", newbot2, 1);
-        botl_text(Stunned,       "Stun",  newbot2, 1);
-        botl_text(Confusion,     "Conf",  newbot2, 1);
-        botl_text(Hallucination, "Hallu", newbot2, 1);
+        botl_text(bl_stone,    Stoned,    "Stone",  newbot2, 1);
+        botl_text(bl_slime,    Slimed,    "Slime",  newbot2, 1);
+        botl_text(bl_strngl,   Strangled, "Strngl", newbot2, 1);
+        botl_text(bl_foodpois, Sick && (u.usick_type & SICK_VOMITABLE),    "FoodPois", newbot2, 1);
+        botl_text(bl_termill,  Sick && (u.usick_type & SICK_NONVOMITABLE), "Ill",      newbot2, 1);
+        botl_text(bl_cond_ignored, u.uhs != NOT_HUNGRY, hu_stat[u.uhs], newbot2, 1);
+        botl_text(bl_cond_ignored, cap > UNENCUMBERED, enc_stat[cap], newbot2, 1);
+        botl_text(bl_blind, Blind,         "Blind", newbot2, 1);
+        botl_text(bl_stun,  Stunned,       "Stun",  newbot2, 1);
+        botl_text(bl_conf,  Confusion,     "Conf",  newbot2, 1);
+        botl_text(bl_hallu, Hallucination, "Hallu", newbot2, 1);
 
         /* levitation and flying are mutually exclusive; riding is not */
         if (Levitation) {
-            botl_text(Levitation, "Lev", newbot2, 1);
+            botl_text(bl_lev, Levitation, "Lev", newbot2, 1);
         } else {
-            botl_text(Flying, "Fly", newbot2, 1);
+            botl_text(bl_fly, Flying, "Fly", newbot2, 1);
         }
 
-        botl_text(u.usteed != NULL,  "Ride",   newbot2, 1);
-        botl_text(u.ufeetfrozen > 0, "Frozen", newbot2, 1);
+        botl_text(bl_ride,        u.usteed != NULL,  "Ride",   newbot2, 1);
+        botl_text(bl_feet_frozen, u.ufeetfrozen > 0, "Frozen", newbot2, 1);
     }
 
     int engr_type;
     if ((engr_type = sengr_at("Elbereth", u.ux, u.uy))) {
         boolean feelable_engraving = (engr_type == ENGRAVE || engr_type == BURN) && can_reach_floor(FALSE);
         if (!Blind || feelable_engraving) {
-            botl_text(1, "Elbereth", newbot2, 1);
+            botl_text(bl_cond_ignored, 1, "Elbereth", newbot2, 1);
         }
     }
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -870,34 +884,34 @@ bot3str(char *newbot3)
     newbot3[0] = '\0';
 
     int cap = near_capacity();
-    botl_text(cap > UNENCUMBERED, enc_stat[cap], newbot3, 2);
+    botl_text(bl_cond_ignored, cap > UNENCUMBERED, enc_stat[cap], newbot3, 2);
     unsigned len = strlen(newbot3);
     while (len < strlen(enc_stat[OVERLOADED]) + 1 ) {
         strcat(newbot3, " ");
         len++;
     }
 
-    botl_text_or_blanks(u.uhs != NOT_HUNGRY, hu_stat[u.uhs], newbot3, 2);
-    botl_text_or_blanks(Stoned,    "Stone",  newbot3, 2);
-    botl_text_or_blanks(Slimed,    "Slime",  newbot3, 2);
-    botl_text_or_blanks(Strangled, "Strngl", newbot3, 2);
-    botl_text_or_blanks(Sick && (u.usick_type & SICK_VOMITABLE),    "FoodPois", newbot3, 2);
-    botl_text_or_blanks(Sick && (u.usick_type & SICK_NONVOMITABLE), "Ill",      newbot3, 2);
-    botl_text_or_blanks(Blind,         "Blind", newbot3, 2);
-    botl_text_or_blanks(Stunned,       "Stun",  newbot3, 2);
-    botl_text_or_blanks(Confusion,     "Conf",  newbot3, 2);
-    botl_text_or_blanks(Hallucination, "Hallu", newbot3, 2);
+    botl_text_or_blanks(bl_cond_ignored, u.uhs != NOT_HUNGRY, hu_stat[u.uhs], newbot3, 2);
+    botl_text_or_blanks(bl_stone,    Stoned,    "Stone",  newbot3, 2);
+    botl_text_or_blanks(bl_slime,    Slimed,    "Slime",  newbot3, 2);
+    botl_text_or_blanks(bl_strngl,   Strangled, "Strngl", newbot3, 2);
+    botl_text_or_blanks(bl_foodpois, Sick && (u.usick_type & SICK_VOMITABLE),    "FoodPois", newbot3, 2);
+    botl_text_or_blanks(bl_termill,  Sick && (u.usick_type & SICK_NONVOMITABLE), "Ill",      newbot3, 2);
+    botl_text_or_blanks(bl_blind,    Blind,         "Blind", newbot3, 2);
+    botl_text_or_blanks(bl_stun,     Stunned,       "Stun",  newbot3, 2);
+    botl_text_or_blanks(bl_conf,     Confusion,     "Conf",  newbot3, 2);
+    botl_text_or_blanks(bl_hallu,    Hallucination, "Hallu", newbot3, 2);
 
     /* levitation and flying are mutually exclusive; riding is not */
     if (Levitation) {
-        botl_text_or_blanks(Levitation, "Lev", newbot3, 2);
+        botl_text_or_blanks(bl_lev, Levitation, "Lev", newbot3, 2);
     } else {
-        botl_text_or_blanks(Flying, "Fly", newbot3, 2);
+        botl_text_or_blanks(bl_fly, Flying,     "Fly", newbot3, 2);
     }
 
     if (CO > 90) {
-        botl_text_or_blanks(u.usteed != NULL,  "Ride",   newbot3, 2);
-        botl_text_or_blanks(u.ufeetfrozen > 0, "Frozen", newbot3, 2);
+        botl_text_or_blanks(bl_ride,        u.usteed != NULL,  "Ride",   newbot3, 2);
+        botl_text_or_blanks(bl_feet_frozen, u.ufeetfrozen > 0, "Frozen", newbot3, 2);
     }
 }
 
@@ -1232,6 +1246,7 @@ const struct conditions_t conditions[] = {
     { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
     { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "Legs",     "Leg",   "Lg"  } },
     { 20, BL_MASK_HOLDING,   bl_holding,   { "UHold",    "UHld",  "UHd" } },
+    { 20, BL_MASK_FEET_FROZEN, bl_feet_frozen, { "Frozen", "Frzn",  "Fz"  } },
 };
 
 struct condtests_t condtests[CONDITION_COUNT] = {
@@ -1241,16 +1256,16 @@ struct condtests_t condtests[CONDITION_COUNT] = {
     { bl_blind,     "blind",       opt_out, TRUE,  FALSE, FALSE },
     { bl_busy,      "busy",        opt_in,  FALSE, FALSE, FALSE },
     { bl_conf,      "conf",        opt_out, TRUE,  FALSE, FALSE },
-    { bl_deaf,      "deaf",        opt_out, TRUE,  FALSE, FALSE },
-    { bl_elf_iron,  "iron",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_deaf,      "deaf",        opt_out, FALSE, FALSE, FALSE },
+    { bl_elf_iron,  "iron",        opt_out, FALSE, FALSE, FALSE },
     { bl_fly,       "fly",         opt_out, TRUE,  FALSE, FALSE },
     { bl_foodpois,  "foodPois",    opt_out, TRUE,  FALSE, FALSE },
     { bl_glowhands, "glowhands",   opt_in,  FALSE, FALSE, FALSE },
-    { bl_grab,      "grab",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_grab,      "grab",        opt_out, FALSE, FALSE, FALSE },
     { bl_hallu,     "hallucinat",  opt_out, TRUE,  FALSE, FALSE },
     { bl_held,      "held",        opt_in,  FALSE, FALSE, FALSE },
     { bl_icy,       "ice",         opt_in,  FALSE, FALSE, FALSE },
-    { bl_inlava,    "lava",        opt_out, TRUE,  FALSE, FALSE },
+    { bl_inlava,    "lava",        opt_out, FALSE, FALSE, FALSE },
     { bl_lev,       "levitate",    opt_out, TRUE,  FALSE, FALSE },
     { bl_parlyz,    "paralyzed",   opt_in,  FALSE, FALSE, FALSE },
     { bl_ride,      "ride",        opt_out, TRUE,  FALSE, FALSE },
@@ -1267,6 +1282,7 @@ struct condtests_t condtests[CONDITION_COUNT] = {
     { bl_unconsc,   "unconscious", opt_in,  FALSE, FALSE, FALSE },
     { bl_woundedl,  "woundedlegs", opt_in,  FALSE, FALSE, FALSE },
     { bl_holding,   "holding",     opt_in,  FALSE, FALSE, FALSE },
+    { bl_feet_frozen, "feetfrozen",opt_out, TRUE,  FALSE, FALSE },
 };
 
 /* condition indexing */
@@ -1743,6 +1759,7 @@ cond_menu(void)
 
         any = zeroany;
         any.a_int = 1;
+#ifdef NEXT_VERSION
         Sprintf(mbuf, "change sort order from \"%s\" to \"%s\"",
                 menutitle[gc.condmenu_sortorder],
                 menutitle[1 - gc.condmenu_sortorder]);
@@ -1751,8 +1768,29 @@ cond_menu(void)
         any = zeroany;
         Sprintf(mbuf, "sorted %s", menutitle[gc.condmenu_sortorder]);
         add_menu_heading(tmpwin, mbuf);
+#endif
         for (i = 0; i < SIZE(condtests); i++) {
             idx = sequence[i];
+            /* Hide conditions that bot2str()/bot3str() don't render
+               yet; offering a toggle for them would be misleading. */
+            switch ((enum blconditions) idx) {
+            case bl_blind:
+            case bl_conf:
+            case bl_feet_frozen:
+            case bl_fly:
+            case bl_foodpois:
+            case bl_hallu:
+            case bl_lev:
+            case bl_ride:
+            case bl_slime:
+            case bl_stone:
+            case bl_strngl:
+            case bl_stun:
+            case bl_termill:
+                break;
+            default:
+                continue;
+            }
             Sprintf(mbuf, "cond_%-14s", condtests[idx].useroption);
             any = zeroany;
             any.a_int = idx + 2; /* avoid zero and the sort change pick */
