@@ -66,3 +66,11 @@ boolean bind_key(uchar key, const char *command) { return FALSE; }
 boolean bind_specialkey(uchar key, const char *command) { return FALSE; }
 
 int rn2(int r) { return 0; }
+
+void clear_status_hilites(void) {}
+void reset_status_hilites(void) {}
+int count_status_hilites(void) { return 0; }
+boolean parse_status_hl1(char *s, boolean b) { return FALSE; }
+boolean status_hilite_menu(void) { return FALSE; }
+boolean cond_menu(void) { return FALSE; }
+int count_cond(void) { return 0; }

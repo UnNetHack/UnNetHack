@@ -72,3 +72,11 @@ boolean is_lava(coordxy i1, coordxy i3) { return FALSE; }
 char txt2key(char *txt) { return ' '; }
 boolean bind_key(uchar key, const char *command) { return FALSE; }
 boolean bind_specialkey(uchar key, const char *command) { return FALSE; }
+
+void clear_status_hilites(void) {}
+void reset_status_hilites(void) {}
+int count_status_hilites(void) { return 0; }
+boolean parse_status_hl1(char *s, boolean b) { return FALSE; }
+boolean status_hilite_menu(void) { return FALSE; }
+boolean cond_menu(void) { return FALSE; }
+int count_cond(void) { return 0; }
