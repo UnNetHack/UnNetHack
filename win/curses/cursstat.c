@@ -235,6 +235,16 @@ print_statdiff(const char *append, nhstat *stat, int new, int type,
         attr = curses_color_attr(color, 0);
     }
 
+    /* Skip a leading separator space without applying the field's
+       attribute, so a configured background colour doesn't bleed into
+       the gap between fields. */
+    if (append[0] == ' ') {
+        int cy, cx;
+        getyx(win, cy, cx);
+        wmove(win, cy, cx + 1);
+        append++;
+    }
+
     wattron(win, attr);
     wprintw(win, "%s", append);
     if (type == STAT_STR && new > 18) {
