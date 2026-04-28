@@ -21,6 +21,8 @@ fi
 export LUA=`pwd`/liblua/lua.exe
 export LUA_INCLUDE=-I`pwd`/liblua
 export LUA_LIB="`pwd`/liblua/liblua.a -lm"
+$LUA -v
+file $LUA
 
 INSTALL=/tmp/unnethack_win32
 DESTDIR=/tmp/unnethack_destdir
