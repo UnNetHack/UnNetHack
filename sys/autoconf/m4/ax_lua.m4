@@ -278,7 +278,7 @@ AC_DEFUN([AX_PROG_LUA],
         ax_cv_lua_version=[`$LUA -e '
           -- return a version number in X.Y format
           local _, _, ver = string.find(_VERSION, "^Lua (%d+%.%d+)")
-          print(ver or "")'`]
+          print(ver or "")' | tr -d '[:cntrl:]'`]
       ])
     AS_IF([test "x$ax_cv_lua_version" = 'x'],
       [AC_MSG_ERROR([invalid Lua version number])])
@@ -289,7 +289,7 @@ AC_DEFUN([AX_PROG_LUA],
       AC_CACHE_CHECK([for $ax_display_LUA jit version], [ax_cv_luajit_version],
         [ ax_cv_luajit_version=[`$LUA -e '
           local _, _, ver = string.find(jit and jit.version, "(%d+%..+)")
-          print(ver or "")'`]
+          print(ver or "")' | tr -d '[:cntrl:]'`]
         ])
       AS_IF([test "x$ax_cv_luajit_version" = 'x'],
         [AC_MSG_ERROR([invalid Lua jit version number])])
@@ -394,7 +394,7 @@ AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
         return n * fact(n-1)
       end
     end
-    print("fact(5) is " .. fact(5))'`]
+    print("fact(5) is " .. fact(5))' | tr -d '[:cntrl:]'`]
   AS_IF([test "$_ax_lua_factorial" = 'fact(5) is 120'],
     [$2], [$3])
 ])
@@ -425,7 +425,7 @@ AC_DEFUN([_AX_LUA_CHK_VER],
       print("yes")
     else
       print("no")
-    end'`]
+    end' | tr -d '[:cntrl:]'`]
     AS_IF([test "x$_ax_lua_good_version" = "xyes"],
       [$4], [$5])
 ])
