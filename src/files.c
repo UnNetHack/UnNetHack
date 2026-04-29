@@ -3169,6 +3169,7 @@ recover_savefile()
     return TRUE;
 }
 
+static
 boolean
 copy_bytes(ifd, ofd)
 int ifd, ofd;
