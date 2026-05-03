@@ -8532,7 +8532,9 @@ printf '%s\n' "#define MENU_COLOR /**/" >>confdefs.h
 
    fi
 
-if test "$enable_tty_graphics" != "no"; then
+if [[ "$enable_tty_graphics" == "yes" ||
+      "$enable_curses_graphics" == "yes" ||
+      "$enable_pdcurses_graphics" == "yes" ]]; then
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable status-color" >&5
 printf %s "checking whether to enable status-color... " >&6; }
    # Check whether --enable-status-color was given.
