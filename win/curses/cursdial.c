@@ -18,7 +18,7 @@ typedef struct nhmi {
     anything identifier;        /* Value returned if item selected */
     char accelerator;           /* Character used to select item from menu */
     char group_accel;           /* Group accelerator for menu item, if any */
-    int attr;                   /* Text attributes for item */
+    attr_t attr;                /* Text attributes for item */
     const char *str;            /* Text of menu item */
     boolean presel;             /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
@@ -150,6 +150,9 @@ curses_character_input_dialog(const char *prompt, const char *choices,
                               char def)
 {
     WINDOW *askwin = NULL;
+#ifdef PDCURSES
+    WINDOW *message_window;
+#endif
     int answer, count, maxwidth, map_height, map_width;
     char *linestr;
     char askstr[BUFSZ + QBUFSZ];
@@ -166,6 +169,9 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         map_width = term_cols;
     }
 
+#ifdef PDCURSES
+    message_window = curses_get_nhwin(MESSAGE_WIN);
+#endif
     maxwidth = map_width - 2;
 
     if (choices != NULL) {
@@ -227,7 +233,11 @@ curses_character_input_dialog(const char *prompt, const char *choices,
     curses_stupid_hack = 0;
 
     while (1) {
-        answer = getch();
+#ifdef PDCURSES
+        answer = wgetch(message_window);
+#else
+        answer = curses_read_char();
+#endif
 
         if (answer == ERR) {
             answer = def;
@@ -510,7 +520,7 @@ curses_create_nhmenu(winid wid)
 
 void
 curses_add_nhmenu_item(winid wid, int glyph, const ANY_P * identifier,
-                       char accelerator, char group_accel, int attr,
+                       char accelerator, char group_accel, attr_t attr,
                        const char *str, boolean presel)
 {
     char *new_str;

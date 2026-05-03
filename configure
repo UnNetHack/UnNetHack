@@ -770,10 +770,13 @@ enable_option_checking
 enable_dummy_graphics
 enable_lisp_graphics
 enable_curses_graphics
+enable_pdcurses_graphics
 enable_tty_graphics
 enable_x11_graphics
 enable_mswin_graphics
 with_compression
+with_pdcurses
+with_pdcurses_backend
 enable_data_librarian
 enable_wallified_maze
 enable_blackmarket
@@ -1474,6 +1477,8 @@ Optional Features:
   --enable-lisp-graphics  enable playing UnNetHack in Emacs (default=no)
   --enable-curses-graphics
                           use curses interface (default=no)
+  --enable-pdcurses-graphics
+                          use pdcurses interface (default=no)
   --enable-tty-graphics   use tty-graphics (default=auto)
   --enable-x11-graphics   use x11-graphics (default=no)
   --enable-mswin-graphics use Microsoft Window's native graphics (default=no)
@@ -1553,6 +1558,11 @@ Optional Packages:
   --with-compression=PROGRAM
                           Set the program to compress data files
                           (default=auto)
+  --with-pdcurses=LIB     Path to PDCurses static library (default:
+                          third_party/PDCurses)
+  --with-pdcurses-backend=BACKEND
+                          PDCurses backend to use (x11, sdl2, wincon, etc,
+                          default: sdl2)
   --with-owner=USER       Set the owner of installed files (default=games)
   --with-group=GROUP      Set the group of installed files (default=bin)
   --with-gamesdir=DIR     Location of other files which may be modified
@@ -3232,7 +3242,11 @@ fi
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking dummy-graphics" >&5
 printf %s "checking dummy-graphics... " >&6; }
   if test "$enable_dummy_graphics" != "no"; then
-    nethack_wins="dummy $nethack_wins"
+    if test "dummy" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="dummy $nethack_wins"
+    fi
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
   else
@@ -3252,7 +3266,11 @@ fi
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking lisp-graphics" >&5
 printf %s "checking lisp-graphics... " >&6; }
   if test "$enable_lisp_graphics" != "no"; then
-    nethack_wins="lisp $nethack_wins"
+    if test "lisp" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="lisp $nethack_wins"
+    fi
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
   else
@@ -3272,7 +3290,35 @@ fi
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking curses-graphics" >&5
 printf %s "checking curses-graphics... " >&6; }
   if test "$enable_curses_graphics" != "no"; then
-    nethack_wins="curses $nethack_wins"
+    if test "curses" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="curses $nethack_wins"
+    fi
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+  else
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+  fi
+
+# Check whether --enable-pdcurses-graphics was given.
+if test ${enable_pdcurses_graphics+y}
+then :
+  enableval=$enable_pdcurses_graphics; enable_pdcurses_graphics="$enableval"
+else case e in #(
+  e) enable_pdcurses_graphics="no" ;;
+esac
+fi
+
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking pdcurses-graphics" >&5
+printf %s "checking pdcurses-graphics... " >&6; }
+  if test "$enable_pdcurses_graphics" != "no"; then
+    if test "pdcurses" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="pdcurses $nethack_wins"
+    fi
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
   else
@@ -3292,7 +3338,11 @@ fi
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking tty-graphics" >&5
 printf %s "checking tty-graphics... " >&6; }
   if test "$enable_tty_graphics" != "no"; then
-    nethack_wins="tty $nethack_wins"
+    if test "tty" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="tty $nethack_wins"
+    fi
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
   else
@@ -3312,7 +3362,11 @@ fi
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking x11-graphics" >&5
 printf %s "checking x11-graphics... " >&6; }
   if test "$enable_x11_graphics" != "no"; then
-    nethack_wins="x11 $nethack_wins"
+    if test "x11" = "pdcurses"; then
+      nethack_wins="x11 curses"
+    else
+      nethack_wins="x11 $nethack_wins"
+    fi
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
   else
@@ -3332,7 +3386,11 @@ fi
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking mswin-graphics" >&5
 printf %s "checking mswin-graphics... " >&6; }
   if test "$enable_mswin_graphics" != "no"; then
-    nethack_wins="mswin $nethack_wins"
+    if test "mswin" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="mswin $nethack_wins"
+    fi
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
   else
@@ -7496,6 +7554,63 @@ fi
     OPTIONS_FILES="options"
 fi
 
+if test "$enable_pdcurses_graphics" != "no"; then
+    if test "$enable_curses_graphics" != "no"; then
+        as_fn_error $? "Using both curses and PDCurses libraries is not supported" "$LINENO" 5
+    fi
+
+
+# Check whether --with-pdcurses was given.
+if test ${with_pdcurses+y}
+then :
+  withval=$with_pdcurses; PDCURSES_LIB="$withval"
+else case e in #(
+  e) PDCURSES_LIB="libpdcurses.a"
+                 ;;
+esac
+fi
+
+
+
+# Check whether --with-pdcurses-backend was given.
+if test ${with_pdcurses_backend+y}
+then :
+  withval=$with_pdcurses_backend; PDCURSES_BACKEND="$withval"
+else case e in #(
+  e) PDCURSES_BACKEND="sdl2" # Default
+             ;;
+esac
+fi
+
+
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: PDCurses static library: $PDCURSES_LIB" >&5
+printf '%s\n' "$as_me: PDCurses static library: $PDCURSES_LIB" >&6;}
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: Using PDCurses backend: $PDCURSES_BACKEND" >&5
+printf '%s\n' "$as_me: Using PDCurses backend: $PDCURSES_BACKEND" >&6;}
+
+    if test "$PDCURSES_BACKEND" = "sdl2"; then
+        PDCURSES_BACKEND_LIB="-lSDL2 -lSDL2_ttf"
+        CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
+        printf '%s\n' "#define PDCURSES_BACKEND_SDL2 1" >>confdefs.h
+    elif test "$PDCURSES_BACKEND" = "wingui"; then
+        PDCURSES_BACKEND_LIB="-lgdi32 -lwinmm -lcomdlg32"
+        CFLAGS="$CFLAGS -DPDC_FORCE_UTF8"
+        printf '%s\n' "#define PDCURSES_BACKEND_WINGUI 1" >>confdefs.h
+    else
+        as_fn_error $? "PDCurses backend ${PDCURSES_BACKEND} is currently not supported" "$LINENO" 5
+    fi
+    WINCURSESLIB="${PDCURSES_LIB} ${PDCURSES_BACKEND_LIB}"
+    WINSRC="${WINSRC} \$(WINCURSESSRC)"
+    WINOBJ="${WINOBJ} \$(WINCURSESOBJ)"
+    WINLIB="${WINLIB} \$(WINCURSESLIB)"
+
+printf '%s\n' "#define CURSES_GRAPHICS /**/" >>confdefs.h
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+
+
 
 
 if test "$enable_x11_graphics" != "no"; then
@@ -9190,7 +9305,8 @@ else
 
 fi
 
-if test "$enable_tty_graphics" != "no" -a "$host_os" != mingw32; then
+if test "$host_os" != mingw32 || test "$enable_pdcurses_graphics" != "no"; then
+	if test "$enable_tty_graphics" != "no" || test "$enable_curses_graphics" != "no" || test "$enable_pdcurses_graphics" != "no"; then
 	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable utf8-glyphs" >&5
 printf %s "checking whether to enable utf8-glyphs... " >&6; }
    # Check whether --enable-utf8-glyphs was given.
@@ -9215,6 +9331,7 @@ printf '%s\n' "#define UTF8_GLYPHS /**/" >>confdefs.h
 			as_fn_error $? "unable to continue without a 4-bytes datatype that could hold unicode codepoints" "$LINENO" 5
 		fi
 	fi
+fi
 fi
 
 

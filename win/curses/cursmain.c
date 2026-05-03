@@ -18,8 +18,12 @@ extern boolean curs_mesg_no_suppress; /* ditto */
 /* Interface definition, for windows.c */
 struct window_procs curses_procs = {
     "curses",
-    WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_HILITE_PET |
-        WC_POPUP_DIALOG | WC_SPLASH_SCREEN,
+    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_INVERSE
+     | WC_HILITE_PET | WC_WINDOWCOLORS
+#ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
+     | WC_MOUSE_SUPPORT
+#endif
+     | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
     WC2_TERM_COLS | WC2_TERM_ROWS | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR |
     WC2_HILITE_ENGRAVINGS | WC2_HILITE_PEACEFULS | WC2_HILITE_STATUES |
     WC2_SUPPRESS_HIST | WC2_URGENT_MESG,
@@ -107,9 +111,32 @@ curses_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 #ifdef PDCURSES
     char window_title[BUFSZ];
 #endif
+#ifdef HAVE_LOCALE_H
+#ifdef PDCURSES
+    static char pdc_font[BUFSZ] = "";
+#endif
+#endif
 
 #ifdef HAVE_LOCALE_H
     setlocale(LC_CTYPE, "");
+#ifdef PDCURSES
+    /* Assume the DOSVGA port of PDCursesMod, or the SDL1 or SDL2 port of
+       either PDCurses or PDCursesMod. Honor the font_map option to set
+       a font.
+       On MS-DOS, if no font_map is set, use ter-u16v.psf if it is present.
+       PDC_FONT has no effect on other PDCurses or PDCursesMod ports. */
+    if (iflags.wc_font_map && iflags.wc_font_map[0]) {
+        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=%s",
+                 iflags.wc_font_map);
+#ifdef MSDOS
+    } else if (access("ter-u16v.psf", R_OK) >= 0) {
+        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=ter-u16v.psf");
+#endif
+    }
+    if (pdc_font[0] != '\0') {
+        putenv(pdc_font);
+    }
+#endif
 #endif
 
 #ifdef XCURSES
@@ -155,9 +182,10 @@ curses_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
        /* VERSION_STRING */
 # else
 #  ifdef VERSION_STRING
-    sprintf(window_title, "%s %s", "NetHack", VERSION_STRING);
+    sprintf(window_title, "%s %s", "UnNetHack", VERSION_STRING);
 #  else
-    sprintf(window_title, "%s", "NetHack");
+    char buf[BUFSZ] = { 0 };
+    sprintf(window_title, "%s", getversionstring(buf));
 #  endif
        /* VERSION_STRING */
 # endif/* DEF_GAME_NAME */
@@ -458,7 +486,7 @@ curses_start_menu(winid wid)
 /*
 add_menu(winid wid, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, boolean preselected)
+                                attr_t attr, char *str, boolean preselected)
                 -- Add a text line str to the given menu window.  If identifier
                    is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
@@ -632,7 +660,7 @@ curses_print_glyph(winid wid, coordxy x, coordxy y, int glyph,
 {
     int ch, color;
     unsigned int special;
-    int attr = -1;
+    attr_t attr = -1;
 
     /* map glyph to character and color */
     mapglyph(glyph, (glyph_t*)&ch, &color, &special, x, y, 0);
@@ -682,6 +710,14 @@ raw_print(str)  -- Print directly to a screen, or otherwise guarantee that
 void
 curses_raw_print(const char *str)
 {
+#ifdef PDCURSES
+    /* WINDOW *win = curses_get_nhwin(MESSAGE_WIN); */
+
+    if (iflags.window_inited) {
+        curses_message_win_puts(str, FALSE);
+        return;
+    }
+#endif
     puts(str);
 }
 

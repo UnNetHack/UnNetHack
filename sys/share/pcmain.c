@@ -33,7 +33,7 @@ long _stksize = 16*1024;
 
 #ifdef AMIGA
 extern int bigscreen;
-void  preserve_icon ();
+void preserve_icon(void);
 #endif
 
 static void process_options(int argc,char **argv);
@@ -94,7 +94,7 @@ int argc;
 char *argv[];
 {
 
-	int fd;
+    NHFILE *nhfp;
 	char *dir;
 #if defined(WIN32)
 	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
@@ -177,7 +177,7 @@ char *argv[];
 	}
 #endif
 
-#if defined(TOS) && defined(TEXTCOLOR)
+#if defined(TOS)
 	if (iflags.BIOS && iflags.use_color)
 		set_colors();
 #endif
@@ -315,35 +315,28 @@ char *argv[];
 	Strcat(lock,plname);
 	Strcat(lock,".99");
 # else
-#  ifndef MFLOPPY
-	/* I'm not sure what, if anything, is left here, but MFLOPPY has
-	 * conflicts with set_lock_and_bones() in files.c.
-	 */
+    /* I'm not sure what, if anything, is left here, but old MFLOPPY had
+     * conflicts with set_lock_and_bones() in files.c.
+     */
 	Strcpy(lock,plname);
 	Strcat(lock,".99");
 	regularize(lock);	/* is this necessary? */
 				/* not compatible with full path a la AMIGA */
-#  endif
 # endif
 #endif	/* PC_LOCKING */
 
-	/* Set up level 0 file to keep the game state.
-	 */
-	fd = create_levelfile(0, (char *)0);
-	if (fd < 0) {
-		raw_print("Cannot create lock file");
-	} else {
-#ifdef WIN32
-		hackpid = GetCurrentProcessId();
-#else
-		hackpid = 1;
-#endif
-		write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
-		close(fd);
-	}
-#ifdef MFLOPPY
-	level_info[0].where = ACTIVE;
-#endif
+    /* Set up level 0 file to keep the game state.
+    */
+    nhfp = create_levelfile(0, (char *) 0);
+    if (!nhfp) {
+        raw_print("Cannot create lock file");
+    } else {
+        hackpid = 1;
+        if (nhfp->structlevel) {
+            write(nhfp->fd, (genericptr_t) &hackpid, sizeof hackpid);
+        }
+        close_nhfile(nhfp);
+    }
 
 	/*
 	 * Initialisation of the boundaries of the mazes
@@ -370,7 +363,7 @@ char *argv[];
 	getreturn_enabled = TRUE;
 #endif
 
-	if ((fd = restore_saved_game()) >= 0) {
+    if ((nhfp = restore_saved_game()) != 0) {
 #ifdef WIZARD
 		/* Since wizard is actually flags.debug, restoring might
 		 * overwrite it.
@@ -389,7 +382,7 @@ char *argv[];
 		pline("Restoring save file...");
 		mark_synch();	/* flush output */
 
-		if(!dorecover(fd))
+        if (dorecover(nhfp))
 			goto not_recovered;
 #ifdef WIZARD
 		if(!wizard && remember_wiz_mode) wizard = TRUE;
@@ -526,15 +519,6 @@ char *argv[];
 			    	flags.initrace = i;
 			}
 			break;
-#ifdef MFLOPPY
-# ifndef AMIGA
-		/* Player doesn't want to use a RAM disk
-		 */
-		case 'R':
-			ramdisk = FALSE;
-			break;
-# endif
-#endif
 #ifdef AMIGA
 			/* interlaced and non-interlaced screens */
 		case 'L':
@@ -587,11 +571,6 @@ nhusage()
 #endif
 #ifndef AMIGA
 	ADD_USAGE(" [-I] [-i] [-d]");
-#endif
-#ifdef MFLOPPY
-# ifndef AMIGA
-	ADD_USAGE(" [-R]");
-# endif
 #endif
 #ifdef AMIGA
 	ADD_USAGE(" [-[lL]]");

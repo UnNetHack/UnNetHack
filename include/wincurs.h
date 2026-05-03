@@ -111,13 +111,13 @@ extern void curses_refresh_nethack_windows(void);
 extern void curses_del_nhwin(winid wid);
 extern void curses_del_wid(winid wid);
 extern void curs_destroy_all_wins(void);
-extern void curses_putch(winid wid, int x, int y, int ch, int color, int attrs);
+extern void curses_putch(winid wid, int x, int y, int ch, int color, attr_t attrs);
 extern void curses_get_window_size(winid wid, int *height, int *width);
 extern boolean curses_window_has_border(winid wid);
 extern boolean curses_window_exists(winid wid);
 extern int curses_get_window_orientation(winid wid);
 extern void curses_get_window_xy(winid wid, int *x, int *y);
-extern void curses_puts(winid wid, int attr, const char *text);
+extern void curses_puts(winid wid, attr_t attr, const char *text);
 extern void curses_clear_nhwin(winid wid);
 extern void curses_alert_win_border(winid wid, boolean onoff);
 extern void curses_alert_main_borders(boolean onoff);
@@ -128,7 +128,7 @@ extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
 /* cursmisc.c */
 
 extern int curses_read_char(void);
-extern void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff);
+extern void curses_toggle_color_attr(WINDOW *win, int color, attr_t attr, int onoff);
 extern void curses_menu_color_attr(WINDOW *, int, int, int);
 extern void curses_bail(const char *mesg);
 extern winid curses_get_wid(int type);
@@ -154,9 +154,9 @@ extern void curses_rtrim(char *str);
 
 extern int curses_get_count(int first_digit);
 
-extern int curses_convert_attr(int attr);
+extern attr_t curses_convert_attr(int attr);
 
-extern int curses_read_attrs(char *attrs);
+extern attr_t curses_read_attrs(char *attrs);
 
 extern int curses_convert_keys(int key);
 
@@ -175,7 +175,7 @@ extern void curses_create_nhmenu(winid wid);
 extern boolean get_menu_coloring(char *, int *, int *);
 #endif
 extern void curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
-                                   char accelerator, char group_accel, int attr, const char *str,
+                                   char accelerator, char group_accel, attr_t attr, const char *str,
                                    boolean presel);
 
 extern void curses_finalize_nhmenu(winid wid, const char *prompt);

@@ -382,64 +382,39 @@ void
 curses_init_nhcolors(void)
 {
 #ifdef TEXTCOLOR
-    if (has_colors()) {
-        use_default_colors();
-        init_pair(1, COLOR_BLACK, -1);
-        init_pair(2, COLOR_RED, -1);
-        init_pair(3, COLOR_GREEN, -1);
-        init_pair(4, COLOR_YELLOW, -1);
-        init_pair(5, COLOR_BLUE, -1);
-        init_pair(6, COLOR_MAGENTA, -1);
-        init_pair(7, COLOR_CYAN, -1);
-        init_pair(8, COLOR_WHITE, -1);
+    /* COLOR_foo + 8 means COLOR | A_BOLD when COLORS < 16 */
+    /* otherwise assume the terminal has least 16 different colors */
+    /* these map to the NetHack CLR_ defines */
+    static const int fg_clr[16] = {
+        COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+        COLOR_BLUE,  COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE,
+        -1, COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
+        COLOR_BLUE + 8, COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
+    };
+    static const int bg_clr[8] = {
+        -1, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+        COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+    };
+    int bg, nhclr;
+    int maxc = (COLORS >= 16) ? 16 : 8;
 
-        {
-            int i;
+    if (!has_colors()) {
+        return;
+    }
 
-            int clr_remap[16] = {
-                COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-                COLOR_BLUE,
-                COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
-                COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
-                COLOR_BLUE + 8,
-                COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
-            };
+    use_default_colors();
 
-            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
-                init_pair(17 + (i * 2) + 0, clr_remap[i], COLOR_RED);
-                init_pair(17 + (i * 2) + 1, clr_remap[i], COLOR_BLUE);
-            }
-
-            boolean hicolor = FALSE;
-            if (COLORS >= 16) {
-                hicolor = TRUE;
-            }
-
-            /* Work around the crazy definitions above for more background colors... */
-            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
-                init_pair((hicolor ? 49 : 9) + i, clr_remap[i], COLOR_GREEN);
-                init_pair((hicolor ? 65 : 33) + i, clr_remap[i], COLOR_YELLOW);
-                init_pair((hicolor ? 81 : 41) + i, clr_remap[i], COLOR_MAGENTA);
-                init_pair((hicolor ? 97 : 49) + i, clr_remap[i], COLOR_CYAN);
-                init_pair((hicolor ? 113 : 57) + i, clr_remap[i], COLOR_WHITE);
-            }
-        }
-
-
-        if (COLORS >= 16) {
-# ifdef USE_DARKGRAY
-            //init_pair(1, COLOR_BLACK + 8, -1);
-# endif
-            init_pair(9, COLOR_BLACK + 8, -1);
-            init_pair(10, COLOR_RED + 8, -1);
-            init_pair(11, COLOR_GREEN + 8, -1);
-            init_pair(12, COLOR_YELLOW + 8, -1);
-            init_pair(13, COLOR_BLUE + 8, -1);
-            init_pair(14, COLOR_MAGENTA + 8, -1);
-            init_pair(15, COLOR_CYAN + 8, -1);
-            init_pair(16, COLOR_WHITE + 8, -1);
+    for (nhclr = CLR_BLACK; nhclr < maxc; nhclr++) {
+        for (bg = 0; bg < 8; bg++) {
+            init_pair((maxc * bg) + nhclr + 1, fg_clr[nhclr], bg_clr[bg]);
         }
     }
+
+# ifdef USE_DARKGRAY
+    if (COLORS >= 16) {
+        init_pair(CLR_BLACK + 1, COLOR_BLACK + 8, -1);
+    }
+# endif
 #endif
 }
 
@@ -938,6 +913,10 @@ curses_init_options(void)
     } else if (iflags.supports_utf8 && !iflags.cursesgraphics) {
         switch_graphics(UTF8_GRAPHICS);
 #endif
+#ifdef __PDCURSESMOD__
+    } else if (iflags.supports_utf8) {
+        switch_graphics(UTF8_GRAPHICS);
+#endif
     } else if (iflags.DECgraphics || iflags.UTF8graphics || iflags.cursesgraphics) {
         switch_graphics(CURS_GRAPHICS);
     } else {
@@ -1151,7 +1130,7 @@ curses_debug_show_colors(void)
         }
 #endif
 
-        int attr = A_NORMAL;
+        attr_t attr = A_NORMAL;
         if (c != NO_COLOR) {
             attr = curses_color_attr(c, 0);
         }

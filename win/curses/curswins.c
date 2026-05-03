@@ -29,7 +29,7 @@ typedef struct nhwd {
 typedef struct nhchar {
     int ch;                     /* character */
     int color;                  /* color info for character */
-    int attr;                   /* attributes of character */
+    attr_t attr;                /* attributes of character */
 } nethack_char;
 
 static boolean map_clipped;     /* Map window smaller than 80x21 */
@@ -357,7 +357,7 @@ curs_destroy_all_wins(void)
 /* Print a single character in the given window at the given coordinates */
 
 void
-curses_putch(winid wid, int x, int y, int ch, int color, int attr)
+curses_putch(winid wid, int x, int y, int ch, int color, attr_t attr)
 {
     int sx, sy, ex, ey;
     boolean border = curses_window_has_border(wid);
@@ -472,7 +472,7 @@ curses_get_window_orientation(winid wid)
 and text attributes */
 
 void
-curses_puts(winid wid, int attr, const char *text)
+curses_puts(winid wid, attr_t attr, const char *text)
 {
     anything identifier;
     WINDOW *win = NULL;
