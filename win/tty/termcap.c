@@ -1003,15 +1003,9 @@ cl_eos(void) /* free after Robert Viduya */
 extern char *tparm();
 #endif
 
-#  ifdef COLOR_BLACK    /* trust include file */
-#ifndef VIDEOSHADES
-#undef COLOR_BLACK
-#endif
-#  else
-#   ifndef _M_UNIX  /* guess BGR */
-#ifdef VIDEOSHADES
+#ifndef COLOR_BLACK /* trust include file */
+#ifndef _M_UNIX     /* guess BGR */
 #define COLOR_BLACK   0
-#endif
 #define COLOR_BLUE    1
 #define COLOR_GREEN   2
 #define COLOR_CYAN    3
@@ -1019,7 +1013,8 @@ extern char *tparm();
 #define COLOR_MAGENTA 5
 #define COLOR_YELLOW  6
 #define COLOR_WHITE   7
-#   else        /* guess RGB */
+#else /* guess RGB */
+#define COLOR_BLACK   0
 #define COLOR_RED     1
 #define COLOR_GREEN   2
 #define COLOR_YELLOW  3
@@ -1027,10 +1022,7 @@ extern char *tparm();
 #define COLOR_MAGENTA 5
 #define COLOR_CYAN    6
 #define COLOR_WHITE   7
-#   endif
-#  endif
-#ifndef VIDEOSHADES
-#define COLOR_BLACK COLOR_BLUE
+#endif
 #endif
 
 #ifdef TTY_GRAPHICS
