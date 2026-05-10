@@ -1654,6 +1654,14 @@ On_stairs_dn(coordxy x, coordxy y)
 }
 
 boolean
+On_stairs_to_sanctum(coordxy x, coordxy y)
+{
+    stairway *stway = stairway_at(x, y);
+
+    return (boolean) (stway && Is_sanctum(&stway->tolev));
+}
+
+boolean
 Is_botlevel(d_level *lev)
 {
     return (boolean)(lev->dlevel == dungeons[lev->dnum].num_dunlevs);

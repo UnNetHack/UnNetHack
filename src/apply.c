@@ -1085,7 +1085,7 @@ use_bell(struct obj **optr)
     boolean wakem = FALSE, learno = FALSE,
             ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
             invoking = (obj->otyp == BELL_OF_OPENING &&
-                        invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy));
+                        invocation_pos(u.ux, u.uy) && !On_stairs_to_sanctum(u.ux, u.uy));
 
     You("ring %s.", the(xname(obj)));
 
@@ -1241,7 +1241,7 @@ use_candelabrum(struct obj *obj)
         pline("%s's %s burn%s", The(xname(obj)), s,
               (Blind ? "." : " brightly!"));
     }
-    if (!invocation_pos(u.ux, u.uy) || On_stairs(u.ux, u.uy)) {
+    if (!invocation_pos(u.ux, u.uy) || On_stairs_to_sanctum(u.ux, u.uy)) {
         pline_The("%s %s being rapidly consumed!", s, vtense(s, "are"));
         obj->age /= 2;
         /* Fix for bug C343-424 "Unlit candelabrum becomes unlightable

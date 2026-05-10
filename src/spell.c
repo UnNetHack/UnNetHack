@@ -192,7 +192,7 @@ deadbook(struct obj *book2)
     makeknown(SPE_BOOK_OF_THE_DEAD);
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
     book2->known = 1;
-    if (invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
+    if (invocation_pos(u.ux, u.uy) && !On_stairs_to_sanctum(u.ux, u.uy)) {
         struct obj *otmp;
         boolean arti1_primed = FALSE, arti2_primed = FALSE,
                          arti_cursed = FALSE;

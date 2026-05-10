@@ -689,6 +689,8 @@ extern boolean On_stairs(coordxy, coordxy);
 extern boolean On_ladder(coordxy, coordxy);
 extern boolean On_stairs_up(coordxy, coordxy);
 extern boolean On_stairs_dn(coordxy, coordxy);
+extern boolean On_stairs_to_sanctum(coordxy, coordxy);
+
 extern void get_level(d_level *, int);
 extern boolean Is_botlevel(d_level *);
 extern boolean Can_fall_thru(d_level *);
