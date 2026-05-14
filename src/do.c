@@ -1957,6 +1957,8 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             record_uevent_achievement("entered Vlad's tower", entered_vlads_tower);
         } else if (Is_knox(&u.uz)) {
             record_uevent_achievement("entered Fort Ludios", entered_fort_ludios);
+        } else if (On_W_tower_level(&u.uz)) {
+            record_uevent_achievement("entered the Wizard of Yendor's tower", entered_wizards_tower);
         }
     }
 

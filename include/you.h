@@ -58,6 +58,7 @@ struct u_event {
     Bitfield(entered_sheol, 1);             /* entered Sheol */
     Bitfield(entered_vlads_tower, 1);       /* entered Vlad's Tower */
     Bitfield(entered_fort_ludios, 1);       /* entered Fort Ludios */
+    Bitfield(entered_wizards_tower, 1);     /* entered the Wizard of Yendor's tower */
 
     Bitfield(entered_a_shop, 1);            /* entered a shop */
     Bitfield(entered_a_temple, 1);          /* entered a temple */
