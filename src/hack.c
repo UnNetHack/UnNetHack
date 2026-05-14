@@ -370,6 +370,39 @@ catchup_dgn_growths(int mvs)
 }
 #endif /* DUNGEON_GROWTH */
 
+static void
+check_high_altars()
+{
+#ifdef RECORD_ACHIEVE
+    /* track which Sanctum altars on the Astral Plane the hero has visited;
+       used for the visited_all_altars_in_planes achievement */
+    if (Is_astralevel(&u.uz)
+         && IS_ALTAR(levl[u.ux][u.uy].typ)
+         && !u.uevent.visited_all_high_altars_on_astral_plane) {
+        aligntyp altar_align = Amask2align(levl[u.ux][u.uy].altarmask & AM_MASK);
+        if (altar_align == A_LAWFUL
+             && !u.uevent.visited_lawful_high_altar_on_astral_plane) {
+            livelog_printf(LL_MINORAC, "visited the lawful high altar on the Astral Plane");
+            u.uevent.visited_lawful_high_altar_on_astral_plane = TRUE;
+        } else if (altar_align == A_NEUTRAL
+             && !u.uevent.visited_neutral_high_altar_on_astral_plane) {
+            livelog_printf(LL_MINORAC, "visited the neutral high altar on the Astral Plane");
+            u.uevent.visited_neutral_high_altar_on_astral_plane = TRUE;
+        } else if (altar_align == A_CHAOTIC
+             && !u.uevent.visited_chaotic_high_altar_on_astral_plane) {
+            livelog_printf(LL_MINORAC, "visited the chaotic high altar on the Astral Plane");
+            u.uevent.visited_chaotic_high_altar_on_astral_plane = TRUE;
+        }
+        if (u.uevent.visited_lawful_high_altar_on_astral_plane
+             && u.uevent.visited_neutral_high_altar_on_astral_plane
+             && u.uevent.visited_chaotic_high_altar_on_astral_plane) {
+            record_uevent_achievement("visited all high altars on the Astral Plane",
+                    visited_all_high_altars_on_astral_plane);
+        }
+    }
+#endif /* RECORD_ACHIEVE */
+}
+
 anything *
 uint_to_any(unsigned int ui)
 {
@@ -3121,6 +3154,8 @@ spoteffects(boolean pick)
     }
 
     check_special_room(FALSE);
+
+    check_high_altars();
 
     if (IS_SINK(levl[u.ux][u.uy].typ) && Levitation) {
         dosinkfall();

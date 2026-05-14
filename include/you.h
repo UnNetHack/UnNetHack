@@ -62,6 +62,11 @@ struct u_event {
     Bitfield(entered_a_shop, 1);            /* entered a shop */
     Bitfield(entered_a_temple, 1);          /* entered a temple */
 
+    Bitfield(visited_all_high_altars_on_astral_plane, 1); /* visited all 3 high altars in end game */
+    Bitfield(visited_lawful_high_altar_on_astral_plane, 1);
+    Bitfield(visited_neutral_high_altar_on_astral_plane, 1);
+    Bitfield(visited_chaotic_high_altar_on_astral_plane, 1);
+
     Bitfield(uhand_of_elbereth, 2);  /* became Hand of Elbereth */
 
     Bitfield(udemigod, 1);       /* killed the wiz */

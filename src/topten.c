@@ -541,6 +541,15 @@ encode_extended_achievements(void)
     add_achieveX(buf, "entered_a_shop", u.uevent.entered_a_shop);
     add_achieveX(buf, "entered_a_temple", u.uevent.entered_a_temple);
 
+    add_achieveX(buf, "visited_lawful_high_altar_on_astral_plane",
+            u.uevent.visited_lawful_high_altar_on_astral_plane);
+    add_achieveX(buf, "visited_neutral_high_altar_on_astral_plane",
+            u.uevent.visited_neutral_high_altar_on_astral_plane);
+    add_achieveX(buf, "visited_chaotic_high_altar_on_astral_plane",
+            u.uevent.visited_chaotic_high_altar_on_astral_plane);
+    add_achieveX(buf, "visited_all_high_altars_on_astral_plane",
+            u.uevent.visited_all_high_altars_on_astral_plane);
+
     return buf;
 }
 
