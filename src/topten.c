@@ -538,6 +538,10 @@ encode_extended_achievements(void)
     add_achieveX(buf, "entered_vlads_tower", u.uevent.entered_vlads_tower);
     add_achieveX(buf, "entered_fort_ludios", u.uevent.entered_fort_ludios);
     add_achieveX(buf, "entered_wizards_tower", u.uevent.entered_wizards_tower);
+    add_achieveX(buf, "entered_juiblex", u.uevent.entered_juiblex);
+    add_achieveX(buf, "entered_baalzebub", u.uevent.entered_baalzebub);
+    add_achieveX(buf, "entered_asmodeus", u.uevent.entered_asmodeus);
+    add_achieveX(buf, "entered_orcus", u.uevent.entered_orcus);
 
     add_achieveX(buf, "entered_a_shop", u.uevent.entered_a_shop);
     add_achieveX(buf, "entered_a_temple", u.uevent.entered_a_temple);

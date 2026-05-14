@@ -1967,6 +1967,14 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
             record_uevent_achievement("entered the Big Room", entered_the_bigroom);
         } else if (Is_town_level(&u.uz)) {
             record_uevent_achievement("entered the Town", entered_the_town);
+        } else if (Is_juiblex_level(&u.uz)) {
+            record_uevent_minor_achievement("entered Juiblex' level", entered_juiblex);
+        } else if (Is_baal_level(&u.uz)) {
+            record_uevent_minor_achievement("entered Baalzebub' level", entered_baalzebub);
+        } else if (Is_asmo_level(&u.uz)) {
+            record_uevent_minor_achievement("entered Asmodeus' level", entered_asmodeus);
+        } else if (Is_orcus_level(&u.uz)) {
+            record_uevent_minor_achievement("entered Orcus' level", entered_orcus);
         }
     }
 

@@ -60,6 +60,11 @@ struct u_event {
     Bitfield(entered_fort_ludios, 1);       /* entered Fort Ludios */
     Bitfield(entered_wizards_tower, 1);     /* entered the Wizard of Yendor's tower */
 
+    Bitfield(entered_juiblex, 1);           /* entered Juiblex' level */
+    Bitfield(entered_baalzebub, 1);         /* entered Baalzebub' level */
+    Bitfield(entered_asmodeus, 1);          /* entered Asmodeus' level */
+    Bitfield(entered_orcus, 1);             /* entered Orcus' level */
+
     Bitfield(entered_a_shop, 1);            /* entered a shop */
     Bitfield(entered_a_temple, 1);          /* entered a temple */
 
@@ -83,8 +88,16 @@ struct u_event {
             u.uevent.field = TRUE; \
         } \
 }
+# define record_uevent_minor_achievement(message, field) \
+{ \
+        if (!u.uevent.field) { \
+            livelog_printf(LL_MINORAC, message); \
+            u.uevent.field = TRUE; \
+        } \
+}
 #else
 # define record_uevent_achievement(message, field) if (!u.uevent.field) { u.uevent.field = TRUE; }
+# define record_uevent_minor_achievement(message, field) if (!u.uevent.field) { u.uevent.field = TRUE; }
 #endif
 
 

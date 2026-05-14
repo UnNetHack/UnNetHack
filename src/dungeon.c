@@ -771,7 +771,7 @@ struct level_map {
 } level_map[] = {
     { "advcal", &advcal_level },
     { "air",    &air_level },
-    { "asmodeus",   &asmodeus_level },
+    { "asmod",  &asmodeus_level },
     { "astral", &astral_level },
     { "baalz",  &baalzebub_level },
     { "bigrm",  &bigroom_level },
