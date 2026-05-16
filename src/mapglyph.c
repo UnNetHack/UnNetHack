@@ -211,6 +211,9 @@ mapglyph(int glyph, glyph_t *ochar, int *ocolor, unsigned int *ospecial, coordxy
             } else if (In_V_tower(&u.uz)) {
                 /* Vlad's tower */
                 color = CLR_ORANGE;
+            } else if (Is_knox(&u.uz)) {
+                /* Fort Ludios */
+                color = CLR_CYAN;
             } else if (In_sokoban(&u.uz)) {
                 color = CLR_CYAN;
             } else if (Is_valley(&u.uz)) {
