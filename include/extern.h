@@ -1386,6 +1386,7 @@ extern void wallification(int, int, int, int);
 extern void fix_wall_spines(coordxy, coordxy, coordxy, coordxy);
 extern void wall_extends(int, int, int, int);
 extern void walkfrom(coordxy, coordxy, schar);
+extern void pick_vibrasquare_location(void);
 extern void makemaz(const char *);
 extern void mazexy(coord *);
 extern void get_level_extends(coordxy *, coordxy *, coordxy *, coordxy *) NONNULLPTRS;

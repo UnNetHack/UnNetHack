@@ -32,6 +32,7 @@ static void stolen_booty(void);
 static boolean maze_inbounds(coordxy, coordxy);
 static void maze_remove_deadends(xint16);
 static boolean is_exclusion_zone(xint16, coordxy, coordxy);
+static void populate_maze(void);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -1319,6 +1320,97 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
 }
 
 void
+pick_vibrasquare_location(void)
+{
+    coordxy x, y;
+    stairway *stway;
+    int trycnt = 0;
+    /* these are also defined in mklev.c and they may not be appropriate
+       for mazes with corridors wider than 1 or for cavernous levels */
+#define x_maze_min 2
+#define y_maze_min 2
+
+    /*
+     * Pick a position where the stairs down to Moloch's Sanctum
+     * level will ultimately be created.  At that time, an area
+     * will be altered:  walls removed, moat and traps generated,
+     * boulders destroyed.  The position picked here must ensure
+     * that that invocation area won't extend off the map.
+     *
+     * We actually allow up to 2 squares around the usual edge of
+     * the area to get truncated; see mkinvokearea(mklev.c).
+     */
+#define INVPOS_X_MARGIN (6 - 2)
+#define INVPOS_Y_MARGIN (5 - 2)
+#define INVPOS_DISTANCE 11
+    int x_range = x_maze_max - x_maze_min - 2 * INVPOS_X_MARGIN - 1,
+        y_range = y_maze_max - y_maze_min - 2 * INVPOS_Y_MARGIN - 1;
+
+    if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN ||
+        (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
+        panic("inv_pos: maze is too small! (%d x %d)",
+                x_maze_max, y_maze_max);
+    }
+    inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
+    do {
+        x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
+        y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
+        /* we don't want it to be too near the stairs, nor
+           to be on a spot that's already in use (wall|trap|stairs) */
+        if (++trycnt > 1000) {
+            break;
+        }
+    } while (((stway = stairway_find_dir(TRUE)) != 0) &&
+            (x == stway->sx || y == stway->sy || /*(direct line)*/
+            abs(x - stway->sx) == abs(y - stway->sy) ||
+            distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE ||
+            !SPACE_POS(levl[x][y].typ) || occupied(x, y) || levl[x][y].typ == STAIRS));
+    inv_pos.x = x;
+    inv_pos.y = y;
+
+    /* "'X' never, ever marks the spot" */
+    if (Role_if(PM_ARCHEOLOGIST)) {
+        make_engr_at(x, y, "X", 0L, DUST);
+    }
+#undef INVPOS_X_MARGIN
+#undef INVPOS_Y_MARGIN
+#undef INVPOS_DISTANCE
+#undef x_maze_min
+#undef y_maze_min
+}
+
+static void
+populate_maze(void)
+{
+    int i;
+    coord mm;
+
+    for (i = rn1(8, 11); i; i--) {
+        mazexy(&mm);
+        (void) mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS, mm.x, mm.y, TRUE);
+    }
+    for (i = rn1(10, 2); i; i--) {
+        mazexy(&mm);
+        (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
+    }
+    for (i = rn2(3); i; i--) {
+        mazexy(&mm);
+        (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
+    }
+    for (i = rn1(5, 7); i; i--) {
+        mazexy(&mm);
+        (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
+    }
+    for (i = rn1(6, 7); i; i--) {
+        mazexy(&mm);
+        (void) mkgold(0L, mm.x, mm.y);
+    }
+    for (i = rn1(6, 7); i; i--) {
+        mktrap(0, 1, (struct mkroom *) 0, (coord*) 0);
+    }
+}
+
+void
 makemaz(const char *s)
 {
     int x, y;
@@ -1435,83 +1527,14 @@ makemaz(const char *s)
     if (!Invocation_lev(&u.uz)) {
         mazexy(&mm);
         mkstairs(mm.x, mm.y, 0, (struct mkroom *)0, FALSE); /* down */
-    } else {    /* choose "vibrating square" location */
-#define x_maze_min 2
-#define y_maze_min 2
-        /*
-         * Pick a position where the stairs down to Moloch's Sanctum
-         * level will ultimately be created.  At that time, an area
-         * will be altered:  walls removed, moat and traps generated,
-         * boulders destroyed.  The position picked here must ensure
-         * that that invocation area won't extend off the map.
-         *
-         * We actually allow up to 2 squares around the usual edge of
-         * the area to get truncated; see mkinvokearea(mklev.c).
-         */
-#define INVPOS_X_MARGIN (6 - 2)
-#define INVPOS_Y_MARGIN (5 - 2)
-#define INVPOS_DISTANCE 11
-        int x_range = x_maze_max - x_maze_min - 2*INVPOS_X_MARGIN - 1,
-            y_range = y_maze_max - y_maze_min - 2*INVPOS_Y_MARGIN - 1;
-
-#ifdef DEBUG
-        if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN ||
-            (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE))
-            panic("inv_pos: maze is too small! (%d x %d)",
-                  x_maze_max, y_maze_max);
-#endif
-        stairway *stway;
-        inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
-        do {
-            x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
-            y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
-            /* we don't want it to be too near the stairs, nor
-               to be on a spot that's already in use (wall|trap|stairs) */
-        } while (((stway = stairway_find_dir(TRUE)) != 0) &&
-                (x == stway->sx || y == stway->sy || /*(direct line)*/
-                abs(x - stway->sx) == abs(y - stway->sy) ||
-                distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE ||
-                !SPACE_POS(levl[x][y].typ) || occupied(x, y) || levl[x][y].typ == STAIRS));
-        inv_pos.x = x;
-        inv_pos.y = y;
-
-        /* "'X' never, ever marks the spot" */
-        if (Role_if(PM_ARCHEOLOGIST)) {
-            make_engr_at(x, y, "X", 0L, DUST);
-        }
-#undef INVPOS_X_MARGIN
-#undef INVPOS_Y_MARGIN
-#undef INVPOS_DISTANCE
-#undef x_maze_min
-#undef y_maze_min
+    } else { /* choose "vibrating square" location */
+        pick_vibrasquare_location();
     }
 
     /* place branch stair or portal */
     place_branch(Is_branchlev(&u.uz), 0, 0);
 
-    for (x = rn1(8, 11); x; x--) {
-        mazexy(&mm);
-        (void) mkobj_at(rn2(2) ? GEM_CLASS : 0, mm.x, mm.y, TRUE);
-    }
-    for (x = rn1(10, 2); x; x--) {
-        mazexy(&mm);
-        (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
-    }
-    for (x = rn2(3); x; x--) {
-        mazexy(&mm);
-        (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
-    }
-    for (x = rn1(5, 7); x; x--) {
-        mazexy(&mm);
-        (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
-    }
-    for (x = rn1(6, 7); x; x--) {
-        mazexy(&mm);
-        (void) mkgold(0L, mm.x, mm.y);
-    }
-    for (x = rn1(6, 7); x; x--) {
-        mktrap(0, 1, (struct mkroom *) 0, (coord*) 0);
-    }
+    populate_maze();
 }
 
 #ifdef MICRO
