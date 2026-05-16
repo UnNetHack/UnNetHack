@@ -1466,12 +1466,12 @@ makemaz(const char *s)
             x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
             y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
             /* we don't want it to be too near the stairs, nor
-               to be on a spot that's already in use (wall|trap) */
+               to be on a spot that's already in use (wall|trap|stairs) */
         } while (((stway = stairway_find_dir(TRUE)) != 0) &&
                 (x == stway->sx || y == stway->sy || /*(direct line)*/
                 abs(x - stway->sx) == abs(y - stway->sy) ||
                 distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE ||
-                !SPACE_POS(levl[x][y].typ) || occupied(x, y)));
+                !SPACE_POS(levl[x][y].typ) || occupied(x, y) || levl[x][y].typ == STAIRS));
         inv_pos.x = x;
         inv_pos.y = y;
 
