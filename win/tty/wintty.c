@@ -1544,6 +1544,10 @@ free_window_info(struct WinDesc *cw, boolean free_data)
                     cw->datlen[i] = 0;
                 }
             }
+            if (cw->attributes && cw->attributes[i]) {
+                free((genericptr_t)cw->attributes[i]);
+                cw->attributes[i] = NULL;
+            }
         }
         if (free_data) {
             free((genericptr_t)cw->data);
