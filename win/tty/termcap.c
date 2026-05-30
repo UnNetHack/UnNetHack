@@ -1323,6 +1323,7 @@ init_hilite(void)
 {
     int c;
     char *setf, *scratch;
+    int md_len = (int) strlen(MD);
 
     for (c = 0; c < SIZE(hilites); c++) {
         hilites[c] = nh_HI;
@@ -1339,8 +1340,11 @@ init_hilite(void)
     for (c = 0; c < CLR_MAX / 2; c++) {
         scratch = tparm(setf, ti_map[c]);
         if (iflags.wc2_newcolors || (c != CLR_GRAY)) {
-            hilites[c] = (char *) alloc(strlen(scratch) + 1);
-            Strcpy(hilites[c], scratch);
+            /* system colors */
+            if (c != CLR_BLACK) {
+                hilites[c] = (char *) alloc(strlen(scratch) + 1);
+                Strcpy(hilites[c], scratch);
+            }
         }
         if (colors >= 16) {
             /* Use proper bright colors if terminal supports them. */
@@ -1358,7 +1362,26 @@ init_hilite(void)
         }
     }
 
-    if (!iflags.wc2_newcolors) {
+    if (iflags.wc2_newcolors) {
+        if (colors >= 16) {
+            scratch = tparm(setf, COLOR_BLACK|BRIGHT);
+            hilites[CLR_BLACK] = dupstr(scratch);
+        } else {
+            /* On many terminals, esp. those using classic PC CGA/EGA/VGA
+            * textmode, specifying "hilight" and "black" simultaneously
+            * produces a dark shade of gray that is visible against a
+            * black background.  We can use it to represent black objects.
+            */
+            scratch = tparm(setf, COLOR_BLACK);
+            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + md_len + 1);
+            Strcpy(hilites[CLR_BLACK], MD);
+            Strcat(hilites[CLR_BLACK], scratch);
+        }
+    } else {
+        /* But it's conceivable that hilighted black-on-black could
+         * still be invisible on many others.  We substitute blue for
+         * black.
+         */
         hilites[CLR_BLACK] = hilites[CLR_BLUE];
     }
 
