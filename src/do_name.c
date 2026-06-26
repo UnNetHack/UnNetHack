@@ -1654,11 +1654,12 @@ namefloorobj(void)
 static const char * const ghostnames[] = {
     /* these names should have length < PL_NSIZ */
     /* Capitalize the names for aesthetics -dgk */
+    /* Last 5 Ghosts in honor of Enchanted Castle Puzzle Hunt - drh */
     "Adri", "Andries", "Andreas", "Bert", "David", "Dirk", "Emile",
     "Frans", "Fred", "Greg", "Hether", "Jay", "John", "Jon", "Karnov",
     "Kay", "Kenny", "Kevin", "Maud", "Michiel", "Mike", "Peter", "Pipes", "Robert",
     "Ron", "Tom", "Wilmar", "Nick Danger", "Phoenix", "Jiro", "Mizue",
-    "Stephan", "Lance Braccus", "Shadowhawk"
+    "Stephan", "Lance Braccus", "Shadowhawk", "Chanel", "Trewlaney", "Quentin", "THE BEAST", "Comet"
 };
 
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
