@@ -1659,7 +1659,7 @@ static const char * const ghostnames[] = {
     "Frans", "Fred", "Greg", "Hether", "Jay", "John", "Jon", "Karnov",
     "Kay", "Kenny", "Kevin", "Maud", "Michiel", "Mike", "Peter", "Pipes", "Robert",
     "Ron", "Tom", "Wilmar", "Nick Danger", "Phoenix", "Jiro", "Mizue",
-    "Stephan", "Lance Braccus", "Shadowhawk", "Chanel", "Trewlaney", "Quentin", "THE BEAST", "Comet"
+    "Stephan", "Lance Braccus", "Shadowhawk", "Chanel", "Trelawney", "Quentin", "THE BEAST", "Comet"
 };
 
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
