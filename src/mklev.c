@@ -1866,7 +1866,7 @@ mkstairs(
     int ltyp;
     d_level dest;
 
-    if (!x || !isok(x, y) || invocation_pos(x, y)) {
+    if (!x || !isok(x, y)) {
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
     }
