@@ -24,7 +24,7 @@ $LUA -v
 file $LUA
 
 if [ ! -d "pdcursesmod" ]; then
-    git clone --depth 1 /home/bubi/Development/pdcursesmod
+    git clone --depth 1 https://github.com/UnNetHack/PDCursesMod pdcursesmod
 
     cd pdcursesmod/wingui
     make CC=i686-w64-mingw32-gcc UTF8=Y
