@@ -249,6 +249,7 @@ struct window_procs lisp_procs = {
   lisp_destroy_nhwindow,
   lisp_curs,
   lisp_putstr,
+  genl_putmixed,
   lisp_display_file,
   lisp_start_menu,
   lisp_add_menu,

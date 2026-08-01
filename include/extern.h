@@ -3136,6 +3136,7 @@ extern void unwield_weapons_silently(void);
 extern void choose_windows(const char *);
 extern char genl_message_menu(char, int, const char *);
 extern void genl_preference_update(const char *);
+extern void genl_putmixed(winid, int, const char *) NONNULLARG3;
 extern void add_menu_heading(winid, const char *) NONNULLARG2;
 extern void add_menu_str(winid, const char *) NONNULLARG2;
 extern void genl_status_init(void);

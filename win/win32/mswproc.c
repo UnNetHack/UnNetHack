@@ -87,6 +87,7 @@ struct window_procs mswin_procs = {
     mswin_destroy_nhwindow,
     mswin_curs,
     mswin_putstr,
+    genl_putmixed,              /* general putmixed until native is written */
     mswin_display_file,
     mswin_start_menu,
     mswin_add_menu,
@@ -812,34 +813,29 @@ void mswin_clear_nhwindow(winid wid)
                 -- Calling display_nhwindow(WIN_MESSAGE,???) will do a
                    --more--, if necessary, in the tty window-port.
 */
-void
-mswin_display_nhwindow(winid wid, BOOLEAN_P block)
+void mswin_display_nhwindow(winid wid, BOOLEAN_P block)
 {
-    logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
-    if (GetNHApp()->windowlist[wid].win != NULL) {
-        ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
-        mswin_layout_main_window(GetNHApp()->windowlist[wid].win);
-        if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
-            MENU_ITEM_P *p;
-            mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win,
-                                          PICK_NONE, &p, TRUE);
-        }
-        if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
-            mswin_display_text_window(GetNHApp()->windowlist[wid].win);
-        }
-        if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
-            mswin_display_RIP_window(GetNHApp()->windowlist[wid].win);
-        } else {
-            if (!block) {
-                UpdateWindow(GetNHApp()->windowlist[wid].win);
-            } else {
-                if (GetNHApp()->windowlist[wid].type == NHW_MAP) {
-                    (void) mswin_nhgetch();
-                }
-            }
-        }
-        SetFocus(GetNHApp()->hMainWnd);
-    }
+	logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
+	if (GetNHApp()->windowlist[wid].win != NULL)
+	{
+		if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
+			MENU_ITEM_P* p;
+			mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, PICK_NONE, &p);
+		} if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
+			mswin_display_text_window(GetNHApp()->windowlist[wid].win);
+		} if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
+			mswin_display_RIP_window(GetNHApp()->windowlist[wid].win);
+		} else {
+			if( !block ) {
+				UpdateWindow(GetNHApp()->windowlist[wid].win);
+			} else {
+				if ( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
+					(void) mswin_nhgetch();
+				}
+			}
+		}
+		SetFocus(GetNHApp()->hMainWnd);
+	}
 }
 
 
@@ -1162,23 +1158,18 @@ int select_menu(windid window, int how, menu_item **selected)
                    select_menu() will be called for the window at
                    create_nhwindow() time.
 */
-int
-mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
+int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 {
-    int nReturned = -1;
+	int nReturned = -1;
 
-    logDebug("mswin_select_menu(%d, %d)\n", wid, how);
+	logDebug("mswin_select_menu(%d, %d)\n", wid, how);
 
-    if ((wid >= 0) && (wid < MAXWINDOWS)
-        && (GetNHApp()->windowlist[wid].win != NULL)) {
-        ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
-        nReturned = mswin_menu_window_select_menu(
-            GetNHApp()->windowlist[wid].win, how, selected,
-            !(iflags.perm_invent && wid == WIN_INVEN
-              && how == PICK_NONE) /* don't activate inventory window if
-                                      perm_invent is on */
-            );
-    }
+	if ((wid >= 0) &&
+		(wid < MAXWINDOWS) &&
+		(GetNHApp()->windowlist[wid].win != NULL))
+	{
+		nReturned = mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, how, selected);
+	}
     return nReturned;
 }
 

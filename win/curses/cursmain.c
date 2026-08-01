@@ -40,6 +40,7 @@ struct window_procs curses_procs = {
     curses_destroy_nhwindow,
     curses_curs,
     curses_putstr,
+    genl_putmixed,
     curses_display_file,
     curses_start_menu,
     curses_add_menu,

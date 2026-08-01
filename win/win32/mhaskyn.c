@@ -5,11 +5,7 @@
 #include "winMS.h"
 #include "mhaskyn.h"
 
-int
-mswin_yes_no_dialog( const char *question, const char *choices, int def)
+int mswin_yes_no_dialog( const char *question, const char *choices, int def)
 {
-    UNREFERENCED_PARAMETER(question);
-    UNREFERENCED_PARAMETER(choices);
-    UNREFERENCED_PARAMETER(def);
-    return '\032';
+	return '\032';
 }

@@ -36,6 +36,7 @@ struct window_procs dummy_procs = {
     dummy_destroy_nhwindow,
     dummy_curs,
     dummy_putstr,
+    genl_putmixed,
     dummy_display_file,
     dummy_start_menu,
     dummy_add_menu,
