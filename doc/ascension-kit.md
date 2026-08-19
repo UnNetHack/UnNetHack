@@ -44,7 +44,7 @@
 - Holy Water — drop potion(s) of water on an aligned altar and pray to bless them; required for blessing Bag of Holding and Unicorn Horn specifically; bless as much of the kit as possible, since Lich encounters can curse your gear
 
 ## Scrolls
-- Scroll of Charging — recharges Magic Markers and Wand of Death; skip on Wand of Wishing (too risky/not worth it)
+- Scroll of Charging — recharges Magic Markers and Wand of Death; doesn't work on Wand of Wishing in UnNetHack
 - Scroll of Genocide — target priority (1 blessed scroll per target in UnNetHack):
   1. Mind Flayers — brain-eating instakill risk
   2. Master Mind Flayers — brain-eating instakill risk
