@@ -54,6 +54,7 @@
 /* #define GNOME_GRAPHICS */    /* Gnome interface */
 /* #define MSWIN_GRAPHICS */    /* Windows NT, CE, Graphics */
 /* #define LISP_GRAPHICS */ /* lisp interface */
+/* #define SDL_GRAPHICS */  /* SDL2 interface (see win/sdl/Install.SDL2) */
 
 /*
  * Define the default window system.  This should be one that is compiled
@@ -123,6 +124,12 @@
 #ifdef CURSES_GRAPHICS
 # ifndef DEFAULT_WINDOW_SYS
 #  define DEFAULT_WINDOW_SYS "curses"
+# endif
+#endif
+
+#ifdef SDL_GRAPHICS
+# ifndef DEFAULT_WINDOW_SYS
+#  define DEFAULT_WINDOW_SYS "sdl"
 # endif
 #endif
 

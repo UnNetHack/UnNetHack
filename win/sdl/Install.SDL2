@@ -1,0 +1,65 @@
+SDL2 window port -- build notes
+================================
+
+This is a scaffold: it gives UnNetHack a real graphical window and a real
+event loop, with map/message/status/menu content drawn as colored glyphs
+via SDL2_ttf. It does not yet draw the pixel tile art from win/share --
+see "Known gaps" below.
+
+Dependencies
+------------
+  - SDL2
+  - SDL2_ttf
+  - a monospace TrueType font on the build machine (the port tries a
+    short list of common macOS/Linux paths at startup; see
+    sdl_font_candidates in win/sdl/sdlmain.c if yours isn't found)
+
+macOS (Homebrew):
+    brew install sdl2 sdl2_ttf
+
+Debian/Ubuntu:
+    apt install libsdl2-dev libsdl2-ttf-dev
+
+Enabling the port
+------------------
+1. In include/config.h, uncomment:
+       #define SDL_GRAPHICS
+
+   Leave whatever other *_GRAPHICS port you already use defined too if
+   you want both available at runtime (selectable via -windowtype sdl
+   or the WINDOWTYPE resource/config option); just make sure exactly
+   one is picked as DEFAULT_WINDOW_SYS, which SDL_GRAPHICS will do
+   automatically if it's the only one defined.
+
+2. In sys/unix/Makefile.src:
+     - Set the windowing-system selector to the SDL block:
+           WINSRC = $(WINSDLSRC)
+           WINOBJ = $(WINSDLOBJ)
+     - Set:
+           WINLIB = $(WINSDLLIB)
+     - Uncomment (and adjust for your platform) one of the SDL2
+       CFLAGS/LFLAGS example pairs near the top of the file, so the
+       compiler and linker can find <SDL2/SDL.h> and libSDL2.
+
+3. Build as usual from sys/unix (configure/Makefile.top per the
+   existing UnNetHack unix build instructions).
+
+Known gaps (intentionally deferred, not bugs)
+-----------------------------------------------
+  - No pixel tile art -- map cells render as a single colored character
+    per glyph (via the same mapglyph() lookup tty/curses use), not the
+    bitmap tiles in win/share. Wiring those in is the natural next
+    step; win/X11/tile2x11.c is the reference for how an existing port
+    turns win/share's tile data into blittable pixels.
+  - No real role/race/gender/alignment selection dialog
+    (sdl_player_selection() is a no-op; unset facets fall back to the
+    game's normal "pick at random" behavior). See
+    win/tty/wintty.c:tty_player_selection for what a full dialog looks
+    like.
+  - No persistent inventory window (WC_PERM_INVENT not advertised).
+  - No message history scrollback viewer (sdl_doprev_message() is a
+    stub) -- full history is kept internally, just not wired to a key.
+  - Font/DPI handling is minimal: one fixed point size, no HiDPI
+    scaling.
+  - SDL_QUIT (closing the window) ends the process immediately via
+    nh_terminate() rather than going through a save-game confirmation.
