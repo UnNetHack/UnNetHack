@@ -8,7 +8,6 @@
 - Magic Markers — writing scrolls
 - Can of Grease — greased helm/cloak resists grab/strip from mind flayers, eels, krakens
 - Blindfold — Medusa alternative to reflection
-- Wand of Digging — Earth Plane navigation (nice-to-have)
 
 ## Artifacts
 - Excalibur — drain resistance
@@ -37,6 +36,7 @@
 - Wand of Polymorph — polypiling
 - Wand of Fire — green slime cure/self-zap
 - Wand of Striking — drawbridge control
+- Wand of Digging — Earth Plane navigation (nice-to-have)
 
 ## Potions
 - Potion of Full Healing — stockpiled
@@ -44,6 +44,8 @@
 - Holy Water — drop potion(s) of water on an aligned altar and pray to bless them; required for blessing Bag of Holding and Unicorn Horn specifically; bless as much of the kit as possible, since Lich encounters can curse your gear
 
 ## Scrolls
+- Scroll of Enchant Armor — stacked blessed for the AC push (see Gehennom Readiness Threshold)
+- Scroll of Enchant Weapon
 - Scroll of Charging — recharges Magic Markers and Wand of Death; doesn't work on Wand of Wishing in UnNetHack
 - Scroll of Genocide — target priority (1 blessed scroll per target in UnNetHack):
   1. Mind Flayers — brain-eating instakill risk
