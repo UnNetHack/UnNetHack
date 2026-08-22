@@ -42,6 +42,18 @@
 # include "autoconf.h"
 #endif
 
+/*
+ * Enables colored monsters/objects/etc. everywhere mapglyph() is used --
+ * i.e. every windowport (tty, curses, X11, sdl, ...), not just one of
+ * them. Without this, mapglyph() always returns NO_COLOR regardless of
+ * what a port requests, even ports (like curses, X11, sdl) that fully
+ * support displaying color. configure's --enable-menu-color and
+ * --enable-status-color already assume this is on; it just isn't wired
+ * into sys/autoconf/configure.ac as its own option, so it has to be set
+ * here instead.
+ */
+#define TEXTCOLOR
+
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.

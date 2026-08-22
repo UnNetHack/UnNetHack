@@ -3,16 +3,16 @@
 
 /*
  * Scaffold implementation.  It gives every UnNetHack window a real SDL2
- * window, a real event loop, and real (if plain) glyph rendering, so the
- * windowport swap can be exercised end to end.  Map cells are drawn as a
- * single character per glyph, colored via the existing mapglyph() lookup,
- * the same source of truth the tty/curses ports use -- NOT yet the pixel
- * tile art in win/share.  Wiring in actual tile bitmaps (see
- * win/X11/tile2x11.c for the reference pipeline) is the natural next step
- * once this skeleton is confirmed to build and run.  See
- * win/sdl/Install.SDL2 for build instructions and the current list of
- * known gaps (no real player_selection dialog, no font hinting/DPI
- * handling, no persistent inventory window, etc).
+ * window and a real event loop.  The map is drawn with real tile art
+ * (tilesets/unchozo32b.png, the only bundled sheet with enough tiles to
+ * cover this fork's total_tiles_used), via the same glyph2tile[] table
+ * (src/tile.c, generated at build time) the X11/Qt ports use -- see
+ * win/X11/tile2x11.c for the reference this was modeled on.  If no
+ * tileset can be found at runtime, map cells fall back to a single
+ * colored character per glyph via mapglyph(), so the port still works
+ * without the asset.  See win/sdl/Install.SDL2 for build instructions
+ * and the current list of known gaps (no real player_selection dialog,
+ * no font hinting/DPI handling, no persistent inventory window, etc).
  */
 
 /*
@@ -26,6 +26,7 @@
 #define SDL_MAIN_HANDLED /* NetHack owns main(); don't let SDL rename it */
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 #include "hack.h"
 #include "color.h"
@@ -39,17 +40,41 @@
 #define CELL_PAD 2      /* pixels of breathing room around each glyph */
 #define MSG_ROWS 2      /* lines reserved for the message window, top */
 #define STATUS_ROWS 2   /* lines reserved for the status window, bottom */
+#define SDL_TILES_PER_ROW 40 /* fixed layout convention every tile sheet
+                                 in tilesets/ and win/X11 shares */
+#define VIEW_COLS 50    /* map columns visible at once. COLNO(80) at
+                            native tile size is 2560px -- wider than
+                            most screens -- so the map viewport scrolls
+                            horizontally with the player instead of
+                            shrinking everything to fit the full width */
+
+/* glyph -> tile index, generated at build time into src/tile.c from
+   win/share/monsters.txt|objects.txt|other.txt by util/tilemap */
+extern short glyph2tile[];
+extern int total_tiles_used;
 
 sdl_window sdl_windows[SDL_MAXWIN];
 
 static SDL_Window *g_win = NULL;
 static SDL_Renderer *g_ren = NULL;
 static TTF_Font *g_font = NULL;
-static int g_cell_w = 8, g_cell_h = 14;
-static int g_map_top = MSG_ROWS;        /* row (in cells) map starts on */
-static int g_status_top = MSG_ROWS + ROWNO;
-static int g_screen_rows = MSG_ROWS + ROWNO + STATUS_ROWS;
-static int g_screen_cols = COLNO;
+static int g_cell_w = 8, g_cell_h = 14; /* text (message/status/menu) cells */
+
+static SDL_Texture *g_tile_tex = NULL;
+static int g_tile_w = 32, g_tile_h = 32; /* map cells, once tiles load */
+
+/* pixel geometry of the three stacked regions; computed once the real
+   cell/tile sizes are known during sdl_init_nhwindows() */
+static int g_map_top_px = 0;
+static int g_status_top_px = 0;
+static int g_window_w_px = 0, g_window_h_px = 0;
+static int g_screen_cols = COLNO;  /* text columns that fit horizontally */
+static int g_screen_rows = 0;      /* text rows that fit vertically */
+
+/* leftmost map column currently visible; recomputed every frame in
+   sdl_render_screen() from the player's position, clamped to keep the
+   VIEW_COLS-wide window inside [0, COLNO) */
+static int g_cam_x = 0;
 
 /* winid of the single message/map/status window of each kind, once
    the core creates them; -1 until then */
@@ -87,6 +112,18 @@ static const char *sdl_font_candidates[] = {
     "/System/Library/Fonts/Monaco.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
+    NULL
+};
+
+/* candidate tileset paths, tried relative to the current directory --
+   which by the time init_nhwindows() runs is HACKDIR (see chdirx() in
+   sys/unix/unixmain.c), hence the first entry; the rest are fallbacks
+   for running straight out of an uninstalled checkout */
+static const char *sdl_tile_candidates[] = {
+    "unchozo32b.png",
+    "tilesets/unchozo32b.png",
+    "../tilesets/unchozo32b.png",
+    "../../tilesets/unchozo32b.png",
     NULL
 };
 
@@ -161,40 +198,77 @@ sdl_glyph_texture(unsigned char ch, int coloridx)
     return tex;
 }
 
+/* raw pixel placement, both axes -- the primitive every other text
+   helper below builds on */
 static void
-sdl_draw_cell(int col, int row, unsigned char ch, int coloridx)
+sdl_draw_glyph_px(int x_px, int y_px, unsigned char ch, int coloridx)
 {
     SDL_Texture *tex = sdl_glyph_texture(ch, coloridx);
     SDL_Rect dst;
     if (!tex)
         return;
-    dst.x = col * g_cell_w;
-    dst.y = row * g_cell_h;
+    dst.x = x_px;
+    dst.y = y_px;
     dst.w = g_cell_w;
     dst.h = g_cell_h;
     SDL_RenderCopy(g_ren, tex, NULL, &dst);
 }
 
+/* col is in text-cell units; y_px is a raw pixel offset (not a row
+   index) so message/status text and the tile-sized map can share the
+   same drawing primitive despite having different row heights */
 static void
-sdl_draw_string(int col, int row, const char *s, int coloridx)
+sdl_draw_cell(int col, int y_px, unsigned char ch, int coloridx)
+{
+    sdl_draw_glyph_px(col * g_cell_w, y_px, ch, coloridx);
+}
+
+static void
+sdl_draw_string(int col, int y_px, const char *s, int coloridx)
 {
     int i;
     if (!s)
         return;
     for (i = 0; s[i] && col + i < g_screen_cols; i++)
-        sdl_draw_cell(col + i, row, (unsigned char) s[i], coloridx);
+        sdl_draw_cell(col + i, y_px, (unsigned char) s[i], coloridx);
 }
 
 /* draw up to `rows` lines of a scrolling text window, most recent last */
 static void
-sdl_draw_textwin(sdl_window *w, int toprow, int rows)
+sdl_draw_textwin(sdl_window *w, int top_px, int rows)
 {
     int start = w->numlines - rows;
     int i, r;
     if (start < 0)
         start = 0;
     for (i = start, r = 0; i < w->numlines && r < rows; i++, r++)
-        sdl_draw_string(0, toprow + r, w->lines[i], CLR_WHITE);
+        sdl_draw_string(0, top_px + r * g_cell_h, w->lines[i], CLR_WHITE);
+}
+
+/* blit the tile for `glyph` at pixel position (x_px, y_px); returns
+   FALSE if no tile texture is loaded, so callers can fall back */
+static boolean
+sdl_draw_tile(int x_px, int y_px, int glyph)
+{
+    int tile;
+    SDL_Rect src, dst;
+
+    if (!g_tile_tex || glyph < 0 || glyph >= MAX_GLYPH)
+        return FALSE;
+    tile = glyph2tile[glyph];
+    if (tile < 0 || tile >= total_tiles_used)
+        return FALSE;
+
+    src.x = (tile % SDL_TILES_PER_ROW) * g_tile_w;
+    src.y = (tile / SDL_TILES_PER_ROW) * g_tile_h;
+    src.w = g_tile_w;
+    src.h = g_tile_h;
+    dst.x = x_px;
+    dst.y = y_px;
+    dst.w = g_tile_w;
+    dst.h = g_tile_h;
+    SDL_RenderCopy(g_ren, g_tile_tex, &src, &dst);
+    return TRUE;
 }
 
 static void
@@ -210,22 +284,49 @@ sdl_render_screen(void)
 
     if (g_map_win != WIN_ERR) {
         sdl_window *w = sdl_win(g_map_win);
+        /* must match the cell size sdl_init_nhwindows() used to size
+           the window: real tiles if loaded, otherwise plain text
+           cells -- the two are not interchangeable dimensions */
+        int cw = g_tile_tex ? g_tile_w : g_cell_w;
+        int ch = g_tile_tex ? g_tile_h : g_cell_h;
+        int max_cam = COLNO - VIEW_COLS;
+        int xend;
+
+        if (max_cam < 0)
+            max_cam = 0;
+        g_cam_x = u.ux - VIEW_COLS / 2;
+        if (g_cam_x < 0)
+            g_cam_x = 0;
+        if (g_cam_x > max_cam)
+            g_cam_x = max_cam;
+        xend = g_cam_x + VIEW_COLS;
+        if (xend > COLNO)
+            xend = COLNO;
+
         for (y = 0; y < ROWNO; y++) {
-            for (x = 0; x < COLNO; x++) {
+            for (x = g_cam_x; x < xend; x++) {
                 int glyph = w->glyphs ? w->glyphs[y * COLNO + x] : -1;
-                glyph_t ch;
-                int color;
-                unsigned special;
+                int x_px, y_px;
                 if (glyph < 0)
                     continue;
-                mapglyph(glyph, &ch, &color, &special, x, y, 0);
-                sdl_draw_cell(x, g_map_top + y, (unsigned char) ch, color);
+                x_px = (x - g_cam_x) * cw;
+                y_px = g_map_top_px + y * ch;
+                if (!sdl_draw_tile(x_px, y_px, glyph)) {
+                    /* no tileset loaded: fall back to a colored
+                       character, same lookup tty/curses use */
+                    glyph_t gch;
+                    int color;
+                    unsigned special;
+                    mapglyph(glyph, &gch, &color, &special, x, y, 0);
+                    sdl_draw_glyph_px(x_px, y_px,
+                                      (unsigned char) gch, color);
+                }
             }
         }
     }
 
     if (g_status_win != WIN_ERR)
-        sdl_draw_textwin(sdl_win(g_status_win), g_status_top, STATUS_ROWS);
+        sdl_draw_textwin(sdl_win(g_status_win), g_status_top_px, STATUS_ROWS);
 
     SDL_RenderPresent(g_ren);
 }
@@ -266,8 +367,17 @@ sdl_wait_input(coordxy *mx, coordxy *my, int *mod, boolean *got_click)
 
         case SDL_MOUSEBUTTONDOWN:
             if (mx && my) {
-                int col = ev.button.x / g_cell_w;
-                int row = (ev.button.y / g_cell_h) - g_map_top;
+                int cw = g_tile_tex ? g_tile_w : g_cell_w;
+                int ch = g_tile_tex ? g_tile_h : g_cell_h;
+                float lx, ly;
+                int col, row;
+                /* event coordinates are in physical window pixels;
+                   translate to the logical (pre-scaling) coordinate
+                   space everything else in this file draws in */
+                SDL_RenderWindowToLogical(g_ren, ev.button.x, ev.button.y,
+                                           &lx, &ly);
+                col = (int) lx / cw + g_cam_x;
+                row = ((int) ly - g_map_top_px) / ch;
                 if (row >= 0 && row < ROWNO && col >= 0 && col < COLNO) {
                     *mx = (coordxy) col;
                     *my = (coordxy) row;
@@ -335,11 +445,19 @@ sdl_init_nhwindows(int *argc UNUSED, char **argv UNUSED)
     int i;
     const char *fontpath = NULL;
     int fh;
+    int msg_h_px, map_h_px, status_h_px;
+    SDL_Surface *tile_surf = NULL; /* held across window/renderer creation --
+                                       SDL_CreateTextureFromSurface() needs
+                                       a live renderer, which doesn't exist
+                                       until after geometry is known */
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
         panic("SDL_Init: %s", SDL_GetError());
     if (TTF_Init() != 0)
         panic("TTF_Init: %s", TTF_GetError());
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
+        raw_print("sdl port: SDL_image PNG support unavailable; "
+                   "map will fall back to colored characters");
 
     for (i = 0; sdl_font_candidates[i]; i++) {
         g_font = TTF_OpenFont(sdl_font_candidates[i], 16);
@@ -357,11 +475,63 @@ sdl_init_nhwindows(int *argc UNUSED, char **argv UNUSED)
     fh = TTF_FontLineSkip(g_font);
     g_cell_h = fh > 0 ? fh : 16;
 
-    g_win = SDL_CreateWindow("UnNetHack",
-                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              g_screen_cols * g_cell_w,
-                              g_screen_rows * g_cell_h,
-                              SDL_WINDOW_SHOWN);
+    /* try to find real tile art (surface only -- no renderer to turn
+       it into a texture yet); sdl_draw_tile()/sdl_render_screen() fall
+       back to colored characters per-glyph if this never succeeds, so
+       a missing asset degrades gracefully rather than crashing */
+    for (i = 0; sdl_tile_candidates[i]; i++) {
+        SDL_Surface *surf = IMG_Load(sdl_tile_candidates[i]);
+        if (!surf)
+            continue;
+        if (surf->w % SDL_TILES_PER_ROW != 0
+            || (surf->h / (surf->w / SDL_TILES_PER_ROW))
+                       * SDL_TILES_PER_ROW
+                   < total_tiles_used) {
+            /* wrong layout, or not enough tiles for this build's
+               glyph set -- keep looking rather than draw garbage */
+            SDL_FreeSurface(surf);
+            continue;
+        }
+        tile_surf = surf;
+        g_tile_w = g_tile_h = surf->w / SDL_TILES_PER_ROW;
+        break;
+    }
+
+    msg_h_px = MSG_ROWS * g_cell_h;
+    map_h_px = ROWNO * (tile_surf ? g_tile_h : g_cell_h);
+    status_h_px = STATUS_ROWS * g_cell_h;
+    g_map_top_px = msg_h_px;
+    g_status_top_px = msg_h_px + map_h_px;
+    g_window_w_px = VIEW_COLS * (tile_surf ? g_tile_w : g_cell_w);
+    g_window_h_px = msg_h_px + map_h_px + status_h_px;
+
+    /* g_window_w_px/h_px above is the *logical* game resolution (e.g.
+       80 tile columns at 32px each = 2560px wide) -- often wider than
+       an actual screen. Create the real OS window scaled down to fit
+       the display, and let SDL_RenderSetLogicalSize() below transparently
+       map every existing pixel-coordinate draw call onto it. */
+    {
+        SDL_Rect bounds;
+        int win_w = g_window_w_px, win_h = g_window_h_px;
+
+        if (SDL_GetDisplayUsableBounds(0, &bounds) == 0) {
+            int max_w = (int) (bounds.w * 0.92);
+            int max_h = (int) (bounds.h * 0.92);
+            if (win_w > max_w || win_h > max_h) {
+                double scale_w = (double) max_w / win_w;
+                double scale_h = (double) max_h / win_h;
+                double scale = (scale_w < scale_h) ? scale_w : scale_h;
+                win_w = (int) (win_w * scale);
+                win_h = (int) (win_h * scale);
+            }
+        }
+
+        g_win = SDL_CreateWindow("UnNetHack",
+                                  SDL_WINDOWPOS_CENTERED,
+                                  SDL_WINDOWPOS_CENTERED,
+                                  win_w, win_h,
+                                  SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    }
     if (!g_win)
         panic("SDL_CreateWindow: %s", SDL_GetError());
 
@@ -373,10 +543,29 @@ sdl_init_nhwindows(int *argc UNUSED, char **argv UNUSED)
     if (!g_ren)
         panic("SDL_CreateRenderer: %s", SDL_GetError());
 
+    /* everything else in this file draws in g_window_w_px/h_px
+       (logical) coordinates; this makes SDL scale that onto whatever
+       actual window size was just created, letterboxing as needed */
+    SDL_RenderSetLogicalSize(g_ren, g_window_w_px, g_window_h_px);
+
+    if (tile_surf) {
+        g_tile_tex = SDL_CreateTextureFromSurface(g_ren, tile_surf);
+        SDL_FreeSurface(tile_surf);
+    }
+
+    g_screen_cols = g_window_w_px / g_cell_w;
+    g_screen_rows = g_window_h_px / g_cell_h;
+
     SDL_StartTextInput();
 
     memset(sdl_windows, 0, sizeof sdl_windows);
     memset(g_glyph_cache, 0, sizeof g_glyph_cache);
+
+    /* every windowport is responsible for setting this once its window
+       is ready; pline() checks it and routes every single message to
+       raw_print() (the terminal, not this window) until it's set --
+       see src/pline.c around "if (!iflags.window_inited)" */
+    iflags.window_inited = TRUE;
 
     nhUse(fontpath);
 }
@@ -417,6 +606,7 @@ void
 sdl_exit_nhwindows(const char *str)
 {
     int i;
+    iflags.window_inited = FALSE;
     if (str)
         raw_print(str);
     for (i = 0; i < SDL_MAXWIN; i++)
@@ -428,12 +618,15 @@ sdl_exit_nhwindows(const char *str)
             if (g_glyph_cache[i][c])
                 SDL_DestroyTexture(g_glyph_cache[i][c]);
     }
+    if (g_tile_tex)
+        SDL_DestroyTexture(g_tile_tex);
     if (g_font)
         TTF_CloseFont(g_font);
     if (g_ren)
         SDL_DestroyRenderer(g_ren);
     if (g_win)
         SDL_DestroyWindow(g_win);
+    IMG_Quit();
     TTF_Quit();
     SDL_Quit();
 }
@@ -516,7 +709,7 @@ sdl_display_nhwindow(winid wid, boolean block)
         /* crude --More-- until this window gets its own dedicated
            pause tracking */
         boolean unused;
-        sdl_draw_string(0, MSG_ROWS - 1, "--More--", CLR_YELLOW);
+        sdl_draw_string(0, (MSG_ROWS - 1) * g_cell_h, "--More--", CLR_YELLOW);
         SDL_RenderPresent(g_ren);
         (void) sdl_wait_input(NULL, NULL, NULL, &unused);
     }
@@ -645,6 +838,22 @@ void
 sdl_end_menu(winid wid, const char *prompt)
 {
     sdl_window *w = sdl_win(wid);
+    char menu_ch = 'a';
+    int i;
+
+    /* add_menu()'s caller is allowed to pass accelerator == 0 to mean
+       "window port picks one" -- every other port assigns a-z then
+       A-Z to selectable items at menu-finalize time (see tty_end_menu
+       in win/tty/wintty.c for the reference sequence); without this,
+       items rendered with no visible/pressable letter at all */
+    for (i = 0; i < w->numitems; i++) {
+        if (w->items[i].id.a_void != NULL && !w->items[i].accelerator) {
+            w->items[i].accelerator = menu_ch;
+            if (menu_ch++ == 'z')
+                menu_ch = 'A';
+        }
+    }
+
     w->menuprompt = strdup(prompt ? prompt : "");
     w->menu_in_progress = FALSE;
 }
@@ -670,7 +879,7 @@ sdl_select_menu(winid wid, int how, MENU_ITEM_P **selected)
         SDL_SetRenderDrawColor(g_ren, 0, 0, 0, 255);
         SDL_RenderClear(g_ren);
         if (w->menuprompt && w->menuprompt[0])
-            sdl_draw_string(0, row++, w->menuprompt, CLR_WHITE);
+            sdl_draw_string(0, row++ * g_cell_h, w->menuprompt, CLR_WHITE);
         for (i = 0; i < w->numitems && row < g_screen_rows; i++, row++) {
             char line[BUFSZ];
             boolean selectable = (w->items[i].id.a_void != NULL);
@@ -680,10 +889,10 @@ sdl_select_menu(winid wid, int how, MENU_ITEM_P **selected)
             Sprintf(line, "%c %s %s",
                     w->items[i].accelerator ? w->items[i].accelerator : ' ',
                     selectable ? mark : " ", w->items[i].str);
-            sdl_draw_string(1, row,
+            sdl_draw_string(1, row * g_cell_h,
                              (i == cursor && selectable) ? "->" : "",
                              CLR_WHITE);
-            sdl_draw_string(4, row, line,
+            sdl_draw_string(4, row * g_cell_h, line,
                              (i == cursor) ? CLR_YELLOW : CLR_WHITE);
         }
         SDL_RenderPresent(g_ren);
@@ -799,8 +1008,10 @@ sdl_wait_synch(void)
 void
 sdl_cliparound(int x UNUSED, int y UNUSED)
 {
-    /* The whole map always fits on screen at once in this scaffold,
-       so there's nothing to scroll. */
+    /* No-op: sdl_render_screen() recomputes g_cam_x from u.ux every
+       frame instead of relying on this hint, which keeps the viewport
+       correct even when core moves the player without calling
+       cliparound (e.g. teleport) or calls it before glyphs update. */
 }
 #endif
 
@@ -875,7 +1086,7 @@ sdl_yn_function(const char *question, const char *choices, char def)
     boolean click;
 
     Sprintf(qbuf, "%s ", question ? question : "");
-    sdl_draw_string(0, MSG_ROWS - 1, qbuf, CLR_WHITE);
+    sdl_draw_string(0, (MSG_ROWS - 1) * g_cell_h, qbuf, CLR_WHITE);
     SDL_RenderPresent(g_ren);
 
     for (;;) {
@@ -908,7 +1119,7 @@ sdl_getlin(const char *question, char *input)
         Sprintf(line, "%s %s", question ? question : "", buf);
         SDL_SetRenderDrawColor(g_ren, 0, 0, 0, 255);
         SDL_RenderClear(g_ren);
-        sdl_draw_string(0, MSG_ROWS - 1, line, CLR_WHITE);
+        sdl_draw_string(0, (MSG_ROWS - 1) * g_cell_h, line, CLR_WHITE);
         SDL_RenderPresent(g_ren);
 
         ch = sdl_wait_input(NULL, NULL, NULL, &click);
