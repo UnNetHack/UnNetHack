@@ -66,19 +66,12 @@ Tileset placement
 sdl_init_nhwindows() looks for the tileset relative to the current
 directory, which is HACKDIR by the time it runs (the game chdir()s
 there at startup) -- see sdl_tile_candidates in win/sdl/sdlmain.c.
-Until `make install` is taught to copy it there automatically, copy it
-in by hand after each install:
-
-    cp tilesets/unchozo32b.png <HACKDIR>/
-
-(e.g. <HACKDIR>/share/unnethack for a typical `--prefix` install). If
-it's missing, the port still runs -- it just draws colored characters
-instead of tiles, exactly like before tile support was added.
+`make install` copies tilesets/unchozo32b.png and tilesets/anim/*.png
+into HACKDIR automatically. If the sheet is missing, the port still
+runs -- it just draws colored characters instead of tiles.
 
 Known gaps (intentionally deferred, not bugs)
 -----------------------------------------------
-  - `make install` doesn't copy the tileset into HACKDIR yet -- see
-    "Tileset placement" above.
   - No real role/race/gender/alignment selection dialog
     (sdl_player_selection() is a no-op; unset facets fall back to the
     game's normal "pick at random" behavior). See
@@ -104,12 +97,23 @@ resolution works (128x128 frames in a 512x128 strip = 4 HD frames) and
 gets smoothly scaled into the tile cell. Tiles without an overlay keep
 their static sheet art, so animated art can be added one piece at a
 time. All copies of a tile animate in sync at 200ms/frame off the wall
-clock, independent of game turns. Do NOT derive tile numbers by
-arithmetic on the win/share/*.txt "# tile" counts -- the authoritative
-mapping is the generated glyph2tile[] table in src/tile.c. To find a
-tile number, compile a tiny query against src/tile.o printing
-glyph2tile[<glyph>] (e.g. GLYPH_CMAP_OFF + S_fountain for dungeon
-features, GLYPH_OBJ_OFF + <otyp> for objects, monster indices for
-monsters). Verified anchors: upstair=1013, altar=1017, grave=1018,
-throne=1019, sink=1020, fountain=1021.
-A demo fountain lives in tilesets/anim/1021.png.
+clock, independent of game turns.
+
+The art pipeline (e.g. Meshy or any tool that exports PNG frames):
+
+1. Find the tile number: grep tilesets/TILE-INDEX.txt (generated from
+   the game's own glyph2tile[] table -- never derive indices by
+   counting the win/share/*.txt files, that gives wrong answers).
+       grep -i kitten tilesets/TILE-INDEX.txt
+2. Export animation frames as PNGs with transparent backgrounds
+   (any size; they get alpha-trimmed, squared, and bottom-aligned).
+3. Stitch them into a strip (accepts a name or a tile number):
+       tools/.venv/bin/python tools/mkanim.py kitten frames_dir/
+   One-time setup for the venv:
+       python3 -m venv tools/.venv
+       tools/.venv/bin/pip install pillow
+4. Deploy and play:
+       make install && graphichack
+
+Demo overlays live in tilesets/anim/ (fountain 1021, dog family
+18-20, cat family 37/38/42).

@@ -260,6 +260,10 @@ dofiles:
 	fi
 	cp $(srcdir)/dat/license $(DESTDIR)$(FILE_AREA_DOC)
 	cp $(srcdir)/dat/unnethack_dump.css $(DESTDIR)$(FILE_AREA_UNSHARE)
+# SDL port art: tileset sheet plus animated tile overlays (anim/)
+	-cp $(srcdir)/tilesets/unchozo32b.png $(DESTDIR)$(FILE_AREA_UNSHARE)
+	-mkdir -p $(DESTDIR)$(FILE_AREA_UNSHARE)/anim
+	-cp $(srcdir)/tilesets/anim/*.png $(DESTDIR)$(FILE_AREA_UNSHARE)/anim/
 	@HOST_UNIX@-rm -f $(DESTDIR)$(SHELLDIR)/$(SCRIPT)
 	@HOST_UNIX@sed -e 's;/usr/games/lib/nethackdir;$(FILE_AREA_UNSHARE);' \
 	@HOST_UNIX@	-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \

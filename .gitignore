@@ -98,3 +98,4 @@ tests/wishing/test_wishing
 
 # /win/
 /win/*/*.o
+tools/.venv/
