@@ -57,14 +57,18 @@ def load_frames(args):
             paths.append(a)
     if not paths:
         sys.exit("no frames given")
-    frames = []
-    for p in paths:
-        im = Image.open(p).convert("RGBA")
-        box = im.getbbox()  # alpha-trim
-        if box:
-            im = im.crop(box)
-        frames.append(im)
+    frames = [Image.open(p).convert("RGBA") for p in paths]
+    # Alpha-trim using the UNION of every frame's bounds, not each
+    # frame's own -- per-frame trimming re-centres the subject every
+    # frame and makes an animation jitter.
+    boxes = [f.getbbox() for f in frames if f.getbbox()]
+    if boxes:
+        u = (min(b[0] for b in boxes), min(b[1] for b in boxes),
+             max(b[2] for b in boxes), max(b[3] for b in boxes))
+        frames = [f.crop(u) for f in frames]
     return frames
+
+MAX_SIDE = int(os.environ.get("ANIM_SIZE", 256))  # per-frame cap in px
 
 def main():
     if len(sys.argv) < 3:
@@ -74,6 +78,14 @@ def main():
     # square cell: fits the largest trimmed frame, with 4% breathing room
     side = max(max(f.width, f.height) for f in frames)
     side = int(side * 1.04)
+    if side > MAX_SIDE:
+        # tiles render ~32px; anything past a few hundred px is wasted
+        # file size. Scale frames down together to preserve alignment.
+        scale = MAX_SIDE / side
+        frames = [f.resize((max(1, int(f.width * scale)),
+                            max(1, int(f.height * scale))), Image.LANCZOS)
+                  for f in frames]
+        side = MAX_SIDE
     strip = Image.new("RGBA", (side * len(frames), side), (0, 0, 0, 0))
     for i, f in enumerate(frames):
         strip.paste(f, (i * side + (side - f.width) // 2,
