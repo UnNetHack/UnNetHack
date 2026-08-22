@@ -133,6 +133,13 @@ WINLISPSRC = $(srcdir)/../win/lisp/winlisp.c
 WINLISPOBJ = winlisp.o nhwin.a
 WINLISPLIB =
 
+# Files for the SDL2 port (see win/sdl/Install.SDL2). Enable with
+# ./configure --enable-sdl-graphics; WINSDLLIB is filled in via
+# pkg-config detection in configure.ac.
+WINSDLSRC = $(srcdir)/../win/sdl/sdlmain.c
+WINSDLOBJ = sdlmain.o
+WINSDLLIB = @WINSDLLIB@
+
 WINSRC = @WINSRC@
 WINOBJ = @WINOBJ@
 WINTTYLIB = @WINTTYLIB@
@@ -579,6 +586,9 @@ cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinvt.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
+sdlmain.o: $(srcdir)/../win/sdl/sdlmain.c $(HACK_H) ../include/color.h \
+		../include/dlb.h ../include/winsdl.h
+	$(CC) $(CFLAGS) -c $(srcdir)/../win/sdl/sdlmain.c
 Window.o: $(srcdir)/../win/X11/Window.c ../include/xwindowp.h \
 		../include/xwindow.h $(CONFIG_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../win/X11/Window.c

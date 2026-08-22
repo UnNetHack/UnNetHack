@@ -660,6 +660,13 @@ WINLIB
 WINOBJ
 WINSRC
 LISPLIB
+WINSDLLIB
+SDL2_IMAGE_LIBS
+SDL2_IMAGE_CFLAGS
+SDL2_TTF_LIBS
+SDL2_TTF_CFLAGS
+SDL2_LIBS
+SDL2_CFLAGS
 WINCURSESLIB
 WINTTYLIB
 EXTRA_UNSHARE
@@ -696,11 +703,11 @@ SYSSRC
 SYSTEM
 HOST_UNIX
 HOST_MSWIN
+LIBXAW_LIBS
+LIBXAW_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
-LIBXAW_LIBS
-LIBXAW_CFLAGS
 host_os
 host_vendor
 host_cpu
@@ -769,6 +776,7 @@ ac_user_opts='
 enable_option_checking
 enable_dummy_graphics
 enable_lisp_graphics
+enable_sdl_graphics
 enable_curses_graphics
 enable_pdcurses_graphics
 enable_tty_graphics
@@ -843,14 +851,20 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
-LIBXAW_CFLAGS
-LIBXAW_LIBS
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
+LIBXAW_CFLAGS
+LIBXAW_LIBS
 LUA
 LUA_INCLUDE
-LUA_LIB'
+LUA_LIB
+SDL2_CFLAGS
+SDL2_LIBS
+SDL2_TTF_CFLAGS
+SDL2_TTF_LIBS
+SDL2_IMAGE_CFLAGS
+SDL2_IMAGE_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1475,6 +1489,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-dummy-graphics dummy graphics for unit tests (default=no)
   --enable-lisp-graphics  enable playing UnNetHack in Emacs (default=no)
+  --enable-sdl-graphics   use SDL2 graphics (default=no)
   --enable-curses-graphics
                           use curses interface (default=no)
   --enable-pdcurses-graphics
@@ -1590,17 +1605,27 @@ Some influential environment variables:
   LIBS        libraries to pass to the linker, e.g. -l<library>
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
-  LIBXAW_CFLAGS
-              Compiler flags for libXaw, overriding pkg-config
-  LIBXAW_LIBS Linker flags for libXaw, overriding pkg-config
   PKG_CONFIG  path to pkg-config utility
   PKG_CONFIG_PATH
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
+  LIBXAW_CFLAGS
+              Compiler flags for libXaw, overriding pkg-config
+  LIBXAW_LIBS Linker flags for libXaw, overriding pkg-config
   LUA         The Lua interpreter, e.g. /usr/bin/lua5.1
   LUA_INCLUDE The Lua includes, e.g. -I/usr/include/lua5.1
   LUA_LIB     The Lua library, e.g. -llua5.1
+  SDL2_CFLAGS C compiler flags for SDL2, overriding pkg-config
+  SDL2_LIBS   linker flags for SDL2, overriding pkg-config
+  SDL2_TTF_CFLAGS
+              C compiler flags for SDL2_TTF, overriding pkg-config
+  SDL2_TTF_LIBS
+              linker flags for SDL2_TTF, overriding pkg-config
+  SDL2_IMAGE_CFLAGS
+              C compiler flags for SDL2_IMAGE, overriding pkg-config
+  SDL2_IMAGE_LIBS
+              linker flags for SDL2_IMAGE, overriding pkg-config
 
 Use these variables to override the choices made by 'configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3278,6 +3303,30 @@ printf '%s\n' "yes" >&6; }
 printf '%s\n' "no" >&6; }
   fi
 
+# Check whether --enable-sdl-graphics was given.
+if test ${enable_sdl_graphics+y}
+then :
+  enableval=$enable_sdl_graphics; enable_sdl_graphics="$enableval"
+else case e in #(
+  e) enable_sdl_graphics="no" ;;
+esac
+fi
+
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking sdl-graphics" >&5
+printf %s "checking sdl-graphics... " >&6; }
+  if test "$enable_sdl_graphics" != "no"; then
+    if test "sdl" = "pdcurses"; then
+      nethack_wins="curses"
+    else
+      nethack_wins="sdl $nethack_wins"
+    fi
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+  else
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+  fi
+
 # Check whether --enable-curses-graphics was given.
 if test ${enable_curses_graphics+y}
 then :
@@ -3363,7 +3412,7 @@ fi
 printf %s "checking x11-graphics... " >&6; }
   if test "$enable_x11_graphics" != "no"; then
     if test "x11" = "pdcurses"; then
-      nethack_wins="x11 curses"
+      nethack_wins="curses"
     else
       nethack_wins="x11 $nethack_wins"
     fi
@@ -4558,11 +4607,6 @@ case $host_os in *\ *) host_os=`printf '%s\n' "$host_os" | sed 's/ /-/g'`;; esac
 
 
 
-if test "$enable_x11_graphics" != "no"; then
-    # We have to check for libXaw before we define SYSV,
-    # since the X11 include files change their behaviour
-    # depending on whether the compiler defines it or not.
-
 
 
 
@@ -4695,9 +4739,11 @@ printf '%s\n' "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
-if test -z "$PKG_CONFIG"; then
-	as_fn_error $? "pkg-config not found" "$LINENO" 5
-fi
+if test "$enable_x11_graphics" != "no"; then
+    # We have to check for libXaw before we define SYSV,
+    # since the X11 include files change their behaviour
+    # depending on whether the compiler defines it or not.
+
 
 
 
@@ -6193,7 +6239,7 @@ fi
       print("yes")
     else
       print("no")
-    end'`
+    end' | tr -d '[:cntrl:]'`
     if test "x$_ax_lua_good_version" = "xyes"
 then :
   break
@@ -7591,11 +7637,15 @@ printf '%s\n' "$as_me: Using PDCurses backend: $PDCURSES_BACKEND" >&6;}
     if test "$PDCURSES_BACKEND" = "sdl2"; then
         PDCURSES_BACKEND_LIB="-lSDL2 -lSDL2_ttf"
         CFLAGS="$CFLAGS -DPDC_WIDE -DPDC_FORCE_UTF8"
-        printf '%s\n' "#define PDCURSES_BACKEND_SDL2 1" >>confdefs.h
+
+printf '%s\n' "#define PDCURSES_BACKEND_SDL2 /**/" >>confdefs.h
+
     elif test "$PDCURSES_BACKEND" = "wingui"; then
         PDCURSES_BACKEND_LIB="-lgdi32 -lwinmm -lcomdlg32"
         CFLAGS="$CFLAGS -DPDC_FORCE_UTF8"
-        printf '%s\n' "#define PDCURSES_BACKEND_WINGUI 1" >>confdefs.h
+
+printf '%s\n' "#define PDCURSES_BACKEND_WINGUI /**/" >>confdefs.h
+
     else
         as_fn_error $? "PDCurses backend ${PDCURSES_BACKEND} is currently not supported" "$LINENO" 5
     fi
@@ -7609,7 +7659,6 @@ printf '%s\n' "#define CURSES_GRAPHICS /**/" >>confdefs.h
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
 fi
-
 
 
 
@@ -7700,6 +7749,240 @@ printf '%s\n' "#define X11_GRAPHICS /**/" >>confdefs.h
     OPTIONS_FILE="options"
     OPTIONS_FILES="options"
 fi
+
+WINSDLLIB=
+if test "$enable_sdl_graphics" != "no"; then
+
+pkg_failed=no
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for sdl2" >&5
+printf %s "checking for sdl2... " >&6; }
+
+if test -n "$SDL2_CFLAGS"; then
+    pkg_cv_SDL2_CFLAGS="$SDL2_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sdl2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sdl2") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SDL2_CFLAGS=`$PKG_CONFIG --cflags "sdl2" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$SDL2_LIBS"; then
+    pkg_cv_SDL2_LIBS="$SDL2_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sdl2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sdl2") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SDL2_LIBS=`$PKG_CONFIG --libs "sdl2" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                SDL2_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "sdl2" 2>&1`
+        else
+                SDL2_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "sdl2" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$SDL2_PKG_ERRORS" >&5
+
+        have_sdl2=no
+elif test $pkg_failed = untried; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        have_sdl2=no
+else
+        SDL2_CFLAGS=$pkg_cv_SDL2_CFLAGS
+        SDL2_LIBS=$pkg_cv_SDL2_LIBS
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        have_sdl2=yes
+fi
+
+pkg_failed=no
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for SDL2_ttf" >&5
+printf %s "checking for SDL2_ttf... " >&6; }
+
+if test -n "$SDL2_TTF_CFLAGS"; then
+    pkg_cv_SDL2_TTF_CFLAGS="$SDL2_TTF_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"SDL2_ttf\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "SDL2_ttf") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SDL2_TTF_CFLAGS=`$PKG_CONFIG --cflags "SDL2_ttf" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$SDL2_TTF_LIBS"; then
+    pkg_cv_SDL2_TTF_LIBS="$SDL2_TTF_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"SDL2_ttf\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "SDL2_ttf") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SDL2_TTF_LIBS=`$PKG_CONFIG --libs "SDL2_ttf" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                SDL2_TTF_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "SDL2_ttf" 2>&1`
+        else
+                SDL2_TTF_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "SDL2_ttf" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$SDL2_TTF_PKG_ERRORS" >&5
+
+        have_sdl2_ttf=no
+elif test $pkg_failed = untried; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        have_sdl2_ttf=no
+else
+        SDL2_TTF_CFLAGS=$pkg_cv_SDL2_TTF_CFLAGS
+        SDL2_TTF_LIBS=$pkg_cv_SDL2_TTF_LIBS
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        have_sdl2_ttf=yes
+fi
+
+pkg_failed=no
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for SDL2_image" >&5
+printf %s "checking for SDL2_image... " >&6; }
+
+if test -n "$SDL2_IMAGE_CFLAGS"; then
+    pkg_cv_SDL2_IMAGE_CFLAGS="$SDL2_IMAGE_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"SDL2_image\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "SDL2_image") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SDL2_IMAGE_CFLAGS=`$PKG_CONFIG --cflags "SDL2_image" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$SDL2_IMAGE_LIBS"; then
+    pkg_cv_SDL2_IMAGE_LIBS="$SDL2_IMAGE_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"SDL2_image\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "SDL2_image") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SDL2_IMAGE_LIBS=`$PKG_CONFIG --libs "SDL2_image" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                SDL2_IMAGE_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "SDL2_image" 2>&1`
+        else
+                SDL2_IMAGE_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "SDL2_image" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$SDL2_IMAGE_PKG_ERRORS" >&5
+
+        have_sdl2_image=no
+elif test $pkg_failed = untried; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        have_sdl2_image=no
+else
+        SDL2_IMAGE_CFLAGS=$pkg_cv_SDL2_IMAGE_CFLAGS
+        SDL2_IMAGE_LIBS=$pkg_cv_SDL2_IMAGE_LIBS
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        have_sdl2_image=yes
+fi
+    if test "$have_sdl2" != "yes" -o "$have_sdl2_ttf" != "yes" \
+            -o "$have_sdl2_image" != "yes"; then
+        as_fn_error $? "Need SDL2, SDL2_ttf, and SDL2_image (found via pkg-config) for SDL2 graphics -- see win/sdl/Install.SDL2" "$LINENO" 5
+    fi
+
+    CFLAGS="${CFLAGS} ${SDL2_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_IMAGE_CFLAGS}"
+    WINSDLLIB="${SDL2_LIBS} ${SDL2_TTF_LIBS} ${SDL2_IMAGE_LIBS}"
+    WINSRC="${WINSRC} \$(WINSDLSRC)"
+    WINOBJ="${WINOBJ} \$(WINSDLOBJ)"
+    WINLIB="${WINLIB} \$(WINSDLLIB)"
+
+printf '%s\n' "#define SDL_GRAPHICS /**/" >>confdefs.h
+
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+
 
 if test "$enable_dummy_graphics" != "no"; then
     WINSRC="${WINSRC} \$(WINDUMMYSRC)"
@@ -8647,9 +8930,9 @@ printf '%s\n' "#define MENU_COLOR /**/" >>confdefs.h
 
    fi
 
-if [[ "$enable_tty_graphics" == "yes" ||
-      "$enable_curses_graphics" == "yes" ||
-      "$enable_pdcurses_graphics" == "yes" ]]; then
+if test "$enable_tty_graphics" = "yes" || \
+   test "$enable_curses_graphics" = "yes" || \
+   test "$enable_pdcurses_graphics" = "yes"; then
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable status-color" >&5
 printf %s "checking whether to enable status-color... " >&6; }
    # Check whether --enable-status-color was given.
@@ -9307,7 +9590,7 @@ fi
 
 if test "$host_os" != mingw32 || test "$enable_pdcurses_graphics" != "no"; then
 	if test "$enable_tty_graphics" != "no" || test "$enable_curses_graphics" != "no" || test "$enable_pdcurses_graphics" != "no"; then
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable utf8-glyphs" >&5
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable utf8-glyphs" >&5
 printf %s "checking whether to enable utf8-glyphs... " >&6; }
    # Check whether --enable-utf8-glyphs was given.
 if test ${enable_utf8_glyphs+y}
@@ -9326,14 +9609,13 @@ printf '%s\n' "#define UTF8_GLYPHS /**/" >>confdefs.h
 
    fi
 
-	if test "$enable_utf8_glyphs" != "no" ; then
-				if test "$uint32_t" = no; then
-			as_fn_error $? "unable to continue without a 4-bytes datatype that could hold unicode codepoints" "$LINENO" 5
+		if test "$enable_utf8_glyphs" != "no" ; then
+						if test "$uint32_t" = no; then
+				as_fn_error $? "unable to continue without a 4-bytes datatype that could hold unicode codepoints" "$LINENO" 5
+			fi
 		fi
 	fi
 fi
-fi
-
 
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable whereis file" >&5
 printf %s "checking whether to enable whereis file... " >&6; }

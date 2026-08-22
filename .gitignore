@@ -3,6 +3,10 @@
 *.swo
 *.exe
 compile
+.DS_Store
+autom4te.cache/
+configure~
+/sys/autoconf/aclocal.m4
 
 
 # /

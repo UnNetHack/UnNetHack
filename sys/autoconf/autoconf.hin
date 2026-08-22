@@ -224,14 +224,14 @@
 /* Require some questions to be answered with 'yes' instead of 'y' */
 #undef PARANOID
 
-/* Compare High Score entries by user id instead of user name */
-#undef PERS_IS_UID
-
 /* PDCurses backend */
 #undef PDCURSES_BACKEND_SDL2
 
 /* PDCurses backend */
 #undef PDCURSES_BACKEND_WINGUI
+
+/* Compare High Score entries by user id instead of user name */
+#undef PERS_IS_UID
 
 /* QWERTZ keyboard layout support */
 #undef QWERTZ
@@ -247,6 +247,9 @@
 
 /* Show score on bottom line */
 #undef SCORE_ON_BOTL
+
+/* SDL2 graphics */
+#undef SDL_GRAPHICS
 
 /* Succubi/incubi seduction */
 #undef SEDUCE

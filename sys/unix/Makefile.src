@@ -291,7 +291,7 @@ WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
 WINGEMLIB = -le_gem -lgem
 #
 # libraries for the SDL2 port (see win/sdl/Install.SDL2)
-WINSDLLIB = -lSDL2 -lSDL2_ttf
+WINSDLLIB = -lSDL2 -lSDL2_ttf -lSDL2_image
 #
 # libraries for BeOS
 WINBELIB = -lbe
