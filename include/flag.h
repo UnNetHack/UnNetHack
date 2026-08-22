@@ -471,6 +471,8 @@ struct instance_flags {
     boolean dark_room;  /* show shadows in lit rooms */
     boolean vanilla_ui_behavior;    /* fall back to vanilla behavior */
     boolean show_annotation;    /* level annotation when entering level */
+    boolean tribute_gates;      /* dungeon claims ascension-kit pieces
+                                   when climbing (inverted-kit mode) */
     int statuslines;    /* number of status lines */
 #ifdef TEXTCOLOR
     int color_mode; /* number of available colors */
