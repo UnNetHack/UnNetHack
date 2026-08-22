@@ -36,6 +36,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
 
 #define CELL_PAD 2      /* pixels of breathing room around each glyph */
 #define MSG_ROWS 2      /* lines reserved for the message window, top */
@@ -62,6 +63,23 @@ static int g_cell_w = 8, g_cell_h = 14; /* text (message/status/menu) cells */
 
 static SDL_Texture *g_tile_tex = NULL;
 static int g_tile_w = 32, g_tile_h = 32; /* map cells, once tiles load */
+
+/* Per-tile animation overlays: HACKDIR/anim/NNNN.png, where NNNN is the
+   tile number and the image is a horizontal strip of square frames at
+   any resolution (frame size = image height); frames get scaled into
+   the tile cell, so high-definition art just works.  Tiles without an
+   overlay keep their static sheet tile -- art can arrive one piece at
+   a time.  All instances of a tile animate in sync off the wall clock,
+   decoupled from game turns. */
+typedef struct {
+    SDL_Texture *tex;
+    int nframes;
+    int frame_px; /* source frame width == height */
+} sdl_anim;
+static sdl_anim *g_anim = NULL;        /* indexed by tile number */
+static int g_anim_count = 0;
+static boolean g_animate_wait = FALSE; /* keep rendering while idle */
+#define SDL_ANIM_FRAME_MS 200
 
 /* pixel geometry of the three stacked regions; computed once the real
    cell/tile sizes are known during sdl_init_nhwindows() */
@@ -259,6 +277,22 @@ sdl_draw_tile(int x_px, int y_px, int glyph)
     if (tile < 0 || tile >= total_tiles_used)
         return FALSE;
 
+    if (g_anim && g_anim[tile].tex && g_anim[tile].nframes > 0) {
+        int fpx = g_anim[tile].frame_px;
+        int frame = (int) ((SDL_GetTicks() / SDL_ANIM_FRAME_MS)
+                           % (Uint32) g_anim[tile].nframes);
+
+        src.x = frame * fpx;
+        src.y = 0;
+        src.w = src.h = fpx;
+        dst.x = x_px;
+        dst.y = y_px;
+        dst.w = g_tile_w;
+        dst.h = g_tile_h;
+        SDL_RenderCopy(g_ren, g_anim[tile].tex, &src, &dst);
+        return TRUE;
+    }
+
     src.x = (tile % SDL_TILES_PER_ROW) * g_tile_w;
     src.y = (tile / SDL_TILES_PER_ROW) * g_tile_h;
     src.w = g_tile_w;
@@ -346,8 +380,16 @@ sdl_wait_input(coordxy *mx, coordxy *my, int *mod, boolean *got_click)
         *got_click = FALSE;
 
     for (;;) {
-        if (!SDL_WaitEvent(&ev))
+        if (!SDL_WaitEventTimeout(&ev, 100)) {
+            /* timeout, not an event: advance animations while idling
+               for input -- but only at the map (menus and prompts
+               paint their own screens that a re-render would clobber,
+               so they leave g_animate_wait off) */
+            if (g_animate_wait && g_anim_count > 0) {
+                sdl_render_screen();
+            }
             continue;
+        }
 
         switch (ev.type) {
         case SDL_QUIT:
@@ -553,6 +595,48 @@ sdl_init_nhwindows(int *argc UNUSED, char **argv UNUSED)
         SDL_FreeSurface(tile_surf);
     }
 
+    /* animation overlays live in HACKDIR/anim (cwd is HACKDIR by now,
+       same as the tileset search above); absence is normal */
+    if (g_tile_tex) {
+        DIR *dp = opendir("anim");
+
+        if (dp) {
+            struct dirent *de;
+
+            g_anim = (sdl_anim *) calloc((size_t) total_tiles_used,
+                                         sizeof (sdl_anim));
+            /* smooth scaling for HD frames; static sheet tiles keep
+               the default crisp nearest-neighbor look */
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+            while ((de = readdir(dp)) != 0) {
+                int tidx;
+                char apath[BUFSZ];
+                SDL_Surface *as;
+
+                if (sscanf(de->d_name, "%d.png", &tidx) != 1
+                    || tidx < 0 || tidx >= total_tiles_used)
+                    continue;
+                Sprintf(apath, "anim/%s", de->d_name);
+                as = IMG_Load(apath);
+                if (!as)
+                    continue;
+                if (as->h > 0 && as->w >= as->h && (as->w % as->h) == 0
+                    && !g_anim[tidx].tex) {
+                    g_anim[tidx].tex =
+                        SDL_CreateTextureFromSurface(g_ren, as);
+                    if (g_anim[tidx].tex) {
+                        g_anim[tidx].frame_px = as->h;
+                        g_anim[tidx].nframes = as->w / as->h;
+                        g_anim_count++;
+                    }
+                }
+                SDL_FreeSurface(as);
+            }
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+            closedir(dp);
+        }
+    }
+
     g_screen_cols = g_window_w_px / g_cell_w;
     g_screen_rows = g_window_h_px / g_cell_h;
 
@@ -617,6 +701,14 @@ sdl_exit_nhwindows(const char *str)
         for (c = 0; c < CLR_MAX; c++)
             if (g_glyph_cache[i][c])
                 SDL_DestroyTexture(g_glyph_cache[i][c]);
+    }
+    if (g_anim) {
+        for (i = 0; i < total_tiles_used; i++)
+            if (g_anim[i].tex)
+                SDL_DestroyTexture(g_anim[i].tex);
+        free(g_anim);
+        g_anim = NULL;
+        g_anim_count = 0;
     }
     if (g_tile_tex)
         SDL_DestroyTexture(g_tile_tex);
@@ -1043,9 +1135,11 @@ sdl_nhgetch(void)
     boolean click;
     int ch;
     sdl_render_screen();
+    g_animate_wait = TRUE;
     do {
         ch = sdl_wait_input(NULL, NULL, NULL, &click);
     } while (click); /* nhgetch() callers don't want mouse events */
+    g_animate_wait = FALSE;
     return ch;
 }
 
@@ -1055,7 +1149,9 @@ sdl_nh_poskey(coordxy *x, coordxy *y, int *mod)
     boolean click;
     int ch;
     sdl_render_screen();
+    g_animate_wait = TRUE;
     ch = sdl_wait_input(x, y, mod, &click);
+    g_animate_wait = FALSE;
     return click ? 0 : ch;
 }
 

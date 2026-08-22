@@ -92,3 +92,22 @@ Known gaps (intentionally deferred, not bugs)
     for unchozo32b.png), no scaling either.
   - SDL_QUIT (closing the window) ends the process immediately via
     nh_terminate() rather than going through a save-game confirmation.
+
+Animated tile overlays
+----------------------
+Drop PNG strips into HACKDIR/anim/ named by tile number, e.g.
+anim/1021.png for tile 1021 (the fountain). Each file is a horizontal
+strip of square frames -- frame size is the image height, so any
+resolution works (128x128 frames in a 512x128 strip = 4 HD frames) and
+gets smoothly scaled into the tile cell. Tiles without an overlay keep
+their static sheet art, so animated art can be added one piece at a
+time. All copies of a tile animate in sync at 200ms/frame off the wall
+clock, independent of game turns. Do NOT derive tile numbers by
+arithmetic on the win/share/*.txt "# tile" counts -- the authoritative
+mapping is the generated glyph2tile[] table in src/tile.c. To find a
+tile number, compile a tiny query against src/tile.o printing
+glyph2tile[<glyph>] (e.g. GLYPH_CMAP_OFF + S_fountain for dungeon
+features, GLYPH_OBJ_OFF + <otyp> for objects, monster indices for
+monsters). Verified anchors: upstair=1013, altar=1017, grave=1018,
+throne=1019, sink=1020, fountain=1021.
+A demo fountain lives in tilesets/anim/1021.png.
