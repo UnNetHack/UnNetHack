@@ -31,6 +31,7 @@
 #include "hack.h"
 #include "color.h"
 #include "dlb.h"
+#include "func_tab.h"
 #include "winsdl.h"
 
 #include <ctype.h>
@@ -393,13 +394,12 @@ sdl_wait_input(coordxy *mx, coordxy *my, int *mod, boolean *got_click)
 
         switch (ev.type) {
         case SDL_QUIT:
-            /* Window closed: there's no safe partial-turn state to
-               preserve here, so end the process the same way the core
-               already does for an unrecognized/unusable window port
-               (see choose_windows() in windows.c). A real port should
-               instead route this through the game's normal save/quit
-               path. */
-            nh_terminate(EXIT_SUCCESS);
+            /* Window closed: treat it like the terminal vanishing on
+               a tty session -- hangup() saves any game in progress
+               and cleans up the lock files, so closing the window is
+               a safe way to quit (leaking locks eventually blocks new
+               games with "There are too many hacks running now.") */
+            hangup(1);
             return 0; /*NOTREACHED*/
 
         case SDL_WINDOWEVENT:
@@ -679,7 +679,7 @@ sdl_get_nh_event(void)
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         if (ev.type == SDL_QUIT)
-            nh_terminate(EXIT_SUCCESS);
+            hangup(1); /* save-and-exit, same as sdl_wait_input */
         if (ev.type == SDL_WINDOWEVENT
             && ev.window.event == SDL_WINDOWEVENT_EXPOSED)
             sdl_render_screen();
@@ -1245,8 +1245,28 @@ sdl_getlin(const char *question, char *input)
 int
 sdl_get_ext_cmd(void)
 {
-    /* No extended-command picker yet; core falls back to its usual
-       "type the command name" prompt via getlin when this returns -1. */
+    char buf[BUFSZ];
+    int i, match = -1, nmatches = 0;
+    size_t len;
+
+    sdl_getlin("# extended command:", buf);
+    if (buf[0] == '\033' || !buf[0])
+        return -1;
+    len = strlen(buf);
+    for (i = 0; extcmdlist[i].ef_txt; i++) {
+        if ((extcmdlist[i].flags & WIZMODECMD) && !wizard)
+            continue;
+        if (!strcmpi(buf, extcmdlist[i].ef_txt))
+            return i; /* exact match wins outright */
+        if (!strncmpi(buf, extcmdlist[i].ef_txt, len)) {
+            match = i;
+            nmatches++;
+        }
+    }
+    if (nmatches == 1)
+        return match;
+    pline(nmatches ? "Ambiguous extended command \"%s\"."
+                   : "Unknown extended command \"%s\".", buf);
     return -1;
 }
 

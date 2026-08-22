@@ -90,8 +90,10 @@ Known gaps (intentionally deferred, not bugs)
   - Font/DPI handling is minimal: one fixed point size, no HiDPI
     scaling. Tile art always renders at native tile resolution (32x32
     for unchozo32b.png), no scaling either.
-  - SDL_QUIT (closing the window) ends the process immediately via
-    nh_terminate() rather than going through a save-game confirmation.
+
+(Closing the window now saves and exits via hangup(), like a tty
+session losing its terminal, and '#' extended commands work via a
+typed prompt with prefix matching -- both were gaps earlier.)
 
 Animated tile overlays
 ----------------------
