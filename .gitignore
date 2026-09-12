@@ -99,3 +99,8 @@ tests/wishing/test_wishing
 # /win/
 /win/*/*.o
 tools/.venv/
+/frames/
+/output/
+/tmp/
+/.claude/settings.local.json
+/.claude/launch.json
