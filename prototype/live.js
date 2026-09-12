@@ -4,6 +4,7 @@ import {createAltar} from './altar.js';
 import {createFire} from './fire.js';
 import {createFloorKit,cellHash} from './floor.js';
 import {stageCreature,addOutlines} from './readability.js';
+import {createCavern} from './cavern.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // Only window-port observations enter this view. No prediction of game rules.
@@ -26,6 +27,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  // Integer hash so torches scatter along a wall instead of lining a whole row.
  function hasTorch(x,z){return cellHash(x,z)%9===0;}
  const floorKit=createFloorKit();
+ const cavern=createCavern({group,scene,camera,controls});
  function updateTorchLights(t,dt){
    const rank=tile=>tile.position.distanceToSquared(hero.g.position)+(tile.userData.fog.visible?16:0);
    const wanted=new Set([...tiles.values()].filter(tile=>tile.userData.torch).sort((a,b)=>rank(a)-rank(b)).slice(0,TORCH_LIGHTS));
@@ -101,7 +103,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  function apply(frame){latest=frame;if(!active)return;
    hero.setWeapon?.(frame.player.weapon??null);
    hero.setHelmet?.(frame.player.helmet??null);addOutlines(hero.g);
-   const level=`${frame.branch}:${frame.depth}`;if(level!==lastLevel){clear();origin={x:frame.player.x,z:frame.player.z};lastLevel=level;hero.g.position.set(0,0,0);camera.position.set(9,10.7,13.1);controls.target.set(0,0,0);}
+   const level=`${frame.branch}:${frame.depth}`;const newLevel=level!==lastLevel;if(newLevel){clear();origin={x:frame.player.x,z:frame.player.z};lastLevel=level;hero.g.position.set(0,0,0);camera.position.set(9,10.7,13.1);controls.target.set(0,0,0);}
    const seen=new Set(),seenActors=new Set(),seenWells=new Set();
    for(const cell of frame.cells){const id=`${cell.x},${cell.z}`,x=cell.x-origin.x,z=cell.z-origin.z;
      if(cell.terrain!=='unknown'){
@@ -151,6 +153,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
      }
    }
    for(const [id,t] of tiles)if(!seen.has(id)){release(t);tiles.delete(id);}
+   cavern.rebuild(tiles,origin,newLevel);
    for(const [id,a] of actors)if(!seenActors.has(id)){release(a.g);actors.delete(id);}
    for(const [id,item] of groundItems)if(!seenActors.has(id)){release(item);groundItems.delete(id);}
    for(const [id,w] of wells)if(!seenWells.has(id)){group.remove(w);wells.delete(id);}
@@ -170,7 +173,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  dialog.addEventListener('cancel',e=>{e.preventDefault();if(pending)reply(pending.kind==='menu'?'!':pending.kind==='line'?'\u001b':27);});
  function connect(){source?.close();source=new EventSource('/engine/events');source.onmessage=e=>{const v=JSON.parse(e.data);if(v.type==='frame')apply(v);else if(v.type==='request'){pending=v;prompt();}else if(v.type==='message'){if(active)message(v.text);}else if(v.type==='status')$('#engine-status').textContent=v.text;else if(v.type==='menu')menu=v;else if(v.type==='text')lines=v.lines;else if(v.type==='ended'){pending=null;if(active){dialog.close();message(v.text);$('#engine-prompt').textContent='Session ended. Use Demo room, then Live UnNetHack to resume.';}}};source.onerror=()=>{if(active)$('#engine-prompt').textContent='Connection interrupted; reconnecting…';};}
  const saved={heading:$('.location h1').textContent,footer:$('footer>small').textContent,keys:$('.keys').innerHTML,companion:$('.companion').innerHTML};
- function setMode(value){active=value;for(const {light,base} of ambientLights)light.intensity=active?base*LIVE_AMBIENT:base;document.body.classList.toggle('live-engine',active);group.visible=active;for(const o of demoObjects)o.visible=!active;panel.hidden=!active;$('#reset').hidden=active;$('.legend').hidden=active;$('.character h2').hidden=active;button.textContent=active?'Demo room':'Live UnNetHack';$('.companion').innerHTML=active?'Companions<small>CONTROLLED BY UNNETHACK</small>':saved.companion;$('footer>small').textContent=active?'Real UnNetHack rules · isolated character and saves · drag to orbit, scroll to zoom':saved.footer;$('.keys').innerHTML=active?'<span><kbd>h j k l / arrows</kbd> Move</span><span><kbd>y u b n</kbd> Diagonals</span><span><kbd>s</kbd> Search</span><span><kbd>SPACE</kbd> Wait</span><span><kbd>i</kbd> Inventory</span><span><kbd>&lt; &gt;</kbd> Stairs</span>':saved.keys;if(active){if(latest)apply(latest);prompt();}else{dialog.close();onDemo();$('.location h1').textContent=saved.heading;controls.target.set(0,.1,0);camera.position.set(11,13,16);}onMode?.(active);}
+ function setMode(value){active=value;cavern.setActive(active);for(const {light,base} of ambientLights)light.intensity=active?base*LIVE_AMBIENT:base;document.body.classList.toggle('live-engine',active);group.visible=active;for(const o of demoObjects)o.visible=!active;panel.hidden=!active;$('#reset').hidden=active;$('.legend').hidden=active;$('.character h2').hidden=active;button.textContent=active?'Demo room':'Live UnNetHack';$('.companion').innerHTML=active?'Companions<small>CONTROLLED BY UNNETHACK</small>':saved.companion;$('footer>small').textContent=active?'Real UnNetHack rules · isolated character and saves · drag to orbit, scroll to zoom':saved.footer;$('.keys').innerHTML=active?'<span><kbd>h j k l / arrows</kbd> Move</span><span><kbd>y u b n</kbd> Diagonals</span><span><kbd>s</kbd> Search</span><span><kbd>SPACE</kbd> Wait</span><span><kbd>i</kbd> Inventory</span><span><kbd>&lt; &gt;</kbd> Stairs</span>':saved.keys;if(active){if(latest)apply(latest);prompt();}else{dialog.close();onDemo();$('.location h1').textContent=saved.heading;controls.target.set(0,.1,0);camera.position.set(11,13,16);}onMode?.(active);}
  button.onclick=async()=>{if(active){setMode(false);return;}setMode(true);$('#engine-prompt').textContent='Starting isolated UnNetHack…';try{await post('/engine/start');connect();}catch(e){message(`Could not start engine: ${e.message}. Run npm run engine:build first.`);}};
  panel.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{if(pending?.kind==='command')reply(Number(b.dataset.key));});
  addEventListener('keydown',e=>{if(!active||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target instanceof HTMLInputElement)return;
@@ -181,7 +184,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  return {get active(){return active;},update(t,dt){if(!active||!hero.target)return;const delta=hero.target.clone().sub(hero.g.position),moving=delta.length()>.025;if(moving)hero.g.rotation.y=Math.atan2(delta.x,delta.z);hero.g.position.lerp(hero.target,1-Math.exp(-dt*14));hero.body.position.y=Math.sin(t*(moving?18:2))*(moving?.035:.013);hero.legs.forEach((l,i)=>l.rotation.x=moving?Math.sin(t*18+i*Math.PI)*.5:0);hero.cape.rotation.x=-.17+Math.sin(t*3)*.06;if(hero.plume)hero.plume.rotation.z=-.16+Math.sin(t*2.4)*.035;
    const offset=hero.g.position.clone().sub(controls.target);offset.y=0;offset.multiplyScalar(1-Math.exp(-dt*3));controls.target.add(offset);camera.position.add(offset);lantern.position.copy(hero.g.position).add(new THREE.Vector3(0,3,0));
    for(const tile of tiles.values())if(tile.visible)tile.traverse(o=>o.userData.updateFire?.(t));
-   updateTorchLights(t,dt);
+   updateTorchLights(t,dt);cavern.update(t,dt,hero.g.position);
    for(const a of actors.values()){let walking=false;if(a.target){const d=a.target.clone().sub(a.g.position);walking=d.length()>.025;if(walking)a.g.rotation.y=Math.atan2(d.x,d.z);a.g.position.lerp(a.target,1-Math.exp(-dt*10));if(a.legs)a.legs.forEach((l,i)=>l.rotation.x=walking?Math.sin(t*22+i*2)*.4:0);}if(a.tail){const tailRate=a.quirk==='dog'?7:a.quirk==='unicorn'?2.6:3;const tailSwing=a.quirk==='dog'?.34:a.quirk==='unicorn'?.16:.24;a.tail.rotation.z=Math.sin(t*tailRate)*tailSwing;}if(a.charm)a.charm.position.y=.3+Math.sin(t*4)*.025;if(a.body){const idle=a.quirk==='orc'?.025:a.quirk==='dragon'?.035:a.quirk==='unicorn'?.022:.015;a.body.position.y=Math.sin(t*(walking?22:2.5))*idle;}if(a.wings?.length)a.wings.forEach((wing,i)=>{if(a.quirk==='bat'){wing.rotation.z=(wing.userData.side||(i?1:-1))*Math.sin(t*14)*.65;}else if(a.quirk==='bee'){wing.rotation.y=(i?1:-1)*Math.sin(t*60)*.35;}else wing.rotation.y=(i?1:-1)*(-.18+Math.sin(t*5)*.12);});if((a.quirk==='hover'||a.quirk==='bat'||a.quirk==='bee')&&a.body)a.body.position.y=Math.sin(t*2.2+a.g.position.x)*.06;if(a.quirk==='dragon')a.g.rotation.z=Math.sin(t*1.7)*.025;if(a.quirk==='gridbug')a.g.rotation.z=Math.sin(t*9)*.035;if(a.quirk==='guard')a.g.rotation.z=Math.sin(t*1.3)*.012;const core=a.core||a.g.userData.core;if(core)core.material.emissiveIntensity=4.5+Math.sin(t*5)*1.4;}
    for(const item of groundItems.values()){if(!item.userData.coinPile)continue;item.userData.coinAge=(item.userData.coinAge||0)+dt;for(const coin of item.userData.coinPile){if(coin.settled||item.userData.coinAge<coin.delay)continue;coin.velocity-=9.8*dt;coin.disk.position.y+=coin.velocity*dt;coin.stamp.position.y+=coin.velocity*dt;if(coin.disk.position.y<=coin.target){coin.disk.position.y=coin.target;coin.stamp.position.y=coin.target+.019;coin.velocity*=-.16;if(Math.abs(coin.velocity)<.35)coin.settled=true;}}}
    for(const tile of tiles.values()){const liquid=tile.userData.liquid;if(!liquid)continue;const phase=tile.userData.liquidPhase||0;liquid.position.y=.01+Math.sin(t*2.2+phase)*.008;liquid.rotation.z=Math.sin(t*.8+phase)*.012;liquid.material.emissiveIntensity=.22+Math.sin(t*2.6+phase)*.06;}
