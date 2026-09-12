@@ -75,8 +75,12 @@ static void frame(void) {
         if(!first)putchar(',');first=FALSE;
         mapglyph(g,&ch,&col,&special,x,y,0);
         terrain_glyph = glyph_is_cmap(g) ? g : b;
-        printf("{\"x\":%d,\"z\":%d,\"glyph\":%d,\"symbol\":%d,\"visible\":%s,\"remembered\":%s,\"terrain\":",x,y,g,ch,cansee(x,y)?"true":"false",levl[x][y].seenv?"true":"false");quoted(terrain(terrain_glyph));
+        printf("{\"x\":%d,\"z\":%d,\"glyph\":%d,\"symbol\":%d,\"color\":%d,\"visible\":%s,\"remembered\":%s,\"terrain\":",x,y,g,ch,col,cansee(x,y)?"true":"false",levl[x][y].seenv?"true":"false");quoted(terrain(terrain_glyph));
         printf(",\"kind\":");quoted(glyph_is_pet(g)?"pet":glyph_is_monster(g)?"monster":glyph_is_object(g)?"object":"terrain");
+        if (glyph_is_monster(g) && !glyph_is_pet(g)) {
+            struct monst *mtmp = m_at(x,y);
+            printf(",\"peaceful\":%s",(mtmp && mtmp->mpeaceful && canspotmon(mtmp))?"true":"false");
+        }
         printf(",\"name\":");m=glyph_to_mon(g);quoted(glyph_is_monster(g)&&m>=0?mons[m].mname:glyph_is_object(g)?object_name(g):"");
         if (glyph_is_object(g)) {
             object_type = glyph_is_body(g) ? CORPSE : glyph_to_obj(g);

@@ -3,6 +3,7 @@ import {createHeldWeapon} from './equipment.js';
 import {createAltar} from './altar.js';
 import {createFire} from './fire.js';
 import {createFloorKit,cellHash} from './floor.js';
+import {stageCreature,addOutlines} from './readability.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // Only window-port observations enter this view. No prediction of game rules.
@@ -99,8 +100,8 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  const hero=playerFactory();hero.setWeapon?.(null);group.add(hero.g);
  function apply(frame){latest=frame;if(!active)return;
    hero.setWeapon?.(frame.player.weapon??null);
-   hero.setHelmet?.(frame.player.helmet??null);
-   const level=`${frame.branch}:${frame.depth}`;if(level!==lastLevel){clear();origin={x:frame.player.x,z:frame.player.z};lastLevel=level;hero.g.position.set(0,0,0);camera.position.set(11,13,16);controls.target.set(0,0,0);}
+   hero.setHelmet?.(frame.player.helmet??null);addOutlines(hero.g);
+   const level=`${frame.branch}:${frame.depth}`;if(level!==lastLevel){clear();origin={x:frame.player.x,z:frame.player.z};lastLevel=level;hero.g.position.set(0,0,0);camera.position.set(9,10.7,13.1);controls.target.set(0,0,0);}
    const seen=new Set(),seenActors=new Set(),seenWells=new Set();
    for(const cell of frame.cells){const id=`${cell.x},${cell.z}`,x=cell.x-origin.x,z=cell.z-origin.z;
      if(cell.terrain!=='unknown'){
@@ -145,7 +146,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
        if(cell.kind==='monster'||cell.kind==='pet'){
        const key=`${id}:${cell.glyph}`;seenActors.add(key);let a=actors.get(key);
        if(!a){for(const [previous,candidate] of actors){if(!seenActors.has(previous)&&candidate.glyph===cell.glyph&&Math.hypot(candidate.g.position.x-x,candidate.g.position.z-z)<2.1){a=candidate;actors.delete(previous);actors.set(key,a);break;}}}
-       if(!a){if(cell.kind==='pet'&&/cat|kitten/.test(cell.name)){a=catFactory();a.g.add(label(cell.name,'#b8ead3'));}else{const made=creatureFactory?creatureFactory(cell):monsterFactory();a=made.g?made:{g:made};a.g.add(label(cell.name||'creature',cell.kind==='pet'?'#b8ead3':'#e9c8ad'));}a.g.position.set(x,0,z);group.add(a.g);actors.set(key,a);}
+       if(!a){const disposition=cell.kind==='pet'?'pet':cell.peaceful?'peaceful':'hostile';if(cell.kind==='pet'&&/cat|kitten/.test(cell.name)){a=catFactory();stageCreature(a.g,{disposition});a.g.add(label(cell.name,'#b8ead3'));}else{const made=creatureFactory?creatureFactory(cell):monsterFactory();a=made.g?made:{g:made};stageCreature(a.g,{disposition});a.g.add(label(cell.name||'creature',cell.kind==='pet'?'#b8ead3':cell.peaceful?'#e8dfb0':'#e9c8ad'));}a.g.position.set(x,0,z);group.add(a.g);actors.set(key,a);}
        a.glyph=cell.glyph;a.species=(cell.name||'').toLowerCase();a.target=new THREE.Vector3(x,0,z);
      }
    }
@@ -181,7 +182,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
    const offset=hero.g.position.clone().sub(controls.target);offset.y=0;offset.multiplyScalar(1-Math.exp(-dt*3));controls.target.add(offset);camera.position.add(offset);lantern.position.copy(hero.g.position).add(new THREE.Vector3(0,3,0));
    for(const tile of tiles.values())if(tile.visible)tile.traverse(o=>o.userData.updateFire?.(t));
    updateTorchLights(t,dt);
-   for(const a of actors.values()){let walking=false;if(a.target){const d=a.target.clone().sub(a.g.position);walking=d.length()>.025;if(walking)a.g.rotation.y=Math.atan2(d.x,d.z);a.g.position.lerp(a.target,1-Math.exp(-dt*10));if(a.legs)a.legs.forEach((l,i)=>l.rotation.x=walking?Math.sin(t*22+i*2)*.4:0);}if(a.tail){const tailRate=a.quirk==='dog'?7:a.quirk==='unicorn'?2.6:3;const tailSwing=a.quirk==='dog'?.34:a.quirk==='unicorn'?.16:.24;a.tail.rotation.z=Math.sin(t*tailRate)*tailSwing;}if(a.charm)a.charm.position.y=.3+Math.sin(t*4)*.025;if(a.body){const idle=a.quirk==='orc'?.025:a.quirk==='dragon'?.035:a.quirk==='unicorn'?.022:.015;a.body.position.y=Math.sin(t*(walking?22:2.5))*idle;}if(a.wings?.length)a.wings.forEach((wing,i)=>{wing.rotation.y=(i?1:-1)*(-.18+Math.sin(t*5)*.12);});if(a.quirk==='dragon')a.g.rotation.z=Math.sin(t*1.7)*.025;if(a.quirk==='gridbug')a.g.rotation.z=Math.sin(t*9)*.035;if(a.quirk==='guard')a.g.rotation.z=Math.sin(t*1.3)*.012;const core=a.core||a.g.userData.core;if(core)core.material.emissiveIntensity=4.5+Math.sin(t*5)*1.4;}
+   for(const a of actors.values()){let walking=false;if(a.target){const d=a.target.clone().sub(a.g.position);walking=d.length()>.025;if(walking)a.g.rotation.y=Math.atan2(d.x,d.z);a.g.position.lerp(a.target,1-Math.exp(-dt*10));if(a.legs)a.legs.forEach((l,i)=>l.rotation.x=walking?Math.sin(t*22+i*2)*.4:0);}if(a.tail){const tailRate=a.quirk==='dog'?7:a.quirk==='unicorn'?2.6:3;const tailSwing=a.quirk==='dog'?.34:a.quirk==='unicorn'?.16:.24;a.tail.rotation.z=Math.sin(t*tailRate)*tailSwing;}if(a.charm)a.charm.position.y=.3+Math.sin(t*4)*.025;if(a.body){const idle=a.quirk==='orc'?.025:a.quirk==='dragon'?.035:a.quirk==='unicorn'?.022:.015;a.body.position.y=Math.sin(t*(walking?22:2.5))*idle;}if(a.wings?.length)a.wings.forEach((wing,i)=>{if(a.quirk==='bat'){wing.rotation.z=(wing.userData.side||(i?1:-1))*Math.sin(t*14)*.65;}else if(a.quirk==='bee'){wing.rotation.y=(i?1:-1)*Math.sin(t*60)*.35;}else wing.rotation.y=(i?1:-1)*(-.18+Math.sin(t*5)*.12);});if((a.quirk==='hover'||a.quirk==='bat'||a.quirk==='bee')&&a.body)a.body.position.y=Math.sin(t*2.2+a.g.position.x)*.06;if(a.quirk==='dragon')a.g.rotation.z=Math.sin(t*1.7)*.025;if(a.quirk==='gridbug')a.g.rotation.z=Math.sin(t*9)*.035;if(a.quirk==='guard')a.g.rotation.z=Math.sin(t*1.3)*.012;const core=a.core||a.g.userData.core;if(core)core.material.emissiveIntensity=4.5+Math.sin(t*5)*1.4;}
    for(const item of groundItems.values()){if(!item.userData.coinPile)continue;item.userData.coinAge=(item.userData.coinAge||0)+dt;for(const coin of item.userData.coinPile){if(coin.settled||item.userData.coinAge<coin.delay)continue;coin.velocity-=9.8*dt;coin.disk.position.y+=coin.velocity*dt;coin.stamp.position.y+=coin.velocity*dt;if(coin.disk.position.y<=coin.target){coin.disk.position.y=coin.target;coin.stamp.position.y=coin.target+.019;coin.velocity*=-.16;if(Math.abs(coin.velocity)<.35)coin.settled=true;}}}
    for(const tile of tiles.values()){const liquid=tile.userData.liquid;if(!liquid)continue;const phase=tile.userData.liquidPhase||0;liquid.position.y=.01+Math.sin(t*2.2+phase)*.008;liquid.rotation.z=Math.sin(t*.8+phase)*.012;liquid.material.emissiveIntensity=.22+Math.sin(t*2.6+phase)*.06;}
    for(const w of wells.values())for(let i=0;i<w.children.length;i++){w.children[i].position.copy(wellTemplate.children[i].position);w.children[i].scale.copy(wellTemplate.children[i].scale);w.children[i].rotation.copy(wellTemplate.children[i].rotation);}
