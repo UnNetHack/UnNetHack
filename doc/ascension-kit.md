@@ -13,12 +13,12 @@
 - Excalibur — drain resistance
 
 ## Armor (+4 or better)
-- Silver Dragon Scale Mail (SDSM) — reflection (Shield of Reflection is a valid alt, frees the body slot for a lighter suit like mithril coat)
-- Cloak of Magic Resistance — magic resistance
-- Gauntlets of Power — +25 St, to-damage, and touch-stoning protection (supersedes plain Gloves — any glove-slot item blocks touch-stoning)
-- Rustproof Helm — plain; Helm of Brilliance is a common alt for +Int/+Wis if spell-focused (skippable for non-casters, e.g. Valkyrie)
-- Speed boots — mobility
-- T-shirt / Hawaiian shirt — extra AC, shirt slot
+- Silver Dragon Scale Mail (SDSM)
+- Cloak of Magic Resistance
+- Gauntlets of Power
+- Rustproof Helm
+- Speed boots
+- T-shirt / Hawaiian shirt
 
 ## Amulets
 - Amulet of Life Saving
@@ -39,9 +39,10 @@
 - Wand of Digging — Earth Plane navigation (nice-to-have)
 
 ## Potions
-- Potion of Full Healing — stockpiled
-- Gather unidentified/unwanted potions — dilute with water as needed, feeds the water supply used for blanking scrolls
-- Holy Water — drop potion(s) of water on an aligned altar and pray to bless them; required for blessing Bag of Holding and Unicorn Horn specifically; bless as much of the kit as possible, since Lich encounters can curse your gear
+- Potion of Extra Healing
+- Potion of Full Healing
+- Potion of Gain Level
+- Other potions — kept for Holy Water, mitigating Lich curses
 
 ## Scrolls
 - Scroll of Enchant Armor — stacked blessed for the AC push (see Gehennom Readiness Threshold)
@@ -52,8 +53,6 @@
   2. Master Mind Flayers — brain-eating instakill risk
   3. Disenchanters — drains charges/enchantment, wrecks your kit
   4. Vorpal Jabberwocks — ~5% instant decapitation
-  5. Weeping Angels — species-level genocide (class 'A' is mostly immune, but this monster was explicitly flagged genocidable)
-  6. Weeping Archangels — same as above
   - Note: demons (class '&') are not genocidable at all in this build — none of them carry the genocidable flag, regular or unique.
 - Scroll of Remove Curse — worth holding onto
 - Gather unidentified/unwanted scrolls — dip in water to blank, then Magic Marker into Enchant Armor / Genocide as needed
@@ -83,9 +82,9 @@
 - See invisible — invisible stalker corpse
 
 ## Level gain
-- Wraith corpse — eating grants an experience level
+- Wraith corpse
 - Potions of Gain Level
-- Succubus/Incubus kills — solid XP in a pinch
+- Succubus/Incubus — sometimes grants a level from sleeping with them
 
 ## Invocation Requirements (to reach Moloch's Sanctum)
 - **Bell of Opening (Silver Bell)** — quest reward; quest requires character level 14
