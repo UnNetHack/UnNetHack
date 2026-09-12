@@ -576,6 +576,14 @@ curses_update_stats(void)
         draw_vertical(x, y, hp, hpmax);
     }
 
+    /* Guard against a colored/inverse condition badge (e.g. a
+     * STATUSCOLOR=blind:red&inverse rule) being the last attribute
+     * curses has on record for this window. If it is, some terminals
+     * paint any later erase-to-end-of-line with that leftover color
+     * instead of the default background, which can leave a colored
+     * bar until the next full redraw (e.g. a terminal resize). */
+    wattrset(win, A_NORMAL);
+
     if (border) {
         box(win, 0, 0);
     }
