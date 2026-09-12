@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {createHeldWeapon} from './equipment.js';
 import {createAltar} from './altar.js';
 import {createFire} from './fire.js';
+import {createFloorKit,cellHash} from './floor.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 // Only window-port observations enter this view. No prediction of game rules.
@@ -22,7 +23,8 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  const ambientLights=scene.children.filter(o=>o.isHemisphereLight||o.isDirectionalLight).map(light=>({light,base:light.intensity}));
  const torchHaloMaterial=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const ctx=c.getContext('2d'),g=ctx.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,190,110,.55)');g.addColorStop(.35,'rgba(255,130,50,.18)');g.addColorStop(1,'rgba(255,100,30,0)');ctx.fillStyle=g;ctx.fillRect(0,0,64,64);return new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});})();
  // Integer hash so torches scatter along a wall instead of lining a whole row.
- function hasTorch(x,z){let h=Math.imul(x,374761393)^Math.imul(z,668265263);h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)%9===0;}
+ function hasTorch(x,z){return cellHash(x,z)%9===0;}
+ const floorKit=createFloorKit();
  function updateTorchLights(t,dt){
    const rank=tile=>tile.position.distanceToSquared(hero.g.position)+(tile.userData.fog.visible?16:0);
    const wanted=new Set([...tiles.values()].filter(tile=>tile.userData.torch).sort((a,b)=>rank(a)-rank(b)).slice(0,TORCH_LIGHTS));
@@ -103,7 +105,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
    for(const cell of frame.cells){const id=`${cell.x},${cell.z}`,x=cell.x-origin.x,z=cell.z-origin.z;
      if(cell.terrain!=='unknown'){
        seen.add(id);let tile=tiles.get(id);if(tile&&tile.userData.type!==cell.terrain){release(tile);tiles.delete(id);tile=null;}
-       if(!tile){tile=new THREE.Group();tile.position.set(x,0,z);tile.userData.type=cell.terrain;box(floorGeo,stone,tile,0,-.1,0);const fog=box(new THREE.PlaneGeometry(.98,.98),new THREE.MeshBasicMaterial({color:0x101a35,transparent:true,opacity:0,depthWrite:false}),tile,0,.012,0);fog.rotation.x=-Math.PI/2;tile.userData.fog=fog;
+       if(!tile){tile=new THREE.Group();tile.position.set(x,0,z);tile.userData.type=cell.terrain;floorKit.dress(box(floorGeo,floorKit.material(cell.x,cell.z),tile,0,-.1,0),tile,cell.x,cell.z,cell.terrain);const fog=box(new THREE.PlaneGeometry(.98,.98),new THREE.MeshBasicMaterial({color:0x101a35,transparent:true,opacity:0,depthWrite:false}),tile,0,.012,0);fog.rotation.x=-Math.PI/2;tile.userData.fog=fog;
          if(cell.terrain==='feature'){const s=label(String.fromCharCode(cell.symbol));s.position.y=.35;tile.add(s);}
          if(cell.terrain==='altar')tile.add(createAltar());
          if(cell.terrain==='bars'){
