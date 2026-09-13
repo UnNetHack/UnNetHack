@@ -1406,6 +1406,111 @@ u_collide_m(struct monst *mtmp)
 d_level new_dlevel = {0, 0};
 #endif
 
+/* ---- ascension-kit tribute gates ("tributegates" option) ----
+ *
+ * Inverted-kit mode: the player assembles their ascension kit early
+ * (see the curated general store in shknam.c) and the dungeon claims
+ * pieces of it as tribute on the climb out.  Instead of tracking paid
+ * gates in the save file, the rule is stateless: each depth tolerates
+ * only so many kit pieces, and arriving on a shallower level while
+ * over that budget costs one piece per level climbed -- the player's
+ * choice of which, or the dungeon's if they refuse to choose.
+ */
+
+/* kit piece types the dungeon recognizes as tribute; deliberately the
+ * same gear the curated general store deals in */
+static const short tribute_kit_types[] = {
+    SHIELD_OF_REFLECTION, AMULET_OF_REFLECTION, RIN_FREE_ACTION,
+    CLOAK_OF_MAGIC_RESISTANCE, GAUNTLETS_OF_POWER, SPEED_BOOTS,
+    DWARVISH_MITHRIL_COAT, RIN_CONFLICT, AMULET_OF_MAGICAL_BREATHING,
+    AMULET_OF_FLYING, AMULET_OF_LIFE_SAVING, UNICORN_HORN, MAGIC_LAMP,
+    WAN_DEATH, PICK_AXE, MAGIC_MARKER,
+};
+
+static boolean
+tribute_kit_piece(struct obj *otmp)
+{
+    int i;
+
+    for (i = 0; i < SIZE(tribute_kit_types); i++) {
+        if (otmp->otyp == tribute_kit_types[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/* how many kit pieces this depth tolerates; shrinks as the player
+ * climbs, so escaping shallow means arriving nearly bare */
+static int
+tribute_budget(int cur_depth)
+{
+    if (cur_depth < 1) {
+        cur_depth = 1;
+    }
+    return 2 + cur_depth / 2;
+}
+
+static void
+tribute_gate(void)
+{
+    struct obj *otmp, *victim = (struct obj *) 0;
+    winid win;
+    anything any;
+    menu_item *selected = (menu_item *) 0;
+    int n, count = 0, pick;
+
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (tribute_kit_piece(otmp)) {
+            count++;
+        }
+    }
+    if (count <= tribute_budget(depth(&u.uz))) {
+        return;
+    }
+
+    pline("The dungeon demands tribute for your passage!");
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win);
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (tribute_kit_piece(otmp)) {
+            any = zeroany;
+            any.a_obj = otmp;
+            add_menu(win, NO_GLYPH, MENU_DEFCNT, &any, otmp->invlet, 0,
+                     ATR_NONE, doname(otmp), MENU_UNSELECTED);
+        }
+    }
+    end_menu(win, "Surrender which piece of your kit?");
+    n = select_menu(win, PICK_ONE, &selected);
+    destroy_nhwindow(win);
+    if (n > 0) {
+        victim = selected[0].item.a_obj;
+        free((genericptr_t) selected);
+    } else {
+        /* refused to choose; the dungeon chooses */
+        pick = rn2(count);
+        for (otmp = invent; otmp; otmp = otmp->nobj) {
+            if (tribute_kit_piece(otmp) && pick-- == 0) {
+                victim = otmp;
+                break;
+            }
+        }
+        pline("The dungeon chooses for itself!");
+    }
+    if (!victim) {
+        return; /* paranoia */
+    }
+    if (victim->lamplit) {
+        end_burn(victim, TRUE);
+    }
+    if (victim->owornmask) {
+        remove_worn_item(victim, TRUE);
+    }
+    Your("%s crumbles into dust!", xname(victim));
+    useupall(victim);
+}
+
 void
 goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal)
 {
@@ -1989,6 +2094,12 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     if (iflags.show_annotation &&
         (annotation = get_annotation(&u.uz))) {
         You("annotated this level: %s", annotation);
+    }
+
+    /* inverted-kit mode: the dungeon takes its toll from those
+       climbing out with too much of their kit intact */
+    if (iflags.tribute_gates && up && !In_endgame(&u.uz)) {
+        tribute_gate();
     }
 
 #ifdef INSURANCE

@@ -177,7 +177,10 @@ main(int argc, char *argv[])
     check_linux_console();
 #endif
 #ifdef UTF8_GLYPHS
-    check_utf8_console();
+    /* Pipe-based window ports have no terminal to probe or put in raw mode. */
+    if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO)) {
+        check_utf8_console();
+    }
 #endif
 
     initoptions();

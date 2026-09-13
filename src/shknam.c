@@ -218,6 +218,143 @@ static const char *shktins[] = {
  * (by testing the sign) whether to use mkobj() or mksobj().
  */
 
+NEARDATA boolean mkshop_curated_loot = FALSE;
+NEARDATA boolean mkshop_no_mimics = FALSE;
+
+/* tools allowed in the curated level-2 general store; every other tool
+ * is considered junk for this shop */
+static const short curated_loot_allowed_tools[] = {
+    PICK_AXE, CAN_OF_GREASE, MAGIC_LAMP, UNICORN_HORN, BAG_OF_HOLDING,
+    MAGIC_MARKER,
+};
+
+/* whether an object is junk for the curated level-2 general store */
+static boolean
+curated_loot_rejected(struct obj *otmp)
+{
+    int i;
+
+    switch (otmp->oclass) {
+    case FOOD_CLASS:
+    case GEM_CLASS:
+    case SPBOOK_CLASS:
+    case WEAPON_CLASS:
+    case ARMOR_CLASS:
+        /* every piece of armor worth having is placed explicitly via
+         * curated_guaranteed_items[] instead of rolled at random */
+        return TRUE;
+    case TOOL_CLASS:
+        for (i = 0; i < SIZE(curated_loot_allowed_tools); i++) {
+            if (otmp->otyp == curated_loot_allowed_tools[i]) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    default:
+        break;
+    }
+
+    return FALSE;
+}
+
+/* one guaranteed copy of each of these is placed in the curated
+ * level-2 general store, on top of its normal (filtered) assortment */
+static const struct {
+    short otyp;
+    boolean erodeproof;
+    boolean force_spe;
+    schar spe;          /* enchantment to force; only used if force_spe */
+    short quan;          /* stack quantity to force; 0 or 1 means a single item */
+    boolean make_excalibur; /* turn this (LONG_SWORD) entry into Excalibur */
+    short corpsenm;      /* for CORPSE entries: which monster; else 0 */
+} curated_guaranteed_items[] = {
+    { GAUNTLETS_OF_POWER, TRUE },          /* rustproof */
+    { HELMET, TRUE },                      /* rustproof */
+    { SPEED_BOOTS, TRUE },                 /* fireproof */
+    { T_SHIRT, TRUE },                     /* fireproof */
+    { SHIELD_OF_REFLECTION, FALSE },
+    { DWARVISH_MITHRIL_COAT, FALSE },
+    { CLOAK_OF_DISPLACEMENT, TRUE },       /* fireproof */
+    { RIN_FREE_ACTION, FALSE },
+    { MAGIC_MARKER, FALSE },
+    { AMULET_OF_MAGICAL_BREATHING, FALSE },
+    { AMULET_OF_FLYING, FALSE },
+    { RIN_CONFLICT, FALSE },
+    { RIN_LEVITATION, FALSE },
+    { MAGIC_LAMP, FALSE },
+    { WAN_DEATH, FALSE },
+    { WAN_FIRE, FALSE },
+    { PICK_AXE, TRUE },                    /* rustproof */
+    { TOWEL, FALSE },
+    { CHROMATIC_DRAGON_SCALE_MAIL, FALSE }, /* +7 via armor handling below */
+    { SILVER_SABER, FALSE, TRUE, 7, 0 },
+    { BAG_OF_HOLDING, FALSE },
+    { UNICORN_HORN, FALSE },
+    { POT_WATER, FALSE, FALSE, 0, 20 },    /* blessed potion of water == holy water */
+    { SCR_IDENTIFY, FALSE, FALSE, 0, 10 },
+    { LONG_SWORD, TRUE, TRUE, 7, 0, TRUE },   /* becomes Excalibur, +7 */
+    { CRAM_RATION, FALSE, FALSE, 0, 30 },
+    { BELL_OF_OPENING, FALSE },
+    { CANDELABRUM_OF_INVOCATION, FALSE, TRUE, 7, 0 },  /* candles attached */
+    { CORPSE, FALSE, FALSE, 0, 0, FALSE, PM_LIZARD },
+};
+
+/* place one of each curated_guaranteed_items[] entry somewhere in the
+ * room; stacking onto an already-stocked square is fine, shops do
+ * that routinely */
+static void
+place_curated_guaranteed_items(struct mkroom *sroom, int rmno, int sh)
+{
+    int i, sx, sy, tries;
+    struct obj *otmp;
+
+    for (i = 0; i < SIZE(curated_guaranteed_items); i++) {
+        tries = 0;
+        do {
+            sx = sroom->lx + rn2(sroom->hx - sroom->lx + 1);
+            sy = sroom->ly + rn2(sroom->hy - sroom->ly + 1);
+            tries++;
+        } while (tries < 50 &&
+                 (!stock_room_goodpos(sroom, rmno, sh, sx, sy) ||
+                  !IS_ROOM(levl[sx][sy].typ)));
+
+        if (tries >= 50) {
+            continue;
+        }
+
+        otmp = mksobj_at(curated_guaranteed_items[i].otyp, sx, sy,
+                         TRUE, FALSE);
+        if (otmp && curated_guaranteed_items[i].make_excalibur) {
+            otmp = oname(otmp, artiname(ART_EXCALIBUR));
+            discover_artifact(ART_EXCALIBUR);
+        }
+        if (otmp && curated_guaranteed_items[i].corpsenm) {
+            otmp->corpsenm = curated_guaranteed_items[i].corpsenm;
+        }
+        if (otmp && curated_guaranteed_items[i].erodeproof) {
+            otmp->oerodeproof = 1;
+        }
+        if (otmp) {
+            /* every guaranteed item in this shop is blessed */
+            otmp->cursed = 0;
+            otmp->blessed = 1;
+            otmp->bknown = 1;
+        }
+        if (otmp && curated_guaranteed_items[i].force_spe) {
+            otmp->spe = curated_guaranteed_items[i].spe;
+        }
+        if (otmp && curated_guaranteed_items[i].quan > 1) {
+            otmp->quan = curated_guaranteed_items[i].quan;
+        }
+        /* mksobj()'s normal init only enchants armor ~10% of the time
+         * (and only up to rne(3) then); force real ascension-kit
+         * quality on every guaranteed armor piece instead */
+        if (otmp && otmp->oclass == ARMOR_CLASS) {
+            otmp->spe = 7;
+        }
+    }
+}
+
 const struct shclass shtypes[] = {
     {"general store", RANDOM_CLASS, 41,
      D_SHOP, {{100, RANDOM_CLASS}, {0, 0}, {0, 0}}, shkgeneral},
@@ -310,7 +447,8 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, int color)
     int atype;
     struct permonst *ptr;
 
-    if (!Is_blackmarket(&u.uz) && rn2(100) < depth(&u.uz) &&
+    if (!mkshop_no_mimics &&
+        !Is_blackmarket(&u.uz) && rn2(100) < depth(&u.uz) &&
         !MON_AT(sx, sy) && (ptr = mkclass(S_MIMIC, 0)) &&
         (mtmp = makemon(ptr, sx, sy, NO_MM_FLAGS)) != 0) {
         /* note: makemon will set the mimic symbol to a shop item */
@@ -339,6 +477,12 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, int color)
         struct obj *otmp;
 redo:
         otmp = mkobj_at(atype, sx, sy, TRUE);
+
+        if (mkshop_curated_loot && curated_loot_rejected(otmp)) {
+            obj_extract_self(otmp);
+            obfree(otmp, NULL);
+            goto redo;
+        }
 
         if ((shp->symb == RANDOM_CLASS) && (color >= 0)) {
             if (objects[otmp->otyp].oc_color != color) {
@@ -711,6 +855,11 @@ stock_room(int shp_indx, struct mkroom *sroom)
     char buf[BUFSZ];
     int rmno = (sroom - rooms) + ROOMOFFSET;
     const struct shclass *shp = &shtypes[shp_indx];
+    boolean curated_loot = mkshop_curated_loot;
+    boolean no_mimics = mkshop_no_mimics;
+
+    mkshop_curated_loot = FALSE;
+    mkshop_no_mimics = FALSE;
 
     /* first, try to place a shopkeeper in the room */
     if ((sh = shkinit(shp, sroom)) < 0) {
@@ -772,6 +921,8 @@ stock_room(int shp_indx, struct mkroom *sroom)
         flags.rainbow_shops++;
     }
 
+    mkshop_curated_loot = curated_loot;
+    mkshop_no_mimics = no_mimics;
     for (sx = sroom->lx; sx <= sroom->hx; sx++) {
         for (sy = sroom->ly; sy <= sroom->hy; sy++) {
             if (stock_room_goodpos(sroom, rmno, sh, sx,sy)) {
@@ -793,12 +944,18 @@ stock_room(int shp_indx, struct mkroom *sroom)
         }
     }
 
+    if (curated_loot) {
+        place_curated_guaranteed_items(sroom, rmno, sh);
+    }
+
     /*
      * Special monster placements (if any) should go here: that way,
      * monsters will sit on top of objects and not the other way around.
      */
 
     level.flags.has_shop = TRUE;
+    mkshop_curated_loot = FALSE;
+    mkshop_no_mimics = FALSE;
 }
 
 #ifdef BLACKMARKET

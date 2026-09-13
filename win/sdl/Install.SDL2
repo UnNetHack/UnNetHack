@@ -1,0 +1,119 @@
+SDL2 window port -- build notes
+================================
+
+This is a scaffold: it gives UnNetHack a real graphical window and a real
+event loop. The map draws real tile art (tilesets/unchozo32b.png) via the
+same glyph2tile[] mapping the X11/Qt ports use; message/status/menu text
+renders via SDL2_ttf. If no usable tileset is found at startup, the map
+falls back to a single colored character per glyph instead of failing --
+see "Known gaps" below.
+
+Dependencies
+------------
+  - SDL2
+  - SDL2_ttf
+  - SDL2_image (built with PNG support -- needed to load
+    tilesets/unchozo32b.png)
+  - a monospace TrueType font on the build machine (the port tries a
+    short list of common macOS/Linux paths at startup; see
+    sdl_font_candidates in win/sdl/sdlmain.c if yours isn't found)
+  - tilesets/unchozo32b.png present in HACKDIR at runtime (see "Tileset
+    placement" below) -- it's the only bundled sheet in tilesets/ with
+    enough tiles (1680) to cover this fork's total_tiles_used (1676);
+    the others (unh16.bmp, unh32.bmp, untiles32x.png) fall short and
+    are silently skipped by sdl_tile_candidates' search even if present
+
+macOS (Homebrew):
+    brew install sdl2 sdl2_ttf sdl2_image
+
+Debian/Ubuntu:
+    apt install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
+
+Enabling the port
+------------------
+This project builds via autoconf (configure/config.status), not the
+classic hand-edited sys/unix/Makefile.src workflow -- sys/autoconf/Makefile.src
+is the real template (sys/unix/Makefile.src is kept in sync for anyone
+still using the older manual build, but isn't what `configure` reads).
+There's no `--enable-sdl-graphics` configure option yet, so enabling the
+port today means:
+
+1. In include/config.h, uncomment:
+       #define SDL_GRAPHICS
+
+   Leave whatever other *_GRAPHICS port you already use defined too if
+   you want both available at runtime (selectable via the `windowtype`
+   option, e.g. `NETHACKOPTIONS="windowtype:sdl"` or `windowtype:sdl`
+   in .unnethackrc) -- all compiled-in ports coexist in one binary.
+
+2. Whichever Makefile.src your build actually uses (usually the
+   autoconf-generated src/Makefile -- check with
+   `grep '^WINSRC' src/Makefile`), add sdl to the active selection
+   rather than replacing it, e.g.:
+       WINSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINSDLSRC)
+       WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ) $(WINSDLOBJ)
+       WINLIB = $(WINTTYLIB) $(WINCURSESLIB) $(WINSDLLIB)
+   and make sure CFLAGS/LFLAGS can find SDL2/SDL2_ttf/SDL2_image (on
+   Apple Silicon Homebrew: `-I/opt/homebrew/include`,
+   `-L/opt/homebrew/lib`).
+
+3. Rebuild (`cd src && make`), then `make install` from the repo root
+   to stage the binary -- this does NOT yet copy tilesets/unchozo32b.png
+   into the install target, so see "Tileset placement" below.
+
+Tileset placement
+------------------
+sdl_init_nhwindows() looks for the tileset relative to the current
+directory, which is HACKDIR by the time it runs (the game chdir()s
+there at startup) -- see sdl_tile_candidates in win/sdl/sdlmain.c.
+`make install` copies tilesets/unchozo32b.png and tilesets/anim/*.png
+into HACKDIR automatically. If the sheet is missing, the port still
+runs -- it just draws colored characters instead of tiles.
+
+Known gaps (intentionally deferred, not bugs)
+-----------------------------------------------
+  - No real role/race/gender/alignment selection dialog
+    (sdl_player_selection() is a no-op; unset facets fall back to the
+    game's normal "pick at random" behavior). See
+    win/tty/wintty.c:tty_player_selection for what a full dialog looks
+    like.
+  - No persistent inventory window (WC_PERM_INVENT not advertised).
+  - No message history scrollback viewer (sdl_doprev_message() is a
+    stub) -- full history is kept internally, just not wired to a key.
+  - Font/DPI handling is minimal: one fixed point size, no HiDPI
+    scaling. Tile art always renders at native tile resolution (32x32
+    for unchozo32b.png), no scaling either.
+
+(Closing the window now saves and exits via hangup(), like a tty
+session losing its terminal, and '#' extended commands work via a
+typed prompt with prefix matching -- both were gaps earlier.)
+
+Animated tile overlays
+----------------------
+Drop PNG strips into HACKDIR/anim/ named by tile number, e.g.
+anim/1021.png for tile 1021 (the fountain). Each file is a horizontal
+strip of square frames -- frame size is the image height, so any
+resolution works (128x128 frames in a 512x128 strip = 4 HD frames) and
+gets smoothly scaled into the tile cell. Tiles without an overlay keep
+their static sheet art, so animated art can be added one piece at a
+time. All copies of a tile animate in sync at 200ms/frame off the wall
+clock, independent of game turns.
+
+The art pipeline (e.g. Meshy or any tool that exports PNG frames):
+
+1. Find the tile number: grep tilesets/TILE-INDEX.txt (generated from
+   the game's own glyph2tile[] table -- never derive indices by
+   counting the win/share/*.txt files, that gives wrong answers).
+       grep -i kitten tilesets/TILE-INDEX.txt
+2. Export animation frames as PNGs with transparent backgrounds
+   (any size; they get alpha-trimmed, squared, and bottom-aligned).
+3. Stitch them into a strip (accepts a name or a tile number):
+       tools/.venv/bin/python tools/mkanim.py kitten frames_dir/
+   One-time setup for the venv:
+       python3 -m venv tools/.venv
+       tools/.venv/bin/pip install pillow
+4. Deploy and play:
+       make install && graphichack
+
+Demo overlays live in tilesets/anim/ (fountain 1021, dog family
+18-20, cat family 37/38/42).

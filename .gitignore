@@ -3,6 +3,10 @@
 *.swo
 *.exe
 compile
+.DS_Store
+autom4te.cache/
+configure~
+/sys/autoconf/aclocal.m4
 
 
 # /
@@ -94,3 +98,9 @@ tests/wishing/test_wishing
 
 # /win/
 /win/*/*.o
+tools/.venv/
+/frames/
+/output/
+/tmp/
+/.claude/settings.local.json
+/.claude/launch.json

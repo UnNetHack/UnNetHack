@@ -24,6 +24,11 @@ nethack_default_win=""
 # Note: Order is important: The last listed enabled port will be the default.
 NETHACK_WIN_ENABLE(dummy, no, [dummy graphics for unit tests])
 NETHACK_WIN_ENABLE(lisp, no, [enable playing UnNetHack in Emacs])
+dnl listed before curses/tty/x11/mswin on purpose: whichever of those
+dnl is also enabled stays the default window system, with sdl as an
+dnl available-but-not-default extra (see the "Order is important"
+dnl note above)
+NETHACK_WIN_ENABLE(sdl, no, [use SDL2 graphics])
 NETHACK_WIN_ENABLE(curses, no, [use curses interface])
 NETHACK_WIN_ENABLE(pdcurses, no, [use pdcurses interface])
 NETHACK_WIN_ENABLE(tty, auto)
@@ -41,7 +46,7 @@ AC_CANONICAL_HOST
 
 dnl  ----- Early checks for libraries, as needed
 
-dnl PKG_PROG_PKG_CONFIG([])
+PKG_PROG_PKG_CONFIG([])
 if test "$enable_x11_graphics" != "no"; then
     # We have to check for libXaw before we define SYSV,
     # since the X11 include files change their behaviour
@@ -276,6 +281,28 @@ if test "$enable_x11_graphics" != "no"; then
     OPTIONS_FILES="options"
 fi
 
+WINSDLLIB=
+if test "$enable_sdl_graphics" != "no"; then
+    PKG_CHECK_MODULES([SDL2], [sdl2], [have_sdl2=yes], [have_sdl2=no])
+    PKG_CHECK_MODULES([SDL2_TTF], [SDL2_ttf], [have_sdl2_ttf=yes], [have_sdl2_ttf=no])
+    PKG_CHECK_MODULES([SDL2_IMAGE], [SDL2_image], [have_sdl2_image=yes], [have_sdl2_image=no])
+    if test "$have_sdl2" != "yes" -o "$have_sdl2_ttf" != "yes" \
+            -o "$have_sdl2_image" != "yes"; then
+        AC_MSG_ERROR([Need SDL2, SDL2_ttf, and SDL2_image (found via pkg-config) for SDL2 graphics -- see win/sdl/Install.SDL2])
+    fi
+
+    CFLAGS="${CFLAGS} ${SDL2_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_IMAGE_CFLAGS}"
+    WINSDLLIB="${SDL2_LIBS} ${SDL2_TTF_LIBS} ${SDL2_IMAGE_LIBS}"
+    WINSRC="${WINSRC} \$(WINSDLSRC)"
+    WINOBJ="${WINOBJ} \$(WINSDLOBJ)"
+    WINLIB="${WINLIB} \$(WINSDLLIB)"
+    AC_DEFINE(SDL_GRAPHICS, [], [SDL2 graphics])
+
+    OPTIONS_FILE="options"
+    OPTIONS_FILES="options"
+fi
+AC_SUBST(WINSDLLIB)
+
 if test "$enable_dummy_graphics" != "no"; then
     WINSRC="${WINSRC} \$(WINDUMMYSRC)"
     WINOBJ="${WINOBJ} \$(WINDUMMYOBJ)"
@@ -427,9 +454,9 @@ NETHACK_ARG(randomized-planes,[Shuffling order of Elemental Planes],RANDOMIZED_P
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
 NETHACK_ARG(clipping,[Allow smaller screens],CLIPPING,yes)
 NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
-if [[ "$enable_tty_graphics" == "yes" ||
-      "$enable_curses_graphics" == "yes" ||
-      "$enable_pdcurses_graphics" == "yes" ]]; then
+if test "$enable_tty_graphics" = "yes" || \
+   test "$enable_curses_graphics" = "yes" || \
+   test "$enable_pdcurses_graphics" = "yes"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
 NETHACK_ARG(status-hilites,[Status field highlighting],STATUS_HILITES,yes)
 fi

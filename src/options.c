@@ -286,6 +286,7 @@ static struct Bool_Opt
     {"tombstone", &flags.tombstone, TRUE, SET_IN_GAME},
     {"toptenwin", &flags.toptenwin, FALSE, SET_IN_GAME},
     {"travel", &iflags.travelcmd, TRUE, SET_IN_GAME},
+    {"tributegates", &iflags.tribute_gates, FALSE, SET_IN_GAME},
 #ifdef UTF8_GLYPHS
     {"UTF8graphics", &iflags.UTF8graphics, FALSE, SET_IN_GAME},
 #else

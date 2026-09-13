@@ -48,6 +48,14 @@ extern NEARDATA struct mkroom* subrooms;
 
 extern struct mkroom *dnstairs_room, *upstairs_room, *sstairs_room;
 
+/* when set, the next mkshop() call forces a general store in the
+ * largest eligible room instead of the usual random type/room pick;
+ * mkshop() clears both flags again once it has used them */
+extern NEARDATA boolean mkshop_force_general;
+extern NEARDATA boolean mkshop_pick_biggest;
+extern NEARDATA boolean mkshop_curated_loot;
+extern NEARDATA boolean mkshop_no_mimics;
+
 extern NEARDATA coord doors[DOORMAX];
 
 /* values for rtype in the room definition structure */

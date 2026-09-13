@@ -154,6 +154,15 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #
 GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 
+# Only used for the SDL2 interface (see win/sdl/Install.SDL2 for the
+# full build writeup). Uncomment and adjust the include/lib path for
+# your platform -- the first pair matches Homebrew on Apple Silicon,
+# the second a typical Linux package install.
+#CFLAGS = -O -I../include -I/opt/homebrew/include
+#LFLAGS = -L/opt/homebrew/lib
+#CFLAGS = -O -I../include -I/usr/include/SDL2
+#LFLAGS = -L/usr/lib
+
 # flags for debugging:
 # CFLAGS = -g -I../include
 
@@ -227,7 +236,15 @@ WINBEOBJ =
 #WINBEOBJ = winbe.o NHWindow.o NHMenuWindow.o NHMapWindow.o tile.o
 
 #
+# Files for the SDL2 port (scaffold -- see win/sdl/Install.SDL2)
+WINSDLSRC = ../win/sdl/sdlmain.c
+WINSDLOBJ = sdlmain.o
+
 #
+# To select a windowing system, set WINSRC/WINOBJ to the matching pair
+# above (e.g. WINSRC = $(WINSDLSRC), WINOBJ = $(WINSDLOBJ) for SDL2),
+# set WINLIB below to match, and define the corresponding *_GRAPHICS
+# symbol in ../include/config.h.
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
 
@@ -272,6 +289,9 @@ WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
 #
 # libraries for Gem port
 WINGEMLIB = -le_gem -lgem
+#
+# libraries for the SDL2 port (see win/sdl/Install.SDL2)
+WINSDLLIB = -lSDL2 -lSDL2_ttf -lSDL2_image
 #
 # libraries for BeOS
 WINBELIB = -lbe
@@ -654,6 +674,9 @@ cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
 cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/cursinvt.h
 	$(CC) $(CFLAGS) -c ../win/curses/cursinvt.c
+sdlmain.o: ../win/sdl/sdlmain.c $(HACK_H) ../include/color.h \
+		../include/dlb.h ../include/winsdl.h
+	$(CC) $(CFLAGS) -c ../win/sdl/sdlmain.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c

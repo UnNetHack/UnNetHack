@@ -46,6 +46,12 @@ extern struct window_procs mswin_procs;
 #ifdef DUMMY_GRAPHICS
 extern struct window_procs dummy_procs;
 #endif
+#ifdef SDL_GRAPHICS
+extern struct window_procs sdl_procs;
+#endif
+#ifdef BRIDGE_GRAPHICS
+extern struct window_procs bridge_procs;
+#endif
 #ifdef LISP_GRAPHICS
 #include "winlisp.h"
 extern struct window_procs lisp_procs;
@@ -96,6 +102,12 @@ struct win_choices {
 #endif
 #ifdef DUMMY_GRAPHICS
     { &dummy_procs, 0 },
+#endif
+#ifdef SDL_GRAPHICS
+    { &sdl_procs, 0 },
+#endif
+#ifdef BRIDGE_GRAPHICS
+    { &bridge_procs, 0 },
 #endif
 #ifdef LISP_GRAPHICS
     { &lisp_procs, win_lisp_init },

@@ -1,0 +1,1082 @@
+# tile-number -> name map, generated from glyph2tile[]
+# monsters
+0	monster	giant ant
+1	monster	killer bee
+2	monster	soldier ant
+3	monster	fire ant
+4	monster	snow ant
+5	monster	giant beetle
+6	monster	queen bee
+7	monster	locust
+8	monster	acid blob
+9	monster	quivering blob
+10	monster	gelatinous cube
+11	monster	chickatrice
+12	monster	cockatrice
+13	monster	pyrolisk
+14	monster	jackal
+15	monster	fox
+16	monster	coyote
+17	monster	werejackal
+18	monster	little dog
+19	monster	dog
+20	monster	large dog
+21	monster	dingo
+22	monster	wolf
+23	monster	werewolf
+24	monster	warg
+25	monster	winter wolf cub
+26	monster	winter wolf
+27	monster	hell hound pup
+28	monster	hell hound
+30	monster	gas spore
+31	monster	floating eye
+32	monster	freezing sphere
+33	monster	flaming sphere
+34	monster	shocking sphere
+36	monster	evil eye
+37	monster	kitten
+38	monster	housecat
+39	monster	jaguar
+40	monster	lynx
+41	monster	panther
+42	monster	large cat
+43	monster	tiger
+44	monster	gremlin
+45	monster	gargoyle
+46	monster	winged gargoyle
+47	monster	hobbit
+48	monster	dwarf
+49	monster	bugbear
+50	monster	dwarf lord
+51	monster	dwarf king
+52	monster	mind flayer
+53	monster	master mind flayer
+54	monster	manes
+55	monster	homunculus
+56	monster	imp
+57	monster	lemure
+58	monster	quasit
+59	monster	tengu
+60	monster	uranium imp
+61	monster	blue jelly
+62	monster	spotted jelly
+63	monster	ochre jelly
+64	monster	kobold
+65	monster	large kobold
+66	monster	kobold lord
+67	monster	kobold shaman
+68	monster	leprechaun
+69	monster	small mimic
+70	monster	large mimic
+71	monster	giant mimic
+72	monster	wood nymph
+73	monster	water nymph
+74	monster	mountain nymph
+75	monster	Aphrodite
+76	monster	goblin
+77	monster	hobgoblin
+78	monster	orc
+79	monster	hill orc
+80	monster	Mordor orc
+81	monster	Uruk-hai
+82	monster	orc shaman
+83	monster	orc-captain
+84	monster	deep orc
+85	monster	rock piercer
+86	monster	iron piercer
+87	monster	glass piercer
+88	monster	rothe
+89	monster	mumak
+90	monster	leocrotta
+91	monster	wumpus
+92	monster	titanothere
+93	monster	baluchitherium
+94	monster	mastodon
+95	monster	sewer rat
+96	monster	giant rat
+97	monster	rabid rat
+98	monster	wererat
+99	monster	enormous rat
+100	monster	rock mole
+101	monster	woodchuck
+102	monster	cave spider
+103	monster	centipede
+104	monster	giant spider
+105	monster	scorpion
+106	monster	lurker above
+107	monster	trapper
+108	monster	white unicorn
+109	monster	gray unicorn
+110	monster	black unicorn
+111	monster	pony
+112	monster	horse
+113	monster	warhorse
+114	monster	fog cloud
+115	monster	dust vortex
+116	monster	ice vortex
+117	monster	energy vortex
+118	monster	steam vortex
+119	monster	fire vortex
+120	monster	baby long worm
+121	monster	baby purple worm
+122	monster	long worm
+123	monster	purple worm
+124	monster	grid bug
+125	monster	xan
+126	monster	chillbug
+127	monster	yellow light
+128	monster	black light
+129	monster	zruty
+130	monster	couatl
+131	monster	Aleax
+132	monster	Angel
+133	monster	dark Angel
+134	monster	ki-rin
+135	monster	Archon
+136	monster	weeping angel
+137	monster	weeping archangel
+138	monster	bat
+139	monster	giant bat
+140	monster	raven
+141	monster	vampire bat
+142	monster	plains centaur
+143	monster	forest centaur
+144	monster	mountain centaur
+145	monster	baby tatzelworm
+146	monster	baby amphitere
+148	monster	baby draken
+149	monster	baby lindworm
+150	monster	baby sarkany
+151	monster	baby sirrush
+152	monster	baby leviathan
+153	monster	baby wyvern
+154	monster	baby glowing dragon
+155	monster	baby guivre
+156	monster	tatzelworm
+157	monster	amphitere
+159	monster	draken
+160	monster	lindworm
+161	monster	sarkany
+162	monster	sirrush
+163	monster	leviathan
+164	monster	wyvern
+165	monster	glowing dragon
+166	monster	guivre
+167	monster	chromatic dragon
+168	monster	stalker
+169	monster	air elemental
+170	monster	fire elemental
+171	monster	earth elemental
+172	monster	water elemental
+173	monster	lichen
+174	monster	brown mold
+175	monster	yellow mold
+176	monster	green mold
+177	monster	red mold
+178	monster	shrieker
+179	monster	violet fungus
+180	monster	gnome
+181	monster	gnome lord
+182	monster	gnomish wizard
+183	monster	gnome king
+184	monster	giant
+185	monster	stone giant
+186	monster	hill giant
+187	monster	fire giant
+188	monster	frost giant
+189	monster	storm giant
+190	monster	ettin
+191	monster	titan
+192	monster	minotaur
+193	monster	jabberwock
+194	monster	vorpal jabberwock
+195	monster	Keystone Kop
+196	monster	Kop Sergeant
+197	monster	Kop Lieutenant
+198	monster	Kop Kaptain
+199	monster	lich
+200	monster	demilich
+201	monster	master lich
+202	monster	arch-lich
+203	monster	kobold mummy
+204	monster	gnome mummy
+205	monster	orc mummy
+206	monster	dwarf mummy
+207	monster	elf mummy
+208	monster	human mummy
+209	monster	ettin mummy
+210	monster	giant mummy
+211	monster	red naga hatchling
+212	monster	black naga hatchling
+213	monster	golden naga hatchling
+214	monster	guardian naga hatchling
+215	monster	white naga hatchling
+216	monster	red naga
+217	monster	black naga
+218	monster	golden naga
+219	monster	guardian naga
+220	monster	white naga
+221	monster	ogre
+222	monster	ogre lord
+223	monster	ogre king
+224	monster	gray ooze
+225	monster	brown pudding
+226	monster	black pudding
+227	monster	green slime
+228	monster	blue slime
+229	monster	quantum mechanic
+230	monster	rust monster
+231	monster	disenchanter
+232	monster	disintegrator
+233	monster	garter snake
+234	monster	snake
+235	monster	water moccasin
+236	monster	pit viper
+237	monster	python
+238	monster	cobra
+239	monster	troll
+240	monster	ice troll
+241	monster	rock troll
+242	monster	water troll
+243	monster	Olog-hai
+244	monster	umber hulk
+245	monster	shambling horror
+246	monster	vampire
+247	monster	vampire lord
+249	monster	Vlad the Impaler
+250	monster	barrow wight
+251	monster	wraith
+252	monster	Nazgul
+253	monster	xorn
+254	monster	monkey
+255	monster	ape
+256	monster	owlbear
+257	monster	yeti
+258	monster	carnivorous ape
+259	monster	sasquatch
+260	monster	kobold zombie
+261	monster	gnome zombie
+262	monster	orc zombie
+263	monster	dwarf zombie
+264	monster	elf zombie
+265	monster	human zombie
+266	monster	ettin zombie
+267	monster	giant zombie
+268	monster	ghoul
+269	monster	skeleton
+270	monster	straw golem
+271	monster	paper golem
+272	monster	wax golem
+273	monster	rope golem
+274	monster	gold golem
+275	monster	leather golem
+276	monster	wood golem
+277	monster	flesh golem
+278	monster	clay golem
+279	monster	stone golem
+280	monster	glass golem
+281	monster	iron golem
+282	monster	ice golem
+283	monster	crystal ice golem
+284	monster	human
+285	monster	miner
+286	monster	prison guard
+287	monster	wererat
+288	monster	werejackal
+289	monster	werewolf
+290	monster	elf
+291	monster	Woodland-elf
+292	monster	Green-elf
+293	monster	Grey-elf
+294	monster	elf-lord
+295	monster	Elvenking
+296	monster	doppelganger
+297	monster	mugger
+298	monster	nurse
+299	monster	shopkeeper
+300	monster	black marketeer
+301	monster	One-eyed Sam
+302	monster	guard
+303	monster	prisoner
+304	monster	Oracle
+305	monster	aligned priest
+306	monster	high priest
+307	monster	soldier
+308	monster	sergeant
+309	monster	lieutenant
+310	monster	captain
+311	monster	watchman
+312	monster	watch captain
+313	monster	Medusa
+314	monster	Wizard of Yendor
+315	monster	Croesus
+316	monster	Executioner
+318	monster	ghost
+319	monster	shade
+320	monster	water demon
+321	monster	lava demon
+322	monster	horned devil
+323	monster	succubus
+324	monster	incubus
+325	monster	erinys
+326	monster	barbed devil
+327	monster	marilith
+328	monster	vrock
+329	monster	hezrou
+330	monster	bone devil
+331	monster	ice devil
+332	monster	nalfeshnee
+333	monster	pit fiend
+334	monster	balrog
+335	monster	Juiblex
+336	monster	Yeenoghu
+337	monster	Orcus
+338	monster	Geryon
+339	monster	Dispater
+340	monster	Baalzebub
+341	monster	Asmodeus
+342	monster	Demogorgon
+343	monster	Cthulhu
+344	monster	Death
+345	monster	Pestilence
+346	monster	Famine
+347	monster	mail daemon
+348	monster	djinni
+349	monster	sandestin
+350	monster	jellyfish
+351	monster	piranha
+352	monster	shark
+353	monster	giant eel
+354	monster	electric eel
+355	monster	kraken
+356	monster	newt
+357	monster	gecko
+358	monster	iguana
+359	monster	baby crocodile
+360	monster	giant turtle
+361	monster	lizard
+362	monster	chameleon
+363	monster	crocodile
+364	monster	salamander
+365	monster	long worm tail
+366	monster	archeologist
+367	monster	barbarian
+368	monster	caveman
+369	monster	cavewoman
+370	monster	convict
+371	monster	healer
+372	monster	knight
+373	monster	monk
+374	monster	priest
+375	monster	priestess
+376	monster	ranger
+377	monster	rogue
+378	monster	samurai
+379	monster	tourist
+380	monster	valkyrie
+381	monster	wizard
+382	monster	Lord Carnarvon
+383	monster	Pelias
+384	monster	Shaman Karnov
+387	monster	Robert the Lifer
+388	monster	Hippocrates
+389	monster	King Arthur
+390	monster	Grand Master
+391	monster	Arch Priest
+392	monster	Orion
+393	monster	Master of Thieves
+394	monster	Lord Sato
+395	monster	Twoflower
+396	monster	Norn
+397	monster	Neferet the Green
+398	monster	Schliemann
+399	monster	Thoth Amon
+400	monster	Tiamat
+402	monster	Warden Arianna
+403	monster	Cyclops
+404	monster	Ixoth
+405	monster	Master Kaen
+406	monster	Nalzok
+407	monster	Scorpius
+408	monster	Master Assassin
+409	monster	Ashikaga Takauji
+410	monster	Lord Surtur
+411	monster	Anaraxis the Black
+412	monster	student
+413	monster	chieftain
+414	monster	neanderthal
+416	monster	inmate
+417	monster	attendant
+418	monster	page
+419	monster	abbot
+420	monster	acolyte
+421	monster	hunter
+422	monster	thug
+423	monster	ninja
+424	monster	roshi
+425	monster	guide
+426	monster	warrior
+427	monster	apprentice
+428	monster	Punisher
+429	monster	dungeon fern
+430	monster	dungeon fern sprout
+431	monster	dungeon fern spore
+432	monster	arctic fern
+433	monster	arctic fern sprout
+434	monster	arctic fern spore
+435	monster	blazing fern
+436	monster	blazing fern sprout
+437	monster	blazing fern spore
+438	monster	swamp fern
+439	monster	swamp fern sprout
+440	monster	swamp fern spore
+441	monster	fern spore
+442	monster	Devil's Snare
+443	monster	Durin's Bane
+444	monster	Watcher in the Water
+# objects
+446	object	strange object
+447	object	strange object
+448	object	strange object
+449	object	strange object
+450	object	strange object
+451	object	strange object
+452	object	strange object
+453	object	strange object
+454	object	strange object
+455	object	strange object
+456	object	strange object
+457	object	strange object
+458	object	strange object
+459	object	strange object
+460	object	strange object
+461	object	strange object
+462	object	strange object
+463	object	strange object
+464	object	strange object
+465	object	strange object
+466	object	strange object
+467	object	strange object
+468	object	strange object
+469	object	strange object
+470	object	strange object
+471	object	strange object
+472	object	strange object
+473	object	strange object
+474	object	strange object
+475	object	strange object
+476	object	strange object
+477	object	strange object
+478	object	strange object
+479	object	strange object
+480	object	strange object
+481	object	strange object
+482	object	strange object
+483	object	strange object
+484	object	strange object
+485	object	strange object
+486	object	strange object
+487	object	strange object
+488	object	strange object
+489	object	strange object
+490	object	strange object
+491	object	strange object
+492	object	strange object
+493	object	strange object
+494	object	strange object
+495	object	strange object
+496	object	strange object
+497	object	strange object
+498	object	strange object
+499	object	strange object
+500	object	strange object
+501	object	strange object
+502	object	strange object
+503	object	strange object
+504	object	strange object
+505	object	strange object
+506	object	strange object
+507	object	strange object
+508	object	strange object
+509	object	strange object
+510	object	strange object
+511	object	strange object
+512	object	strange object
+513	object	strange object
+514	object	strange object
+515	object	strange object
+516	object	strange object
+517	object	strange object
+518	object	strange object
+519	object	strange object
+520	object	strange object
+521	object	strange object
+522	object	strange object
+523	object	strange object
+524	object	strange object
+525	object	strange object
+526	object	strange object
+527	object	strange object
+528	object	strange object
+529	object	strange object
+530	object	strange object
+532	object	strange object
+533	object	strange object
+534	object	strange object
+535	object	strange object
+536	object	strange object
+537	object	strange object
+538	object	strange object
+539	object	strange object
+540	object	strange object
+541	object	strange object
+542	object	strange object
+544	object	strange object
+545	object	strange object
+546	object	strange object
+547	object	strange object
+548	object	strange object
+549	object	strange object
+550	object	strange object
+551	object	strange object
+552	object	strange object
+553	object	strange object
+554	object	strange object
+555	object	strange object
+556	object	strange object
+557	object	strange object
+558	object	strange object
+559	object	strange object
+560	object	strange object
+561	object	strange object
+562	object	strange object
+563	object	strange object
+564	object	strange object
+565	object	strange object
+566	object	strange object
+567	object	strange object
+568	object	strange object
+569	object	strange object
+570	object	strange object
+571	object	strange object
+572	object	strange object
+573	object	strange object
+574	object	strange object
+575	object	strange object
+576	object	strange object
+577	object	strange object
+578	object	strange object
+579	object	strange object
+580	object	strange object
+581	object	strange object
+582	object	strange object
+583	object	strange object
+584	object	strange object
+585	object	strange object
+586	object	strange object
+587	object	strange object
+588	object	strange object
+589	object	strange object
+590	object	strange object
+591	object	strange object
+592	object	strange object
+593	object	strange object
+594	object	strange object
+595	object	strange object
+596	object	strange object
+597	object	strange object
+598	object	strange object
+599	object	strange object
+600	object	strange object
+601	object	strange object
+602	object	strange object
+603	object	strange object
+604	object	strange object
+605	object	strange object
+606	object	strange object
+607	object	strange object
+608	object	strange object
+609	object	strange object
+610	object	strange object
+611	object	strange object
+612	object	strange object
+613	object	strange object
+614	object	strange object
+615	object	strange object
+616	object	strange object
+617	object	strange object
+618	object	strange object
+619	object	strange object
+620	object	strange object
+621	object	strange object
+622	object	strange object
+623	object	strange object
+624	object	strange object
+625	object	strange object
+626	object	strange object
+627	object	strange object
+628	object	strange object
+629	object	strange object
+630	object	strange object
+631	object	strange object
+632	object	strange object
+633	object	strange object
+634	object	strange object
+635	object	strange object
+636	object	strange object
+637	object	strange object
+638	object	strange object
+639	object	strange object
+640	object	strange object
+641	object	strange object
+642	object	strange object
+643	object	strange object
+644	object	strange object
+645	object	strange object
+646	object	strange object
+647	object	strange object
+648	object	strange object
+649	object	strange object
+650	object	strange object
+651	object	strange object
+652	object	strange object
+653	object	strange object
+654	object	strange object
+655	object	strange object
+656	object	strange object
+657	object	strange object
+658	object	strange object
+659	object	strange object
+660	object	strange object
+661	object	strange object
+662	object	strange object
+663	object	strange object
+664	object	strange object
+665	object	strange object
+666	object	strange object
+667	object	strange object
+668	object	strange object
+669	object	strange object
+670	object	strange object
+671	object	strange object
+672	object	strange object
+673	object	strange object
+674	object	strange object
+675	object	strange object
+676	object	strange object
+677	object	strange object
+678	object	strange object
+679	object	strange object
+680	object	strange object
+681	object	strange object
+682	object	strange object
+683	object	strange object
+684	object	strange object
+685	object	strange object
+686	object	strange object
+687	object	strange object
+688	object	strange object
+689	object	strange object
+690	object	strange object
+691	object	strange object
+692	object	strange object
+693	object	strange object
+694	object	strange object
+695	object	strange object
+696	object	strange object
+697	object	strange object
+698	object	strange object
+699	object	strange object
+700	object	strange object
+701	object	strange object
+702	object	strange object
+703	object	strange object
+704	object	strange object
+705	object	strange object
+706	object	strange object
+707	object	strange object
+708	object	strange object
+709	object	strange object
+710	object	strange object
+711	object	strange object
+712	object	strange object
+713	object	strange object
+714	object	strange object
+715	object	strange object
+716	object	strange object
+717	object	strange object
+718	object	strange object
+719	object	strange object
+720	object	strange object
+721	object	strange object
+722	object	strange object
+723	object	strange object
+724	object	strange object
+725	object	strange object
+726	object	strange object
+727	object	strange object
+728	object	strange object
+729	object	strange object
+730	object	strange object
+731	object	strange object
+732	object	strange object
+733	object	strange object
+734	object	strange object
+735	object	strange object
+736	object	strange object
+737	object	strange object
+738	object	strange object
+739	object	strange object
+740	object	strange object
+741	object	strange object
+742	object	strange object
+743	object	strange object
+744	object	strange object
+745	object	strange object
+746	object	strange object
+747	object	strange object
+748	object	strange object
+749	object	strange object
+750	object	strange object
+751	object	strange object
+752	object	strange object
+753	object	strange object
+754	object	strange object
+755	object	strange object
+756	object	strange object
+757	object	strange object
+758	object	strange object
+759	object	strange object
+760	object	strange object
+761	object	strange object
+762	object	strange object
+763	object	strange object
+764	object	strange object
+765	object	strange object
+766	object	strange object
+767	object	strange object
+768	object	strange object
+769	object	strange object
+770	object	strange object
+771	object	strange object
+772	object	strange object
+773	object	strange object
+774	object	strange object
+775	object	strange object
+776	object	strange object
+777	object	strange object
+778	object	strange object
+779	object	strange object
+780	object	strange object
+781	object	strange object
+782	object	strange object
+783	object	strange object
+784	object	strange object
+785	object	strange object
+786	object	strange object
+787	object	strange object
+788	object	strange object
+789	object	strange object
+790	object	strange object
+791	object	strange object
+792	object	strange object
+793	object	strange object
+794	object	strange object
+795	object	strange object
+796	object	strange object
+797	object	strange object
+798	object	strange object
+799	object	strange object
+800	object	strange object
+801	object	strange object
+802	object	strange object
+803	object	strange object
+804	object	strange object
+805	object	strange object
+806	object	strange object
+807	object	strange object
+808	object	strange object
+809	object	strange object
+810	object	strange object
+811	object	strange object
+812	object	strange object
+813	object	strange object
+814	object	strange object
+815	object	strange object
+816	object	strange object
+817	object	strange object
+818	object	strange object
+819	object	strange object
+820	object	strange object
+821	object	strange object
+822	object	strange object
+823	object	strange object
+824	object	strange object
+825	object	strange object
+826	object	strange object
+827	object	strange object
+828	object	strange object
+829	object	strange object
+830	object	strange object
+831	object	strange object
+832	object	strange object
+833	object	strange object
+834	object	strange object
+835	object	strange object
+836	object	strange object
+837	object	strange object
+838	object	strange object
+839	object	strange object
+840	object	strange object
+841	object	strange object
+842	object	strange object
+843	object	strange object
+844	object	strange object
+845	object	strange object
+846	object	strange object
+847	object	strange object
+848	object	strange object
+849	object	strange object
+850	object	strange object
+851	object	strange object
+852	object	strange object
+853	object	strange object
+854	object	strange object
+855	object	strange object
+856	object	strange object
+857	object	strange object
+858	object	strange object
+859	object	strange object
+860	object	strange object
+861	object	strange object
+862	object	strange object
+863	object	strange object
+864	object	strange object
+865	object	strange object
+866	object	strange object
+867	object	strange object
+868	object	strange object
+869	object	strange object
+870	object	strange object
+871	object	strange object
+872	object	strange object
+873	object	strange object
+874	object	strange object
+875	object	strange object
+876	object	strange object
+877	object	strange object
+878	object	strange object
+879	object	strange object
+880	object	strange object
+881	object	strange object
+882	object	strange object
+883	object	strange object
+884	object	strange object
+885	object	strange object
+886	object	strange object
+887	object	strange object
+888	object	strange object
+889	object	strange object
+890	object	strange object
+891	object	strange object
+892	object	strange object
+893	object	strange object
+894	object	strange object
+895	object	strange object
+896	object	strange object
+897	object	strange object
+898	object	strange object
+899	object	strange object
+900	object	strange object
+901	object	strange object
+902	object	strange object
+903	object	strange object
+904	object	strange object
+905	object	strange object
+906	object	strange object
+907	object	strange object
+908	object	strange object
+909	object	strange object
+910	object	strange object
+911	object	strange object
+912	object	strange object
+913	object	strange object
+914	object	strange object
+915	object	strange object
+916	object	strange object
+917	object	strange object
+918	object	strange object
+919	object	strange object
+920	object	strange object
+921	object	strange object
+922	object	strange object
+923	object	strange object
+924	object	strange object
+925	object	strange object
+926	object	strange object
+927	object	strange object
+928	object	strange object
+929	object	strange object
+930	object	strange object
+931	object	strange object
+932	object	strange object
+933	object	strange object
+934	object	strange object
+935	object	strange object
+936	object	strange object
+937	object	strange object
+938	object	strange object
+939	object	strange object
+940	object	strange object
+941	object	strange object
+942	object	strange object
+943	object	strange object
+944	object	strange object
+945	object	strange object
+946	object	strange object
+947	object	strange object
+948	object	strange object
+949	object	strange object
+950	object	strange object
+951	object	strange object
+952	object	strange object
+953	object	strange object
+954	object	strange object
+955	object	strange object
+956	object	strange object
+957	object	strange object
+958	object	strange object
+959	object	strange object
+960	object	strange object
+961	object	strange object
+962	object	strange object
+963	object	strange object
+964	object	strange object
+965	object	strange object
+966	object	strange object
+967	object	strange object
+968	object	strange object
+969	object	strange object
+970	object	strange object
+971	object	strange object
+972	object	strange object
+973	object	strange object
+974	object	strange object
+975	object	strange object
+976	object	strange object
+977	object	strange object
+978	object	strange object
+979	object	strange object
+980	object	strange object
+981	object	strange object
+982	object	strange object
+983	object	strange object
+984	object	strange object
+985	object	strange object
+986	object	strange object
+987	object	strange object
+988	object	strange object
+# dungeon features (cmap)
+989	feature	unexplored area
+990	feature	wall
+991	feature	wall
+992	feature	wall
+993	feature	wall
+994	feature	wall
+995	feature	wall
+996	feature	wall
+997	feature	wall
+998	feature	wall
+999	feature	wall
+1000	feature	wall
+1001	feature	doorway
+1002	feature	open door
+1003	feature	open door
+1004	feature	closed door
+1005	feature	closed door
+1006	feature	iron bars
+1007	feature	tree
+1008	feature	dead tree
+1009	feature	floor of a room
+1010	feature	dark part of a room
+1011	feature	corridor
+1012	feature	lit corridor
+1013	feature	staircase up
+1014	feature	staircase down
+1015	feature	ladder up
+1016	feature	ladder down
+1017	feature	altar
+1018	feature	grave
+1019	feature	opulent throne
+1020	feature	sink
+1021	feature	fountain
+1022	feature	water
+1023	feature	ice
+1024	feature	muddy swamp
+1025	feature	magic platform
+1026	feature	molten lava
+1027	feature	lowered drawbridge
+1028	feature	lowered drawbridge
+1029	feature	raised drawbridge
+1030	feature	raised drawbridge
+1031	feature	air
+1032	feature	cloud
+1033	feature	ice wall
+1034	feature	crystal ice wall
+1035	feature	water
+1036	feature	arrow trap
+1037	feature	dart trap
+1038	feature	falling rock trap
+1039	feature	squeaky board
+1040	feature	bear trap
+1041	feature	land mine
+1042	feature	rolling boulder trap
+1043	feature	sleeping gas trap
+1044	feature	rust trap
+1045	feature	fire trap
+1046	feature	pit
+1047	feature	spiked pit
+1048	feature	hole
+1049	feature	trap door
+1050	feature	teleportation trap
+1051	feature	level teleporter
+1052	feature	magic portal
+1053	feature	web
+1054	feature	statue trap
+1055	feature	magic trap
+1056	feature	anti-magic field
+1057	feature	ice trap
+1058	feature	polymorph trap
+1059	feature	vibrating square
+1060	feature	
+1061	feature	
+1062	feature	
+1063	feature	
+1064	feature	
+1065	feature	
+1066	feature	
+1067	feature	
+1068	feature	
+1069	feature	
+1070	feature	
+1071	feature	
+1072	feature	poison cloud
+1073	feature	valid position
+1074	feature	
+1075	feature	
+1076	feature	
+1077	feature	
+1078	feature	
+1079	feature	
+1080	feature	
+1081	feature	
+1082	feature	
+1083	feature	
+1084	feature	
+1085	feature	
+1086	feature	
+1087	feature	
+1088	feature	
+1089	feature	
+1090	feature	

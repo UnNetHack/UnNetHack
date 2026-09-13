@@ -1547,6 +1547,7 @@ begin_burn(struct obj *obj, boolean already_lit)
     int radius = 3;
     long turns = 0;
     boolean do_timer = TRUE;
+    boolean could_see = !Blind;
 
     if (obj->age == 0 && obj->otyp != MAGIC_LAMP && !artifact_light(obj)) {
         return;
@@ -1637,6 +1638,12 @@ begin_burn(struct obj *obj, boolean already_lit)
             warning("begin_burn: can't get obj position");
         }
     }
+
+    /* lighting a magic lamp can silently clear Blind (see youprop.h);
+       make sure the status line/vision actually refresh to reflect it */
+    if (could_see != !Blind) {
+        toggle_blindness();
+    }
 }
 
 /*
@@ -1646,6 +1653,8 @@ begin_burn(struct obj *obj, boolean already_lit)
 void
 end_burn(struct obj *obj, boolean timer_attached)
 {
+    boolean could_see = !Blind;
+
     if (!obj->lamplit) {
         warning("end_burn: obj %s not lit", xname(obj));
         return;
@@ -1664,6 +1673,12 @@ end_burn(struct obj *obj, boolean timer_attached)
         }
     } else if (!stop_timer(BURN_OBJECT, obj_to_any(obj))) {
         warning("end_burn: obj %s not timed!", xname(obj));
+    }
+
+    /* extinguishing a magic lamp can silently set Blind (see youprop.h);
+       make sure the status line/vision actually refresh to reflect it */
+    if (could_see != !Blind) {
+        toggle_blindness();
     }
 }
 

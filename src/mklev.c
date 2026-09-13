@@ -44,6 +44,7 @@ static void join(int, int, boolean);
 static void do_room_or_subroom(struct mkroom *, int, int, int, int,
                                boolean, schar, boolean, boolean);
 static void makerooms(void);
+static void ensure_big_shop_room(void);
 static void finddpos(coord *, coordxy, coordxy, coordxy, coordxy);
 static void mkinvpos(coordxy, coordxy, int);
 static void mk_knox_portal(coordxy, coordxy);
@@ -342,6 +343,39 @@ makerooms(void)
         }
     }
     return;
+}
+
+#define FORCED_SHOPROOM_W 10
+#define FORCED_SHOPROOM_H 6
+
+/* guarantee that at least one ordinary room on the level is big enough
+ * (in either orientation) to host the forced level-2 general store;
+ * if nothing that generated naturally is big enough, carve one in
+ * ourselves before corridors get dug, so it ends up properly connected */
+static void
+ensure_big_shop_room(void)
+{
+    struct mkroom *sroom;
+    int w, h;
+
+    for (sroom = &rooms[0]; sroom->hx >= 0 && sroom - rooms < nroom;
+            sroom++) {
+        if (sroom->rtype != OROOM
+                || has_dnstairs(sroom) || has_upstairs(sroom)) {
+            continue;
+        }
+        w = sroom->hx - sroom->lx + 1;
+        h = sroom->hy - sroom->ly + 1;
+        if ((w >= FORCED_SHOPROOM_W && h >= FORCED_SHOPROOM_H) ||
+                (w >= FORCED_SHOPROOM_H && h >= FORCED_SHOPROOM_W)) {
+            return;
+        }
+    }
+
+    if (nroom < MAXNROFROOMS) {
+        (void) create_room(-1, -1, FORCED_SHOPROOM_W, FORCED_SHOPROOM_H,
+                            -1, -1, OROOM, -1);
+    }
 }
 
 static void
@@ -1007,6 +1041,8 @@ fill_ordinary_room(struct mkroom *croom)
      * On dungeon level 1, put a special graffiti in the starting room.
      * Either a hint or a true rumor. */
     if (depth(&u.uz) == 1 && has_upstairs(croom)) {
+        /* Give the arrival room a place for offerings and prayer. */
+        mkaltar(croom);
         if (find_okay_roompos(croom, &pos)) {
 #ifdef MAIL
             if (rnf(1, 2)) {
@@ -1125,6 +1161,10 @@ makelevel(void)
 
     generate_stairs(); /* up and down stairs */
 
+    if (!u.uz.dnum && u.uz.dlevel == 2) {
+        ensure_big_shop_room();
+    }
+
     branchp = Is_branchlev(&u.uz);  /* possible dungeon branch */
     room_threshold = branchp ? 4 : 3; /* minimum number of rooms needed
                                          to allow a random special room */
@@ -1174,7 +1214,16 @@ fill_vault:
             mkroom(SHOPBASE);
         } else {
 #endif
-        if (u_depth > 1 &&
+        if (!u.uz.dnum && u.uz.dlevel == 2) {
+            /* the 2nd level of the main dungeon always gets a general
+             * store, using the biggest room available for it, so that
+             * every run has at least one guaranteed shop early on */
+            mkshop_force_general = TRUE;
+            mkshop_pick_biggest = TRUE;
+            mkshop_curated_loot = TRUE;
+            mkshop_no_mimics = TRUE;
+            mkroom(SHOPBASE);
+        } else if (u_depth > 1 &&
             u_depth < depth(&medusa_level) &&
             nroom >= room_threshold &&
             rn2(u_depth) < 3) {

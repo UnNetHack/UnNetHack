@@ -31,6 +31,9 @@ static void rest_room(NHFILE *, struct mkroom *);
 
 extern const struct shclass shtypes[];  /* defined in shknam.c */
 
+NEARDATA boolean mkshop_force_general = FALSE;
+NEARDATA boolean mkshop_pick_biggest = FALSE;
+
 static boolean
 isbig(struct mkroom *sroom)
 {
@@ -72,6 +75,11 @@ mkshop(void)
 {
     struct mkroom *sroom;
     int i = -1;
+    boolean force_general = mkshop_force_general;
+    boolean pick_biggest = mkshop_pick_biggest;
+
+    mkshop_force_general = FALSE;
+    mkshop_pick_biggest = FALSE;
 #ifdef WIZARD
     char *ep = (char *)0;   /* (init == lint suppression) */
 
@@ -154,25 +162,52 @@ mkshop(void)
 gottype:
 #endif
 #endif
-    for (sroom = &rooms[0]; ; sroom++) {
-        if (sroom->hx < 0) {
+    if (pick_biggest) {
+        struct mkroom *biggest = (struct mkroom *)0;
+        int biggest_area = -1;
+
+        /* take the single largest eligible room on the level,
+         * regardless of door count (the shopkeeper will only watch
+         * one door, so extra doors are an escape route from paying) */
+        for (sroom = &rooms[0]; sroom->hx >= 0 && sroom - rooms < nroom;
+                sroom++) {
+            int area;
+
+            if (sroom->rtype != OROOM
+                    || has_dnstairs(sroom) || has_upstairs(sroom)) {
+                continue;
+            }
+            area = (sroom->hx - sroom->lx + 1) * (sroom->hy - sroom->ly + 1);
+            if (area > biggest_area) {
+                biggest_area = area;
+                biggest = sroom;
+            }
+        }
+        if (!biggest) {
             return;
         }
-        if (sroom - rooms >= nroom) {
-            pline("rooms not closed by -1?");
-            return;
-        }
-        if (sroom->rtype != OROOM) {
-            continue;
-        }
-        if (has_dnstairs(sroom) || has_upstairs(sroom)) {
-            continue;
-        }
-        if (
+        sroom = biggest;
+    } else {
+        for (sroom = &rooms[0]; ; sroom++) {
+            if (sroom->hx < 0) {
+                return;
+            }
+            if (sroom - rooms >= nroom) {
+                pline("rooms not closed by -1?");
+                return;
+            }
+            if (sroom->rtype != OROOM) {
+                continue;
+            }
+            if (has_dnstairs(sroom) || has_upstairs(sroom)) {
+                continue;
+            }
+            if (
 #ifdef WIZARD
-            (wizard && ep && sroom->doorct != 0) ||
+                (wizard && ep && sroom->doorct != 0) ||
 #endif
-            sroom->doorct == 1) break;
+                sroom->doorct == 1) break;
+        }
     }
     if (!sroom->rlit) {
         int x, y;
@@ -185,7 +220,9 @@ gottype:
         sroom->rlit = 1;
     }
 
-    if (i < 0) {         /* shoptype not yet determined */
+    if (i < 0 && force_general) {
+        i = 0;   /* general store is always shtypes[0] */
+    } else if (i < 0) {  /* shoptype not yet determined */
         int j;
 
         /* pick a shop type at random */

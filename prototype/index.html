@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DeanHack · The Quiet Well</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<div id="scene" aria-label="Interactive three dimensional dungeon"></div>
+<header><a class="brand" href="/">DH<span>DEANHACK</span></a><div class="location"><small>THE DUNGEONS OF DOOM · DEPTH 01</small><h1>The Quiet Well</h1></div><span class="badge">VISUAL PROTOTYPE</span></header>
+<aside class="character"><small>THE WANDERER</small><h2>A little light.<br>A long way down.</h2><div class="health"><span>VITALITY</span><strong id="hp">24 / 24</strong></div><div class="bar"><i id="healthbar"></i></div><div class="stats"><span>AC <b>−2</b></span><span>LVL <b>1</b></span><span>TURN <b id="turn">0</b></span></div><div class="companion"><span class="dot"></span> Miso <small>YOUR FAITHFUL CAT</small></div></aside>
+<aside class="legend"><small>ROOM I / THE FORGOTTEN CISTERN</small><p>Something still stirs<br>beneath the stone.</p><div><i class="cyan"></i> Ancient spring</div><div><i class="orange"></i> Watchful sentinel</div></aside>
+<div class="log" role="status" aria-live="polite"><span id="message">The fountain murmurs. Miso stays close.</span></div>
+<footer><div class="keys"><span><kbd>H J K L</kbd> / <kbd>↑ ↓ ← →</kbd> Move</span><span><kbd>Y U B N</kbd> Diagonals</span><span><kbd>SPACE</kbd> Wait</span><span><kbd>E</kbd> Drink nearby</span><span>Walk into sentinel to attack</span></div><div class="buttons"><button id="reset">Reset room</button><button id="camera">Rotate view</button><button id="sound" aria-pressed="false">Sound off</button></div><small>Drag to orbit · Scroll to zoom · Standalone scene, not connected to UnNetHack</small></footer>
+<script type="module" src="/main.js"></script></body></html>

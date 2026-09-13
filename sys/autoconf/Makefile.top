@@ -260,6 +260,10 @@ dofiles:
 	fi
 	cp $(srcdir)/dat/license $(DESTDIR)$(FILE_AREA_DOC)
 	cp $(srcdir)/dat/unnethack_dump.css $(DESTDIR)$(FILE_AREA_UNSHARE)
+# SDL port art: tileset sheet plus animated tile overlays (anim/)
+	-cp $(srcdir)/tilesets/unchozo32b.png $(DESTDIR)$(FILE_AREA_UNSHARE)
+	-mkdir -p $(DESTDIR)$(FILE_AREA_UNSHARE)/anim
+	-cp $(srcdir)/tilesets/anim/*.png $(DESTDIR)$(FILE_AREA_UNSHARE)/anim/
 	@HOST_UNIX@-rm -f $(DESTDIR)$(SHELLDIR)/$(SCRIPT)
 	@HOST_UNIX@sed -e 's;/usr/games/lib/nethackdir;$(FILE_AREA_UNSHARE);' \
 	@HOST_UNIX@	-e 's;HACKDIR/nethack;HACKDIR/$(GAME);' \
@@ -270,6 +274,14 @@ dofiles:
 			$(CHGRP) $(GAMEGRP) $(GAME) recover$(EXEEXT) )
 	chmod $(GAMEPERM) $(DESTDIR)$(FILE_AREA_UNSHARE)/$(GAME)
 	chmod $(EXEPERM) $(DESTDIR)$(FILE_AREA_UNSHARE)/recover$(EXEEXT)
+# macOS can attach stale provenance/quarantine metadata to a freshly
+# rebuilt binary that makes Gatekeeper refuse to launch it with no error
+# message at all; clear it and re-sign ad-hoc so it just works. No-op
+# (and harmless) on other platforms.
+	-@if [ "`uname`" = "Darwin" ]; then \
+		xattr -cr $(DESTDIR)$(FILE_AREA_UNSHARE)/$(GAME) 2>/dev/null; \
+		codesign --force -s - $(DESTDIR)$(FILE_AREA_UNSHARE)/$(GAME) 2>/dev/null; \
+	fi
 	-( cd $(DESTDIR)$(FILE_AREA_DOC) ; \
 			$(CHOWN) $(GAMEUID) license @GUIDEBOOK_TXT@ ; \
 			$(CHGRP) $(GAMEGRP) license @GUIDEBOOK_TXT@ ; \
