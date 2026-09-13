@@ -43,6 +43,7 @@ static const char *terrain(int glyph) {
     return "feature";
 }
 static const char *object_kind(int glyph) {
+    if (glyph_is_statue(glyph) || (glyph_is_object(glyph) && glyph_to_obj(glyph)==STATUE)) return "statue";
     if (glyph_is_body(glyph)) return "corpse";
     if (!glyph_is_object(glyph)) return "";
     return "item";
@@ -68,7 +69,17 @@ static void frame(void) {
         printf("{\"name\":");quoted(xname(uarmh));
         printf(",\"otyp\":%d}",uarmh->otyp);
     } else printf("null");
-    printf("},\"cells\":[");
+    printf("},\"ground\":[");
+    {
+        struct obj *ground;
+        boolean first_ground=TRUE;
+        if (!Blind && !u.uswallow && !is_pool(u.ux,u.uy))
+        for (ground=level.objects[u.ux][u.uy];ground;ground=ground->nexthere) {
+            if (!first_ground) putchar(',');
+            first_ground=FALSE;quoted(doname(ground));
+        }
+    }
+    printf("],\"cells\":[");
     boolean first=TRUE;
     for(y=0;y<ROWNO;y++) for(x=1;x<COLNO;x++) {
         g=glyphs[x][y]; if(g<0)continue;b=backgrounds[x][y];
@@ -88,7 +99,17 @@ static void frame(void) {
             printf(",\"otyp\":%d,\"class\":%d,\"material\":%d,\"name\":",object_type,
                    object_type == CORPSE ? FOOD_CLASS : objects[object_type].oc_class,
                    object_type == CORPSE ? FLESH : objects[object_type].oc_material);
-            quoted(object_name(g));putchar('}');
+            quoted(object_name(g));
+            if (glyph_is_statue(g)) {
+                m = glyph_to_mon(g);
+                printf(",\"creature\":");quoted(mons[m].mname);
+            } else if (object_type == STATUE && cansee(x,y) && !Hallucination) {
+                struct obj *statue = sobj_at(STATUE,x,y);
+                if (statue && statue->corpsenm >= 0 && statue->corpsenm < NUMMONS) {
+                    printf(",\"creature\":");quoted(mons[statue->corpsenm].mname);
+                }
+            }
+            putchar('}');
         }
         putchar('}');
     }

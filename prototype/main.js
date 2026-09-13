@@ -67,7 +67,7 @@ const flames=[];for(const x of [-3,3]){
  const f=createFire(x+3);f.position.set(x,1.52,-3.4);f.scale.setScalar(1.5);scene.add(f);
  const light=new THREE.PointLight(0xffa450,13,8,2);light.position.set(x,1.9,-3);scene.add(light);flames.push({f,light,phase:rand()*5});
 }
-function knight(){const g=new THREE.Group();const body=new THREE.Group();g.add(body);const armor=mat('#58727b',{map:metalSurface.map,bumpMap:metalSurface.bump,bumpScale:.1,metalness:.82,roughness:.26}),armorLight=mat('#a7c2c5',{map:metalSurface.map,bumpMap:metalSurface.bump,bumpScale:.08,metalness:.76,roughness:.22}),boots=mat('#20292c',{roughness:.72}),leather=mat('#533c2f',{roughness:.9}),visor=mat('#101c20',{metalness:.5,roughness:.32}),accent=mat('#c8a45a',{metalness:.78,roughness:.26});const legs=[];for(const x of [-.14,.14]){const pivot=new THREE.Group();pivot.position.set(x,.49,0);body.add(pivot);roundedBox(.19,.4,.2,armor,pivot,0,-.14,0,.05);roundedBox(.19,.22,.2,leather,pivot,0,-.30,0,.035);
+function knight(){const g=new THREE.Group();const body=new THREE.Group();g.add(body);const armor=mat('#58727b',{map:metalSurface.map,bumpMap:metalSurface.bump,bumpScale:.1,metalness:.82,roughness:.26}),armorLight=mat('#a7c2c5',{map:metalSurface.map,bumpMap:metalSurface.bump,bumpScale:.08,metalness:.76,roughness:.22}),boots=mat('#20292c',{roughness:.72}),leather=mat('#533c2f',{roughness:.9}),visor=mat('#101c20',{metalness:.5,roughness:.32}),accent=mat('#c8a45a',{metalness:.78,roughness:.26});const legs=[];for(const x of [-.14,.14]){const pivot=new THREE.Group();pivot.position.set(x,.49,0);body.add(pivot);sphere(.1,armor,pivot,0,-.14,0,.91,2,1);cylinder(.085,.09,.22,leather,pivot,0,-.30,0,16);
  roundedBox(.21,.065,.22,boots,pivot,0,-.205,0,.02);
  sphere(.115,leather,pivot,0,-.405,.074,.86,.58,1.48);
  sphere(.112,boots,pivot,0,-.455,.071,.89,.16,1.5);
@@ -76,7 +76,10 @@ function knight(){const g=new THREE.Group();const body=new THREE.Group();g.add(b
  roundedBox(.16,.026,.013,boots,pivot,0,-.248,.112,.006);
  roundedBox(.036,.036,.018,accent,pivot,.05,-.248,.123,.006);
  const scuff=roundedBox(.068,.008,.015,accent,pivot,-.026,-.411,.228,.004);scuff.rotation.z=.13;legs.push(pivot);}
- roundedBox(.46,.43,.31,armor,body,0,.78,0,.08);roundedBox(.32,.26,.32,cloth,body,0,.8,.045,.05);roundedBox(.5,.085,.34,accent,body,0,.59,0,.025);roundedBox(.33,.08,.28,leather,body,0,.65,.02,.02);
+ const cuirass=new THREE.LatheGeometry([new THREE.Vector2(.145,.56),new THREE.Vector2(.17,.63),new THREE.Vector2(.22,.82),new THREE.Vector2(.215,.91),new THREE.Vector2(.13,.99)],24);
+ const chest=mesh(cuirass,armor,body);chest.scale.z=.76;
+ const belt=cylinder(.164,.153,.05,leather,body,0,.605,0,24);belt.scale.z=.78;
+ roundedBox(.045,.045,.015,accent,body,0,.605,.135,.006);
  const skin=mat('#c3977e',{roughness:.86}),eyeWhite=mat('#ded8ca',{roughness:.7}),iris=mat('#384a42',{roughness:.6});
  cylinder(.11,.13,.14,skin,body,0,1.04,.02,12);
  const head=new THREE.Group();head.position.set(0,1.23,.02);body.add(head);
@@ -123,8 +126,8 @@ function knight(){const g=new THREE.Group();const body=new THREE.Group();g.add(b
  const capeCloth=cloth.clone();capeCloth.side=THREE.DoubleSide;mesh(capeGeo,capeCloth,cape);
  for(const side of [-1,1]){const mantle=roundedBox(.18,.06,.29,capeCloth,body,side*.15,1.02,0,.025);mantle.rotation.z=side*.1;sphere(.026,accent,body,side*.16,1.02,.15,1,1,.45);}
  const clasp=new THREE.CatmullRomCurve3([new THREE.Vector3(-.16,1.02,.15),new THREE.Vector3(0,.99,.19),new THREE.Vector3(.16,1.02,.15)]);mesh(new THREE.TubeGeometry(clasp,12,.008,5,false),accent,body);
- const arm=new THREE.Group();arm.position.set(.34,.92,0);body.add(arm);roundedBox(.15,.25,.17,armor,arm,0,-.12,0,.035);
- const elbow=new THREE.Group();elbow.position.set(0,-.25,0);elbow.rotation.x=-.65;arm.add(elbow);sphere(.078,leather,elbow);roundedBox(.13,.22,.15,armorLight,elbow,0,-.12,0,.03);
+ const arm=new THREE.Group();arm.position.set(.34,.92,0);body.add(arm);cylinder(.085,.066,.25,armor,arm,0,-.12,0,16);
+ const elbow=new THREE.Group();elbow.position.set(0,-.25,0);elbow.rotation.x=-.65;arm.add(elbow);sphere(.078,leather,elbow);cylinder(.075,.052,.22,armorLight,elbow,0,-.12,0,16);
  const wrist=new THREE.Group();wrist.position.set(0,-.25,0);elbow.add(wrist);
  const weaponSocket=new THREE.Group();weaponSocket.rotation.x=Math.PI/4+.65;wrist.add(weaponSocket);
  function grippingHand(parent){roundedBox(.105,.1,.072,skin,parent,0,0,-.03,.025);for(let i=0;i<4;i++)roundedBox(.082,.018,.056,skin,parent,.014,.032-i*.022,.012,.008);const thumb=roundedBox(.034,.065,.055,skin,parent,-.047,.018,.013,.012);thumb.rotation.z=-.35;}
@@ -132,8 +135,8 @@ function knight(){const g=new THREE.Group();const body=new THREE.Group();g.add(b
  let heldWeapon=null,heldKey;
  function setWeapon(item){const key=JSON.stringify(item??null);if(key===heldKey)return;heldKey=key;if(heldWeapon){heldWeapon.userData.dispose?.();weaponSocket.remove(heldWeapon);}heldWeapon=createHeldWeapon(item);weaponSocket.add(heldWeapon);}
  setWeapon({name:'long sword'});
- const shieldArm=new THREE.Group();shieldArm.position.set(-.34,.91,0);body.add(shieldArm);roundedBox(.15,.25,.16,armor,shieldArm,0,-.13,0,.035);
- const shieldElbow=new THREE.Group();shieldElbow.position.y=-.25;shieldElbow.rotation.x=-.9;shieldArm.add(shieldElbow);roundedBox(.13,.22,.15,armorLight,shieldElbow,0,-.1,0,.03);
+ const shieldArm=new THREE.Group();shieldArm.position.set(-.34,.91,0);body.add(shieldArm);cylinder(.085,.066,.25,armor,shieldArm,0,-.13,0,16);
+ const shieldElbow=new THREE.Group();shieldElbow.position.y=-.25;shieldElbow.rotation.x=-.9;shieldArm.add(shieldElbow);cylinder(.075,.052,.22,armorLight,shieldElbow,0,-.1,0,16);
  const shieldHand=new THREE.Group();shieldHand.position.set(0,-.23,0);shieldHand.rotation.set(.35,-.2,-.12);shieldElbow.add(shieldHand);grippingHand(shieldHand);
  const shieldRoot=new THREE.Group();shieldRoot.position.set(0,0,.085);shieldHand.add(shieldRoot);
  const shield=cylinder(.29,.29,.065,leather,shieldRoot,0,0,0,32);shield.rotation.x=Math.PI/2;

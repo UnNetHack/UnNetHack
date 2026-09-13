@@ -38,7 +38,9 @@ export default function enginePlugin(){
    server.middlewares.use(async(req,res,next)=>{
      const path=req.url?.split('?')[0];if(!path?.startsWith('/engine/'))return next();
      const host=req.headers.host;
-     if(!host||!/^127\.0\.0\.1:\d+$/.test(host)||(req.headers.origin&&req.headers.origin!==`http://${host}`)){res.writeHead(403);res.end('Local same-origin requests only');return;}
+     // Vite may be opened as either localhost or 127.0.0.1. Both resolve to the
+     // local machine; rejecting localhost makes the live controls look frozen.
+     if(!host||! /^(?:127\.0\.0\.1|localhost):\d+$/.test(host)||(req.headers.origin&&req.headers.origin!==`http://${host}`)){res.writeHead(403);res.end('Local same-origin requests only');return;}
      const json=(code,data)=>{res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
      if(req.method==='GET'&&path==='/engine/token')return json(200,{token});
      if(req.method==='GET'&&path==='/engine/events'){

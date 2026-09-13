@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import {groundNotice,groundTile} from './ground-notice.js';
+import {meleeDirection,confirmsPlayerMelee,poseMelee} from './combat-visuals.js';
 import {createHeldWeapon} from './equipment.js';
 import {createAltar} from './altar.js';
 import {createFire} from './fire.js';
@@ -40,11 +42,12 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
    $('.companion').innerHTML=pets.length?`<span class="dot"></span> ${esc(pets[0])}${pets.length>1?` +${pets.length-1}`:''}<small>YOUR COMPANION · UNNETHACK</small>`:'<span class="dot faded"></span> Alone<small>NO COMPANION IN SIGHT</small>';
  }
  const dialog=document.createElement('dialog');dialog.id='engine-dialog';document.body.append(dialog);
- const lantern=new THREE.PointLight(0xffd49c,15,9,2);group.add(lantern);
+ const groundPanel=document.createElement('aside');groundPanel.id='ground-notice';groundPanel.hidden=true;groundPanel.setAttribute('aria-live','polite');groundPanel.setAttribute('aria-label','Items on this tile');document.body.append(groundPanel);let groundPanelTile=null;
+ const lantern=new THREE.PointLight(0xffd49c,22,11,2);group.add(lantern);
  const stone=new THREE.MeshStandardMaterial({color:'#68736e',roughness:.9}),wall=new THREE.MeshStandardMaterial({color:'#52605f',roughness:.88}),wood=new THREE.MeshStandardMaterial({color:'#95774e',roughness:.8}),doorFace=new THREE.MeshStandardMaterial({color:'#4d382a',roughness:.9}),iron=new THREE.MeshStandardMaterial({color:'#293337',metalness:.72,roughness:.4}),floorGeo=new RoundedBoxGeometry(.97,.14,.97,3,.035),wallGeo=new RoundedBoxGeometry(.97,.7,.97,3,.045),doorGeo=new RoundedBoxGeometry(.86,1.1,.16,3,.025),stepGeo=new RoundedBoxGeometry(.76,.14,.22,3,.025);
  // Torches are real light sources: a fixed pool of point lights follows the torches
  // nearest the hero. The pool size never changes, so materials never recompile.
- const TORCH_LIGHTS=8,TORCH_INTENSITY=15,LIVE_AMBIENT=.4;
+ const TORCH_LIGHTS=8,TORCH_INTENSITY=15,LIVE_AMBIENT=.68;
  const torchLights=Array.from({length:TORCH_LIGHTS},()=>{const l=new THREE.PointLight(0xff9a48,0,6,2);l.userData={tile:null,level:0};group.add(l);return l;});
  const ambientLights=scene.children.filter(o=>o.isHemisphereLight||o.isDirectionalLight).map(light=>({light,base:light.intensity}));
  const torchHaloMaterial=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const ctx=c.getContext('2d'),g=ctx.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,190,110,.55)');g.addColorStop(.35,'rgba(255,130,50,.18)');g.addColorStop(1,'rgba(255,100,30,0)');ctx.fillStyle=g;ctx.fillRect(0,0,64,64);return new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});})();
@@ -72,15 +75,30 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  function clear(){for(const o of tiles.values())release(o);for(const a of actors.values())release(a.g);for(const o of groundItems.values())release(o);for(const w of wells.values())group.remove(w);tiles.clear();actors.clear();groundItems.clear();wells.clear();}
  function pickupIcon(cell){
    const icon=new THREE.Group(), kind=cell.object?.kind||'item', cls=cell.object?.class||0, itemName=(cell.object?.name||cell.name||'').toLowerCase();
+   // Older bridge processes expose statues as generic objects. Keep the visual path
+   // usable while they are being replaced; the current bridge supplies creature directly.
+   const statueCreature=cell.object?.creature||({6746:'gecko'}[cell.glyph]);
    const warm=new THREE.MeshStandardMaterial({color:kind==='corpse'?0x72534a:cls===POTION_CLASS?0x5bd0c7:cls===WEAPON_CLASS?0xd9b15e:0xc9a86b,emissive:kind==='corpse'?0x241314:0x362718,roughness:.42,metalness:cls===WEAPON_CLASS?.65:.18});
    const edge=new THREE.MeshStandardMaterial({color:kind==='corpse'?0xb9a189:0xe8d8aa,roughness:.55,metalness:cls===WEAPON_CLASS?.7:.25});
    const add=(geometry,material=warm,x=0,y=.34,z=0)=>{const m=new THREE.Mesh(geometry,material);m.position.set(x,y,z);m.castShadow=true;icon.add(m);return m;};
-   if(kind==='corpse'){
+   if((kind==='statue'||itemName==='statue')&&statueCreature&&creatureFactory){
+     const sculpture=creatureFactory({name:statueCreature}).g;
+     const stoneMaterials=[new THREE.MeshStandardMaterial({color:0x898b86,roughness:.98}),new THREE.MeshStandardMaterial({color:0x777b78,roughness:1})];
+     sculpture.traverse(o=>{if(o.isMesh){o.material=stoneMaterials[o.geometry?.uuid?.charCodeAt?.(0)%2||0];o.castShadow=o.receiveShadow=true;}});
+     sculpture.scale.multiplyScalar(.75);sculpture.position.y=.06;icon.add(sculpture);
+     const base=new THREE.Mesh(new THREE.CylinderGeometry(.38,.42,.07,12),stoneMaterials[0]);base.position.y=.035;icon.add(base);
+     icon.userData.restingWeapon=true;icon.name=`Stone statue of ${statueCreature}`;
+     icon.userData.dispose=()=>{const geometries=new Set();sculpture.traverse(o=>{if(o.geometry)geometries.add(o.geometry);});geometries.forEach(geo=>geo.dispose());base.geometry.dispose();stoneMaterials.forEach(material=>material.dispose());};
+   }else if(kind==='corpse'){
      const bone=new THREE.MeshStandardMaterial({color:0xc9b993,roughness:.78}),boneShade=new THREE.MeshStandardMaterial({color:0x756a5c,roughness:.86}),socket=new THREE.MeshStandardMaterial({color:0x17191a,roughness:1});
-     const addBone=(angle,x,z,length=.48)=>{const shaft=add(new THREE.CylinderGeometry(.035,.035,length,8),bone,x,.31,z);shaft.rotation.z=Math.PI/2;shaft.rotation.y=angle;for(const end of [-1,1]){const p=add(new THREE.SphereGeometry(.07,8,6),bone,x+Math.cos(angle)*length*.5*end,.31,z+Math.sin(angle)*length*.5*end);p.scale.set(1,.72,1);}};
+     icon.userData.restingWeapon=true;
+     const addBone=(angle,x,z,length=.48)=>{const shaft=add(new THREE.CylinderGeometry(.024,.033,length,10),bone,x,.054,z);shaft.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(Math.cos(angle),0,Math.sin(angle)));for(const end of [-1,1])for(const offset of [-.022,.022]){const p=add(new THREE.SphereGeometry(.04,10,8),bone,x+Math.cos(angle)*length*.5*end-Math.sin(angle)*offset,.045,z+Math.sin(angle)*length*.5*end+Math.cos(angle)*offset);p.scale.set(1,.7,1);}};
      addBone(.18,-.08,-.02,.55);addBone(-.92,.08,.02,.52);addBone(1.25,0,-.08,.4);addBone(-.28,.02,.1,.34);
-     const skull=add(new THREE.SphereGeometry(.16,12,8),bone,0,.49,.02);skull.scale.set(.92,.82,1.08);add(new THREE.BoxGeometry(.14,.06,.13),boneShade,0,.39,.12);
-     for(const x of [-.055,.055])add(new THREE.SphereGeometry(.026,8,6),socket,x,.51,.155);
+     const skull=add(new THREE.SphereGeometry(.13,20,14),bone,0,.163,-.055);skull.scale.set(.94,.92,1.12);
+     const jaw=add(new THREE.TorusGeometry(.073,.018,6,18,Math.PI),boneShade,0,.053,.057);jaw.rotation.x=Math.PI/2;
+     for(const x of [-.05,.05]){const cavity=add(new THREE.SphereGeometry(.043,14,10),socket,x,.151,.067);cavity.scale.set(1,.84,.32);const brow=add(new THREE.SphereGeometry(.047,12,8),bone,x,.183,.069);brow.scale.set(1,.26,.35);}
+     const nose=add(new THREE.ConeGeometry(.023,.043,3),socket,0,.109,.083);nose.rotation.z=Math.PI;
+     for(let i=0;i<6;i++)add(new THREE.BoxGeometry(.014,.026,.02),bone,(i-2.5)*.017,.07,.09);
      icon.userData.dispose=()=>{bone.dispose();boneShade.dispose();socket.dispose();};
    } else if(/boulder|large rock/.test(itemName)){
      const rock=new THREE.MeshStandardMaterial({color:0x5b5752,roughness:.97}),rockLight=new THREE.MeshStandardMaterial({color:0x81786c,roughness:.92}),rockDark=new THREE.MeshStandardMaterial({color:0x292b2a,roughness:1}),rockShadow=new THREE.MeshBasicMaterial({color:0x111517,transparent:true,opacity:.58,depthWrite:false});
@@ -125,6 +143,8 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  function setDim(tile,dim){tile.userData.fog.visible=dim;tile.userData.fog.material.opacity=dim?.72:0;tile.userData.fog.material.needsUpdate=true;}
  const hero=playerFactory();hero.setWeapon?.(null);group.add(hero.g);
  function apply(frame){latest=frame;if(!active)return;
+   if(groundPanelTile!==groundTile(frame)){groundPanel.hidden=true;groundPanelTile=null;}
+   if(Array.isArray(frame.ground))showGround(frame.ground);
    hero.setWeapon?.(frame.player.weapon??null);
    hero.setHelmet?.(frame.player.helmet??null);addOutlines(hero.g);
    const level=`${frame.branch}:${frame.depth}`;const newLevel=level!==lastLevel;if(newLevel){clear();origin={x:frame.player.x,z:frame.player.z};lastLevel=level;hero.g.position.set(0,0,0);camera.position.set(9,10.7,13.1);controls.target.set(0,0,0);}
@@ -165,7 +185,7 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
      if(cell.terrain==='fountain'){seenWells.add(id);if(!wells.has(id)){const w=wellTemplate.clone(true);w.position.set(x,0,z);group.add(w);wells.set(id,w);}}
      if(cell.x===frame.player.x&&cell.z===frame.player.z)continue;
        if(cell.kind==='object'){
-       const key=`${id}:${cell.glyph}`,seenObject=cell.visible||cell.remembered;seenActors.add(key);
+       const key=`${id}:${cell.glyph}:${cell.object?.creature||''}`,seenObject=cell.visible||cell.remembered;seenActors.add(key);
        if(seenObject&&!groundItems.has(key)){const item=pickupIcon(cell);item.position.set(x,0,z);group.add(item);groundItems.set(key,item);}
        const item=groundItems.get(key);if(item){item.visible=cell.visible;if(!item.userData.coinPile&&!item.userData.restingWeapon)item.position.y=Math.sin(performance.now()/600+x+z)*.025;}
      }
@@ -184,18 +204,30 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
    hero.target=new THREE.Vector3(frame.player.x-origin.x,0,frame.player.z-origin.z);renderSurroundings(frame);
    $('#hp').textContent=`${frame.player.hp} / ${frame.player.maxhp}`;$('#healthbar').style.width=`${100*frame.player.hp/Math.max(1,frame.player.maxhp)}%`;$('#turn').textContent=frame.turn;$('.stats').innerHTML=`<span>AC <b>${frame.player.ac}</b></span><span>LVL <b>${frame.player.level}</b></span><span>TURN <b id="turn">${frame.turn}</b></span>`;$('.location h1').textContent=`The Dungeons · ${frame.depth}`;
  }
- function message(text){const line=$('#engine-line'),log=$('#engine-messages');if(line.textContent){const p=document.createElement('div');p.textContent=line.textContent;log.prepend(p);while(log.children.length>3)log.lastChild.remove();}line.textContent=text;$('#message').textContent=text;}
+ let meleeIntent=null,attackStarted=-Infinity,queuedCommand=null;
+ function message(text){if(meleeIntent&&confirmsPlayerMelee(text)){hero.g.rotation.y=Math.atan2(...meleeIntent);attackStarted=performance.now()/1000;meleeIntent=null;}const line=$('#engine-line'),log=$('#engine-messages');if(line.textContent){const p=document.createElement('div');p.textContent=line.textContent;log.prepend(p);while(log.children.length>3)log.lastChild.remove();}line.textContent=text;$('#message').textContent=text;}
  async function post(path,body={}){if(!token)token=(await fetch('/engine/token').then(r=>r.json())).token;const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-Engine-Token':token},body:JSON.stringify(body)});const data=await r.json();if(!r.ok)throw new Error(data.error);return data;}
- async function reply(value){if(!pending)return;const req=pending;pending=null;lines=[];menu=null;dialog.close();setPrompt('Engine is resolving your action…');try{await post('/engine/input',{id:req.id,value});}catch(e){message(e.message);setPrompt('Input was not accepted. Reconnect Live mode to refresh the prompt.');}}
+ async function reply(value){if(!pending)return;const req=pending;meleeIntent=req.kind==='command'?meleeDirection(value):null;pending=null;lines=[];menu=null;dialog.close();setPrompt('Engine is resolving your action…');try{await post('/engine/input',{id:req.id,value});}catch(e){meleeIntent=null;message(e.message);setPrompt('Input was not accepted. Reconnect Live mode to refresh the prompt.');}}
+ function showGround(items){
+  groundPanel.replaceChildren();groundPanelTile=groundTile(latest);groundPanel.hidden=!items.length;
+  const heading=document.createElement('strong');heading.textContent='On the ground';groundPanel.append(heading);
+  const list=document.createElement('ul');for(const name of items){const item=document.createElement('li');item.textContent=name;list.append(item);}groundPanel.append(list);
+  const hint=document.createElement('small');hint.textContent='Press , to pick up';groundPanel.append(hint);
+ }
  function prompt(){if(!active||!pending)return;setPrompt(pending.prompt);if(pending.kind==='command')return;
+   const groundItems=groundNotice(pending,lines);
+   if(groundItems&&latest){
+    showGround(groundItems);
+    void reply(13);return;
+   }
    dialog.replaceChildren();const kicker=document.createElement('small');kicker.textContent='UNNETHACK ASKS';const title=document.createElement('h2');title.textContent=pending.prompt||'UnNetHack';dialog.append(kicker,title);
-   if(pending.kind==='menu'&&menu){const form=document.createElement('form');for(const item of menu.items){const row=document.createElement('label');row.className='engine-menu-row';if(item.selectable&&menu.how!==0){const input=document.createElement('input');input.type=menu.how===1?'radio':'checkbox';input.name='selection';input.value=item.id;input.dataset.accelerator=item.accelerator||'';row.append(input);const accel=document.createElement('kbd');accel.textContent=item.accelerator?`[${item.accelerator}]`:'';row.append(accel);}row.append(document.createTextNode(item.text));form.append(row);}const submit=document.createElement('button');submit.textContent='Continue (Enter)';submit.type='submit';form.append(submit);form.onsubmit=e=>{e.preventDefault();reply([...form.querySelectorAll('input:checked')].map(i=>i.value).join(','));};form.addEventListener('keydown',e=>{const key=e.key.length===1?e.key.toLowerCase():e.key;if(key==='Escape'){e.preventDefault();reply('!');return;}if(key==='Enter'){e.preventDefault();form.requestSubmit();return;}if(key==='a'&&menu.how===2){e.preventDefault();form.querySelectorAll('input').forEach(i=>i.checked=true);return;}const input=[...form.querySelectorAll('input')].find(i=>i.dataset.accelerator===key);if(input){e.preventDefault();if(menu.how===1)reply(input.value);else input.checked=!input.checked;}});dialog.append(form);}
+   if(pending.kind==='menu'&&menu){const form=document.createElement('form');for(const item of menu.items){const row=document.createElement('label');row.className='engine-menu-row';if(item.selectable&&menu.how!==0){const input=document.createElement('input');input.type=menu.how===1?'radio':'checkbox';input.name='selection';input.value=item.id;input.dataset.accelerator=item.accelerator||'';row.append(input);const accel=document.createElement('kbd');accel.textContent=item.accelerator?`[${item.accelerator}]`:'';row.append(accel);}row.append(document.createTextNode(item.text));form.append(row);}const submit=document.createElement('button');submit.textContent=menu.how===2?'Continue (Enter) · , selects all':'Continue (Enter)';submit.type='submit';form.append(submit);form.onsubmit=e=>{e.preventDefault();reply([...form.querySelectorAll('input:checked')].map(i=>i.value).join(','));};form.addEventListener('keydown',e=>{const key=e.key;if(key==='Escape'){e.preventDefault();reply('!');return;}if(key==='Enter'){e.preventDefault();form.requestSubmit();return;}if(key===','&&menu.how===2){e.preventDefault();form.querySelectorAll('input').forEach(i=>i.checked=true);return;}const input=[...form.querySelectorAll('input')].find(i=>i.dataset.accelerator===key);if(input){e.preventDefault();if(menu.how===1)reply(input.value);else input.checked=!input.checked;}});dialog.append(form);}
    else if(pending.kind==='line'){const form=document.createElement('form'),input=document.createElement('input'),submit=document.createElement('button');input.maxLength=200;input.autofocus=true;submit.textContent='Enter';form.append(input,submit);form.onsubmit=e=>{e.preventDefault();reply(input.value);};dialog.append(form);}
    else{if(lines.length){const pre=document.createElement('pre');pre.textContent=lines.join('\n');dialog.append(pre);}const p=document.createElement('p');p.textContent=pending.kind==='more'?'Press Enter to continue.':'Press a response key. For a direction use arrows or h/j/k/l.';dialog.append(p);const ok=document.createElement('button');ok.textContent='Enter';ok.onclick=()=>reply(13);dialog.append(ok);}
    const cancel=document.createElement('button');cancel.textContent='Cancel / Escape';cancel.onclick=()=>reply(pending.kind==='menu'?'!':pending.kind==='line'?'\u001b':27);dialog.append(cancel);dialog.showModal();
  }
  dialog.addEventListener('cancel',e=>{e.preventDefault();if(pending)reply(pending.kind==='menu'?'!':pending.kind==='line'?'\u001b':27);});
- function connect(){source?.close();source=new EventSource('/engine/events');source.onmessage=e=>{const v=JSON.parse(e.data);if(v.type==='frame')apply(v);else if(v.type==='request'){pending=v;prompt();}else if(v.type==='message'){if(active)message(v.text);}else if(v.type==='status')renderStatus(v.text);else if(v.type==='menu')menu=v;else if(v.type==='text')lines=v.lines;else if(v.type==='ended'){pending=null;if(active){dialog.close();message(v.text);setPrompt('Session ended. Use Demo room, then Live UnNetHack to resume.');}}};source.onerror=()=>{if(active)setPrompt('Connection interrupted; reconnecting…');};}
+ function connect(){meleeIntent=null;source?.close();source=new EventSource('/engine/events');source.onmessage=e=>{const v=JSON.parse(e.data);if(v.type==='frame')apply(v);else if(v.type==='request'){meleeIntent=null;pending=v;prompt();if(v.kind==='command'&&queuedCommand!==null){const command=queuedCommand;queuedCommand=null;void reply(command);}}else if(v.type==='message'){if(active)message(v.text);}else if(v.type==='status')renderStatus(v.text);else if(v.type==='menu')menu=v;else if(v.type==='text')lines=v.lines;else if(v.type==='ended'){pending=null;queuedCommand=null;if(active){dialog.close();message(v.text);setPrompt('Session ended. Use Demo room, then Live UnNetHack to resume.');}}};source.onerror=()=>{if(active)setPrompt('Connection interrupted; reconnecting…');};}
  const saved={heading:$('.location h1').textContent,footer:$('footer>small').textContent,keys:$('.keys').innerHTML,companion:$('.companion').innerHTML};
  function setMode(value){active=value;cavern.setActive(active);for(const {light,base} of ambientLights)light.intensity=active?base*LIVE_AMBIENT:base;document.body.classList.toggle('live-engine',active);group.visible=active;for(const o of demoObjects)o.visible=!active;panel.hidden=!active;actions.hidden=!active;$('#reset').hidden=active;$('.legend').hidden=active;$('.character h2').hidden=active;button.textContent=active?'Demo room':'Live UnNetHack';if(!active)$('.companion').innerHTML=saved.companion;$('footer>small').textContent=active?'Real UnNetHack rules · isolated character and saves · drag to orbit, scroll to zoom':saved.footer;$('.keys').innerHTML=active?'<span><kbd>h j k l / arrows</kbd> Move</span><span><kbd>y u b n</kbd> Diagonals</span><span><kbd>s</kbd> Search</span><span><kbd>SPACE</kbd> Wait</span><span><kbd>i</kbd> Inventory</span><span><kbd>&lt; &gt;</kbd> Stairs</span>':saved.keys;if(active){if(latest)apply(latest);prompt();}else{dialog.close();onDemo();$('.location h1').textContent=saved.heading;controls.target.set(0,.1,0);camera.position.set(11,13,16);}onMode?.(active);}
  button.onclick=async()=>{if(active){setMode(false);return;}setMode(true);setPrompt('Starting isolated UnNetHack…');try{await post('/engine/start');connect();}catch(e){message(`Could not start engine: ${e.message}. Run npm run engine:build first.`);}};
@@ -203,11 +235,12 @@ export function installLive({scene,camera,controls,playerFactory,catFactory,mons
  addEventListener('keydown',e=>{if(!active||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target instanceof HTMLInputElement)return;
    if(pending?.kind==='menu')return;let code;const directions={ArrowUp:107,ArrowDown:106,ArrowLeft:104,ArrowRight:108};
    if(pending?.kind==='command'){code=directions[e.key]??(e.key===' '?46:e.key.length===1?e.key.charCodeAt(0):undefined);}else code=directions[e.key]??(e.key==='Enter'?13:e.key==='Escape'?27:e.key.length===1?e.key.charCodeAt(0):undefined);
-   if(code){e.preventDefault();e.stopImmediatePropagation();reply(code);}
+   if(code){e.preventDefault();e.stopImmediatePropagation();if(pending)reply(code);else if(pending===null)queuedCommand=code;}
  },true);
  return {get active(){return active;},update(t,dt){if(!active||!hero.target)return;const delta=hero.target.clone().sub(hero.g.position),moving=delta.length()>.025;if(moving)hero.g.rotation.y=Math.atan2(delta.x,delta.z);hero.g.position.lerp(hero.target,1-Math.exp(-dt*14));hero.body.position.y=Math.sin(t*(moving?18:2))*(moving?.035:.013);hero.legs.forEach((l,i)=>l.rotation.x=moving?Math.sin(t*18+i*Math.PI)*.5:0);hero.cape.rotation.x=-.17+Math.sin(t*3)*.06;if(hero.plume)hero.plume.rotation.z=-.16+Math.sin(t*2.4)*.035;
    const offset=hero.g.position.clone().sub(controls.target);offset.y=0;offset.multiplyScalar(1-Math.exp(-dt*3));controls.target.add(offset);camera.position.add(offset);lantern.position.copy(hero.g.position).add(new THREE.Vector3(0,3,0));
    for(const tile of tiles.values())if(tile.visible)tile.traverse(o=>o.userData.updateFire?.(t));
+   poseMelee(hero,performance.now()/1000-attackStarted);
    updateTorchLights(t,dt);cavern.update(t,dt,hero.g.position);
    for(const a of actors.values()){let walking=false;if(a.target){const d=a.target.clone().sub(a.g.position);walking=d.length()>.025;if(walking)a.g.rotation.y=Math.atan2(d.x,d.z);a.g.position.lerp(a.target,1-Math.exp(-dt*10));if(a.legs)a.legs.forEach((l,i)=>l.rotation.x=walking?Math.sin(t*22+i*2)*.4:0);}if(a.tail){const tailRate=a.quirk==='dog'?7:a.quirk==='unicorn'?2.6:3;const tailSwing=a.quirk==='dog'?.34:a.quirk==='unicorn'?.16:.24;a.tail.rotation.z=Math.sin(t*tailRate)*tailSwing;}if(a.charm)a.charm.position.y=.3+Math.sin(t*4)*.025;if(a.body){const idle=a.quirk==='orc'?.025:a.quirk==='dragon'?.035:a.quirk==='unicorn'?.022:.015;a.body.position.y=Math.sin(t*(walking?22:2.5))*idle;}if(a.wings?.length)a.wings.forEach((wing,i)=>{if(a.quirk==='bat'){wing.rotation.z=(wing.userData.side||(i?1:-1))*Math.sin(t*14)*.65;}else if(a.quirk==='bee'){wing.rotation.y=(i?1:-1)*Math.sin(t*60)*.35;}else wing.rotation.y=(i?1:-1)*(-.18+Math.sin(t*5)*.12);});if((a.quirk==='hover'||a.quirk==='bat'||a.quirk==='bee')&&a.body)a.body.position.y=Math.sin(t*2.2+a.g.position.x)*.06;if(a.quirk==='dragon')a.g.rotation.z=Math.sin(t*1.7)*.025;if(a.quirk==='gridbug')a.g.rotation.z=Math.sin(t*9)*.035;if(a.quirk==='guard')a.g.rotation.z=Math.sin(t*1.3)*.012;const core=a.core||a.g.userData.core;if(core)core.material.emissiveIntensity=4.5+Math.sin(t*5)*1.4;}
    for(const item of groundItems.values()){if(!item.userData.coinPile)continue;item.userData.coinAge=(item.userData.coinAge||0)+dt;for(const coin of item.userData.coinPile){if(coin.settled||item.userData.coinAge<coin.delay)continue;coin.velocity-=9.8*dt;coin.disk.position.y+=coin.velocity*dt;coin.stamp.position.y+=coin.velocity*dt;if(coin.disk.position.y<=coin.target){coin.disk.position.y=coin.target;coin.stamp.position.y=coin.target+.019;coin.velocity*=-.16;if(Math.abs(coin.velocity)<.35)coin.settled=true;}}}

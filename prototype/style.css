@@ -42,5 +42,13 @@ dialog button{margin:18px 8px 0 0;font-size:12px}
 .engine-menu-row{font:14px/1.4 Inter,sans-serif;color:#d6d9c9;margin:6px 0;padding:4px 0}
 .engine-menu-row kbd{color:#d1d9df;border-color:#7489a266}
 .engine-menu-row input:checked+kbd{background:#294660;border-color:#c4b683;color:#fff}
+.engine-menu-row input[type="checkbox"]+kbd{position:relative;min-width:24px;min-height:22px;box-sizing:border-box;padding-left:25px}
+.engine-menu-row input[type="checkbox"]+kbd::before{content:"";position:absolute;left:7px;top:50%;width:6px;height:11px;border:solid transparent;border-width:0 2px 2px 0;transform:translateY(-65%) rotate(45deg)}
+.engine-menu-row input[type="checkbox"]:checked+kbd::before{border-color:#f5e8b9}
+.engine-menu-row input:focus-visible+kbd{outline:2px solid #a9e1d5;outline-offset:3px}
 @media(max-width:1000px){.live-engine #engine-panel{top:auto;bottom:140px;left:auto;right:24px;width:230px;max-height:none}.live-engine #engine-line{font-size:20px}.live-engine #engine-messages{max-height:none}.engine-actions{flex-wrap:wrap;border-right:0;padding-right:0}}
 @media(max-width:650px){.live-engine #engine-panel{left:24px;right:24px;width:auto;bottom:175px}.live-engine #engine-messages,.live-engine #engine-seen{display:none}}
+.live-engine #ground-notice:not([hidden]){display:block}
+#ground-notice{display:none;position:absolute;z-index:4;left:24px;bottom:145px;width:220px;max-height:32vh;overflow:auto;padding:14px 16px;background:#0c181bed;border:1px solid #64797266;border-radius:5px;color:#dedfce;font:13px/1.5 Inter,sans-serif;pointer-events:none}
+#ground-notice strong{font-size:14px;color:#f0e5cc}#ground-notice ul{padding:0;margin:8px 0;list-style:none}#ground-notice li+li{margin-top:4px}#ground-notice small{color:#9fb5b0}
+@media(max-width:650px){#ground-notice{left:12px;bottom:155px;width:175px;max-height:22vh}}
