@@ -286,9 +286,10 @@ totals, you gain an experience level.  The more experienced you are,
 the better you fight and withstand magical attacks.  Many dungeons
 show only your experience level here.
 .lp Weight
-The total weight of all items in your inventory, displayed if you have the
+The total weight of all items in your inventory, displayed if the
+\fBstatus\fP setting of the
 .op showweight
-option set. The number after the slash is your carrying capacity.
+option is enabled. The number after the slash is your carrying capacity.
 .lp "Time  "
 The number of turns elapsed so far, displayed if you have the
 .op time
@@ -1887,7 +1888,9 @@ even if you override the selections with your own graphics strings.
 .lp ignintr
 Ignore interrupt signals, including breaks (default off).
 .lp invweight
-Display the weights of items in your inventory (and at other times)
+Legacy alias for the
+.op showweight
+option with the \fBitems\fP setting.
 .lp legacy
 Display an introductory message when starting the game (default on).
 .lp lit_corridor
@@ -2151,7 +2154,20 @@ the appearance of the display, not the way the game treats you.
 .lp showscore
 Show your approximate accumulated score on bottom line (default off).
 .lp showweight
-Show total weight in inventory on bottom line (default off).
+Compound option controlling where weight information is displayed.
+It takes a space separated list of \fB+\fP or \fB-\fP settings;
+the recognized settings are \fBinventory\fP (total carried weight and
+carrying capacity in the full inventory heading), \fBslots\fP (number
+of used inventory slots in the full inventory heading), \fBstatus\fP
+(total carried weight and carrying capacity on the bottom status line)
+and \fBitems\fP (weight of individual items in various listings).
+For compatibility with the old boolean option, specifying
+\fBshowweight\fP without any settings enables \fBstatus\fP, while
+\fB!showweight\fP disables it; the other settings are not changed.
+.op showweight:none
+disables all weight display, while
+.op showweight:all
+enables all of them.
 .lp "silent  "
 Suppress terminal beeps (default on).
 .lp sortloot

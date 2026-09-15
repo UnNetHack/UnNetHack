@@ -801,7 +801,7 @@ void bot2str(char *newbot2)
     }
 
 #ifdef SHOW_WEIGHT
-    if (flags.showweight) {
+    if (flags.showweight_status) {
         Sprintf(eos(newbot2), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
     }

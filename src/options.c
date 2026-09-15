@@ -151,11 +151,6 @@ static struct Bool_Opt
 #else
     {"ignintr", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-#ifdef SHOW_WEIGHT
-    {"invweight", &flags.invweight, FALSE, SET_IN_GAME},
-#else
-    {"invweight", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
     {"large_font", &iflags.obsolete, FALSE, SET_IN_FILE},   /* OBSOLETE */
     {"legacy", &flags.legacy, TRUE, SET_IN_FILE},
     {"lit_corridor", &flags.lit_corridor, TRUE, SET_IN_FILE},
@@ -259,9 +254,15 @@ static struct Bool_Opt
     {"showscore", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 #ifdef SHOW_WEIGHT
-    {"showweight", &flags.showweight, FALSE, SET_IN_GAME},
+    {"showweight_items", &flags.showweight_items, FALSE, SET_IN_FILE},
+    {"showweight_inventory", &flags.showweight_inventory, TRUE, SET_IN_FILE},
+    {"showweight_slots", &flags.showweight_slots, TRUE, SET_IN_FILE},
+    {"showweight_status", &flags.showweight_status, FALSE, SET_IN_FILE},
 #else
-    {"showweight", (boolean *)0, FALSE, SET_IN_FILE},
+    {"showweight_items", (boolean *)0, FALSE, SET_IN_FILE},
+    {"showweight_inventory", (boolean *)0, TRUE, SET_IN_FILE},
+    {"showweight_slots", (boolean *)0, TRUE, SET_IN_FILE},
+    {"showweight_status", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
     {"silent", &flags.silent, TRUE, SET_IN_GAME},
     {"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
@@ -461,6 +462,10 @@ static struct Comp_Opt
     { "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
     { "seed", "game seed for repeatable dungeon layout",
       20, DISP_IN_GAME },
+#ifdef SHOW_WEIGHT
+    { "showweight", "the weight information to display (inventory, items, slots, status)",
+      48, SET_IN_GAME },
+#endif
 #ifdef SORTLOOT
     { "sortloot", "sort object selection lists by description", 4, SET_IN_GAME },
 #endif
@@ -2488,6 +2493,14 @@ parseoptions(char *opts, boolean tinitial, boolean tfrom_file)
         }
     }
 
+#ifdef SHOW_WEIGHT
+    /* kept for backwards compatibility, same as showweight_items */
+    if (match_optname(opts, "invweight", 9, FALSE)) {
+        flags.showweight_items = !negated;
+        return retval;
+    }
+#endif
+
 #if defined(MICRO) && !defined(AMIGA)
     /* included for compatibility with old NetHack.cnf files */
     if (match_optname(opts, "IBM_", 4, FALSE)) {
@@ -3724,6 +3737,25 @@ goodfruit:
         return retval;
     }
 
+#ifdef SHOW_WEIGHT
+    /* showweight:+inventory +slots +status +items */
+    fullname = "showweight";
+    if (match_optname(opts, fullname, 10, TRUE)) {
+        if ((op = string_for_opt(opts, TRUE)) != 0) {
+            if (negated) {
+                bad_negation(fullname, TRUE);
+                return FALSE;
+            }
+            common_prefix_options_parser(fullname, opts, negated);
+        } else {
+            /* plain "showweight" / "!showweight" for old config files */
+            flags.showweight_status = !negated;
+        }
+        flags.botl = TRUE;
+        return retval;
+    }
+#endif
+
     fullname = "statuscolor";
     if (match_optname(opts, fullname, 11, TRUE)) {
 #if defined(STATUS_COLORS) && defined(TEXTCOLOR)
@@ -4398,7 +4430,7 @@ goodfruit:
                 || (boolopt[i].addr) == &flags.showscore
 #endif
 #ifdef SHOW_WEIGHT
-                || (boolopt[i].addr) == &flags.showweight
+                || (boolopt[i].addr) == &flags.showweight_status
 #endif
                 )
                 flags.botl = TRUE;
@@ -4943,6 +4975,56 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         iflags.paranoid_trap = paranoid_settings[3];
         iflags.paranoid_lava = paranoid_settings[4];
         iflags.paranoid_water = paranoid_settings[5];
+
+        retval = TRUE;
+#endif
+#ifdef SHOW_WEIGHT
+    } else if (!strcmp("showweight", optname)) {
+        int pick_cnt, pick_idx, opt_idx;
+        menu_item *showweight_pick = (menu_item *)0;
+
+        static const char *showweight_names[] = {
+            "inventory", "items", "slots", "status"
+        };
+        static const char showweight_accelerators[] = {
+            'a', 'b', 'c', 'd'
+        };
+#define NUM_SHOWWEIGHT_OPTIONS SIZE(showweight_names)
+        static boolean *showweight_bools[NUM_SHOWWEIGHT_OPTIONS];
+        showweight_bools[0] = &flags.showweight_inventory;
+        showweight_bools[1] = &flags.showweight_items;
+        showweight_bools[2] = &flags.showweight_slots;
+        showweight_bools[3] = &flags.showweight_status;
+        int showweight_settings[NUM_SHOWWEIGHT_OPTIONS];
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        for (i = 0; i < NUM_SHOWWEIGHT_OPTIONS; i++) {
+            any.a_int = i + 1;
+            add_menu(tmpwin, NO_GLYPH, MENU_DEFCNT, &any, showweight_accelerators[i], 0,
+                     ATR_NONE, showweight_names[i],
+                     *showweight_bools[i] ? MENU_SELECTED : MENU_UNSELECTED);
+            showweight_settings[i] = 0;
+        }
+        end_menu(tmpwin, "Change which weight information to show:");
+        if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &showweight_pick)) > 0) {
+            for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+                opt_idx = showweight_pick[pick_idx].item.a_int - 1;
+                showweight_settings[opt_idx] = 1;
+            }
+            free((genericptr_t)showweight_pick);
+            showweight_pick = (menu_item *)0;
+        }
+        destroy_nhwindow(tmpwin);
+
+        /* selecting nothing or pressing ESC leaves everything unchanged */
+        if (pick_cnt > 0) {
+            flags.showweight_inventory = showweight_settings[0];
+            flags.showweight_items = showweight_settings[1];
+            flags.showweight_slots = showweight_settings[2];
+            flags.showweight_status = showweight_settings[3];
+            flags.botl = TRUE;
+        }
 
         retval = TRUE;
 #endif
@@ -5579,6 +5661,15 @@ get_compopt_value(const char *optname, char *buf)
                 iflags.paranoid_trap ? "+" : "-", "trap",
                 iflags.paranoid_lava ? "+" : "-", "lava",
                 iflags.paranoid_water ? "+" : "-", "water");
+    }
+#endif
+#ifdef SHOW_WEIGHT
+    else if (!strcmp(optname, "showweight")) {
+        Sprintf(buf, "%s%s %s%s %s%s %s%s",
+                flags.showweight_inventory ? "+" : "-", "inventory",
+                flags.showweight_items ? "+" : "-", "items",
+                flags.showweight_slots ? "+" : "-", "slots",
+                flags.showweight_status ? "+" : "-", "status");
     }
 #endif
     else if (!strcmp(optname, "pettype")) {

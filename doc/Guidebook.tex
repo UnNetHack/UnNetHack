@@ -388,9 +388,10 @@ the better you fight and withstand magical attacks.  Many dungeons
 show only your experience level here.
 %.lp
 \item[\bb{Weight}]
-The total weight of all items in your inventory, displayed if you have the
+The total weight of all items in your inventory, displayed if the
+{\tt status} setting of the
 {\it showweight\/}
-option set. The number after the slash is your carrying capacity.
+option is enabled. The number after the slash is your carrying capacity.
 %.lp
 \item[\bb{Time}]
 The number of turns elapsed so far, displayed if you have the
@@ -2336,8 +2337,9 @@ even if you override the selections with your own graphics strings.
 Ignore interrupt signals, including breaks (default off).
 %.lp
 \item[\ib{invweight}]
-Display the weights of items in your inventory (and at other times)
-in braces (default off).
+Legacy alias for the
+{\it showweight\/}
+option with the {\tt items} setting.
 %.lp
 \item[\ib{legacy}]
 Display an introductory message when starting the game (default on).
@@ -2638,7 +2640,20 @@ the appearance of the display, not the way the game treats you.
 Show your approximate accumulated score on bottom line (default off).
 %.lp
 \item[\ib{showweight}]
-Show total weight in inventory on bottom line (default off).
+Compound option controlling where weight information is displayed.
+It takes a space separated list of {\tt +} or {\tt -} settings;
+the recognized settings are {\tt inventory} (total carried weight and
+carrying capacity in the full inventory heading), {\tt slots} (number
+of used inventory slots in the full inventory heading), {\tt status}
+(total carried weight and carrying capacity on the bottom status line)
+and {\tt items} (weight of individual items in various listings).
+For compatibility with the old boolean option, specifying
+\ib{showweight} without any settings enables {\tt status}, while
+{\tt !showweight} disables it; the other settings are not changed.
+\ib{showweight:none}
+disables all weight display, while
+\ib{showweight:all}
+enables all of them.
 %.lp
 \item[\ib{silent}]
 Suppress terminal beeps (default on).

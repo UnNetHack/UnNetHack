@@ -1620,7 +1620,7 @@ long
 display_weight(struct obj *obj)
 {
 #ifdef SHOW_WEIGHT
-    if (!flags.invweight) {
+    if (!flags.showweight_items) {
         return 0;
     }
 
@@ -1634,7 +1634,7 @@ display_weight(struct obj *obj)
         if (Is_container(obj) && (!obj->cknown || !obj->dknown)) {
             return 0;
         }
-        if (!Hallucination && flags.invweight) {
+        if (!Hallucination) {
             return obj->owt;
         }
     }
