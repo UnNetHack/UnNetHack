@@ -1619,7 +1619,6 @@ ring:
 long
 display_weight(struct obj *obj)
 {
-#ifdef SHOW_WEIGHT
     if (!flags.showweight_items) {
         return 0;
     }
@@ -1638,7 +1637,7 @@ display_weight(struct obj *obj)
             return obj->owt;
         }
     }
-#endif
+
     return 0;
 }
 
@@ -1998,9 +1997,7 @@ const char *
 singular(struct obj *otmp, char *(*func) (struct obj *))
 {
     long savequan;
-#ifdef SHOW_WEIGHT
     unsigned saveowt;
-#endif
     char *nam;
 
     /* Note: using xname for corpses will not give the monster type */
@@ -2010,15 +2007,12 @@ singular(struct obj *otmp, char *(*func) (struct obj *))
 
     savequan = otmp->quan;
     otmp->quan = 1L;
-#ifdef SHOW_WEIGHT
     saveowt = otmp->owt;
     otmp->owt = weight(otmp);
-#endif
     nam = (*func)(otmp);
     otmp->quan = savequan;
-#ifdef SHOW_WEIGHT
     otmp->owt = saveowt;
-#endif
+
     return nam;
 }
 

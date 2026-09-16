@@ -8831,7 +8831,6 @@ printf '%s\n' "#define PERS_IS_UID /**/" >>confdefs.h
 # NETHACK_ARG(keep-save,[Keep save files after restore],KEEP_SAVE,no)
 # NETHACK_ARG(charon,[Charon's boat, enables Cerebus (not implemented)],CHARON,no)
 # NETHACK_ARG(show-dmg,[Display damage reports],SHOW_DMG,yes)
-# NETHACK_ARG(show-weight,[Display object weight],SHOW_WEIGHT,yes)
 # NETHACK_ARG(other-services,[Shopkeeper services],OTHER_SERVICES,yes)
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable paranoid" >&5
 printf %s "checking whether to enable paranoid... " >&6; }

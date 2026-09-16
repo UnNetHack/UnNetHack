@@ -253,17 +253,10 @@ static struct Bool_Opt
 #else
     {"showscore", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
-#ifdef SHOW_WEIGHT
     {"showweight_items", &flags.showweight_items, FALSE, SET_IN_FILE},
     {"showweight_inventory", &flags.showweight_inventory, TRUE, SET_IN_FILE},
     {"showweight_slots", &flags.showweight_slots, TRUE, SET_IN_FILE},
     {"showweight_status", &flags.showweight_status, FALSE, SET_IN_FILE},
-#else
-    {"showweight_items", (boolean *)0, FALSE, SET_IN_FILE},
-    {"showweight_inventory", (boolean *)0, TRUE, SET_IN_FILE},
-    {"showweight_slots", (boolean *)0, TRUE, SET_IN_FILE},
-    {"showweight_status", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
     {"silent", &flags.silent, TRUE, SET_IN_GAME},
     {"softkeyboard", &iflags.wc2_softkeyboard, FALSE, SET_IN_FILE},
     {"sortpack", &flags.sortpack, TRUE, SET_IN_GAME},
@@ -462,10 +455,8 @@ static struct Comp_Opt
     { "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
     { "seed", "game seed for repeatable dungeon layout",
       20, DISP_IN_GAME },
-#ifdef SHOW_WEIGHT
     { "showweight", "the weight information to display (inventory, items, slots, status)",
       48, SET_IN_GAME },
-#endif
 #ifdef SORTLOOT
     { "sortloot", "sort object selection lists by description", 4, SET_IN_GAME },
 #endif
@@ -2493,13 +2484,11 @@ parseoptions(char *opts, boolean tinitial, boolean tfrom_file)
         }
     }
 
-#ifdef SHOW_WEIGHT
     /* kept for backwards compatibility, same as showweight_items */
     if (match_optname(opts, "invweight", 9, FALSE)) {
         flags.showweight_items = !negated;
         return retval;
     }
-#endif
 
 #if defined(MICRO) && !defined(AMIGA)
     /* included for compatibility with old NetHack.cnf files */
@@ -3737,7 +3726,6 @@ goodfruit:
         return retval;
     }
 
-#ifdef SHOW_WEIGHT
     /* showweight:+inventory +slots +status +items */
     fullname = "showweight";
     if (match_optname(opts, fullname, 10, TRUE)) {
@@ -3754,7 +3742,6 @@ goodfruit:
         flags.botl = TRUE;
         return retval;
     }
-#endif
 
     fullname = "statuscolor";
     if (match_optname(opts, fullname, 11, TRUE)) {
@@ -4429,9 +4416,7 @@ goodfruit:
 #ifdef SCORE_ON_BOTL
                 || (boolopt[i].addr) == &flags.showscore
 #endif
-#ifdef SHOW_WEIGHT
                 || (boolopt[i].addr) == &flags.showweight_status
-#endif
                 )
                 flags.botl = TRUE;
 
@@ -4978,7 +4963,6 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
 
         retval = TRUE;
 #endif
-#ifdef SHOW_WEIGHT
     } else if (!strcmp("showweight", optname)) {
         int pick_cnt, pick_idx, opt_idx;
         menu_item *showweight_pick = (menu_item *)0;
@@ -5027,7 +5011,6 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
         }
 
         retval = TRUE;
-#endif
     } else if (!strcmp("disclose", optname)) {
         int pick_cnt, pick_idx, opt_idx;
         menu_item *disclosure_category_pick = (menu_item *)0;
@@ -5663,7 +5646,6 @@ get_compopt_value(const char *optname, char *buf)
                 iflags.paranoid_water ? "+" : "-", "water");
     }
 #endif
-#ifdef SHOW_WEIGHT
     else if (!strcmp(optname, "showweight")) {
         Sprintf(buf, "%s%s %s%s %s%s %s%s",
                 flags.showweight_inventory ? "+" : "-", "inventory",
@@ -5671,7 +5653,6 @@ get_compopt_value(const char *optname, char *buf)
                 flags.showweight_slots ? "+" : "-", "slots",
                 flags.showweight_status ? "+" : "-", "status");
     }
-#endif
     else if (!strcmp(optname, "pettype")) {
         Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat" :
                 (preferred_pet == 'd') ? "dog" :

@@ -470,7 +470,6 @@ typedef long glyph_t;
  * killed - Patric Mueller (15 Aug 2009) */
 #define TUTORIAL_MODE /* Alex Smith */
 #define ELBERETH_CONDUCT /* Track the number of times the player engraves Elbereth. - Ray Kulhanek */
-#define SHOW_WEIGHT
 /* End of Section 6 */
 
 #include "cstd.h"

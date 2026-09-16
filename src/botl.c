@@ -800,12 +800,10 @@ void bot2str(char *newbot2)
             Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
     }
 
-#ifdef SHOW_WEIGHT
     if (flags.showweight_status) {
         Sprintf(eos(newbot2), " Wt:%ld/%ld", (long)(inv_weight()+weight_cap()),
                 (long)weight_cap());
     }
-#endif
 
     if (flags.time) {
 #ifdef STATUS_HILITES
