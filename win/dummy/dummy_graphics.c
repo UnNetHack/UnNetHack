@@ -107,6 +107,7 @@ void dummy_init_nhwindows(int* argc, char** argv)
     nhUse(argv);
 
     dummy_printf("dummy_init_nhwindows\n");
+    iflags.window_inited = TRUE;
 }
 
 
