@@ -129,8 +129,9 @@ void dummy_askname(void)
     fprintf(stdout, "What is your name? ");
     char *ret = fgets(plname, sizeof(plname), stdin);
     /* Quit if they want to quit... */
-    if (ret==NULL) {
-        dummy_exit_nhwindows(0);
+    if (ret == NULL) {
+        /* EOF: cannot proceed without a name. */
+        hangup(0);
     }
 }
 
@@ -494,9 +495,12 @@ static int dummy_getchar(void)
     if (iflags.debug_fuzzer) {
         return randomkey();
     }
-    do {
-        rets = fgets(input, sizeof(input), stdin);
-    } while (rets == NULL);
+    rets = fgets(input, sizeof(input), stdin);
+    if (rets == NULL) {
+        /* EOF received. Terminate like a terminal hangup (save if
+           appropriate, clear locks, exit). */
+        hangup(0);
+    }
 
     return input[0];
 }
@@ -652,6 +656,9 @@ int dummy_get_ext_cmd(void)
         return i;
     }
     ret = fgets(cmd, sizeof(cmd), stdin);
+    if (ret == NULL) {
+        return -1;
+    }
 
     for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
         dummy_strip_newline(ret);
