@@ -1357,7 +1357,7 @@ dump_spells(void)
                 spelltypemnemonic(spell_skilltype(spellid(i))),
                 100 - percent_success(i),
                 (spellknow(i) * 100 + (KEEN-1)) / KEEN);
-        dump_html(buf, "");
+        dump_html("%s", buf);
     }
     dump_html("</table>\n", "");
     dump("", "");
