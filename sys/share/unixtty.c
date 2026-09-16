@@ -462,6 +462,12 @@ check_utf8_console(void)
 #if defined(__PDCURSESMOD__) && defined(PDC_WIDE)
     iflags.supports_utf8 = TRUE;
 #else
+    /* Not attached to a console: skip UTF-8 detection, otherwise the
+     * tcgetattr/exit below makes headless runs (e.g. the dummy
+     * window port) impossible. */
+    if (!isatty(STDIN_FILENO)) {
+        return;
+    }
     struct termios original;
     /* store current tty settings */
     if (tcgetattr(STDIN_FILENO, &original) == -1) {
