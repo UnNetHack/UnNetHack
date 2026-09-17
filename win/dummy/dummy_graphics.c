@@ -289,13 +289,13 @@ dummy_display_file(const char *filename, boolean must_exist)
 #endif
     if (!f) {
         if (must_exist) {
-            printf("Warning! Could not find file: %s\n",filename);
+            dummy_printf("Warning! Could not find file: %s\n", filename);
         }
     } else {
 #define LLEN 128
         char line[LLEN];
         while (dlb_fgets(line, LLEN, f)) {
-            printf("%s", line);
+            dummy_printf("%s", line);
         }
         (void) dlb_fclose(f);
     }
