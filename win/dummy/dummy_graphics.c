@@ -666,7 +666,6 @@ char yn_function(const char *ques, const char *choices, char default)
 char dummy_yn_function(const char *question, const char *choices,
         char def)
 {
-    // TODO
     dummy_printf("dummy_yn_function %s\n", question);
     int ret = dummy_getchar();
     dummy_printf("dummy_yn_function %d %c\n", ret, ret);
@@ -679,6 +678,39 @@ char dummy_yn_function(const char *question, const char *choices,
             return 'q';
         }
         if (index(choices, 'n')) {
+            return 'n';
+        }
+        return def;
+    }
+    if (choices != NULL && index(choices, '#')
+        && (ret == '#' || digit(ret))) {
+        /* count entry: '#' or a first digit starts a count; further
+           digits accumulate (one input line per character), a commit
+           terminator (y, return, space) sets yn_number and returns
+           '#', a count of 0 answers 'n', anything else aborts, like
+           the tty port */
+        long value = (ret == '#') ? 0L : (long) (ret - '0');
+
+        for (;;) {
+            int c = dummy_getchar();
+
+            if (digit(c)) {
+                value = 10 * value + (long) (c - '0');
+                if (value < 0) {
+                    value = 0L; /* overflow: answers 'n' */
+                }
+            } else if (c == 'y' || c == '\n' || c == '\r' || c == ' ') {
+                break; /* commit the count */
+            } else {
+                value = -1L; /* aborted */
+                break;
+            }
+        }
+        if (value > 0) {
+            yn_number = value;
+            return '#';
+        }
+        if (value == 0) {
             return 'n';
         }
         return def;
