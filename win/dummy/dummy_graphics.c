@@ -703,25 +703,35 @@ int dummy_get_ext_cmd(void)
 {
     char cmd[255];
     int i;
-    char *ret;
+    int match;
 
     dummy_printf("dummy_get_ext_cmd\n");
     if (iflags.debug_fuzzer) {
         i =  moves % (10);
         return i;
     }
-    ret = fgets(cmd, sizeof(cmd), stdin);
-    if (ret == NULL) {
+    if (fgets(cmd, sizeof(cmd), stdin) == NULL) {
         return -1;
     }
+    dummy_strip_newline(cmd);
 
     for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
-        dummy_strip_newline(ret);
-        if (!strcmpi(ret, extcmdlist[i].ef_txt)) {
+        if (!strcmpi(cmd, extcmdlist[i].ef_txt)) {
             return i;
         }
     }
-    return -1;
+    /* unambiguous prefix match, like the tty port */
+    match = -1;
+    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++) {
+        if (!strncmpi(cmd, extcmdlist[i].ef_txt, strlen(cmd))) {
+            if (match == -1) {
+                match = i;
+            } else {
+                match = -2;
+            }
+        }
+    }
+    return (match >= 0) ? match : -1;
 }
 
 
