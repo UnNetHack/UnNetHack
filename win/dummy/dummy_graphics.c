@@ -682,7 +682,7 @@ void dummy_getlin(const char *question, char *input)
     }
     fprintf(stdout, "%s:\n", question);
     fflush(stdout);
-    char *ret = fgets(input, 256, stdin);
+    char *ret = fgets(input, BUFSZ, stdin);
 
     if (ret == NULL) {
         input[0] = '\033';
