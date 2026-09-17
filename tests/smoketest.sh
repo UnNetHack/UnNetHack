@@ -89,7 +89,7 @@ rm -f "$VARDIR"/saves/*smk*.bz2 "$VARDIR"/smk*.whereis /tmp/unnethack_dumped_*sm
 if (( FAILED > 0 )); then
     for out in "$TMP"/*.out; do
         printf '\n--- tail of %s ---\n' "$out"
-        grep -a '^dummy_' "$out" | tail -n 10
+        grep -a '^\[[^]]*\] dummy_\|^dummy_' "$out" | tail -n 10
     done
     printf '%s check(s) failed\n' "$FAILED"
     exit 1
