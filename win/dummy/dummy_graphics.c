@@ -85,6 +85,7 @@ dummy_printf(const char *fmt, ...)
     va_start(args, fmt);
 
     if (!iflags.debug_fuzzer) {
+        printf("[turn %ld] ", moves);
         vprintf(fmt, args);
     }
     va_end(args);
@@ -207,6 +208,30 @@ dummy_wid2str(winid wid)
     return "invalid winid";
 }
 
+/* ring buffer of the last messages, for ^P (doprev_message) */
+#define DUMMY_HIST 100
+
+struct dummy_msg {
+    long turn;
+    char text[BUFSZ];
+};
+
+static struct dummy_msg dummy_hist[DUMMY_HIST];
+static int dummy_hist_next, dummy_hist_count;
+
+static void
+dummy_hist_add(const char *text)
+{
+    struct dummy_msg *m = &dummy_hist[dummy_hist_next];
+
+    m->turn = moves;
+    (void) strncpy(m->text, text, BUFSZ - 1);
+    m->text[BUFSZ - 1] = '\0';
+    dummy_hist_next = (dummy_hist_next + 1) % DUMMY_HIST;
+    if (dummy_hist_count < DUMMY_HIST)
+        dummy_hist_count++;
+}
+
 
 /*  Create a window of type "type" which can be
         NHW_MESSAGE     (top line)
@@ -300,6 +325,11 @@ Attributes
 */
 void dummy_putstr(winid wid, int attr, const char *text)
 {
+    if (text && wid >= 0 && wid < DUMMY_MAX_WINDOWS
+        && dummy_windows[wid].in_use
+        && dummy_windows[wid].type == NHW_MESSAGE) {
+        dummy_hist_add(text);
+    }
     dummy_printf("winid %s, %s, attr %d\n", dummy_wid2str(wid), text, attr);
 }
 
@@ -603,7 +633,14 @@ doprev_message()
 */
 int dummy_doprev_message(void)
 {
-    /* Do Nothing.  They can read old messages using the scrollbar. */
+    int i, idx;
+
+    dummy_printf("dummy_doprev_message\n");
+    /* show the last messages, oldest first */
+    for (i = dummy_hist_count; i > 0; i--) {
+        idx = (dummy_hist_next - i + DUMMY_HIST) % DUMMY_HIST;
+        dummy_printf("%ld %s\n", dummy_hist[idx].turn, dummy_hist[idx].text);
+    }
     return 0;
 }
 
@@ -793,8 +830,8 @@ outrip(winid, int)
 */
 void dummy_outrip(winid wid, int how)
 {
-    nhUse(wid);
-    nhUse(how);
-
     dummy_printf("dummy_outrip\n");
+    /* draw the tombstone through the generic code so the death cause
+       becomes part of the trace output */
+    genl_outrip(wid, how);
 }
