@@ -187,6 +187,25 @@ winid2str(int type)
     }
 }
 
+/* The dummy port hands out unique window ids and remembers the type
+   of each window, so that two windows of the same type can coexist
+   and the trace output stays unambiguous. */
+#define DUMMY_MAX_WINDOWS 32
+
+static struct {
+    boolean in_use;
+    int type;
+} dummy_windows[DUMMY_MAX_WINDOWS];
+
+static const char*
+dummy_wid2str(winid wid)
+{
+    if (wid >= 0 && wid < DUMMY_MAX_WINDOWS && dummy_windows[wid].in_use) {
+        return winid2str(dummy_windows[wid].type);
+    }
+    return "invalid winid";
+}
+
 
 /*  Create a window of type "type" which can be
         NHW_MESSAGE     (top line)
@@ -198,14 +217,24 @@ winid2str(int type)
 winid
 dummy_create_nhwindow(int type)
 {
+    int i;
+
     dummy_printf("dummy_create_nhwindow(%s)\n", winid2str(type));
-    return type;
+    for (i = 0; i < DUMMY_MAX_WINDOWS; i++) {
+        if (!dummy_windows[i].in_use) {
+            dummy_windows[i].in_use = TRUE;
+            dummy_windows[i].type = type;
+            return (winid) i;
+        }
+    }
+    dummy_printf("dummy_create_nhwindow: out of windows\n");
+    return WIN_ERR;
 }
 
 /* Clear the given window, when asked to. */
 void dummy_clear_nhwindow(winid wid)
 {
-    dummy_printf("dummy_clear_nhwindow(%s)\n", winid2str(wid));
+    dummy_printf("dummy_clear_nhwindow(%s)\n", dummy_wid2str(wid));
 }
 
 /* -- Display the window on the screen.  If there is data
@@ -219,7 +248,7 @@ void dummy_clear_nhwindow(winid wid)
 */
 void dummy_display_nhwindow(winid wid, boolean block)
 {
-    dummy_printf("dummy_display_nhwindow(%s, %d)\n", winid2str(wid), block);
+    dummy_printf("dummy_display_nhwindow(%s, %d)\n", dummy_wid2str(wid), block);
 }
 
 
@@ -228,7 +257,11 @@ void dummy_display_nhwindow(winid wid, boolean block)
 */
 void dummy_destroy_nhwindow(winid wid)
 {
-    dummy_printf("dummy_destroy_nhwindow(%s)\n", winid2str(wid));
+    dummy_printf("dummy_destroy_nhwindow(%s)\n", dummy_wid2str(wid));
+    if (wid >= 0 && wid < DUMMY_MAX_WINDOWS) {
+        dummy_windows[wid].in_use = FALSE;
+        dummy_windows[wid].type = -1;
+    }
 }
 
 /* Next output to window will start at (x,y), also moves
@@ -238,7 +271,7 @@ void dummy_destroy_nhwindow(winid wid)
 */
 void dummy_curs(winid wid, int x, int y)
 {
-    dummy_printf("winid %s, x %d, y %d\n", winid2str(wid), x, y);
+    dummy_printf("winid %s, x %d, y %d\n", dummy_wid2str(wid), x, y);
 }
 
 /*
@@ -266,7 +299,7 @@ Attributes
 */
 void dummy_putstr(winid wid, int attr, const char *text)
 {
-    dummy_printf("winid %s, %s, attr %d\n", winid2str(wid), text, attr);
+    dummy_printf("winid %s, %s, attr %d\n", dummy_wid2str(wid), text, attr);
 }
 
 /* Display the file named str.  Complain about missing files
@@ -309,7 +342,7 @@ dummy_display_file(const char *filename, boolean must_exist)
 void dummy_start_menu(winid wid)
 {
     /* Do Nothing */
-    dummy_printf("dummy_start_menu(%s)\n", winid2str(wid));
+    dummy_printf("dummy_start_menu(%s)\n", dummy_wid2str(wid));
 }
 
 /*
@@ -349,7 +382,7 @@ void dummy_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
 {
     /* Do Nothing */
     dummy_printf("dummy_add_menu(%s, %d, %d, %p, %c, %c, %d, %s, %u)\n",
-                 winid2str(wid), glyph, cnt, identifier, accelerator,
+                 dummy_wid2str(wid), glyph, cnt, identifier, accelerator,
                  group_accel, attr, str ? str : "(null)", presel);
 }
 
@@ -365,7 +398,7 @@ end_menu(window, prompt)
 void dummy_end_menu(winid wid, const char *prompt)
 {
     /* Do Nothing */
-    dummy_printf("dummy_end_menu(%s, %s)\n", winid2str(wid),
+    dummy_printf("dummy_end_menu(%s, %s)\n", dummy_wid2str(wid),
                  prompt ? prompt : "(null)");
 }
 
@@ -398,7 +431,7 @@ int dummy_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 {
     int nReturned = -1;
     nhUse(selected);
-    dummy_printf("dummy_select_menu(%s, %d, ...)\n", winid2str(wid), how);
+    dummy_printf("dummy_select_menu(%s, %d, ...)\n", dummy_wid2str(wid), how);
 
     /*if (wid != -1 && dummy_windowlist[wid].win != NULL &&
             dummy_windowlist[wid].type == NHW_MENU)
