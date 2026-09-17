@@ -598,6 +598,19 @@ char dummy_yn_function(const char *question, const char *choices,
     dummy_printf("dummy_yn_function %s\n", question);
     int ret = dummy_getchar();
     dummy_printf("dummy_yn_function %d %c\n", ret, ret);
+    if (ret == '\033') {
+        /* ESC maps to 'q', 'n' or default, in that order */
+        if (choices == NULL) {
+            return '\033';
+        }
+        if (index(choices, 'q')) {
+            return 'q';
+        }
+        if (index(choices, 'n')) {
+            return 'n';
+        }
+        return def;
+    }
     if (choices == NULL) {
         return ret;
     } else if (index(choices, ret)) {
