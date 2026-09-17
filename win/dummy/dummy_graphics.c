@@ -76,6 +76,7 @@ struct window_procs dummy_procs = {
 
 
 static void dummy_printf(const char *fmt, ...) PRINTF_F(1, 2);
+static void dummy_strip_newline(char *);
 
 static void
 dummy_printf(const char *fmt, ...)
@@ -135,7 +136,9 @@ void dummy_askname(void)
     if (ret == NULL) {
         /* EOF: cannot proceed without a name. */
         hangup(0);
+        return;
     }
+    dummy_strip_newline(plname);
 }
 
 
