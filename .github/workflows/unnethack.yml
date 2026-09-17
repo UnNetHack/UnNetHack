@@ -21,7 +21,7 @@ jobs:
       env:
         CFLAGS: '-O2 -Wall -Wextra -fno-common -Werror=format -Werror=return-type -Werror=uninitialized -Werror=implicit-function-declaration -Werror=unused-variable -Wno-format-overflow'
         LFLAGS: '-fno-common'
-      run: "./configure --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
+      run: "./configure --prefix=$PWD/install --with-owner=`id -un` --with-group=`id -gn` --enable-wizmode=`id -un` --enable-dummy-graphics --enable-lisp-graphics --enable-curses-graphics --disable-x11-graphics --enable-tty-graphics"
 
     - name: info
       run: make debug_info
@@ -34,6 +34,16 @@ jobs:
 
     - name: make check
       run: make check
+
+    - name: install game
+      run: make install
+
+    - name: smoke test (dummy window port)
+      env:
+        GAME: ${{ github.workspace }}/install/share/unnethack/unnethack
+        HACKDIR: ${{ github.workspace }}/install/share/unnethack
+        SMOKETEST_TIMEOUT: 300
+      run: bash tests/smoketest.sh
 
   macos:
     runs-on: macos-latest
