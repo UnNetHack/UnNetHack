@@ -15,7 +15,7 @@
 
 /*
  * This file implements the interface between the window port specific
- * code in the Gnome port and the rest of the nethack game engine.
+ * code in the dummy port and the rest of the nethack game engine.
 */
 
 /* Interface definition, for windows.c */
@@ -429,18 +429,12 @@ int select_menu(windid window, int how, menu_item **selected)
 */
 int dummy_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 {
-    int nReturned = -1;
     nhUse(selected);
     dummy_printf("dummy_select_menu(%s, %d, ...)\n", dummy_wid2str(wid), how);
 
-    /*if (wid != -1 && dummy_windowlist[wid].win != NULL &&
-            dummy_windowlist[wid].type == NHW_MENU)
-    {
-        nReturned=ghack_menu_window_select_menu (dummy_windowlist[wid].win,
-                selected, how);
-    }*/
-
-    return nReturned;
+    /* The dummy port has no menu interaction; report that nothing was
+       selected (0), not an explicit cancel (-1). */
+    return 0;
 }
 
 /*
