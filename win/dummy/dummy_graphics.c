@@ -624,8 +624,10 @@ char dummy_yn_function(const char *question, const char *choices,
 static
 void dummy_strip_newline(char *str) {
     /* Strip newline from end */
-    if (str[strlen(str)-1] == '\n') {
-        str[strlen(str)-1] = '\0';
+    size_t len = strlen(str);
+
+    if (len > 0 && str[len-1] == '\n') {
+        str[len-1] = '\0';
     }
 }
 
