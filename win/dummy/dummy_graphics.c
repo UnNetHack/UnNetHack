@@ -75,6 +75,8 @@ struct window_procs dummy_procs = {
 };
 
 
+static void dummy_printf(const char *fmt, ...) PRINTF_F(1, 2);
+
 static void
 dummy_printf(const char *fmt, ...)
 {
@@ -150,13 +152,13 @@ void dummy_get_nh_event(void)
 */
 void dummy_exit_nhwindows(const char *str)
 {
-    dummy_printf("dummy_exit_nhwindows(%s)\n", str);
+    dummy_printf("dummy_exit_nhwindows(%s)\n", str ? str : "(null)");
 }
 
 /* Prepare the window to be suspended. */
 void dummy_suspend_nhwindows(const char *str)
 {
-    dummy_printf("dummy_suspend_nhwindows(%s)\n", str);
+    dummy_printf("dummy_suspend_nhwindows(%s)\n", str ? str : "(null)");
     /* I don't think we need to do anything here... */
     return;
 }
@@ -343,8 +345,9 @@ void dummy_add_menu(winid wid, int glyph, int cnt, const ANY_P * identifier,
         const char *str, unsigned int presel)
 {
     /* Do Nothing */
-    dummy_printf("dummy_add_menu(%s, %d, %d, %d, %c, %c, %d, %s, %d\n", winid2str(wid), glyph, cnt,
-                 identifier, accelerator, group_accel, attr, str, presel);
+    dummy_printf("dummy_add_menu(%s, %d, %d, %p, %c, %c, %d, %s, %u)\n",
+                 winid2str(wid), glyph, cnt, identifier, accelerator,
+                 group_accel, attr, str ? str : "(null)", presel);
 }
 
 /*
@@ -359,7 +362,8 @@ end_menu(window, prompt)
 void dummy_end_menu(winid wid, const char *prompt)
 {
     /* Do Nothing */
-    dummy_printf("dummy_end_menu(%s, %s)\n", winid2str(wid), prompt);
+    dummy_printf("dummy_end_menu(%s, %s)\n", winid2str(wid),
+                 prompt ? prompt : "(null)");
 }
 
 /*
