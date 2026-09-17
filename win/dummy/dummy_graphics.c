@@ -483,7 +483,9 @@ raw_print(str)  -- Print directly to a screen, or otherwise guarantee that
 */
 void dummy_raw_print(const char *str)
 {
-    dummy_printf("dummy_raw_print\n%s\n", str);
+    /* raw_print() must always be seen: it carries startup errors and
+       warnings, also in debug_fuzzer mode */
+    printf("dummy_raw_print\n%s\n", str);
 }
 
 /*
@@ -493,7 +495,7 @@ possible).
 */
 void dummy_raw_print_bold(const char *str)
 {
-    dummy_printf("dummy_raw_print_bold\n*%s*\n", str);
+    printf("dummy_raw_print_bold\n*%s*\n", str);
 }
 
 static int dummy_getchar(void)
