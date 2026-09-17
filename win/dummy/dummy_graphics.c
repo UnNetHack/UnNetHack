@@ -131,6 +131,7 @@ void dummy_askname(void)
         return;
     }
     fprintf(stdout, "What is your name? ");
+    fflush(stdout);
     char *ret = fgets(plname, sizeof(plname), stdin);
     /* Quit if they want to quit... */
     if (ret == NULL) {
@@ -532,6 +533,8 @@ static int dummy_getchar(void)
     if (iflags.debug_fuzzer) {
         return randomkey();
     }
+    /* make pending prompts visible before blocking on input */
+    fflush(stdout);
     rets = fgets(input, sizeof(input), stdin);
     if (rets == NULL) {
         /* EOF received. Terminate like a terminal hangup (save if
@@ -710,6 +713,7 @@ int dummy_get_ext_cmd(void)
         i =  moves % (10);
         return i;
     }
+    fflush(stdout);
     if (fgets(cmd, sizeof(cmd), stdin) == NULL) {
         return -1;
     }
