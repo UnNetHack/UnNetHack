@@ -506,11 +506,14 @@ static int dummy_getchar(void)
     rets = fgets(input, sizeof(input), stdin);
     if (rets == NULL) {
         /* EOF received. Terminate like a terminal hangup (save if
-           appropriate, clear locks, exit). */
+           appropriate, clear locks, exit). hangup() returns without
+           terminating if a hangup was already processed; do not read
+           the buffer then. */
         hangup(0);
+        return '\033';
     }
 
-    return input[0];
+    return (unsigned char) input[0];
 }
 
 /*
