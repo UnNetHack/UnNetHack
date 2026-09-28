@@ -209,7 +209,7 @@ extern int rnd_vault_freq;
 %token	<i> QUANTITY_ID BURIED_ID LOOP_ID
 %token	<i> FOR_ID TO_ID
 %token	<i> SWITCH_ID CASE_ID BREAK_ID DEFAULT_ID
-%token	<i> ERODED_ID TRAPPED_STATE RECHARGED_ID INVIS_ID GREASED_ID
+%token	<i> ERODED_ID TRAPPED_STATE TKNOWN_STATE RECHARGED_ID INVIS_ID GREASED_ID
 %token	<i> FEMALE_ID CANCELLED_ID REVIVED_ID AVENGE_ID FLEEING_ID BLINDED_ID
 %token	<i> PARALYZED_ID STUNNED_ID CONFUSED_ID SEENTRAPS_ID ALL_ID
 %token	<i> MON_GENERATION_ID MONTYPE_ID
@@ -1701,6 +1701,11 @@ object_info	: CURSE_TYPE
 		  {
 		      add_opvars(splev, "ii", $1, SP_O_V_TRAPPED);
 		      $$ = 0x0400;
+		  }
+		| TKNOWN_STATE
+		  {
+		      add_opvars(splev, "ii", $1, SP_O_V_TKNOWN);
+		      $$ = 0x8000;
 		  }
 		| RECHARGED_ID ':' integer_or_var
 		  {

@@ -364,8 +364,11 @@ main(int argc, char **argv)
                     fatal_error = 0;
                 }
             }
-            (void) fclose(fin);
+            if (fin) {
+                (void) fclose(fin);
+            }
             funcdef_free_all(function_definitions);
+            function_definitions = NULL;
         }
     }
     exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);

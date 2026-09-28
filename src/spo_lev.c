@@ -2331,6 +2331,7 @@ spo_object(struct sp_coder *coder)
     tmpobj.eroded = 0;
     tmpobj.locked = 0;
     tmpobj.trapped = -1;
+    tmpobj.tknown = -1;
     tmpobj.recharged = 0;
     tmpobj.invis = 0;
     tmpobj.greased = 0;
@@ -2418,6 +2419,11 @@ spo_object(struct sp_coder *coder)
         case SP_O_V_TRAPPED:
             if (OV_typ(parm) == SPOVAR_INT) {
                 tmpobj.trapped = OV_i(parm);
+            }
+            break;
+        case SP_O_V_TKNOWN:
+            if (OV_typ(parm) == SPOVAR_INT) {
+                tmpobj.tknown = OV_i(parm);
             }
             break;
         case SP_O_V_RECHARGED:
