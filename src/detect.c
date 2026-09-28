@@ -987,6 +987,8 @@ detect_obj_traps(
     for (otmp = objlist; otmp; otmp = otmp->nobj) {
         if (Is_box(otmp) && otmp->otrapped &&
              get_obj_location(otmp, &x, &y, BURIED_TOO | CONTAINED_TOO)) {
+            otmp->tknown = 1;
+            otmp->dknown = 1;
             result |= u_at(x, y) ? OTRAP_HERE : OTRAP_THERE;
             if (show_them) {
                 sense_trap((struct trap *) 0, x, y, how);

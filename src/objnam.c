@@ -1277,6 +1277,15 @@ doname_base(struct obj *obj, boolean with_price)
             Strcat(prefix, do_bknown ? "[uncursed] " : "uncursed ");
     }
 
+    /* "a large trapped box" would perhaps be more correct; [no!]
+       what about ``(obj->tknown && !obj->otrapped)''? shouldn't that
+       yield "a non-trapped large box"? (not "an untrapped large box");
+       TODO: this should be ``(Is_box(obj) || obj->otyp == TIN) && ...''
+       but at present there's no way to set obj->tknown for tins */
+    if (Is_box(obj) && obj->otrapped && obj->tknown && obj->dknown) {
+        Strcat(prefix,"trapped ");
+    }
+
     if ((lknown || do_lknown) && Is_box(obj)) {
         if (obj->obroken) {
             /* 3.6.0 used "unlockable" here but that could be misunderstood

@@ -433,7 +433,7 @@ typedef struct {
     int quan;
     short buried;
     short lit;
-    short eroded, locked, trapped, recharged, invis, greased, broken;
+    short eroded, locked, trapped, tknown, recharged, invis, greased, broken;
 } object;
 
 typedef struct {

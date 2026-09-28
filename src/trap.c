@@ -24,6 +24,8 @@ static void clear_conjoined_pits(struct trap *);
 static boolean adj_nonconjoined_pit(struct trap *);
 static int try_lift(struct monst *, struct trap *, int, boolean);
 static int help_monster_out(struct monst *, struct trap *);
+static void disarm_box(struct obj *, boolean, boolean);
+static void untrap_box(struct obj *, boolean, boolean);
 #if 0
 static void join_adjacent_pits(struct trap *);
 #endif
@@ -4740,6 +4742,64 @@ help_monster_out(struct monst *mtmp, struct trap *ttmp)
     return 1;
 }
 
+static void
+disarm_box(struct obj *box, boolean force, boolean confused)
+{
+    if (box->otrapped) {
+        int ch = ACURR(A_DEX) + u.ulevel;
+
+        if (Role_if(PM_ROGUE)) {
+            ch *= 2;
+        }
+        if (!force && (confused || Fumbling
+                       || rnd(75 + level_difficulty() / 2) > ch)) {
+            (void) chest_trap(box, FINGER, TRUE);
+            /* 'box' might be gone now */
+        } else {
+            You("disarm it!");
+            box->otrapped = 0;
+            box->tknown = 1;
+            more_experienced(8, 8, 0);
+            newexplevel();
+        }
+        exercise(A_DEX, TRUE);
+    } else {
+        pline("That %s was not trapped.", xname(box));
+        box->tknown = 0;
+    }
+}
+
+/* check a particular container for a trap and optionally disarm it */
+static void
+untrap_box(
+    struct obj *box,
+    boolean force,
+    boolean confused)
+{
+    if ((box->otrapped
+         && (force || (!confused && rn2(MAXULEV + 1 - u.ulevel) < 10)))
+        || box->tknown
+        || (!force && confused && !rn2(3))) {
+
+        if (!(box->tknown && box->dknown)) {
+            You("find a trap on %s!", the(xname(box)));
+        } else {
+            pline("There's a trap on %s.", the(xname(box)));
+        }
+        box->tknown = 1;
+        box->dknown = 1;
+        if (!confused) {
+            exercise(A_WIS, TRUE);
+        }
+
+        if (ynq("Disarm it?") == 'y') {
+            disarm_box(box, force, confused);
+        }
+    } else {
+        You("find no traps on %s.", the(xname(box)));
+    }
+}
+
 int
 untrap(boolean force)
 {
@@ -4902,55 +4962,37 @@ untrap(boolean force)
         } /* end if */
 
         if (boxcnt) {
+            /* 5.0: this used to allow searching for traps on multiple
+               containers on the same move and needed to keep track of
+               whether any had been found but not attempted to untrap;
+               now at most one per move may be checked and we only
+               continue on to door handling if they are all declined */
             for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
-                if (Is_box(otmp)) {
-                    (void) safe_qbuf(qbuf, "There is ",
-                                    " here.  Check it for traps?", otmp,
-                                    doname, ansimpleoname, "a box");
-                    switch (ynq(qbuf)) {
-                    case 'q': return 0;
-                    case 'n': continue;
-                    }
-
-                    if ((otmp->otrapped && (force || (!confused && rn2(MAXULEV + 1 - u.ulevel) < 10))) ||
-                         (!force && confused && !rn2(3))) {
-                        You("find a trap on %s!", the(xname(otmp)));
-                        if (!confused) {
-                            exercise(A_WIS, TRUE);
-                        }
-
-                        switch (ynq("Disarm it?")) {
-                        case 'q': return 1;
-                        case 'n': trap_skipped = TRUE;  continue;
-                        }
-
-                        if (otmp->otrapped) {
-                            exercise(A_DEX, TRUE);
-                            ch = ACURR(A_DEX) + u.ulevel;
-                            if (Role_if(PM_ROGUE)) {
-                                ch *= 2;
-                            }
-                            if (!force && (confused || Fumbling ||
-                                        rnd(75+level_difficulty()/2) > ch)) {
-                                (void) chest_trap(otmp, FINGER, TRUE);
-                            } else {
-                                You("disarm it!");
-                                otmp->otrapped = 0;
-                            }
-                        } else {
-                            pline("That %s was not trapped.", xname(otmp));
-                        }
-                        return 1;
-                    } else {
-                        You("find no traps on %s.", the(xname(otmp)));
-                        return 1;
-                    }
+                if (!Is_box(otmp)) {
+                    continue;
                 }
+                if (otmp->tknown && otmp->dknown) {
+                    (void) safe_qbuf(qbuf, "Disarm this ", NULL,
+                                     otmp, xname, ansimpleoname, "a box");
+                } else {
+                    (void) safe_qbuf(qbuf, "There is ",
+                                     " here.  Check it for traps?", otmp,
+                                     doname, ansimpleoname, "a box");
+                }
+                switch (ynq(qbuf)) {
+                    case 'q':
+                        return 0;
+                    case 'y':
+                        if (otmp->tknown && otmp->dknown) {
+                            disarm_box(otmp, force, confused);
+                        } else {
+                            untrap_box(otmp, force, confused);
+                        }
+                        return 1; /* even for 'no' at "Disarm it?" prompt */
+                    }
+                    /* 'n' => continue to next box */
             }
-
-            You(trap_skipped ? "find no other traps here."
-                : "know of no traps here.");
-            return 0;
+            There("are no other chests or boxes here.");
         }
 
         if (stumble_on_door_mimic(x, y)) {
@@ -5225,6 +5267,7 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
         obj->ox = cc.x,  obj->oy = cc.y;
     }
 
+    otmp->tknown = 0;   /* for xname(); will be set to 1 below */
     otmp->otrapped = 0; /* trap is one-shot; clear flag first in case
                            chest kills you and ends up in bones file */
     You(disarm ? "set it off!" : "trigger a trap!");
@@ -5260,7 +5303,7 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
         case 21: {
             struct monst *shkp = 0;
             long loss = 0L;
-            boolean costly, insider;
+            boolean costly, insider, chestgone;
             coordxy ox = obj->ox, oy = obj->oy;
 
             /* the obj location need not be that of player */
@@ -5286,12 +5329,20 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
                 unpunish();
             }
 
+            /* destroy everything at the spot (the Amulet, the
+               invocation tools, and Rider corpses will remain intact);
+               usually the chest will be destroyed along with the stuff at
+               this spot, but not if it is being carried */
+            chestgone = FALSE;
             for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
                 otmp2 = otmp->nexthere;
                 if (costly) {
                     loss += stolen_value(otmp, otmp->ox,
                                          otmp->oy, (boolean)shkp->mpeaceful,
                                          TRUE);
+                }
+                if (otmp == obj) {
+                    chestgone = TRUE;
                 }
                 delobj(otmp);
             }
@@ -5308,7 +5359,10 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
                     make_angry_shk(shkp, ox, oy);
                 }
             }
-            return TRUE;
+            if (chestgone) {
+                return TRUE;
+            }
+            break; /* set tknown and return False */
         }
         case 20:
         case 19:
@@ -5389,6 +5443,7 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
         bot(); /* to get immediate botl re-display */
     }
 
+    obj->tknown = 1; /* hero knows chest is no longer trapped */
     return FALSE;
 }
 

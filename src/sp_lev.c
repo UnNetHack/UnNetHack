@@ -2470,6 +2470,9 @@ create_object(object *o, struct mkroom *croom)
     if (o->trapped == 0 || o->trapped == 1) {
         otmp->otrapped = o->trapped;
     }
+    if (o->tknown == 0 || o->tknown == 1) {
+        otmp->tknown = o->tknown;
+    }
     otmp->greased = o->greased ? 1 : 0;
 
     if (o->quan > 0 && objects[otmp->otyp].oc_merge) {
@@ -3740,7 +3743,7 @@ lspo_object(lua_State *L)
             0,       /* quan */
             0,       /* buried */
             0,       /* lit */
-            0, 0, 0, 0, /* eroded, locked, trapped, recharged */
+            0, 0, 0, 0, 0, /* eroded, locked, trapped, tknown, recharged */
             0, 0, 0, /* invis, greased, broken */
     };
 #if 0
@@ -3760,6 +3763,7 @@ lspo_object(lua_State *L)
     tmpobj.spe = -127;
     tmpobj.quan = -1;
     tmpobj.trapped = -1;
+    tmpobj.tknown = -1;
     tmpobj.locked = -1;
     tmpobj.corpsenm = NON_PM;
 
@@ -3813,6 +3817,7 @@ lspo_object(lua_State *L)
         tmpobj.eroded = get_table_int_opt(L, "eroded", 0);
         tmpobj.locked = get_table_boolean_opt(L, "locked", -1);
         tmpobj.trapped = get_table_boolean_opt(L, "trapped", -1);
+        tmpobj.tknown = get_table_boolean_opt(L, "trap_known", -1);
         tmpobj.recharged = get_table_int_opt(L, "recharged", 0);
         tmpobj.greased = get_table_boolean_opt(L, "greased", 0);
         tmpobj.broken = get_table_boolean_opt(L, "broken", 0);

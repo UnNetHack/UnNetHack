@@ -840,6 +840,7 @@ mksobj(int otyp, boolean init, boolean artif)
     }
     otmp->lknown = 0;
     otmp->cknown = 0;
+    otmp->tknown = 0;
     otmp->corpsenm = NON_PM;
     if (is_rustprone(otmp) || is_corrodeable(otmp) || is_flammable(otmp)) {
         otmp->rknown = 1;
@@ -980,6 +981,7 @@ mksobj(int otyp, boolean init, boolean artif)
                     otmp->olocked = !!(rn2(5));      /* clumsy tweak */
                 }
                 otmp->otrapped = !(rn2(10));
+                otmp->tknown = otmp->otrapped && !rn2(100); /* obvious trap */
                 /* fall through */
             case ICE_BOX:
             case SACK:

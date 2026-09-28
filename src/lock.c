@@ -115,10 +115,12 @@ picklock(void)
     if ((!xlock.door ? (int) xlock.box->otrapped : (xlock.door->doormask & D_TRAPPED) != 0) &&
          xlock.magic_key) {
         xlock.chance += 20; /* less effort needed next time */
-        /* unfortunately we don't have a 'tknown' flag to record
-           "known to be trapped" so declining to disarm and then
-           retrying lock manipulation will find it all over again */
-        if (yn("You find a trap!  Do you want to try to disarm it?") == 'y') {
+        if (!xlock.door) {
+            if (!xlock.box->tknown)
+                You("find a trap!");
+            xlock.box->tknown = 1;
+        }
+        if (y_n("Do you want to try to disarm it?") == 'y') {
             const char *what;
             boolean alreadyunlocked;
 
@@ -129,6 +131,7 @@ picklock(void)
                 alreadyunlocked = !(xlock.door->doormask & D_LOCKED);
             } else {
                 xlock.box->otrapped = 0;
+                xlock.box->tknown = 0;
                 what = (xlock.box->otyp == CHEST) ? "chest" : "box";
                 alreadyunlocked = !xlock.box->olocked;
             }
@@ -141,7 +144,6 @@ picklock(void)
         }
         return ((xlock.usedtime = 0));
     }
-
 
     You("succeed in %s.", lock_action());
     if (xlock.door) {
