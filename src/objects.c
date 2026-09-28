@@ -24,8 +24,8 @@
  *  Note:  OBJ() and BITS() macros are used to avoid exceeding argument
  *  limits imposed by some compilers.  The ctnr field of BITS currently
  *  does not map into struct objclass, and is ignored in the expansion.
- *  The 0 in the expansion corresponds to oc_pre_discovered, which is
- *  set at run-time during role-specific character initialization.
+ *  The 0 in the expansion corresponds to oc_encountered, which is
+ *  set at run-time when the hero observes such an item.
  */
 
 #ifndef OBJECTS_PASS_2_

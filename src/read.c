@@ -963,7 +963,7 @@ static void
 forget_single_object(int obj_id)
 {
     objects[obj_id].oc_name_known = 0;
-    objects[obj_id].oc_pre_discovered = 0;  /* a discovery when relearned */
+    objects[obj_id].oc_encountered = 0;  /* a discovery when relearned */
     if (objects[obj_id].oc_uname) {
         free((genericptr_t)objects[obj_id].oc_uname);
         objects[obj_id].oc_uname = 0;

@@ -2858,6 +2858,8 @@ read_wizkit(void)
                 otmp = readobjnam(buf, (struct obj *)0);
                 if (otmp) {
                     if (otmp != &zeroobj) {
+                        /* subset of starting inventory pre-ID */
+                        observe_object(otmp);
                         otmp = addinv(otmp);
                     }
                 } else {

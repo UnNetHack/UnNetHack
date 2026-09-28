@@ -1104,7 +1104,7 @@ hmon_hitmon(struct monst *mon, struct obj *obj, int thrown, int dieroll)
                         hittxt = TRUE;
                         You("hit %s with %s.", mon_nam(mon),
                             corpse_xname(obj, NULL, obj->dknown ? CXN_PFX_THE : CXN_ARTICLE));
-                        obj->dknown = 1;
+                        observe_object(obj);
                         if (!munstone(mon, TRUE)) {
                             minstapetrify(mon, TRUE);
                         }

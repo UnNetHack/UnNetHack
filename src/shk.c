@@ -3721,7 +3721,7 @@ shk_names_obj(
     char *obj_name, fmtbuf[BUFSZ];
     boolean was_unknown = !obj->dknown;
 
-    obj->dknown = TRUE;
+    observe_object(obj);
     /* Use real name for ordinary weapons/armor, and spell-less
      * scrolls/books (that is, blank and mail), but only if the
      * object is within the shk's area of interest/expertise.

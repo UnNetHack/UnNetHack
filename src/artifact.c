@@ -1555,7 +1555,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
                 pline("%s cuts %s in half!", wepdesc, mon_nam(mdef));
-                otmp->dknown = TRUE;
+                observe_object(otmp);
                 return TRUE;
             } else {
                 if (bigmonst(youmonst.data)) {
@@ -1572,7 +1572,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                  */
                 *dmgptr = 2 * (Upolyd ? u.mh : u.uhp) + FATAL_DAMAGE_MODIFIER;
                 pline("%s cuts you in half!", wepdesc);
-                otmp->dknown = TRUE;
+                observe_object(otmp);
                 return TRUE;
             }
         } else if ((otmp->oartifact == ART_VORPAL_BLADE &&
@@ -1608,7 +1608,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
                 pline(behead_msg[rn2(SIZE(behead_msg))],
                       wepdesc, mon_nam(mdef));
-                otmp->dknown = TRUE;
+                observe_object(otmp);
                 return TRUE;
             } else {
                 if (!has_head(youmonst.data)) {
@@ -1626,7 +1626,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                           + FATAL_DAMAGE_MODIFIER;
                 pline(behead_msg[rn2(SIZE(behead_msg))],
                       wepdesc, "you");
-                otmp->dknown = TRUE;
+                observe_object(otmp);
                 /* Should amulets fall off? */
                 return TRUE;
             }

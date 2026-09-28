@@ -501,7 +501,7 @@ hold_another_object(struct obj *obj, const char *drop_fmt, const char *drop_arg,
     char buf[BUFSZ];
 
     if (!Blind) {
-        obj->dknown = 1; /* maximize mergibility */
+        observe_object(obj); /* maximize mergibility */
     }
     if (obj->oartifact) {
         /* place_object may change these */
@@ -1893,7 +1893,7 @@ identify_dragon(int number)
         || objects[number + GRAY_DRAGON_SCALE_MAIL].oc_color != color) {
         mons[number+PM_GRAY_DRAGON].mcolor = color;
         mons[number+PM_BABY_GRAY_DRAGON].mcolor = color;
-        discover_object(number + GRAY_DRAGON_SCALES, TRUE, FALSE); /* to save dragon type discovery */
+        discover_object(number + GRAY_DRAGON_SCALES, TRUE, FALSE, FALSE); /* to save dragon type discovery */
         objects[number + GRAY_DRAGON_SCALES].oc_color = color;
         objects[number + GRAY_DRAGON_SCALE_MAIL].oc_color = color;
         doredraw();
@@ -1912,7 +1912,8 @@ fully_identify_obj(struct obj *otmp)
     if (otmp->oartifact) {
         discover_artifact((coordxy)otmp->oartifact);
     }
-    otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
+    observe_object(otmp);
+    otmp->known = otmp->bknown = otmp->rknown = 1;
     if (Is_container(otmp) || otmp->otyp == STATUE) {
         otmp->cknown = otmp->lknown = 1;
     }
@@ -4736,7 +4737,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
     for (n = 0, obj = level.buriedobjlist; obj; obj = obj->nobj) {
         if (obj->ox == x && obj->oy == y) {
             if (as_if_seen) {
-                obj->dknown = 1;
+                observe_object(obj);
             }
             n++;
         }

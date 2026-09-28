@@ -56,8 +56,6 @@ static struct Jitem Japanese_items[] = {
     {0, "" }
 };
 
-static const char *Japanese_item_name(int i);
-
 static char *
 strprepend(char *s, const char *pref)
 {
@@ -474,11 +472,11 @@ xname_flags(
         obj->known = 0;
     }
     if (!Blind && !distantname) {
-        obj->dknown = 1;
+        observe_object(obj);
     }
     /* needed, otherwise BoH shows only up as "bag" when blind */
     if (Is_sokoprize(obj)) {
-        obj->dknown = 1;
+        obj->dknown = 1; /* not observe_object(obj); */
     }
 
     if (Role_if(PM_PRIEST)) {
@@ -843,6 +841,8 @@ minimal_xname(struct obj *obj)
     bareobj = zeroobj;
     bareobj.otyp = otyp;
     bareobj.oclass = obj->oclass;
+    /* not observe_object, either the hero observed the object already or this
+       is overriding ID and shouldn't discover the object */
     bareobj.dknown = obj->dknown;
     /* suppress known except for amulets (needed for fakes and real A-of-Y) */
     bareobj.known = (obj->oclass == AMULET_CLASS)
@@ -1006,7 +1006,7 @@ doname_base(struct obj *obj, boolean with_price)
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
         if (price > 0) {
-            discover_object(obj->otyp, TRUE, FALSE);
+            discover_object(obj->otyp, TRUE, FALSE, FALSE);
         }
     }
 
@@ -1864,7 +1864,8 @@ killer_xname(struct obj *obj)
         save_oname = ONAME(obj);
     }
     /* killer name should be more specific than general xname; however, exact
-       info like blessed/cursed and rustproof makes things be too verbose */
+       info like blessed/cursed and rustproof makes things be too verbose; set
+       dknown (not observe_object) because dead characters don't observe */
     obj->known = obj->dknown = 1;
     obj->bknown = obj->rknown = obj->greased = 0;
     /* if character is a priest[ess], bknown will get toggled back on */
@@ -4850,7 +4851,7 @@ rnd_class(int first, int last)
     return 0;
 }
 
-static const char *
+const char *
 Japanese_item_name(int i)
 {
     struct Jitem *j = Japanese_items;

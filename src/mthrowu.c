@@ -338,6 +338,9 @@ ohitmon(
     notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
     ismimic = M_AP_TYPE(mtmp) && M_AP_TYPE(mtmp) != M_AP_MONSTER;
     vis = cansee(bhitpos.x, bhitpos.y);
+    if (vis) {
+        observe_object(otmp);
+    }
 
     tmp = 5 + find_mac(mtmp) + omon_adj(mtmp, otmp, FALSE);
     /* High level monsters will be more likely to hit */
@@ -368,9 +371,6 @@ ohitmon(
             seemimic(mtmp);
         }
         mtmp->msleeping = 0;
-        if (vis) {
-            otmp->dknown = 1;
-        }
         /* probably thrown by a monster rather than 'other', but the
            distinction only matters when hitting the hero */
         potionhit(mtmp, otmp, POTHIT_OTHER_THROW);
@@ -603,6 +603,9 @@ m_throw(
     while (range-- > 0) { /* Actually the loop is always exited by break */
         bhitpos.x += dx;
         bhitpos.y += dy;
+        if (cansee(bhitpos.x, bhitpos.y)) {
+            observe_object(singleobj);
+        }
         mtmp = m_at(bhitpos.x, bhitpos.y);
         if (mtmp && shade_miss(mon, mtmp, singleobj, TRUE, TRUE)) {
             /* if mtmp is a shade and missile passes harmlessly through it,
@@ -636,9 +639,6 @@ m_throw(
                 break;
             }
             if (singleobj->oclass == POTION_CLASS) {
-                if (!Blind) {
-                    singleobj->dknown = 1;
-                }
                 potionhit(&youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
             }

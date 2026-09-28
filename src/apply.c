@@ -2491,7 +2491,7 @@ use_stone(struct obj *tstone)
 
     /* in case it was acquired while blinded */
     if (!Blind) {
-        tstone->dknown = 1;
+        observe_object(tstone);
     }
     /* when the touchstone is fully known, don't bother listing extra
        junk as likely candidates for rubbing */

@@ -619,8 +619,8 @@ static const struct def_skill Skill_W[] = {
 static void
 knows_object(int obj)
 {
-    discover_object(obj, TRUE, FALSE);
-    objects[obj].oc_pre_discovered = 1; /* not a "discovery" */
+    /* mark as known, but not yet encountered */
+    discover_object(obj, TRUE, FALSE, FALSE);
 }
 
 /* Know ordinary (non-magical) objects of a certain class,
@@ -1367,10 +1367,10 @@ ini_inv(struct trobj *trop)
 
         /* Make the type known if necessary */
         if (OBJ_DESCR(objects[otyp]) && obj->known) {
-            discover_object(otyp, TRUE, FALSE);
+            discover_object(otyp, TRUE, TRUE, FALSE);
         }
         if (otyp == OIL_LAMP) {
-            discover_object(POT_OIL, TRUE, FALSE);
+            discover_object(POT_OIL, TRUE, TRUE, FALSE);
         }
 
         if ((obj->oclass == ARMOR_CLASS && !u.roleplay.nudist)) {

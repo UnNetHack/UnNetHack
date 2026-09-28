@@ -11,7 +11,7 @@
 
 extern boolean known;   /* from read.c */
 
-static void do_dknown_of(struct obj *);
+static void observe_recursively(struct obj *);
 static boolean check_map_spot(coordxy, coordxy, char, unsigned);
 static boolean clear_stale_map(char, unsigned);
 static void sense_trap(struct trap *, coordxy, coordxy, int);
@@ -217,14 +217,14 @@ o_material(struct obj *obj, unsigned int material)
 }
 
 static void
-do_dknown_of(struct obj *obj)
+observe_recursively(struct obj *obj)
 {
     struct obj *otmp;
 
-    obj->dknown = 1;
+    observe_object(obj);
     if (Has_contents(obj)) {
         for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
-            do_dknown_of(otmp);
+            observe_recursively(otmp);
         }
     }
 }
@@ -659,7 +659,7 @@ object_detect(
 
     if (do_dknown) {
         for (obj = invent; obj; obj = obj->nobj) {
-            do_dknown_of(obj);
+            observe_recursively(obj);
         }
     }
 
@@ -672,7 +672,7 @@ object_detect(
             }
         }
         if (do_dknown) {
-            do_dknown_of(obj);
+            observe_recursively(obj);
         }
     }
 
@@ -685,7 +685,7 @@ object_detect(
             }
         }
         if (do_dknown) {
-            do_dknown_of(obj);
+            observe_recursively(obj);
         }
     }
 
@@ -702,7 +702,7 @@ object_detect(
                 ct++;
             }
             if (do_dknown) {
-                do_dknown_of(obj);
+                observe_recursively(obj);
             }
         }
         if ((is_cursed && M_AP_TYPE(mtmp) == M_AP_OBJECT &&
@@ -988,7 +988,7 @@ detect_obj_traps(
         if (Is_box(otmp) && otmp->otrapped &&
              get_obj_location(otmp, &x, &y, BURIED_TOO | CONTAINED_TOO)) {
             otmp->tknown = 1;
-            otmp->dknown = 1;
+            observe_object(otmp);
             result |= u_at(x, y) ? OTRAP_HERE : OTRAP_THERE;
             if (show_them) {
                 sense_trap((struct trap *) 0, x, y, how);

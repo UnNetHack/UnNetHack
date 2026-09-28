@@ -140,7 +140,9 @@ boolean prohibited_by_generation_flags(struct permonst *permonst) { return FALSE
 
 int undead_to_corpse(int number) { return NON_PM; }
 
-void discover_object(int number, boolean bool1, boolean bool2) {}
+void observe_object(struct obj *obj) {}
+void discover_object(int number, boolean bool1, boolean bool2, boolean bool3) {}
+boolean hard_helmet(struct obj *obj) { return FALSE; }
 
 struct monst* shop_keeper(char c) { return NULL; }
 long contained_cost(struct obj *obj, struct monst *monst, long number, boolean bool1, boolean bool2) { return 0; }

@@ -1613,7 +1613,7 @@ pickup_object(
 #ifdef INVISIBLE_OBJECTS
         if (!obj->oinvis || See_invisible) {
 #endif
-            obj->dknown = 1;
+            observe_object(obj);
 #ifdef INVISIBLE_OBJECTS
         }
 #endif

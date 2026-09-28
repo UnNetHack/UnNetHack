@@ -129,14 +129,14 @@ learn_wand(struct obj *obj)
         /* if type already discovered, treat this item has having been seen
            even if hero is currently blinded (skips redundant makeknown) */
         if (objects[obj->otyp].oc_name_known) {
-            obj->dknown = 1; /* will usually be set already */
+            observe_object(obj); /* will usually be dknown already */
 
         /* otherwise discover it if item itself has been or can be seen */
         } else {
             /* in case it was picked up while blind and then zapped without
                examining inventory after regaining sight (bypassing xname) */
             if (!Blind) {
-                obj->dknown = 1;
+                observe_object(obj);
             }
             /* make the discovery iff we know what we're manipulating */
             if (obj->dknown) {
@@ -603,7 +603,7 @@ probe_monster(struct monst *mtmp)
 
     if (mtmp->minvent) {
         for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
-            otmp->dknown = 1; /* treat as "seen" */
+            observe_object(otmp); /* treat as "seen" */
             if (Is_container(otmp) || otmp->otyp == STATUE) {
                 otmp->lknown = 1;
                 if (!SchroedingersBox(otmp)) {
@@ -2226,7 +2226,7 @@ bhito(struct obj *obj, struct obj *otmp)
         case WAN_PROBING:
             res = !obj->dknown;
             /* target object has now been "seen (up close)" */
-            obj->dknown = 1;
+            observe_object(obj);
             if (Is_container(obj) || obj->otyp == STATUE) {
                 obj->cknown = obj->lknown = 1;
                 if (Is_box(obj) && !obj->tknown) {
@@ -2256,7 +2256,7 @@ bhito(struct obj *obj, struct obj *otmp)
 
                     /* view contents (not recursively) */
                     for (o = obj->cobj; o; o = o->nobj) {
-                        o->dknown = 1; /* "seen", even if blind */
+                        observe_object(o); /* "seen", even if blind */
                     }
                     (void) display_cinventory(obj);
                 }
@@ -2854,7 +2854,7 @@ zapyourself(struct obj *obj, boolean ordinary)
 
         struct obj *otmp;
         for (otmp = invent; otmp; otmp = otmp->nobj) {
-            otmp->dknown = 1;
+            observe_object(otmp); /* treat as "seen" */
             if (Is_container(otmp) || otmp->otyp == STATUE) {
                 otmp->lknown = 1;
                 if (!SchroedingersBox(otmp)) {

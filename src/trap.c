@@ -997,7 +997,7 @@ dotrap(struct trap *trap, unsigned int trflags)
         } else {
             place_object(otmp, u.ux, u.uy);
             if (!Blind) {
-                otmp->dknown = 1;
+                observe_object(otmp);
             }
             stackobj(otmp);
             newsym(u.ux, u.uy);
@@ -1034,7 +1034,7 @@ dotrap(struct trap *trap, unsigned int trflags)
         } else {
             place_object(otmp, u.ux, u.uy);
             if (!Blind) {
-                otmp->dknown = 1;
+                observe_object(otmp);
             }
             stackobj(otmp);
             newsym(u.ux, u.uy);
@@ -1070,7 +1070,7 @@ dotrap(struct trap *trap, unsigned int trflags)
             }
 
             if (!Blind) {
-                otmp->dknown = 1;
+                observe_object(otmp);
             }
             stackobj(otmp);
             newsym(u.ux, u.uy);  /* map the rock */
@@ -4787,7 +4787,7 @@ untrap_box(
             pline("There's a trap on %s.", the(xname(box)));
         }
         box->tknown = 1;
-        box->dknown = 1;
+        observe_object(box);
         if (!confused) {
             exercise(A_WIS, TRUE);
         }

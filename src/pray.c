@@ -926,6 +926,7 @@ gcrownu(void)
                                          * even if hero doesn't know book */
         bless(obj);
         obj->bknown = 1; /* ok to skip set_bknown() */
+        observe_object(obj);
         at_your_feet("A spellbook");
         dropy(obj);
         u.ugifts++;
@@ -1011,7 +1012,7 @@ gcrownu(void)
             ; /* already got bonus above */
         } else if (obj && in_hand) {
             Your("%s goes snicker-snack!", xname(obj));
-            obj->dknown = TRUE;
+            observe_object(obj);
         } else if (!already_exists) {
             obj = mksobj(LONG_SWORD, FALSE, FALSE);
             obj = oname(obj, artiname(ART_VORPAL_BLADE));
@@ -1039,7 +1040,7 @@ gcrownu(void)
             ; /* already got bonus above */
         } else if (in_hand) {
             Your("%s hums ominously!", swordbuf);
-            obj->dknown = TRUE;
+            observe_object(obj);
         } else if (!already_exists) {
             obj = mksobj(RUNESWORD, FALSE, FALSE);
             obj = oname(obj, artiname(ART_STORMBRINGER));
@@ -1150,7 +1151,7 @@ give_spell(void)
             obfree(otmp, (struct obj *) 0); /* discard the book */
             otmp = mkobj(WAND_CLASS, FALSE);
         }
-        otmp->dknown = 1; /* not bknown */
+        observe_object(otmp); /* don't set bknown */
         /* discovering blank paper will make it less likely to
            be given again; small chance to arbitrarily discover
            some other book type without having to read it first */
@@ -1952,7 +1953,11 @@ bestow_artifact(void)
                             uhim(), u_gname());
             /* make sure we can use this weapon */
             unrestrict_weapon_skill(weapon_type(otmp));
-            discover_artifact(otmp->oartifact);
+            if (!Hallucination && !Blind) {
+                observe_object(otmp);
+                makeknown(otmp->otyp);
+                discover_artifact(otmp->oartifact);
+            }
             return TRUE;
         }
     }

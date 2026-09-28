@@ -134,7 +134,7 @@ artitouch(struct obj *obj)
     if (!Qstat(touched_artifact)) {
         /* in case we haven't seen the item yet (ie, currently blinded),
            this quest message describes it by name so mark it as seen */
-        obj->dknown = 1;
+        observe_object(obj);
         /* only give this message once */
         Qstat(touched_artifact) = TRUE;
         qt_pager("gotit");

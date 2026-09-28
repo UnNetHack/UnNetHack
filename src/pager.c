@@ -217,12 +217,12 @@ object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
         /* terrain mode views what's already known, doesn't learn new stuff */
         !iflags.terrainmode) {
         /* so don't set dknown when in terrain mode */
-        otmp->dknown = 1; /* if a pile, clearly see the top item only */
+        observe_object(otmp); /* if a pile, clearly see the top item only */
     }
     if (fakeobj && mtmp && mimic_obj &&
         (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
         mtmp->m_ap_type |= M_AP_F_DKNOWN;
-        otmp->dknown = 1;
+        observe_object(otmp);
     }
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */

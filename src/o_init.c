@@ -394,10 +394,30 @@ restnames(NHFILE* nhfp)
 #endif
 }
 
+/* make the object dknown and mark it as encountered */
 void
-discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
+observe_object(struct obj *obj)
 {
-    if (!objects[oindx].oc_name_known) {
+    int oindx = obj->otyp;
+
+    /* skip for generic objects and for STRANGE_OBJECT */
+    if (oindx >= FIRST_OBJECT && !Hallucination) {
+        obj->dknown = 1;
+        discover_object(oindx, FALSE, TRUE, FALSE);
+    }
+}
+
+void
+discover_object(int oindx, boolean mark_as_known, boolean mark_as_encountered,
+                boolean credit_hero)
+{
+    if (oindx < FIRST_OBJECT) { /* don't discover generic objects */
+        return;
+    }
+
+    if ((!objects[oindx].oc_name_known && mark_as_known)
+        || (!objects[oindx].oc_encountered && mark_as_encountered)
+        || (Role_if(PM_SAMURAI) && Japanese_item_name(oindx))) {
         int dindx, acls = objects[oindx].oc_class;
 
         /* Loop thru disco[] 'til we find the target (which may have been
@@ -411,20 +431,29 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
         }
         disco[dindx] = oindx;
 
-        if (mark_as_known) {
+        if (mark_as_encountered) {
+            objects[oindx].oc_encountered = 1;
+        }
+
+        /* if already known, we forced an item with a Japanese name into
+           disco[] but don't want to exercise wisdom or update perminv */
+        if (!objects[oindx].oc_name_known && mark_as_known) {
             objects[oindx].oc_name_known = 1;
             if (credit_hero) {
                 exercise(A_WIS, TRUE);
             }
 
             if (Is_dragon_scales(oindx)) {
-                discover_object(Dragon_scales_to_mail(oindx), mark_as_known, FALSE);
+                discover_object(Dragon_scales_to_mail(oindx), mark_as_known,
+                                mark_as_encountered, FALSE);
             } else if (Is_dragon_mail(oindx)) {
-                discover_object(Dragon_mail_to_scales(oindx), mark_as_known, FALSE);
+                discover_object(Dragon_mail_to_scales(oindx), mark_as_known,
+                                mark_as_encountered, FALSE);
             }
-        }
-        if (moves > 1L) {
-            update_inventory();
+
+            if (moves > 1L) {
+                update_inventory();
+            }
         }
     }
 }
@@ -433,7 +462,7 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
 void
 undiscover_object(int oindx)
 {
-    if (!objects[oindx].oc_name_known) {
+    if (!objects[oindx].oc_name_known && !objects[oindx].oc_encountered) {
         int dindx, acls = objects[oindx].oc_class;
         boolean found = FALSE;
 
@@ -491,9 +520,16 @@ makeknown_msg(int otyp, boolean past_tense)
 static boolean
 interesting_to_discover(int i)
 {
-    /* Pre-discovered objects are now printed with a '*' */
+    if (Role_if(PM_SAMURAI) && Japanese_item_name(i)) {
+        return TRUE;
+    }
+
+    /* Objects that were discovered without encountering them are now
+       printed with a '*' */
     return((boolean)(objects[i].oc_uname != (char *)0 ||
-                     (objects[i].oc_name_known && OBJ_DESCR(objects[i]) != (char *)0)));
+                     ((objects[i].oc_name_known ||
+                       objects[i].oc_encountered) &&
+                      OBJ_DESCR(objects[i]) != (char *)0)));
 }
 
 /* items that should stand out once they're known */
@@ -549,7 +585,7 @@ dodiscovered(void) /* free after Robert Viduya */
                     putstr(tmpwin, iflags.menu_headings, let_to_name(oclass, FALSE));
                     prev_class = oclass;
                 }
-                Sprintf(buf, "%s %s", (objects[dis].oc_pre_discovered ? "*" : " "),
+                Sprintf(buf, "%s %s", (objects[dis].oc_encountered ? " " : "*"),
                         obj_typename(dis));
                 putstr(tmpwin, 0, buf);
             }
@@ -765,7 +801,7 @@ doclassdisco(void)
         for (i = bases[(int) oclass]; i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
             if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
                 Sprintf(buf, "%s %s",
-                        objects[dis].oc_pre_discovered ? "*" : " ",
+                        objects[dis].oc_encountered ? " " : "*",
                         obj_typename(dis));
                 putstr(tmpwin, 0, buf);
                 ++ct;

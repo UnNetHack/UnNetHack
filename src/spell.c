@@ -190,6 +190,7 @@ deadbook(struct obj *book2)
 
     You("turn the pages of the Book of the Dead...");
     makeknown(SPE_BOOK_OF_THE_DEAD);
+    observe_object(book2); /* in case blind now and hasn't been seen yet */
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
     book2->known = 1;
     if (invocation_pos(u.ux, u.uy) && !On_stairs_to_sanctum(u.ux, u.uy)) {

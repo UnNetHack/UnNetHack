@@ -1025,7 +1025,7 @@ rehumanize(void)
             done(DIED);
         } else if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) {
             Your("%s %s!", simpleonames(uamul), otense(uamul, "fail"));
-            uamul->dknown = 1;
+            observe_object(uamul);
             makeknown(AMULET_OF_UNCHANGING);
         }
     }

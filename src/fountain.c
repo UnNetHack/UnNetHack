@@ -650,7 +650,9 @@ drinksink(void)
         pline("Some %s liquid flows from the faucet.",
               Blind ? "odd" :
               hcolor(OBJ_DESCR(objects[otmp->otyp])));
-        otmp->dknown = !(Blind || Hallucination);
+        if (!(Blind || Hallucination)) {
+            observe_object(otmp);
+        }
         otmp->quan++;     /* Avoid panic upon useup() */
         otmp->fromsink = 1;     /* kludge for docall() */
         (void) dopotion(otmp);

@@ -78,7 +78,9 @@ struct obj {
     Bitfield(unpaid, 1);      /* on some bill */
     Bitfield(no_charge, 1);   /* if shk shouldn't charge for this */
     Bitfield(known, 1);       /* exact nature known */
-    Bitfield(dknown, 1);      /* color or text known */
+    Bitfield(dknown, 1);      /* color or text known; use observe_object to
+                                 set it so that the discoveries list stays
+                                 correct */
     Bitfield(bknown, 1);      /* blessing or curse known */
     Bitfield(rknown, 1);      /* rustproof or not known */
 
@@ -139,6 +141,8 @@ struct obj {
 };
 
 #define newobj() (struct obj *) alloc(sizeof(struct obj))
+
+#define FIRST_OBJECT ARROW
 
 /***
  ** oextra referencing and testing macros

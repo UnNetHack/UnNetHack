@@ -195,7 +195,7 @@ mplayhorn(struct monst *mtmp, struct obj *otmp, boolean self)
                  (mdistu(mtmp) <= range * range) ? "nearby" : "in the distance");
         otmp->known = 0; /* hero doesn't know how many charges are left */
     } else {
-        otmp->dknown = 1;
+        observe_object(otmp);
         pline("%s plays a %s directed at %s!", Monnam(mtmp), xname(otmp),
               self ? mon_nam_too(mtmp, mtmp) : (char *) "you");
         makeknown(otmp->otyp); /* (wands handle this slightly differently) */
@@ -218,7 +218,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
         return; /* no feedback */
     }
 
-    otmp->dknown = 1;  /* seeing or hearing it read reveals its label */
+    observe_object(otmp); /* seeing or hearing it read reveals its label */
     /* shouldn't be able to hear curse/bless status of unseen scrolls;
        for priest characters, bknown will always be set during naming */
     savebknown = otmp->bknown;
@@ -252,7 +252,7 @@ static void
 mquaffmsg(struct monst *mtmp, struct obj *otmp)
 {
     if (canseemon(mtmp)) {
-        otmp->dknown = 1;
+        observe_object(otmp);
         pline("%s %s %s!", Monnam(mtmp), is_weeping(mtmp->data) ?
               "is drinking" : "drinks", singular(otmp, doname));
     } else if (!Deaf) {
@@ -1738,7 +1738,7 @@ use_offensive(struct monst *mtmp)
         boolean isoil = (otmp->otyp == POT_OIL);
         struct obj *minvptr;
         if (cansee(mtmp->mx, mtmp->my)) {
-            otmp->dknown = 1;
+            observe_object(otmp);
             pline("%s hurls %s!", Monnam(mtmp), singular(otmp, doname));
         }
         if (isoil && !otmp->lamplit && (!mtmp->mconf || rn2(3))) {

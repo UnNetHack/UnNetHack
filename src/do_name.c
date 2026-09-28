@@ -1572,7 +1572,7 @@ call_object(int obj_otyp, char *buf)
         }
     } else {
         *str1 = strcpy((char *) alloc((unsigned)strlen(buf)+1), buf);
-        discover_object(obj_otyp, FALSE, TRUE); /* possibly add to disco[] */
+        discover_object(obj_otyp, FALSE, TRUE, TRUE); /* possibly add to disco[] */
     }
 }
 
