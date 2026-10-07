@@ -294,15 +294,15 @@ enum corefuncs {
 
 #define SP_MONST_CLASS(l) (int8_t)(l & 0xff)
 #define SP_MONST_PM(l)    ((l >> 8) & 0xffff)
-#define SP_MONST_PACK(m, c) ((( m ) << 8) + ((char)( c )))
+#define SP_MONST_PACK(m, c) (((unsigned long)( m ) << 8) + ((char)( c )))
 
 #define SP_OBJ_CLASS(l)   (int8_t)(l & 0xff)
 #define SP_OBJ_TYP(l)     ((l >> 8) & 0xffff)
-#define SP_OBJ_PACK(o, c)  ((( o ) << 8) + ((char)( c )))
+#define SP_OBJ_PACK(o, c)  (((unsigned long)( o ) << 8) + ((char)( c )))
 
 #define SP_MAPCHAR_TYP(l) (l & 0xff)
 #define SP_MAPCHAR_LIT(l) ((l >> 8) & 0xff)
-#define SP_MAPCHAR_PACK(typ, lit) ((( lit ) << 8) + ((char)( typ )))
+#define SP_MAPCHAR_PACK(typ, lit) (((unsigned long)( lit ) << 8) + ((char)( typ )))
 
 struct splev_var {
     struct splev_var *next;
