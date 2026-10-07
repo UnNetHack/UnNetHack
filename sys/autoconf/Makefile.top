@@ -117,6 +117,15 @@ CHMOD = @CHMOD@
 # end of configuration
 #
 
+.PHONY: all install update dofiles dofiles-dlb dofiles-nodlb check-dlb \
+	clean spotless distclean check debug_info manpages Guidebook \
+	Guidebook.txt data rumors oracles @OPTIONS_FILE@ spec_levs dungeon \
+	nhcore.lua nhlib.lua quest.lua vaults.dat tiles.bmp x11tiles beostiles \
+	UnNetHack.ad pet_mark.xbm rip.xpm mapbg.xpm nhsplash.xpm nh16.img \
+	rip.img GEM_RSC.RSC title.img release_archive dist \
+	win32_prerelease_tag win32_release $(GAME) dlb$(EXEEXT) \
+	recover$(EXEEXT)
+
 DATHELP = help hh cmdhelp history opthelp wizhelp
 
 SPEC_LEVS = asmod-?.l* baalz-?.l* bigrm-*.l* blkmar-?.l* castle-?.l* fakewiz?.l* \

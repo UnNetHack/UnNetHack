@@ -14,6 +14,8 @@ EXEEXT = @EXEEXT@
 VARDAT = data rumors oracles options vaults.dat
 LEVCOMP_FLAGS=
 
+.PHONY: all spotless
+
 all:	$(VARDAT) spec_levs quest_levs dungeon
 
 ../util/makedefs$(EXEEXT):

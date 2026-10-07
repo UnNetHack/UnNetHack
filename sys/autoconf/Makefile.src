@@ -361,6 +361,8 @@ nh340key.o: $(srcdir)/../sys/winnt/nh340key.c
 nhraykey.o: $(srcdir)/../sys/winnt/nhraykey.c
 	$(CC) $(CFLAGS) -DBUILD_DLL -c $(srcdir)/../sys/winnt/nhraykey.c
 
+.PHONY: all lint tags clean spotless depend
+
 all:	$(GAME)
 
 #	dependencies for makedefs and its outputs, which the util

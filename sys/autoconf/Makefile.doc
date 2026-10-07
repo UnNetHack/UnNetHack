@@ -31,6 +31,8 @@ PSCMD = groff -Wall -Tps
 # GUIDECMD = tbl tmac.n Guidebook.mn | groff -Wall -mtty-char -Tascii -P-u -P-b 
 GUIDECMD = tbl $(srcdir)/tmac.n $(srcdir)/Guidebook.mn | nroff -c -Tascii | $(COLCMD)
 
+.PHONY: manpages distrib clean spotless maintainer-clean
+
 # the basic guidebook
 Guidebook:	Guidebook.mn
 	$(GUIDECMD) > Guidebook
