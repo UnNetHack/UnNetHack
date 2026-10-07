@@ -50,6 +50,7 @@
 
 	/* names of files to be generated */
 #define DATE_FILE	"date.h"
+#define VERSION_FILE	"nhversion.h"
 #define MONST_FILE	"pm.h"
 #define ONAME_FILE	"onames.h"
 #ifndef OPTIONS_FILE
@@ -146,6 +147,7 @@ void do_objs(void);
 void do_data(void);
 void do_dungeon(void);
 void do_date(void);
+void do_version(void);
 void do_options(void);
 void do_monstr(void);
 void do_permonst(void);
@@ -254,65 +256,81 @@ main( int argc, char *argv[])
 void
 do_makedefs(char *options)
 {
-	boolean more_than_one;
+    boolean more_than_one;
 
-	/* Note:  these initializers don't do anything except guarantee that
-		we're linked properly.
-	*/
-	monst_init();
-	objects_init();
+    /* Note:  these initializers don't do anything except guarantee that
+       we're linked properly.
+       */
+    monst_init();
+    objects_init();
 
-	/* construct the current version number */
-	make_version();
+    /* construct the current version number */
+    make_version();
 
 
-	more_than_one = strlen(options) > 1;
-	while (*options) {
-	    if (more_than_one)
-		Fprintf(stderr, "makedefs -%c\n", *options);
+    more_than_one = strlen(options) > 1;
+    while (*options) {
+        if (more_than_one) {
+            Fprintf(stderr, "makedefs -%c\n", *options);
+        }
 
-	    switch (*options) {
-		case 'o':
-		case 'O':	do_objs();
-				break;
-		case 'd':
-		case 'D':	do_data();
-				break;
-		case 'e':
-		case 'E':	do_dungeon();
-				break;
-		case 'm':
-		case 'M':	do_monstr();
-				break;
-		case 'v':
-		case 'V':	do_date();
-				do_options();
-				break;
-		case 'p':
-		case 'P':	do_permonst();
-				break;
-		case 'q':
-		case 'Q':	do_questtxt();
-				break;
-		case 'r':
-		case 'R':	do_rumors();
-				break;
-		case 'h':
-		case 'H':	do_oracles();
-				break;
-		case 'z':
-		case 'Z':	do_vision();
-				break;
+        switch (*options) {
+            case 'o':
+            case 'O':
+                do_objs();
+                break;
+            case 'd':
+            case 'D':
+                do_data();
+                break;
+            case 'e':
+            case 'E':
+                do_dungeon();
+                break;
+            case 'm':
+            case 'M':
+                do_monstr();
+                break;
+            case 'v':
+                do_date();
+                do_options();
+                break;
+            case 'V':
+                do_version();
+                break;
+            case 'p':
+            case 'P':
+                do_permonst();
+                break;
+            case 'q':
+            case 'Q':
+                do_questtxt();
+                break;
+            case 'r':
+            case 'R':
+                do_rumors();
+                break;
+            case 'h':
+            case 'H':
+                do_oracles();
+                break;
+            case 'z':
+            case 'Z':
+                do_vision();
+                break;
 
-		default:	Fprintf(stderr,	"Unknown option '%c'.\n",
-					*options);
-				(void) fflush(stderr);
-				exit(EXIT_FAILURE);
+            default:
+                Fprintf(stderr,	"Unknown option '%c'.\n",
+                        *options);
+                (void) fflush(stderr);
+                exit(EXIT_FAILURE);
 
-	    }
-	    options++;
-	}
-	if (more_than_one) Fprintf(stderr, "Completed.\n");	/* feedback */
+        }
+        options++;
+    }
+    if (more_than_one) {
+        Fprintf(stderr, "Completed.\n");	/* feedback */
+    }
 
 }
 
@@ -523,12 +541,40 @@ version_id_string(char *outbuf, const char *build_date)
     return outbuf;
 }
 
+/* do the two named files have identical contents? */
+static boolean
+same_contents(const char *f1, const char *f2)
+{
+	FILE *fp1, *fp2;
+	int c1, c2;
+
+	fp1 = fopen(f1, RDTMODE);
+	fp2 = fopen(f2, RDTMODE);
+	if (!fp1 || !fp2) {
+		if (fp1)
+			Fclose(fp1);
+		if (fp2)
+			Fclose(fp2);
+		return FALSE;	/* unreadable counts as "different" */
+	}
+	do {
+		c1 = getc(fp1);
+		c2 = getc(fp2);
+	} while (c1 == c2 && c1 != EOF);
+	Fclose(fp1);
+	Fclose(fp2);
+	return (boolean) (c1 == c2);
+}
+
+/*
+ * date.h: volatile build stamp.  Rewritten on every source change so that
+ * the embedded build date reflects the current build.
+ */
 void
 do_date(void)
 {
 	time_t clocktim = 0;
 	char *c, cbuf[60], buf[BUFSZ], *source_date_epoch;
-	const char *ul_sfx;
 
 	filename[0]='\0';
 #ifdef FILE_PREFIX
@@ -554,6 +600,46 @@ do_date(void)
 	Fprintf(ofp,"#define BUILD_DATE \"%s\"\n", cbuf);
 	Fprintf(ofp,"#define BUILD_TIME (%ldL)\n", clocktim);
 	Fprintf(ofp,"\n");
+	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
+		version_id_string(buf, cbuf));
+	Fprintf(ofp,"\n");
+#ifdef AMIGA
+	{
+	struct tm *tm = gmtime((time_t *) &clocktim);
+	Fprintf(ofp,"#define AMIGA_VERSION_STRING ");
+	Fprintf(ofp,"\"\\0$VER: UnNetHack %d.%d.%d (%d.%d.%d)\"\n",
+		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
+		tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
+	}
+#endif
+	Fclose(ofp);
+	return;
+}
+
+/*
+ * nhversion.h: stable version/sanity data.  The level and dungeon compilers
+ * embed these values into the data files they produce, so this file is
+ * written only when the values actually change; that keeps the compilers
+ * from being relinked (and all levels reprocessed) on ordinary rebuilds.
+ */
+void
+do_version(void)
+{
+	char tempfile[60], buf[BUFSZ];
+	const char *ul_sfx;
+
+	filename[0]='\0';
+#ifdef FILE_PREFIX
+	Strcat(filename,file_prefix);
+#endif
+	Sprintf(eos(filename), INCLUDE_TEMPLATE, VERSION_FILE);
+	Sprintf(tempfile, "%s.%ld.new", filename, (long) getpid());
+	if (!(ofp = fopen(tempfile, WRTMODE))) {
+		perror(tempfile);
+		exit(EXIT_FAILURE);
+	}
+	Fprintf(ofp,"/*\tSCCS Id: @(#)nhversion.h\t3.4\t2002/02/03 */\n\n");
+	Fprintf(ofp, "%s", Dont_Edit_Code);
 #ifdef NHSTDC
 	ul_sfx = "UL";
 #else
@@ -573,19 +659,17 @@ do_date(void)
 		version.struct_sizes, ul_sfx);
 	Fprintf(ofp,"\n");
 	Fprintf(ofp,"#define VERSION_STRING \"%s\"\n", version_string(buf));
-	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
-		version_id_string(buf, cbuf));
-	Fprintf(ofp,"\n");
-#ifdef AMIGA
-	{
-	struct tm *tm = gmtime((time_t *) &clocktim);
-	Fprintf(ofp,"#define AMIGA_VERSION_STRING ");
-	Fprintf(ofp,"\"\\0$VER: UnNetHack %d.%d.%d (%d.%d.%d)\"\n",
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
-		tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
-	}
-#endif
 	Fclose(ofp);
+
+	if (same_contents(filename, tempfile)) {
+		Unlink(tempfile);
+	} else {
+		Unlink(filename);
+		if (rename(tempfile, filename) != 0) {
+			perror(filename);
+			exit(EXIT_FAILURE);
+		}
+	}
 	return;
 }
 

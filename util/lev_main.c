@@ -12,7 +12,7 @@
 #include <stdarg.h>
 
 #include "hack.h"
-#include "date.h"
+#include "nhversion.h"
 #include "sp_lev.h"
 #ifdef STRICT_REF_DEF
 #include "tcap.h"

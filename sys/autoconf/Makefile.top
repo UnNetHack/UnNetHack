@@ -374,7 +374,7 @@ debug_info:
 	$(CC) --version
 	$(CC) -v
 
-RELEASEVERSION = $(shell grep VERSION_STRING include/date.h | cut -f 2 -d \")
+RELEASEVERSION = $(shell grep VERSION_STRING include/nhversion.h | cut -f 2 -d \")
 UNNETHACK_WIN32_DIR = $(DESTDIR)$(prefix)/unnethack-win32-$(RELEASEVERSION)
 UNNETHACK_RELEASE_ARCHIVE_PREFIX = unnethack-$(RELEASEVERSION)
 UNNETHACK_RELEASE_ARCHIVE = $(DESTDIR)$(prefix)/$(UNNETHACK_RELEASE_ARCHIVE_PREFIX).tar.gz

@@ -435,8 +435,16 @@ $(srcdir)/../win/gnome/gn_rip.h: $(srcdir)/../win/X11/rip.xpm
 #
 #	hack.h depends on makedefs' output, so we know makedefs will be
 #	up to date before being executed
-../include/date.h:	$(VERSOURCES) $(HACK_H)
+../include/date.h:	$(VERSOURCES) $(HACK_H) ../include/patchlevel.h
 	../util/makedefs$(EXEEXT) -v
+
+#	nhversion.h holds the stable version/sanity values that the level and
+#	dungeon compilers embed into the data files.  makedefs -V replaces it
+#	only when those values change, so its timestamp does not advance on
+#	ordinary rebuilds; that keeps the compilers (and all the data files they
+#	produce) from being reprocessed whenever any source file is recompiled.
+../include/nhversion.h:	$(VERSOURCES) $(HACK_H) ../include/patchlevel.h
+	../util/makedefs$(EXEEXT) -V
 
 
 lint:
@@ -459,7 +467,7 @@ clean:
 
 spotless: clean
 	-rm -f a.out core $(GAME) Sys* @EXTRA_UNSHARE@
-	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
+	-rm -f ../include/date.h ../include/nhversion.h ../include/onames.h ../include/pm.h
 	-rm -f monstr.c ../include/vis_tab.h vis_tab.c tile.c *.moc
 	-rm -f $(srcdir)/../win/gnome/gn_rip.h
 	-rm -f ../include/filename.h
@@ -773,7 +781,7 @@ dogmove.o: $(srcdir)/dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: $(srcdir)/dokick.c $(HACK_H)
 dothrow.o: $(srcdir)/dothrow.c $(HACK_H)
 drawing.o: $(srcdir)/drawing.c $(HACK_H) ../include/tcap.h
-dump.o: $(srcdir)/dump.c $(HACK_H) ../include/date.h
+dump.o: $(srcdir)/dump.c $(HACK_H) ../include/nhversion.h
 dungeon.o: $(srcdir)/dungeon.c $(HACK_H) ../include/dlb.h
 eat.o: $(srcdir)/eat.c $(HACK_H)
 end.o: $(srcdir)/end.c $(HACK_H) ../include/dlb.h
@@ -869,7 +877,7 @@ uhitm.o: $(srcdir)/uhitm.c $(HACK_H)
 unicode.o: $(srcdir)/unicode.c $(HACK_H)
 vault.o: $(srcdir)/vault.c $(HACK_H)
 version.o: $(srcdir)/version.c $(HACK_H) ../include/date.h \
-		../include/patchlevel.h
+		../include/nhversion.h ../include/patchlevel.h
 vision.o: $(srcdir)/vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: $(srcdir)/weapon.c $(HACK_H)
 were.o: $(srcdir)/were.c $(HACK_H)

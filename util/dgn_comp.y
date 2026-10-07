@@ -23,7 +23,7 @@
 #endif
 
 #include "config.h"
-#include "date.h"
+#include "nhversion.h"
 #include "dgn_file.h"
 
 void yyerror(const char *);

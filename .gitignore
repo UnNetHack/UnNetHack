@@ -45,6 +45,7 @@ compile
 /include/autoconf.h
 /include/autoconf_paths.h
 /include/date.h
+/include/nhversion.h
 /include/dgn_comp.h
 /include/lev_comp.h
 /include/onames.h

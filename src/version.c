@@ -3,6 +3,7 @@
 
 #include "hack.h"
 #include "date.h"
+#include "nhversion.h"
 /*
  * All the references to the contents of patchlevel.h have been moved
  * into makedefs....
