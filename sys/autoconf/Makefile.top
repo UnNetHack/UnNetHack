@@ -1,6 +1,5 @@
 #	UnNetHack Makefile.
 #       @configure_input@
-#	SCCS Id: @(#)Makefile.top	3.4	1995/01/05
 
 VPATH=@srcdir@
 srcdir=@srcdir@
@@ -362,6 +361,7 @@ spotless:
 	( cd dat ; $(MAKE) spotless )
 	( cd doc ; $(MAKE) spotless )
 	-rm -f Makefile include/autoconf.h include/autoconf_paths.h include/win32api.h
+	-rm -f config.cache config.log config.status
 
 distclean: spotless
 check:
