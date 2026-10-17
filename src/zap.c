@@ -864,6 +864,10 @@ revive(struct obj *corpse, boolean by_hero)
         impossible("Attempting to revive %s?", xname(corpse));
         return (struct monst *) 0;
     }
+    /* if this corpse is being eaten, stop doing that; this should be done
+       after makemon() succeeds and skipped if it fails, but waiting until
+       we know the result for that would be too late */
+    cant_finish_meal(corpse);
 
     x = y = 0;
     if (corpse->where != OBJ_CONTAINED) {

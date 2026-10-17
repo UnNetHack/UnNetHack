@@ -768,6 +768,7 @@ extern void fix_petrification(void);
 extern int intrinsic_possible(int, struct permonst *);
 extern void consume_oeaten(struct obj *, int);
 extern boolean maybe_finished_meal(boolean);
+extern void cant_finish_meal(struct obj *);
 extern void set_tin_variety(struct obj *, int);
 extern int tin_variety_txt(char *, int *);
 extern void tin_details(struct obj *, int, char *);
