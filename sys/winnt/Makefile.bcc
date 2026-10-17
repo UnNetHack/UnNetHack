@@ -1323,7 +1323,8 @@ $(O)muse.o: muse.c $(HACK_H) $(INCL)\edog.h
 $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)\lev.h
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
-		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
+		$(INCL)\objects.h $(INCL)\prop.h $(INCL)\skills.h \
+		$(INCL)\color.h
 $(O)objnam.o: objnam.c $(HACK_H)
 $(O)options.o: options.c $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
 		$(HACK_H) $(INCL)\tcap.h

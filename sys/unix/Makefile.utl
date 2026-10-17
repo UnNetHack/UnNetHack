@@ -374,7 +374,7 @@ $(OBJDIR)/decl.o: ../src/decl.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../src/decl.c -o $@
 $(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../src/monst.c -o $@
-$(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H)
+$(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H) ../include/objects.h
 	$(CC) $(CFLAGS) -c ../src/objects.c -o $@
 $(OBJDIR)/dlb.o: ../src/dlb.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c ../src/dlb.c -o $@

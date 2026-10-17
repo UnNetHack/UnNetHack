@@ -414,7 +414,8 @@ $(OBJDIR)/decl_util.o: $(srcdir)/../src/decl.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../src/decl.c -o $@
 $(OBJDIR)/monst_util.o: $(srcdir)/../src/monst.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c $(srcdir)/../src/monst.c -o $@
-$(OBJDIR)/objects_util.o: $(srcdir)/../src/objects.c $(CONFIG_H)
+$(OBJDIR)/objects_util.o: $(srcdir)/../src/objects.c $(CONFIG_H) \
+		../include/objects.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../src/objects.c -o $@
 $(OBJDIR)/dlb_util.o: $(srcdir)/../src/dlb.c $(HACK_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c $(srcdir)/../src/dlb.c -o $@
