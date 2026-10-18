@@ -218,7 +218,7 @@ mksobj_migr_to_species(int otyp, unsigned int mflags2, boolean init, boolean art
 struct obj *
 mkobj(char oclass, boolean artif)
 {
-    int tprob, i, prob = rnd(1000);
+    int tprob, i, prob;
 
     if (oclass == RANDOM_CLASS) {
         const struct icp *iprobs =
@@ -237,13 +237,15 @@ mkobj(char oclass, boolean artif)
         oclass = iprobs->iclass;
     }
 
+    prob = rnd(oclass_prob_totals[(int)oclass]);
     i = bases[(int)oclass];
     while ((prob -= objects[i].oc_prob) > 0) {
         i++;
     }
 
     if (objects[i].oc_class != oclass || !OBJ_NAME(objects[i])) {
-        panic("probtype error, oclass=%d i=%d", (int) oclass, i);
+        impossible("probtype error, oclass=%d i=%d", (int) oclass, i);
+        i = bases[(int)oclass];
     }
 
     return mksobj(i, TRUE, artif);

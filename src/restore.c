@@ -941,6 +941,7 @@ dorecover(NHFILE *nhfp)
 #endif
     restlevelstate();
     max_rank_sz(); /* to recompute mrank_sz (botl.c) */
+    init_oclass_probs(); /* recompute oclass_prob_totals[] */
 
     /* this comes after inventory has been loaded */
     for (otmp = invent; otmp; otmp = otmp->nobj) {

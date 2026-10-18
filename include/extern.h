@@ -1861,6 +1861,7 @@ extern void synch_cursor(void);
 /* ### o_init.c ### */
 
 extern void init_objects(void);
+extern void init_oclass_probs(void);
 extern int find_skates(void);
 /* objdescr_is() contains a test for NULL arg1, so can't be NONNULLARG12 */
 extern boolean objdescr_is(struct obj *, const char *) NONNULLARG2;

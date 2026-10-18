@@ -17,6 +17,7 @@ char *catmore = 0;      /* default pager */
 #endif
 
 int bases[MAXOCLASSES + 2] = DUMMY;
+short oclass_prob_totals[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
 char multi_txt[BUFSZ] = DUMMY;

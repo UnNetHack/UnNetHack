@@ -25,6 +25,7 @@ E char SAVEP[];
 #endif
 
 extern int bases[MAXOCLASSES + 2];
+extern short oclass_prob_totals[MAXOCLASSES];
 
 E NEARDATA int multi;
 E char multi_txt[BUFSZ];

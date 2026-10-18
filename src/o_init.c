@@ -45,7 +45,7 @@ shuffle_tiles(void)
 static void
 setgemprobs(d_level *dlev)
 {
-    int j, first, lev;
+    int j, first, lev, sum = 0;
 
     if (dlev) {
         lev = (ledger_no(dlev) > maxledgerno()) ? maxledgerno() : ledger_no(dlev);
@@ -67,6 +67,12 @@ setgemprobs(d_level *dlev)
     for (j = first; j <= LAST_GEM; j++) {
         objects[j].oc_prob = (171+j-first)/(LAST_GEM+1-first);
     }
+
+    /* recompute GEM_CLASS total oc_prob - including rocks/stones */
+    for (j = bases[GEM_CLASS]; j < bases[GEM_CLASS + 1]; j++) {
+        sum += objects[j].oc_prob;
+    }
+    oclass_prob_totals[GEM_CLASS] = sum;
 }
 
 /* shuffle descriptions on objects o_low to o_high */
@@ -115,7 +121,7 @@ shuffle(int o_low, int o_high, boolean domaterial)
 void
 init_objects(void)
 {
-    int i, first, last, prevoclass, sum;
+    int i, first, last, prevoclass;
     boolean class_seen[MAXOCLASSES];
     char oclass;
 #ifdef TEXTCOLOR
@@ -139,8 +145,7 @@ init_objects(void)
     for (i = 0; i < NUM_OBJECTS; i++) {
         objects[i].oc_name_idx = objects[i].oc_descr_idx = i;
     }
-    /* init base; if probs given check that they add up to 1000,
-       otherwise compute probs */
+    /* init base; class probabilities don't have to add up to 1000 */
     first = 0;
     prevoclass = -1;
     while (first < NUM_OBJECTS) {
@@ -177,20 +182,6 @@ init_objects(void)
                 break;
             }
         }
-check:
-        sum = 0;
-        for (i = first; i < last; i++) {
-            sum += objects[i].oc_prob;
-        }
-        if (sum == 0) {
-            for (i = first; i < last; i++) {
-                objects[i].oc_prob = (1000+i-first)/(last-first);
-            }
-            goto check;
-        }
-        if (sum != 1000) {
-            error("init-prob error for class %d (%d%%)", oclass, sum);
-        }
         first = last;
         prevoclass = (int) oclass;
     }
@@ -204,11 +195,41 @@ check:
             bases[i] = bases[i + 1];
         }
     }
+    /* compute oclass_prob_totals */
+    init_oclass_probs();
+
     /* shuffle descriptions */
     shuffle_all();
 #ifdef USE_TILES
     shuffle_tiles();
 #endif
+}
+
+/* Compute the total probability of each object class.
+ * Assumes bases[] and objects[] have already been initialized. */
+void
+init_oclass_probs(void)
+{
+    int i, oclass;
+    short sum;
+
+    for (oclass = 0; oclass < MAXOCLASSES; ++oclass) {
+        sum = 0;
+        for (i = bases[oclass]; i < bases[oclass + 1]; ++i) {
+            sum += objects[i].oc_prob;
+        }
+        if (sum <= 0 && oclass != ILLOBJ_CLASS
+            && bases[oclass] != bases[oclass + 1]) {
+            impossible("zero or negative probability total for oclass %d",
+                       oclass);
+            /* gracefully fail by setting all members of this class to 1 */
+            for (i = bases[oclass]; i < bases[oclass + 1]; ++i) {
+                objects[i].oc_prob = 1;
+                sum++;
+            }
+        }
+        oclass_prob_totals[oclass] = sum;
+    }
 }
 
 static void
