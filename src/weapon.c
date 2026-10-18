@@ -116,14 +116,18 @@ weapon_descr(struct obj *obj)
     switch (skill) {
     case P_NONE:
         /* not a weapon or weptool: use item class name;
-           override class name "food" for corpses, tins, and eggs,
-           "large rock" for statues and boulders, and "tool" for towels */
-        descr = (obj->otyp == CORPSE ||
-                 obj->otyp == TIN ||
-                 obj->otyp == EGG ||
-                 obj->otyp == STATUE ||
-                 obj->otyp == BOULDER ||
-                 obj->otyp == TOWEL) ? OBJ_NAME(objects[obj->otyp]) : objexplain[(int)obj->oclass];
+           override class name for things where it sounds strange and
+           for things that aren't unexpected to find being wielded:
+           corpses, tins, eggs, and globs avoid "food",
+           statues and boulders avoid "large rock",
+           and towels and tin openers avoid "tool" */
+        descr = (obj->otyp == CORPSE || obj->otyp == TIN
+                 || obj->otyp == EGG || obj->otyp == STATUE
+                 || obj->otyp == BOULDER || obj->otyp == TOWEL
+                 || obj->otyp == TIN_OPENER)
+                    ? OBJ_NAME(objects[obj->otyp])
+                    : obj->globby ? "glob"
+                      : objexplain[(int) obj->oclass];
         break;
 
     case P_SLING:
