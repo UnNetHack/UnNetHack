@@ -5346,7 +5346,7 @@ chest_trap(struct obj *obj, int bodypart, boolean disarm)
                usually the chest will be destroyed along with the stuff at
                this spot, but not if it is being carried */
             chestgone = FALSE;
-            for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
+            for (otmp = level.objects[ox][oy]; otmp; otmp = otmp2) {
                 otmp2 = otmp->nexthere;
                 if (costly) {
                     loss += stolen_value(otmp, otmp->ox,
