@@ -115,7 +115,8 @@ shuffle(int o_low, int o_high, boolean domaterial)
 void
 init_objects(void)
 {
-    int i, first, last, sum;
+    int i, first, last, prevoclass, sum;
+    boolean class_seen[MAXOCLASSES];
     char oclass;
 #ifdef TEXTCOLOR
 # define COPY_OBJ_DESCR(o_dst, o_src) \
@@ -128,8 +129,11 @@ init_objects(void)
     /* bug fix to prevent "initialization error" abort on Intel Xenix.
      * reported by mikew@semike
      */
-    for (i = 0; i < MAXOCLASSES; i++) {
+    for (i = 0; i < MAXOCLASSES + 2; i++) {
         bases[i] = 0;
+    }
+    for (i = 0; i < MAXOCLASSES; i++) {
+        class_seen[i] = FALSE;
     }
     /* initialize object descriptions */
     for (i = 0; i < NUM_OBJECTS; i++) {
@@ -138,11 +142,18 @@ init_objects(void)
     /* init base; if probs given check that they add up to 1000,
        otherwise compute probs */
     first = 0;
+    prevoclass = -1;
     while (first < NUM_OBJECTS) {
         oclass = objects[first].oc_class;
+        /* objects[] must be in ascending class order so that
+           bases[oclass + 1] is the end of the current class */
+        if ((int) oclass < prevoclass) {
+            panic("objects[%d] class #%d not in order!", first, (int) oclass);
+        }
         last = first+1;
         while (last < NUM_OBJECTS && objects[last].oc_class == oclass) last++;
         bases[(int)oclass] = first;
+        class_seen[(int)oclass] = TRUE;
 
         if (oclass == GEM_CLASS) {
             setgemprobs((d_level *)0);
@@ -181,6 +192,17 @@ check:
             error("init-prob error for class %d (%d%%)", oclass, sum);
         }
         first = last;
+        prevoclass = (int) oclass;
+    }
+    /* extra entries allow deriving the range of a class via
+       bases[oclass] through bases[oclass + 1] - 1 */
+    bases[MAXOCLASSES] = bases[MAXOCLASSES + 1] = NUM_OBJECTS;
+    /* fill gaps for classes without objects so that every class has
+       a valid, possibly empty, range */
+    for (i = MAXOCLASSES - 1; i >= 0; --i) {
+        if (!class_seen[i]) {
+            bases[i] = bases[i + 1];
+        }
     }
     /* shuffle descriptions */
     shuffle_all();

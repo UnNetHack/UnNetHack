@@ -24,7 +24,7 @@ E char SAVEF[];
 E char SAVEP[];
 #endif
 
-E NEARDATA int bases[MAXOCLASSES];
+extern int bases[MAXOCLASSES + 2];
 
 E NEARDATA int multi;
 E char multi_txt[BUFSZ];

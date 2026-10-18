@@ -16,7 +16,7 @@ int locknum = 0;        /* max num of simultaneous users */
 char *catmore = 0;      /* default pager */
 #endif
 
-NEARDATA int bases[MAXOCLASSES] = DUMMY;
+int bases[MAXOCLASSES + 2] = DUMMY;
 
 NEARDATA int multi = 0;
 char multi_txt[BUFSZ] = DUMMY;
