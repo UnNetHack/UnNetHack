@@ -28,6 +28,22 @@ struct Jitem {
 #define BSTRNCMP(base, ptr, string, num) ((ptr)<base || strncmp((ptr), string, num))
 #define BSTRNCMPI(base, ptr, string, num) ((ptr)<base||strncmpi((ptr), string, num))
 #define Strcasecpy(dst, src) (void) strcasecpy(dst, src)
+#define Strncat(dst, src, cnt) (void) strncat(dst, src, cnt)
+
+/* bounded concatenation for object name buffers; the end of the
+   containing obuf[] is derived from the pointer itself */
+#define Concat(base, delta, text) \
+    do { \
+        char *base_end = obuf_end(base); \
+        Strncat(eos(base) - delta, text, \
+                (size_t) (base_end - eos(base)) + delta); \
+    } while (0)
+#define ConcatF(base, delta, fmt, ...) \
+    do { \
+        char *base_end = obuf_end(base); \
+        Snprintf(eos(base) - delta, \
+                 (size_t) (base_end - eos(base)) + delta, fmt, __VA_ARGS__); \
+    } while (0)
 
 /* true for gems/rocks that should have " stone" appended to their names */
 #define GemStone(typ)   (typ == FLINT ||                          \
@@ -76,6 +92,35 @@ nextobuf(void)
     obufidx = (obufidx + 1) % NUMOBUF;
     obufs[obufidx][0] = '\0';
     return obufs[obufidx];
+}
+
+/* last byte of the obuf[] containing 'p' */
+static char *
+obuf_end(char *p)
+{
+    int i;
+
+    for (i = 0; i < NUMOBUF; i++) {
+        if (p >= obufs[i] && p < obufs[i] + BUFSZ) {
+            return obufs[i] + BUFSZ - 1;
+        }
+    }
+    /* not expected; return a pointer with no room rather than overrun */
+    return eos(p);
+}
+
+/* append "<pfx> called <sfx>" while keeping room for a following
+   description (and its parentheses) */
+static void
+xcalled(char *buf, int siz, const char *pfx, const char *sfx)
+{
+    int bufsiz = siz - 1 - (int) strlen(buf),
+        pfxlen = (int) (strlen(pfx) + sizeof " called " - sizeof "");
+
+    if (pfxlen > bufsiz) {
+        panic("xcalled: not enough room for prefix (%d > %d)", pfxlen, bufsiz);
+    }
+    Sprintf(eos(buf), "%s called %.*s", pfx, bufsiz - pfxlen, sfx);
 }
 
 /* put the most recently allocated buffer back if possible */
@@ -137,7 +182,7 @@ obj_typename(int otyp)
             Strcpy(buf, "amulet");
         }
         if (un) {
-            Sprintf(eos(buf), " called %s", un);
+            xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
         }
         if (dn) {
             Sprintf(eos(buf), " (%s)", dn);
@@ -150,7 +195,7 @@ obj_typename(int otyp)
                 Strcat(buf, " stone");
             }
             if (un) {
-                Sprintf(eos(buf), " called %s", un);
+                xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
             }
             if (dn) {
                 Sprintf(eos(buf), " (%s)", dn);
@@ -162,7 +207,7 @@ obj_typename(int otyp)
                        " stone" : " gem");
             }
             if (un) {
-                Sprintf(eos(buf), " called %s", un);
+                xcalled(buf, BUFSZ, "", un);
             }
         }
         return buf;
@@ -176,7 +221,7 @@ obj_typename(int otyp)
         }
     }
     if (un) {
-        Sprintf(eos(buf), " called %s", un);
+        xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
     }
     if (dn) {
         Sprintf(eos(buf), " (%s)", dn);
@@ -527,7 +572,7 @@ xname_flags(
         } else if (nn) {
             Strcpy(buf, actualn);
         } else if (un) {
-            Sprintf(buf, "amulet called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "amulet", un);
         } else if (Is_sokoprize(obj)) {
             Strcpy(buf, "sokoban amulet");
         } else {
@@ -550,34 +595,33 @@ xname_flags(
         }
 
         if (!dknown) {
-            Strcat(buf, dn);
+            Concat(buf, 0, dn);
         } else if (nn) {
-            Strcat(buf, actualn);
+            Concat(buf, 0, actualn);
         } else if (un) {
-            Strcat(buf, dn);
-            Strcat(buf, " called ");
-            Strcat(buf, un);
+            Concat(buf, 0, dn);
+            xcalled(buf, BUFSZ - PREFIX, "", un);
         } else if (Is_sokoprize(obj)) {
             Strcpy(buf, "sokoban bag");
         } else {
-            Strcat(buf, dn);
+            Concat(buf, 0, dn);
         }
         if (typ == FIGURINE && omndx != NON_PM) {
             char anbuf[10]; /* [4] would be enough: 'a','n',' ','\0' */
 
-            Sprintf(eos(buf), " of %s%s",
+            ConcatF(buf, 0, " of %s%s",
                     just_an(anbuf, mons[omndx].mname),
                     mons[omndx].mname);
         } else if (is_wet_towel(obj)) {
             if (wizard) {
-                Sprintf(eos(buf), " (%d)", obj->spe);
+                ConcatF(buf, 0, " (%d)", obj->spe);
             }
         }
         break;
 
     case ARMOR_CLASS:
         if (Is_dragon_scales(obj->otyp)) {
-            Strcat(buf, "set of ");
+            Concat(buf, 0, "set of ");
         }
         if (is_boots(obj) || is_gloves(obj)) {
             Strcpy(buf, "pair of ");
@@ -592,12 +636,12 @@ xname_flags(
         }
 
         if (nn) {
-            Strcat(buf, actualn);
+            Concat(buf, 0, actualn);
         } else if (un) {
             if (is_boots(obj)) {
-                Strcat(buf, "boots");
+                Concat(buf, 0, "boots");
             } else if (is_gloves(obj)) {
-                Strcat(buf, "gloves");
+                Concat(buf, 0, "gloves");
             } else if (is_cloak(obj)) {
                 Strcpy(buf, "cloak");
             } else if (is_helmet(obj)) {
@@ -607,12 +651,11 @@ xname_flags(
             } else {
                 Strcpy(buf, "armor");
             }
-            Strcat(buf, " called ");
-            Strcat(buf, un);
+            xcalled(buf, BUFSZ - PREFIX, "", un);
         } else if (Is_sokoprize(obj)) {
             Strcpy(buf, "sokoban cloak");
         } else {
-            Strcat(buf, dn);
+            Concat(buf, 0, dn);
         }
         break;
 
@@ -675,31 +718,30 @@ xname_flags(
             Strcpy(buf, "diluted ");
         }
         if (nn || un || !dknown) {
-            Strcat(buf, "potion");
+            Concat(buf, 0, "potion");
             if (!dknown) {
                 break;
             }
             if (nn) {
-                Strcat(buf, " of ");
+                Concat(buf, 0, " of ");
                 if (typ == POT_WATER &&
                      bknown && (obj->blessed || obj->cursed)) {
-                    Strcat(buf, obj->blessed ? "holy " : "unholy ");
+                    Concat(buf, 0, obj->blessed ? "holy " : "unholy ");
                 }
                 /* work around for potion alchemy bug that lets one
                  * alchemize potions in unused range */
                 if (actualn) {
-                    Strcat(buf, actualn);
+                    Concat(buf, 0, actualn);
                 } else {
                     warning("inexistant potion %d", obj->otyp);
-                    Strcat(buf, "inexistant");
+                    Concat(buf, 0, "inexistant");
                 }
             } else {
-                Strcat(buf, " called ");
-                Strcat(buf, un);
+                xcalled(buf, BUFSZ - PREFIX, "", un);
             }
         } else {
-            Strcat(buf, dn);
-            Strcat(buf, " potion");
+            Concat(buf, 0, dn);
+            Concat(buf, 0, " potion");
         }
         break;
 
@@ -709,17 +751,16 @@ xname_flags(
             break;
         }
         if (nn) {
-            Strcat(buf, " of ");
-            Strcat(buf, actualn);
+            Concat(buf, 0, " of ");
+            Concat(buf, 0, actualn);
         } else if (un) {
-            Strcat(buf, " called ");
-            Strcat(buf, un);
+            xcalled(buf, BUFSZ - PREFIX, "", un);
         } else if (ocl->oc_magic) {
-            Strcat(buf, " labeled ");
-            Strcat(buf, dn);
+            Concat(buf, 0, " labeled ");
+            Concat(buf, 0, dn);
         } else {
             Strcpy(buf, dn);
-            Strcat(buf, " scroll");
+            Concat(buf, 0, " scroll");
         }
         break;
 
@@ -729,7 +770,7 @@ xname_flags(
         } else if (nn) {
             Sprintf(buf, "wand of %s", actualn);
         } else if (un) {
-            Sprintf(buf, "wand called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "wand", un);
         } else {
             Sprintf(buf, "%s wand", dn);
         }
@@ -742,9 +783,9 @@ xname_flags(
             if (typ != SPE_BOOK_OF_THE_DEAD) {
                 Strcpy(buf, "spellbook of ");
             }
-            Strcat(buf, actualn);
+            Concat(buf, 0, actualn);
         } else if (un) {
-            Sprintf(buf, "spellbook called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
         } else {
             Sprintf(buf, "%s spellbook", dn);
         }
@@ -756,7 +797,7 @@ xname_flags(
         } else if (nn) {
             Sprintf(buf, "ring of %s", actualn);
         } else if (un) {
-            Sprintf(buf, "ring called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "ring", un);
         } else {
             Sprintf(buf, "%s ring", dn);
         }
@@ -770,14 +811,14 @@ xname_flags(
             Strcpy(buf, rock);
         } else if (!nn) {
             if (un) {
-                Sprintf(buf, "%s called %s", rock, un);
+                xcalled(buf, BUFSZ - PREFIX, rock, un);
             } else {
                 Sprintf(buf, "%s %s", dn, rock);
             }
         } else {
             Strcpy(buf, actualn);
             if (GemStone(typ)) {
-                Strcat(buf, " stone");
+                Concat(buf, 0, " stone");
             }
         }
         break;
@@ -786,7 +827,11 @@ xname_flags(
         Sprintf(buf, "glorkum %d %d %d", obj->oclass, typ, obj->spe);
     }
     if (pluralize) {
-        Strcpy(buf, makeplural(buf));
+        char *obufp2 = makeplural(buf);
+
+        buf[0] = '\0';
+        Concat(buf, 0, obufp2);
+        releaseobuf(obufp2);
     }
 
     if (program_state.gameover) {
@@ -796,15 +841,15 @@ xname_flags(
            players who aren't aware that something readable is present */
         switch (obj->otyp) {
         case T_SHIRT:
-            Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+            ConcatF(buf, 0, " with text \"%s\"", tshirt_text(obj, tmpbuf));
             break;
 
         case ALCHEMY_SMOCK:
-            Sprintf(eos(buf), " with text \"%s\"", apron_text(obj, tmpbuf));
+            ConcatF(buf, 0, " with text \"%s\"", apron_text(obj, tmpbuf));
             break;
 
         case HAWAIIAN_SHIRT:
-            Sprintf(eos(buf), " with %s motif", an(hawaiian_motif(obj, tmpbuf)));
+            ConcatF(buf, 0, " with %s motif", an(hawaiian_motif(obj, tmpbuf)));
             break;
 
         default:
@@ -813,9 +858,9 @@ xname_flags(
     }
 
     if (has_oname(obj) && dknown) {
-        Strcat(buf, " named ");
+        Concat(buf, 0, " named ");
 nameit:
-        Strcat(buf, ONAME(obj));
+        Concat(buf, 0, ONAME(obj));
     }
 
     if (!strncmpi(buf, "the ", 4)) {
@@ -1044,7 +1089,7 @@ doname_base(struct obj *obj, boolean with_price)
         ; /* early exit */
     } else if (exist_artifact(obj->otyp, (tmp = (char *)safe_oname(obj)))) {
         if (do_dknown || do_known) {
-            Sprintf(eos(bp), " [%s]", tmp);
+            ConcatF(bp, 0, " [%s]", tmp);
         }
         ; /* if already known as an artifact, don't bother showing the base type */
     } else if (obj->otyp == EGG && obj->corpsenm >= LOW_PM &&
@@ -1185,19 +1230,19 @@ doname_base(struct obj *obj, boolean with_price)
             if (obj->oclass == POTION_CLASS || obj->oclass == SCROLL_CLASS
                 || (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BOOK_OF_THE_DEAD)
                 || obj->oclass == WAND_CLASS || obj->oclass == RING_CLASS)
-                Sprintf(eos(bp), " [of %s]", cp);
+                ConcatF(bp, 0, " [of %s]", cp);
             else
-                Sprintf(eos(bp), " [%s]", cp);
+                ConcatF(bp, 0, " [%s]", cp);
         }
     } else if (obj->otyp == TIN && do_known) {
         if (obj->spe > 0) {
-            Strcat(bp, " [of spinach]");
+            Concat(bp, 0, " [of spinach]");
         } else if (obj->corpsenm == NON_PM) {
-            Strcat(bp, " [empty]");
+            Concat(bp, 0, " [empty]");
         } else if (vegetarian(&mons[obj->corpsenm])) {
-            Sprintf(eos(bp), " [of %s]", mons[obj->corpsenm].mname);
+            ConcatF(bp, 0, " [of %s]", mons[obj->corpsenm].mname);
         } else {
-            Sprintf(eos(bp), " [of %s meat]", mons[obj->corpsenm].mname);
+            ConcatF(bp, 0, " [of %s meat]", mons[obj->corpsenm].mname);
         }
     } else if (obj->otyp == POT_WATER &&
              (obj->blessed || obj->cursed) && do_bknown) {
@@ -1328,22 +1373,22 @@ doname_base(struct obj *obj, boolean with_price)
         long itemcount = count_contents(obj, FALSE, FALSE, TRUE, FALSE);
 
         if (do_cknown) {
-            Sprintf(eos(bp), " [containing %ld item%s]", itemcount, plur(itemcount));
+            ConcatF(bp, 0, " [containing %ld item%s]", itemcount, plur(itemcount));
         } else {
-            Sprintf(eos(bp), " (containing %ld item%s)", itemcount, plur(itemcount));
+            ConcatF(bp, 0, " (containing %ld item%s)", itemcount, plur(itemcount));
         }
     }
 
     switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL) {
-            Strcat(bp, " (being worn)");
+            Concat(bp, 0, " (being worn)");
         }
         break;
 
     case ARMOR_CLASS:
         if (obj->owornmask & W_ARMOR) {
-            Strcat(bp, (obj == uskin) ? " (embedded in your skin)" :
+            Concat(bp, 0, (obj == uskin) ? " (embedded in your skin)" :
                        /* in case of perm_invent update while Wear/Takeoff
                           is in progress; check doffing() before donning()
                           because donning() returns True for both cases */
@@ -1356,7 +1401,9 @@ doname_base(struct obj *obj, boolean with_price)
             if (obj == uarmg && Glib) {
                 /* just appended "(something)",
                  * change to "(something; slippery)" */
-                Strcpy(rindex(bp, ')'), "; slippery)");
+                if (eos(bp) > bp && *(eos(bp) - 1) == ')') {
+                    Concat(bp, 1, "; slippery)");
+                }
             }
         }
         /* fall through */
@@ -1374,7 +1421,7 @@ doname_base(struct obj *obj, boolean with_price)
 
     case TOOL_CLASS:
         if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
-            Strcat(bp, " (being worn)");
+            Concat(bp, 0, " (being worn)");
             break;
         }
         if (obj->otyp == LEASH && obj->leashmon != 0) {
@@ -1384,7 +1431,7 @@ doname_base(struct obj *obj, boolean with_price)
                 impossible("leashed monster not on this level");
                 obj->leashmon = 0;
             } else {
-                Sprintf(eos(bp), " (attached to %s)",
+                ConcatF(bp, 0, " (attached to %s)",
                         noit_mon_nam(mlsh));
             }
             break;
@@ -1395,7 +1442,7 @@ doname_base(struct obj *obj, boolean with_price)
             } else {
                 Sprintf(tmpbuf, "%d", obj->spe);
             }
-            Sprintf(eos(bp), " (%s candle%s%s)",
+            ConcatF(bp, 0, " (%s candle%s%s)",
                     tmpbuf, plur(obj->spe),
                     !obj->lamplit ? " attached" : ", lit");
             break;
@@ -1405,7 +1452,7 @@ doname_base(struct obj *obj, boolean with_price)
                 obj->age < 20L * (long)objects[obj->otyp].oc_cost)
                 Strcat(prefix, "partly used ");
             if (obj->lamplit) {
-                Strcat(bp, " (lit)");
+                Concat(bp, 0, " (lit)");
             }
             break;
         }
@@ -1425,14 +1472,14 @@ doname_base(struct obj *obj, boolean with_price)
         add_erosion_words(obj, prefix, dump_ID_flag);
 charges:
         if (known || do_known) {
-            Sprintf(eos(bp), " %s%d:%d%s", do_known ? "[(" : "(",
+            ConcatF(bp, 0, " %s%d:%d%s", do_known ? "[(" : "(",
                     (int)obj->recharged, obj->spe, do_known ? ")]" : ")");
         }
         break;
 
     case POTION_CLASS:
         if (obj->otyp == POT_OIL && obj->lamplit) {
-            Strcat(bp, " (lit)");
+            Concat(bp, 0, " (lit)");
         }
         break;
 
@@ -1440,14 +1487,14 @@ charges:
         add_erosion_words(obj, prefix, dump_ID_flag);
 ring:
         if (obj->owornmask & W_RINGR) {
-            Strcat(bp, " (on right ");
+            Concat(bp, 0, " (on right ");
         }
         if (obj->owornmask & W_RINGL) {
-            Strcat(bp, " (on left ");
+            Concat(bp, 0, " (on left ");
         }
         if (obj->owornmask & W_RING) {
-            Strcat(bp, body_part(HAND));
-            Strcat(bp, ")");
+            Concat(bp, 0, body_part(HAND));
+            Concat(bp, 0, ")");
         }
         if ((known || do_known) && objects[obj->otyp].oc_charged) {
             Sprintf(eos(prefix), "%s%s%s ",
@@ -1500,7 +1547,7 @@ ring:
                 Strcat(prefix, mons[omndx].mname);
                 Strcat(prefix, " ");
                 if (obj->spe) {
-                    Strcat(bp, " (laid by you)");
+                    Concat(bp, 0, " (laid by you)");
                 }
             }
         }
@@ -1513,14 +1560,14 @@ ring:
     case CHAIN_CLASS:
         add_erosion_words(obj, prefix, dump_ID_flag);
         if (obj->owornmask & W_BALL) {
-            Strcat(bp, " (chained to you)");
+            Concat(bp, 0, " (chained to you)");
         }
         break;
     }
 
     if ((obj->owornmask & W_WEP) && !mrg_to_wielded) {
         if (obj->quan != 1L) {
-            Strcat(bp, " (wielded)");
+            Concat(bp, 0, " (wielded)");
         } else {
             const char *hand_s = body_part(HAND);
 
@@ -1529,13 +1576,13 @@ ring:
             }
             /* note: Sting's glow message, if added, will insert text
                in front of "(weapon in hand)"'s closing paren */
-            Sprintf(eos(bp), " (%sweapon in %s)",
+            ConcatF(bp, 0, " (%sweapon in %s)",
                     (obj->otyp == AKLYS) ? "tethered " : "", hand_s);
 
             if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP)) {
-                if (!Blind) {
+                if (!Blind && eos(bp) > bp && *(eos(bp) - 1) == ')') {
                     /* we know bp[] ends with ')'; overwrite that */
-                    Sprintf(eos(bp)-1, ", %s %s)",
+                    ConcatF(bp, 1, ", %s %s)",
                             glow_verb(warn_obj_cnt, TRUE),
                             glow_color(obj->oartifact));
                 }
@@ -1544,10 +1591,10 @@ ring:
     }
     if (obj->owornmask & W_SWAPWEP) {
         if (u.twoweap) {
-            Sprintf(eos(bp), " (wielded in other %s)",
+            ConcatF(bp, 0, " (wielded in other %s)",
                     body_part(HAND));
         } else {
-            Strcat(bp, " (alternate weapon; not wielded)");
+            Concat(bp, 0, " (alternate weapon; not wielded)");
         }
     }
     if (obj->owornmask & W_QUIVER) {
@@ -1556,16 +1603,16 @@ ring:
             if (is_ammo(obj)) {
                 if (objects[obj->otyp].oc_skill == -P_BOW) {
                     /* Ammo for a bow */
-                    Strcat(bp, " (in quiver)");
+                    Concat(bp, 0, " (in quiver)");
                     break;
                 } else {
                     /* Ammo not for a bow */
-                    Strcat(bp, " (in quiver pouch)");
+                    Concat(bp, 0, " (in quiver pouch)");
                     break;
                 }
             } else {
                 /* Weapons not considered ammo */
-                Strcat(bp, " (quivered)");
+                Concat(bp, 0, " (quivered)");
                 break;
             }
         /* Small things and ammo not for a bow */
@@ -1574,10 +1621,10 @@ ring:
         case WAND_CLASS:
         case COIN_CLASS:
         case GEM_CLASS:
-            Strcat(bp, " (in quiver pouch)");
+            Concat(bp, 0, " (in quiver pouch)");
             break;
         default: /* odd things */
-            Strcat(bp, " (quivered)");
+            Concat(bp, 0, " (quivered)");
         }
     }
 
@@ -1590,7 +1637,7 @@ ring:
     } else if (obj->unpaid) {
         long quotedprice = unpaid_cost(obj, COST_CONTENTS);
 
-        Sprintf(eos(bp), " (unpaid, %ld %s)",
+        ConcatF(bp, 0, " (unpaid, %ld %s)",
                 quotedprice, currency(quotedprice));
     } else if (with_price) {
         /* price needs to be recalculated in case identification
@@ -1598,7 +1645,7 @@ ring:
         int nochrg = 0;
         long price = get_cost_of_shop_item(obj, &nochrg);
         if (price > 0) {
-            Sprintf(eos(bp), " (%ld %s)", price, currency(price));
+            ConcatF(bp, 0, " (%ld %s)", price, currency(price));
         }
     }
     if (!strncmp(prefix, "a ", 2) &&
@@ -2157,7 +2204,7 @@ the(const char *str)
     } else {
         buf[0] = '\0';
     }
-    Strcat(buf, str);
+    Concat(buf, 0, str);
 
     return buf;
 }
@@ -2184,8 +2231,8 @@ aobjnam(struct obj *otmp, const char *verb)
     }
 
     if (verb) {
-        Strcat(bp, " ");
-        Strcat(bp, otense(otmp, verb));
+        Concat(bp, 0, " ");
+        Concat(bp, 0, otense(otmp, verb));
     }
     return bp;
 }
@@ -2230,8 +2277,8 @@ Tobjnam(struct obj *otmp, const char *verb)
     char *bp = The(xname(otmp));
 
     if (verb) {
-        Strcat(bp, " ");
-        Strcat(bp, otense(otmp, verb));
+        Concat(bp, 0, " ");
+        Concat(bp, 0, otense(otmp, verb));
     }
     return bp;
 }
