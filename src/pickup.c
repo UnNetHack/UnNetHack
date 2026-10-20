@@ -1276,7 +1276,8 @@ query_category(
         char tmpbuf[BUFSZ];
 
         if (num_most_recently_picked_up == 1) {
-            Sprintf(tmpbuf, "Most recently picked up: %s", doname(find_most_recently_picked_up_obj(olist)));
+            Snprintf(tmpbuf, sizeof tmpbuf, "Most recently picked up: %s",
+                     doname(find_most_recently_picked_up_obj(olist)));
         } else {
             Sprintf(tmpbuf, "Items most recently picked up");
         }
