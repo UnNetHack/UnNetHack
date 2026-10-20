@@ -427,9 +427,9 @@ NETHACK_ARG(randomized-planes,[Shuffling order of Elemental Planes],RANDOMIZED_P
 NETHACK_ARG(redo,[Redo last command],REDO,yes)
 NETHACK_ARG(clipping,[Allow smaller screens],CLIPPING,yes)
 NETHACK_ARG(menu-color,[TTY graphics menu color],MENU_COLOR,yes)
-if [[ "$enable_tty_graphics" == "yes" ||
-      "$enable_curses_graphics" == "yes" ||
-      "$enable_pdcurses_graphics" == "yes" ]]; then
+if test "$enable_tty_graphics" != "no" ||
+    test "$enable_curses_graphics" != "no" ||
+    test "$enable_pdcurses_graphics" != "no"; then
 NETHACK_ARG(status-color,[TTY graphics status color],STATUS_COLORS,yes)
 NETHACK_ARG(status-hilites,[Status field highlighting],STATUS_HILITES,yes)
 fi
