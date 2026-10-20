@@ -632,8 +632,9 @@ dodiscovered(void) /* free after Robert Viduya */
                     putstr(tmpwin, iflags.menu_headings, let_to_name(oclass, FALSE));
                     prev_class = oclass;
                 }
-                Sprintf(buf, "%s %s", (objects[dis].oc_encountered ? " " : "*"),
-                        obj_typename(dis));
+                Snprintf(buf, sizeof buf, "%s %s",
+                         (objects[dis].oc_encountered ? " " : "*"),
+                         obj_typename(dis));
                 putstr(tmpwin, 0, buf);
             }
         }
@@ -847,9 +848,9 @@ doclassdisco(void)
         putstr(tmpwin, iflags.menu_headings, buf);
         for (i = bases[(int) oclass]; i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
             if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
-                Sprintf(buf, "%s %s",
-                        objects[dis].oc_encountered ? " " : "*",
-                        obj_typename(dis));
+                Snprintf(buf, sizeof buf, "%s %s",
+                         objects[dis].oc_encountered ? " " : "*",
+                         obj_typename(dis));
                 putstr(tmpwin, 0, buf);
                 ++ct;
             }
