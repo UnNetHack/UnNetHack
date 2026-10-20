@@ -1094,11 +1094,12 @@ remove_corpse(struct obj *corpse)
     case OBJ_FLOOR:
         /* in case MON_AT+enexto for invisible mon */
         x = corpse->ox,  y = corpse->oy;
-        /* not useupf(), which charges */
+        /* not useupf(), which charges;
+           delobj() won't destroy a Rider's corpse, delobj_core(, TRUE) will */
         if (corpse->quan > 1L) {
             corpse = splitobj(corpse, 1L);
         }
-        delobj(corpse);
+        delobj_core(corpse, TRUE);
         newsym(x, y);
         break;
     case OBJ_MINVENT:
