@@ -4857,7 +4857,8 @@ untrap(boolean force)
 
     for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
         /* are there are one or more containers here? */
-        if (Is_box(otmp) && !u.dx && !u.dy) {
+        if (Is_box(otmp) && !u.dx && !u.dy
+            && !(otmp->tknown && !otmp->otrapped)) {
             boxcnt++;
         }
         if (otmp->oartifact == ART_EXCALIBUR && (levl[x][y].typ <= SCORR)) {
@@ -4986,6 +4987,9 @@ untrap(boolean force)
                continue on to door handling if they are all declined */
             for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere) {
                 if (!Is_box(otmp)) {
+                    continue;
+                }
+                if (otmp->tknown && !otmp->otrapped) {
                     continue;
                 }
                 if (otmp->tknown && otmp->otrapped && otmp->dknown) {
