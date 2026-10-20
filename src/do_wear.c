@@ -185,8 +185,10 @@ Boots_on(void)
 
     case WATER_WALKING_BOOTS:
         if (u.uinwater || is_lava(u.ux, u.uy) || is_swamp(u.ux, u.uy)) {
+            int otyp = uarmf->otyp; /* lava may destroy and clear uarmf */
+
             spoteffects(TRUE);
-            makeknown_msg(uarmf->otyp, FALSE);
+            makeknown_msg(otyp, FALSE);
         }
         break;
 
