@@ -2997,6 +2997,8 @@ split_clridx(int idx, int *coloridx, int *attrib)
     }
 }
 
+#define MAX_THRESH 21
+
 /*
  * This is the parser for the hilite options.
  *
@@ -3008,14 +3010,13 @@ split_clridx(int idx, int *coloridx, int *attrib)
 boolean
 parse_status_hl1(char *op, boolean from_configfile)
 {
-#define MAX_THRESH 21
-    char hsbuf[MAX_THRESH][QBUFSZ];
+    char hsbuf[MAX_THRESH + 1][QBUFSZ]; /* last row is a sentinel */
     boolean rslt, badopt = FALSE;
     int i, fldnum, ccount = 0;
     char c;
 
     fldnum = 0;
-    for (i = 0; i < MAX_THRESH; ++i) {
+    for (i = 0; i <= MAX_THRESH; ++i) {
         hsbuf[i][0] = '\0';
     }
     while (*op && fldnum < MAX_THRESH && ccount < (QBUFSZ - 2)) {
@@ -3035,12 +3036,17 @@ parse_status_hl1(char *op, boolean from_configfile)
                     break;
                 }
             }
-            for (i = 0; i < MAX_THRESH; ++i) {
+            for (i = 0; i <= MAX_THRESH; ++i) {
                 hsbuf[i][0] = '\0';
             }
             fldnum = 0;
             ccount = 0;
         } else if (c == '/') {
+            if (fldnum + 1 >= MAX_THRESH) {
+                config_error_add("hilite_status: too many components");
+                badopt = TRUE;
+                break;
+            }
             fldnum++;
             ccount = 0;
         } else {
@@ -3048,6 +3054,10 @@ parse_status_hl1(char *op, boolean from_configfile)
             hsbuf[fldnum][ccount] = '\0';
         }
         op++;
+    }
+    if (!badopt && *op) {
+        config_error_add("hilite_status: component too long");
+        badopt = TRUE;
     }
     if (fldnum >= 1 && !badopt) {
         rslt = parse_status_hl2(hsbuf, from_configfile);
@@ -3063,7 +3073,6 @@ parse_status_hl1(char *op, boolean from_configfile)
         iflags.hilite_delta = 3L;
     }
     return TRUE;
-#undef MAX_THRESH
 }
 
 /* is str in the format of "[<>]?=?[-+]?[0-9]+%?" regex */
@@ -3296,7 +3305,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
     }
 
     ++sidx;
-    while (s[sidx][0]) {
+    while (sidx < MAX_THRESH && s[sidx][0]) {
         char buf[BUFSZ], **subfields;
         int sf = 0; /* subfield count */
         int kidx;
@@ -3316,10 +3325,11 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
         hilite.set = FALSE; /* mark it "unset" */
         hilite.fld = fld;
 
-        if (*s[sidx + 1] == '\0' || !strcmpi(s[sidx], "always")) {
+        if (sidx + 1 >= MAX_THRESH || *s[sidx + 1] == '\0'
+            || !strcmpi(s[sidx], "always")) {
             /* "field/always/color" OR "field/color" */
             always = TRUE;
-            if (*s[sidx + 1] == '\0') {
+            if (sidx + 1 >= MAX_THRESH || *s[sidx + 1] == '\0') {
                 sidx--;
             }
         } else if (!strcmpi(s[sidx], "up") || !strcmpi(s[sidx], "down")) {
@@ -3700,11 +3710,11 @@ parse_condition(char (*s)[QBUFSZ], int sidx)
      */
 
     sidx++;
-    if (!s[sidx][0]) {
+    if (sidx >= MAX_THRESH || !s[sidx][0]) {
         config_error_add("Missing condition(s)");
         return FALSE;
     }
-    while (s[sidx][0]) {
+    while (sidx < MAX_THRESH && s[sidx][0]) {
         int sf = 0; /* subfield count */
         char buf[BUFSZ], **subfields;
 
