@@ -1038,7 +1038,7 @@ add_obj_info(winid datawin, struct obj *obj, short otyp)
                 OBJPUTSTR("Comestible providing varied nutrition.");
             }
             OBJPUTSTR("Takes various amounts of turns to eat.");
-            if (obj) {
+            if (obj && obj->corpsenm >= LOW_PM) {
                 if (vegan(&mons[obj->corpsenm])) {
                     OBJPUTSTR("Is vegan.");
                 } else if (vegetarian(&mons[obj->corpsenm])) {
