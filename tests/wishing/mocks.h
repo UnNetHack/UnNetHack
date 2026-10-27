@@ -73,7 +73,7 @@ void unblock_point(coordxy x, coordxy y) {}
 const char* body_part(int typ) { return "body_part"; }
 int can_be_hatched(int typ) { return typ; }
 void consume_oeaten(struct obj *obj, int amount) {}
-boolean dead_species(int typ, boolean bool) { return FALSE; }
+boolean dead_species(int typ, boolean b) { return FALSE; }
 void del_engr_at(coordxy x, coordxy y) {}
 void delete_contents(struct obj *obj) {}
 int genus(int typ, int number) { return 0; }
@@ -101,7 +101,7 @@ void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed) {}
 const char *artiname(int i) { return 0; }
 struct obj* mk_artifact(struct obj *obj, aligntyp typ) { return NULL; }
 boolean exist_artifact(int typ, const char *str) { return FALSE; }
-void artifact_exists(struct obj *obj, const char *str, boolean bool) {}
+void artifact_exists(struct obj *obj, const char *str, boolean b) {}
 int nartifact_exist() { return 0; }
 boolean confers_luck(struct obj *obj) { return FALSE; }
 boolean defends(int number1, struct obj *obj) { return FALSE; }
@@ -158,7 +158,7 @@ char * shk_your(char *buf, struct obj *obj) { return NULL; }
 boolean rloco(struct obj *obj) { return FALSE; }
 
 void attach_fig_transform_timeout(struct obj *obj) {}
-void begin_burn(struct obj *obj, boolean bool) {}
+void begin_burn(struct obj *obj, boolean b) {}
 boolean start_timer(long timeleft, short typ, short action, ANY_P *generic) { return TRUE; }
 long stop_timer(short typ, ANY_P *generic) { return 0; }
 void obj_split_timers(struct obj *obj1, struct obj *obj2) {}
