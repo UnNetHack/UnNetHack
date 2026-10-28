@@ -69,9 +69,6 @@ extern struct engr *head_engr;
 
 extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
-/* positions touched by level elements explicitly defined in the des-file */
-char SpLev_Map[COLNO][ROWNO];
-
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 
 static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
@@ -92,20 +89,6 @@ static boolean icedpools = FALSE;
 static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
 #define SPLEV_STACK_RESERVE 128
-
-void
-solidify_map(void)
-{
-    coordxy x, y;
-
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y]) {
-                levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
-            }
-        }
-    }
-}
 
 void
 splev_stack_init(struct splevstack *st)

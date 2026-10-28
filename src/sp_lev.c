@@ -21,7 +21,6 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
 extern void mkmap(lev_init *);
 
-static void solidify_map(void);
 static void map_cleanup(void);
 static void lvlfill_solid(schar, schar);
 static void lvlfill_swamp(schar, schar, schar);
@@ -194,8 +193,6 @@ int lspo_wallify(lua_State *);
      * sp_level_coder_init() always re-initializes them prior to use.
      */
 static boolean splev_init_present, icedpools;
-/* positions touched by level elements explicitly defined in the level */
-static char SpLev_Map[COLNO][ROWNO];
 #define MAX_CONTAINMENT 10
 static int container_idx = 0; /* next slot in container_obj[] to use */
 static struct obj *container_obj[MAX_CONTAINMENT];
@@ -326,7 +323,7 @@ mapfrag_match(struct mapfragment *mf,  int x, int y)
     return TRUE;
 }
 
-static void
+void
 solidify_map(void)
 {
     coordxy x, y;

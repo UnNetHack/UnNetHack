@@ -147,6 +147,7 @@ struct mkroom *upstairs_room, *dnstairs_room, *sstairs_room;
 struct engr *head_engr;
 
 dlevel_t level;     /* level map */
+NEARDATA char SpLev_Map[COLNO][ROWNO];
 struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct permonst upermonst = DUMMY;

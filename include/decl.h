@@ -35,6 +35,8 @@ E NEARDATA int warnlevel;
 #endif
 E NEARDATA int nroom;
 E NEARDATA int nsubroom;
+/* cells already written by the active special-level loader */
+E NEARDATA char SpLev_Map[COLNO][ROWNO];
 E NEARDATA int occtime;
 
 #define WARNCOUNT 6         /* number of different warning levels */
