@@ -23,7 +23,6 @@ extern void mkmap(lev_init *);
 
 static void solidify_map(void);
 static void map_cleanup(void);
-static void lvlfill_maze_grid(int, int, int, int, schar);
 static void lvlfill_solid(schar, schar);
 static void lvlfill_swamp(schar, schar, schar);
 static void flip_dbridge_horizontal(struct rm *);
@@ -377,7 +376,7 @@ map_cleanup(void)
     }
 }
 
-static void
+void
 lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling)
 {
     int x, y;

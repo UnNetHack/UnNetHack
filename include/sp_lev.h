@@ -545,4 +545,10 @@ struct mapfragment {
     char *data;
 };
 
+/*
+ * Level construction primitives shared by sp_lev.c (Lua) and
+ * spo_lev.c (.des).  Defined once in sp_lev.c.
+ */
+void lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling);
+
 #endif /* SP_LEV_H */

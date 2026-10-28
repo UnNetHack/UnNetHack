@@ -501,22 +501,6 @@ variable_list_del(struct splev_var *varlist)
 }
 
 void
-lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling)
-{
-    int x, y;
-
-    for (x = x1; x <= x2; x++) {
-        for (y = y1; y <= y2; y++) {
-            if (level.flags.corrmaze) {
-                levl[x][y].typ = STONE;
-            } else {
-                levl[x][y].typ = (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-            }
-        }
-    }
-}
-
-void
 lvlfill_solid(schar filling, schar lit)
 {
     int x, y;
