@@ -48,7 +48,7 @@ TEST_INCLUDES = -I../include -I../src $(CHECK_CFLAGS) $(LUA_CFLAGS)
 # from other build targets, and the two implementations under test.
 LEVEL_OBJS = $(filter-out ../src/unixmain.o %_util.o, $(wildcard ../src/*.o))
 
-LEVEL_CFLAGS = $(TEST_CFLAGS) -Wno-unused-function $(TEST_INCLUDES) \
+LEVEL_CFLAGS = $(TEST_CFLAGS) -Wno-unused-function -DAUTOCONF $(TEST_INCLUDES) \
                $(CFLAGS) -fno-omit-frame-pointer
 
 levels/test_sp_lev: levels/test_sp_lev.c levels/level_tests.inc
@@ -62,3 +62,16 @@ levels/test_spo_lev: levels/test_spo_lev.c levels/level_tests.inc
 	    $(filter-out ../src/spo_lev.o, $(LEVEL_OBJS)) \
 	    $(LUA_LIBS) -lm $(CURSES_LIBS) $(CHECK_LIBS) -o $@
 	./$@
+
+# Golden-master driver: loads a compiled special level and prints a
+# canonical dump on stderr.  Links the whole game (both loaders).
+levels/dump_des: levels/dump_des.c
+	$(CC) $(LEVEL_CFLAGS) -g $< \
+	    $(LEVEL_OBJS) \
+	    $(LUA_LIBS) -lm $(CURSES_LIBS) -o $@
+
+# Golden-master comparison.  Not part of `all`: the driver reads the
+# installed data directory through DLB, so the game must be built (and
+# its data reachable) first.
+golden: levels/dump_des
+	sh levels/run_golden.sh

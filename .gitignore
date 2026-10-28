@@ -94,3 +94,4 @@ tests/levels/test_spo_lev
 
 # /win/
 /win/*/*.o
+tests/levels/dump_des

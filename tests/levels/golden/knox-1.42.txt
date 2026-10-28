@@ -1,0 +1,229 @@
+level knox-1.lev seed 42
+flags maze=1 corrmaze=0 temperature=0
+stair 11 17 up stair
+row 00 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+row 01 00000322222222922222222222222222222222222222222222222222222222222222222222222240
+row 02 000001RRRRRRRR1RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR10
+row 03 000001RRRRRRRR1RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR322222222224RR10
+row 04 000005222229P26RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR1RRRRRRRRRR1RR10
+row 05 000000000001RRRRRRRRKKKKKKKRRRRRRRRRRRRRRRRRRRRKKKKKKKRRRRRRRRRR1RRRRRRRRRR1RR10
+row 06 000000000001RRRRRRRRK32224KRRRRRRRRRRRRRRRRRRRRK32224KRRRRRRRRRR52P22P24RRR1RR10
+row 07 000000000326RRRRRRRRK1RRR1KKKKKKKKKKKKKKKKKKKKKK1RRR1KRRRRRRRRRRRRRRRRR1RRR1RR10
+row 08 0000000001RRRRRRRRRRK529H822222222222229222222228H926KRRRRRRRRRRRRRRRRR1RRR1RR10
+row 09 0000000001RRRRRRRRRRKKK1RRRRRRRRRRRRRRR1RRRRRRRRRR1KKKRRRRRRRRRRRRRRRRRPRRR1RR10
+row 10 000003222824RRRRRRRRRRK1RRRRRRRRRRRRRRRHRRRRRRRRRR1KRRRRRRRRRRRRRRRRRRR1RRR1RR10
+row 11 000001RRRRR1RRRRRRRRRRK1RRRRRRRRRRRRRRR1RRRRRRVRRRHKRRRRRRRRRRRRRRRRRRR1RRR1RR10
+row 12 000001RRRRRPRRRRRRRRKKK1RRRRRRRRRRRRRRR1RRRRRRRRRR1KKKRRRRRRRRRRRRRRRRRPRRR1RR10
+row 13 000001RRRRR1RRRRRRRRK328H922222222222228222222229H824KRRRRRRRRRRRRRRRRR1RRR1RR10
+row 14 000001RRRRR1RRRRRRRRK1RRR1KKKKKKKKKKKKKKKKKKKKKK1RRR1KRRRRRRRRRRRRRRRRR1RRR1RR10
+row 15 000001RR3H2824RRRRRRK52226KRRRRRRRRRRRRRRRRRRRRK52226KRRRRRRRRRR32P22P26RRR1RR10
+row 16 000001RR1RRRR1RRRRRRKKKKKKKRRRRRRRRRRRRRRRRRRRRKKKKKKKRRRRRRRRRR1RRRRRRRRRR1RR10
+row 17 000001RR1RRSR1RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR1RRRRRRRRRR1RR10
+row 18 0000052282222824RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR522222222226RR10
+row 19 0000000000000001RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR10
+row 20 00000000000000052222222222222222222222222222222222222222222222222222222222222260
+room 0 40 9 49 12 type=2 doors=4
+room 1 24 9 38 12 type=6 doors=3
+room 2 6 11 10 17 type=8 doors=2
+room 3 9 16 12 17 type=0 doors=1
+room 4 65 4 74 17 type=7 doors=6
+door 49 8
+door 39 10
+door 50 11
+door 49 13
+door 24 8
+door 39 10
+door 24 13
+door 11 12
+door 9 15
+door 9 15
+door 66 6
+door 69 6
+door 71 9
+door 71 12
+door 66 15
+door 69 15
+obj 219 68 16 1
+obj 219 67 4 1
+obj 497 10 14 13
+obj 497 9 14 12
+obj 497 9 13 11
+obj 497 9 12 11
+obj 497 9 11 16
+obj 497 8 14 10
+obj 497 8 13 12
+obj 497 8 12 10
+obj 497 8 11 99
+obj 497 7 17 10
+obj 497 7 16 11
+obj 497 7 15 10
+obj 497 7 14 10
+obj 497 7 13 12
+obj 497 7 12 12
+obj 497 7 11 206
+obj 497 6 17 10
+obj 497 6 16 14
+obj 497 6 15 14
+obj 497 6 14 14
+obj 497 6 13 10
+obj 497 6 12 12
+obj 497 6 11 10
+obj 219 47 12 1
+obj 514 51 14 1
+obj 514 50 14 1
+obj 514 49 14 1
+obj 500 51 7 1
+obj 500 50 7 1
+obj 500 49 7 1
+obj 504 24 14 1
+obj 504 23 14 1
+obj 504 22 14 1
+obj 499 24 7 1
+obj 499 23 7 1
+obj 499 22 7 1
+mon 302 74 17 peaceful=0 asleep=1
+mon 302 74 16 peaceful=0 asleep=1
+mon 302 74 15 peaceful=0 asleep=1
+mon 302 74 14 peaceful=0 asleep=1
+mon 302 74 13 peaceful=0 asleep=1
+mon 302 74 12 peaceful=0 asleep=1
+mon 302 74 11 peaceful=0 asleep=1
+mon 302 74 10 peaceful=0 asleep=1
+mon 302 74 9 peaceful=0 asleep=1
+mon 302 74 8 peaceful=0 asleep=1
+mon 302 74 7 peaceful=0 asleep=1
+mon 302 74 6 peaceful=0 asleep=1
+mon 302 74 5 peaceful=0 asleep=1
+mon 302 74 4 peaceful=0 asleep=1
+mon 302 73 17 peaceful=0 asleep=1
+mon 303 73 16 peaceful=0 asleep=1
+mon 302 73 15 peaceful=0 asleep=1
+mon 302 73 14 peaceful=0 asleep=1
+mon 302 73 13 peaceful=0 asleep=1
+mon 302 73 12 peaceful=0 asleep=1
+mon 302 73 11 peaceful=0 asleep=1
+mon 302 73 10 peaceful=0 asleep=1
+mon 302 73 9 peaceful=0 asleep=1
+mon 302 73 8 peaceful=0 asleep=1
+mon 302 73 7 peaceful=0 asleep=1
+mon 302 73 6 peaceful=0 asleep=1
+mon 302 73 5 peaceful=0 asleep=1
+mon 302 73 4 peaceful=0 asleep=1
+mon 302 72 17 peaceful=0 asleep=1
+mon 302 72 16 peaceful=0 asleep=1
+mon 302 72 15 peaceful=0 asleep=1
+mon 302 72 14 peaceful=0 asleep=1
+mon 302 72 13 peaceful=0 asleep=1
+mon 302 72 12 peaceful=0 asleep=1
+mon 302 72 11 peaceful=0 asleep=1
+mon 302 72 10 peaceful=0 asleep=1
+mon 302 72 9 peaceful=0 asleep=1
+mon 302 72 8 peaceful=0 asleep=1
+mon 302 72 7 peaceful=0 asleep=1
+mon 302 72 6 peaceful=0 asleep=1
+mon 302 72 5 peaceful=0 asleep=1
+mon 302 72 4 peaceful=0 asleep=1
+mon 302 71 17 peaceful=0 asleep=1
+mon 302 71 16 peaceful=0 asleep=1
+mon 302 71 5 peaceful=0 asleep=1
+mon 302 71 4 peaceful=0 asleep=1
+mon 302 70 17 peaceful=0 asleep=1
+mon 302 70 16 peaceful=0 asleep=1
+mon 302 70 5 peaceful=0 asleep=1
+mon 302 70 4 peaceful=0 asleep=1
+mon 302 69 17 peaceful=0 asleep=1
+mon 302 69 16 peaceful=0 asleep=1
+mon 302 69 5 peaceful=0 asleep=1
+mon 302 69 4 peaceful=0 asleep=1
+mon 302 68 17 peaceful=0 asleep=1
+mon 302 68 16 peaceful=0 asleep=1
+mon 302 68 5 peaceful=0 asleep=1
+mon 302 68 4 peaceful=0 asleep=1
+mon 302 67 17 peaceful=0 asleep=1
+mon 302 67 16 peaceful=0 asleep=1
+mon 302 67 4 peaceful=0 asleep=1
+mon 302 66 17 peaceful=0 asleep=1
+mon 302 66 16 peaceful=0 asleep=1
+mon 302 66 4 peaceful=0 asleep=1
+mon 302 65 17 peaceful=0 asleep=1
+mon 302 65 16 peaceful=0 asleep=1
+mon 302 65 4 peaceful=0 asleep=1
+mon 14 10 13 peaceful=0 asleep=1
+mon 14 10 14 peaceful=0 asleep=1
+mon 350 9 14 peaceful=0 asleep=1
+mon 350 9 12 peaceful=0 asleep=1
+mon 122 9 11 peaceful=0 asleep=1
+mon 14 9 13 peaceful=0 asleep=1
+mon 14 8 14 peaceful=0 asleep=1
+mon 255 8 13 peaceful=0 asleep=1
+mon 169 8 12 peaceful=0 asleep=1
+mon 15 8 11 peaceful=0 asleep=1
+mon 15 7 17 peaceful=0 asleep=1
+mon 14 7 16 peaceful=0 asleep=1
+mon 74 7 15 peaceful=0 asleep=1
+mon 350 7 13 peaceful=0 asleep=1
+mon 169 7 12 peaceful=0 asleep=1
+mon 169 7 11 peaceful=0 asleep=1
+mon 169 6 17 peaceful=0 asleep=1
+mon 169 6 16 peaceful=0 asleep=1
+mon 350 6 15 peaceful=0 asleep=1
+mon 14 7 14 peaceful=0 asleep=1
+mon 14 6 14 peaceful=0 asleep=1
+mon 169 6 13 peaceful=0 asleep=1
+mon 169 6 12 peaceful=0 asleep=1
+mon 350 6 11 peaceful=0 asleep=1
+mon 62 49 12 peaceful=0 asleep=1
+mon 176 49 11 peaceful=0 asleep=1
+mon 63 49 10 peaceful=0 asleep=1
+mon 75 48 12 peaceful=0 asleep=1
+mon 177 48 11 peaceful=0 asleep=1
+mon 176 48 10 peaceful=0 asleep=1
+mon 62 47 12 peaceful=0 asleep=1
+mon 47 47 11 peaceful=0 asleep=1
+mon 75 47 10 peaceful=0 asleep=1
+mon 47 46 12 peaceful=0 asleep=1
+mon 176 46 10 peaceful=0 asleep=1
+mon 75 45 12 peaceful=0 asleep=1
+mon 75 45 11 peaceful=0 asleep=1
+mon 75 45 10 peaceful=0 asleep=1
+mon 47 44 12 peaceful=0 asleep=1
+mon 176 44 11 peaceful=0 asleep=1
+mon 75 44 10 peaceful=0 asleep=1
+mon 75 43 12 peaceful=0 asleep=1
+mon 63 43 11 peaceful=0 asleep=1
+mon 47 43 10 peaceful=0 asleep=1
+mon 47 42 12 peaceful=0 asleep=1
+mon 62 42 11 peaceful=0 asleep=1
+mon 47 42 10 peaceful=0 asleep=1
+mon 176 41 12 peaceful=0 asleep=1
+mon 75 41 11 peaceful=0 asleep=1
+mon 63 41 10 peaceful=0 asleep=1
+mon 47 40 12 peaceful=0 asleep=1
+mon 62 40 11 peaceful=0 asleep=1
+mon 75 40 10 peaceful=0 asleep=1
+mon 347 51 12 peaceful=0 asleep=0
+mon 347 51 9 peaceful=0 asleep=1
+mon 347 20 12 peaceful=0 asleep=1
+mon 347 20 9 peaceful=0 asleep=0
+mon 156 36 15 peaceful=0 asleep=0
+mon 159 36 6 peaceful=0 asleep=0
+mon 155 52 11 peaceful=0 asleep=0
+mon 158 21 10 peaceful=0 asleep=0
+mon 304 18 9 peaceful=0 asleep=0
+mon 302 60 10 peaceful=0 asleep=0
+mon 302 60 11 peaceful=0 asleep=0
+mon 302 57 14 peaceful=0 asleep=0
+mon 302 57 15 peaceful=0 asleep=0
+mon 302 57 17 peaceful=0 asleep=0
+mon 302 43 17 peaceful=0 asleep=0
+mon 302 35 17 peaceful=0 asleep=0
+mon 302 33 17 peaceful=0 asleep=0
+mon 302 43 3 peaceful=0 asleep=0
+mon 302 33 3 peaceful=0 asleep=0
+mon 302 23 3 peaceful=0 asleep=0
+mon 302 17 4 peaceful=0 asleep=0
+mon 302 16 3 peaceful=0 asleep=0
+mon 302 14 11 peaceful=0 asleep=0
+mon 302 15 14 peaceful=0 asleep=0
+mon 302 15 15 peaceful=0 asleep=0
+mon 310 46 11 peaceful=0 asleep=0
