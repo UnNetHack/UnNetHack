@@ -314,9 +314,9 @@ moveloop_core(void)
     /* don't make it obvious when monsters will start speeding up */
     int timeout_start = rnd(10000) + 25000;
     int past_clock;
-    /* for keeping track of Elbereth and correctstatus line display */
-    int was_on_elbereth = 0;
-    int is_on_elbereth = 0;
+    /* for keeping track of Elbereth and correctly updating the status line */
+    static int was_on_elbereth = 0;
+    int is_on_elbereth;
 
     get_nh_event();
 #ifdef POSITIONBAR
