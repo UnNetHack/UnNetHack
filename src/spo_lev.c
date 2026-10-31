@@ -69,9 +69,6 @@ extern struct engr *head_engr;
 
 extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
-/* positions touched by level elements explicitly defined in the des-file */
-char SpLev_Map[COLNO][ROWNO];
-
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 
 static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
@@ -92,20 +89,6 @@ static boolean icedpools = FALSE;
 static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
 #define SPLEV_STACK_RESERVE 128
-
-void
-solidify_map(void)
-{
-    coordxy x, y;
-
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y]) {
-                levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
-            }
-        }
-    }
-}
 
 void
 splev_stack_init(struct splevstack *st)
@@ -497,22 +480,6 @@ variable_list_del(struct splev_var *varlist)
         tmp = varlist->next;
         Free(varlist);
         varlist = tmp;
-    }
-}
-
-void
-lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling)
-{
-    int x, y;
-
-    for (x = x1; x <= x2; x++) {
-        for (y = y1; y <= y2; y++) {
-            if (level.flags.corrmaze) {
-                levl[x][y].typ = STONE;
-            } else {
-                levl[x][y].typ = (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-            }
-        }
     }
 }
 

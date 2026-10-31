@@ -1,0 +1,476 @@
+level blkmar-2.lev seed 7
+flags maze=0 corrmaze=0 temperature=0
+wallhash 61e2b7e8
+lithash 1c656f03
+stair 10 12 up stair
+row 00 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+row 01 00000000000000000000000000000032222222922222222222222292222222229222222222222240
+row 02 0000000000003222222222400000001RRRRRRR1RRRRRRRRRRRRRRR1RRRRRRRRR1RRRRRRRRRRRRR10
+row 03 0000000003226RRRRRRRRR522400001RRRRRRR1RRRRRRRRRRRRRRR1RRRRRRRRR1RRRRRRRRRRRRR10
+row 04 0000000326RRRRRRRRRRRRRRR524001RRRRRRR1RRRRRRRRRRRRRRR1RRRRRRRRR1RRRRRRRRRRRRR10
+row 05 00000036RRRRRRRRRRRRRRRRRRR5401RRRRRRR1RR32222222224RR1RRRRRR3228P24RRRRRRRRRR10
+row 06 0000036RRRRRRRRRRRRRRRRRRRRR541RRRRRRR1RR1RRRRRRRRR1RR1RRRRRR1RRRRR1RRRRRRRRRR10
+row 07 000036RRRRRRRRRRRRRRRRRRRRRRR5ARRRRRRR1RR1RRRRRRRRR1RR1RRRRRRPRRURR59222222222A0
+row 08 00001RRRRRRRRRRRRRRRRRRRRRRRRR52P222226RR1RRRRRRRRR1RR52222226RRRRRR1RRRRRRRRR10
+row 09 00001RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRPRRRRRRRRR1RRRRRRRRRRRRRRRRPRRRRRRRRR10
+row 10 00001RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR1RRRRRRRRR1RRRRRRRRRRRRRURR1RRRRRRRRR10
+row 11 00001RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRB222222222ARRR32222224RRRRR1RRRRRRRRR10
+row 12 00001RRRRRSRRRRRRRRRRRRRRRRRRR322222224RRPRRRRRRRRR1RR36RRRRRR54RRRR1RRRRRRRRR10
+row 13 000054RRRRRRRRRRRRRRRRRRRRRRR3ARRRRRRR1RR1RRRRRRRRR1RRPRRRRRRRR1RR328222222222A0
+row 14 0000054RRRRRRRRRRRRRRRRRRRRR361RRRRRRRPRR1RRRRRRRRR1RR1RRRRRRRR1RRPRRRRRRRRRRR10
+row 15 00000054RRRRRRRRRRRRRRRRRRR3601RRRRRRR1RR1RRRRRRRRR1RR1RRRRRRRR1RR1RRRRRRRRRRR10
+row 16 0000000524RRRRRRRRRRRRRRR39822ARRRRRRR1RR52224RRRRR1RR54RRRRRR36RR1RRRRRRRRRRR10
+row 17 0000000005224RRRRRRRRR3228ARRR1RRRRRRR1RRRRRR1RRRRR1RRR52222226RRR1RRRRRRRRRRR10
+row 18 0000000000005H222222226QQQHRRR1RRRRRRR1RRRRRR1RRRRR1RRRRRRRRRRRRRR1RRRRRRRRRRR10
+row 19 0000000000000QQQQQQQQQQQ00522282222222822222282222282222222222222282222222222260
+row 20 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+room 0 5 3 40 17 type=19 doors=6
+room 1 31 13 37 18 type=20 doors=1
+room 2 31 2 37 7 type=22 doors=1
+room 3 65 2 77 6 type=23 doors=1
+room 4 42 6 50 10 type=27 doors=1
+room 5 67 14 77 18 type=26 doors=1
+room 6 55 12 62 16 type=21 doors=1
+room 7 69 8 77 12 type=28 doors=1
+room 8 55 2 63 7 type=24 doors=1
+room 9 42 12 50 18 type=29 doors=1
+door 32 8 mask=4 horizontal=1
+door 41 9 mask=4 horizontal=0
+door 41 12 mask=4 horizontal=0
+door 38 14 mask=2 horizontal=0
+door 13 18 mask=4 horizontal=1
+door 26 18 mask=4 horizontal=0
+door 38 14 mask=2 horizontal=0
+door 32 8 mask=4 horizontal=1
+door 65 5 mask=4 horizontal=1
+door 41 9 mask=4 horizontal=0
+door 66 14 mask=4 horizontal=0
+door 54 13 mask=4 horizontal=0
+door 68 9 mask=4 horizontal=0
+door 61 7 mask=2 horizontal=0
+door 41 12 mask=4 horizontal=0
+obj 388 50 18 1
+obj 413 50 17 1
+obj 355 50 16 1
+obj 415 50 15 1
+obj 401 50 14 1
+obj 407 50 13 1
+obj 416 50 12 1
+obj 398 49 18 1
+obj 393 49 17 1
+obj 408 49 16 1
+obj 389 49 15 1
+obj 409 49 14 1
+obj 419 49 13 1
+obj 400 49 12 1
+obj 405 48 18 1
+obj 400 48 17 1
+obj 383 48 16 1
+obj 339 48 15 1
+obj 401 48 14 1
+obj 408 48 13 1
+obj 387 48 12 1
+obj 382 47 18 1
+obj 405 47 17 1
+obj 412 47 16 1
+obj 397 47 15 1
+obj 395 47 14 1
+obj 349 47 13 1
+obj 413 47 12 1
+obj 384 46 18 1
+obj 412 46 17 1
+obj 409 46 16 1
+obj 348 46 15 1
+obj 419 46 14 1
+obj 418 46 13 1
+obj 399 46 12 1
+obj 400 45 15 1
+obj 343 45 14 1
+obj 420 45 13 1
+obj 395 45 12 1
+obj 389 44 15 1
+obj 395 44 14 1
+obj 392 44 13 1
+obj 406 44 12 1
+obj 406 43 15 1
+obj 400 43 14 1
+obj 418 43 13 1
+obj 384 43 12 1
+obj 390 42 15 1
+obj 398 42 14 1
+obj 59 63 4 1
+obj 56 63 3 1
+obj 69 63 2 1
+obj 44 62 4 1
+obj 70 62 3 1
+obj 69 62 2 1
+obj 50 61 4 1
+obj 3 61 3 8
+obj 70 61 2 1
+obj 2 60 5 10
+obj 67 60 4 1
+obj 69 60 3 1
+obj 37 60 2 1
+obj 52 59 7 1
+obj 59 59 6 1
+obj 6 59 5 6
+obj 44 59 4 1
+obj 42 59 3 1
+obj 117 59 2 1
+obj 7 58 7 9
+obj 110 58 6 1
+obj 63 58 5 1
+obj 13 58 4 1
+obj 3 58 3 9
+obj 70 58 2 1
+obj 33 57 7 1
+obj 9 57 6 1
+obj 37 57 5 1
+obj 57 57 4 1
+obj 36 57 3 1
+obj 27 57 2 1
+obj 33 56 7 1
+obj 113 56 6 1
+obj 67 56 5 1
+obj 1 56 4 11
+obj 13 56 3 1
+obj 7 56 2 6
+obj 6 55 7 8
+obj 65 55 6 1
+obj 67 55 5 1
+obj 6 55 4 8
+obj 2 55 3 10
+obj 7 55 2 10
+obj 244 77 12 1
+obj 250 77 11 1
+obj 250 77 10 1
+obj 224 77 9 1
+obj 230 77 8 7
+obj 226 76 12 1
+obj 227 76 11 1
+obj 218 76 10 1
+obj 227 76 9 1
+obj 229 76 8 1
+obj 227 75 12 1
+obj 250 75 11 1
+obj 250 75 10 1
+obj 227 75 9 1
+obj 226 75 8 1
+obj 236 74 12 1
+obj 239 74 11 1
+obj 232 74 10 1
+obj 246 74 9 1
+obj 242 74 8 1
+obj 239 73 12 1
+obj 250 73 11 1
+obj 255 73 10 1
+obj 259 73 9 1
+obj 246 73 8 1
+obj 238 72 12 1
+obj 235 72 11 1
+obj 227 72 10 1
+obj 231 72 9 1
+obj 224 72 8 1
+obj 244 71 12 1
+obj 219 71 11 1
+obj 235 71 10 1
+obj 238 71 9 1
+obj 255 71 8 1
+obj 264 70 12 1
+obj 239 70 11 1
+obj 242 70 10 1
+obj 246 70 9 1
+obj 251 70 8 1
+obj 262 69 12 1
+obj 221 69 11 1
+obj 116 62 15 1
+obj 116 62 14 1
+obj 106 62 13 1
+obj 109 61 16 1
+obj 118 61 15 1
+obj 110 61 14 1
+obj 110 61 13 1
+obj 119 61 12 1
+obj 19 60 16 1
+obj 116 60 15 1
+obj 110 60 14 1
+obj 45 60 13 1
+obj 113 60 12 1
+obj 115 59 16 1
+obj 150 59 15 1
+obj 151 59 14 1
+obj 117 59 13 1
+obj 131 59 12 1
+obj 127 58 16 1
+obj 121 58 15 1
+obj 149 58 14 1
+obj 133 58 13 1
+obj 155 58 12 1
+obj 117 57 16 1
+obj 130 57 15 1
+obj 113 57 14 1
+obj 106 57 13 1
+obj 108 57 12 1
+obj 119 56 16 1
+obj 116 56 15 1
+obj 119 56 14 1
+obj 115 56 13 1
+obj 2 56 12 6
+obj 119 55 15 1
+obj 534 77 18 7
+obj 187 77 17 1
+obj 160 77 16 1
+obj 167 77 15 1
+obj 158 77 14 1
+obj 159 76 18 1
+obj 164 76 17 1
+obj 519 76 16 1
+obj 175 76 15 1
+obj 186 76 14 1
+obj 201 75 18 1
+obj 158 75 17 1
+obj 176 75 16 1
+obj 528 75 15 1
+obj 187 75 14 1
+obj 164 74 18 1
+obj 186 74 17 1
+obj 177 74 16 1
+obj 177 74 15 1
+obj 181 74 14 1
+obj 187 73 18 1
+obj 174 73 17 1
+obj 168 73 16 1
+obj 162 73 15 1
+obj 175 73 14 1
+obj 161 72 18 1
+obj 161 72 17 1
+obj 178 72 16 1
+obj 180 72 15 1
+obj 527 72 14 1
+obj 525 71 18 1
+obj 201 71 17 1
+obj 176 71 16 1
+obj 518 71 15 1
+obj 168 71 14 1
+obj 157 70 18 1
+obj 162 70 17 1
+obj 186 70 16 1
+obj 184 70 15 1
+obj 157 70 14 1
+obj 169 69 18 1
+obj 170 69 17 1
+obj 172 69 16 1
+obj 167 69 15 1
+obj 174 69 14 1
+obj 185 68 18 1
+obj 210 68 17 1
+obj 159 68 16 1
+obj 186 68 15 1
+obj 164 68 14 1
+obj 167 67 18 1
+obj 166 67 17 1
+obj 173 67 16 1
+obj 456 50 10 1
+obj 465 50 9 1
+obj 461 50 8 1
+obj 457 50 7 1
+obj 466 50 6 1
+obj 459 49 10 1
+obj 471 49 9 1
+obj 454 49 8 1
+obj 448 49 7 1
+obj 125 49 6 1
+obj 469 48 10 1
+obj 462 48 9 1
+obj 448 48 8 1
+obj 125 48 7 1
+obj 448 48 6 1
+obj 453 47 10 1
+obj 471 47 9 1
+obj 449 47 8 1
+obj 448 47 7 1
+obj 457 47 6 1
+obj 462 46 10 1
+obj 471 46 9 1
+obj 125 46 8 1
+obj 458 46 7 1
+obj 448 46 6 1
+obj 456 45 10 1
+obj 460 45 9 1
+obj 471 45 8 1
+obj 465 45 7 1
+obj 455 45 6 1
+obj 458 44 10 1
+obj 458 44 9 1
+obj 448 44 8 1
+obj 454 44 7 1
+obj 461 44 6 1
+obj 460 43 10 1
+obj 456 43 9 1
+obj 459 43 8 1
+obj 458 43 7 1
+obj 143 43 6 1
+obj 454 42 7 1
+obj 454 42 6 1
+obj 303 77 6 1
+obj 303 77 5 1
+obj 308 77 4 1
+obj 300 77 3 1
+obj 306 77 2 1
+obj 303 76 6 1
+obj 306 76 5 1
+obj 303 76 4 1
+obj 317 76 3 1
+obj 305 76 2 1
+obj 318 75 6 1
+obj 312 75 5 1
+obj 316 75 4 1
+obj 308 75 3 1
+obj 310 75 2 1
+obj 306 74 6 1
+obj 336 74 5 1
+obj 313 74 4 1
+obj 306 74 3 1
+obj 320 74 2 1
+obj 300 73 6 1
+obj 336 73 5 1
+obj 312 73 4 1
+obj 323 73 3 1
+obj 318 73 2 1
+obj 299 72 6 1
+obj 309 72 5 1
+obj 320 72 4 1
+obj 336 72 3 1
+obj 312 72 2 1
+obj 304 71 6 1
+obj 308 71 5 1
+obj 311 71 4 1
+obj 303 71 3 1
+obj 319 71 2 1
+obj 317 70 6 1
+obj 321 70 5 1
+obj 336 70 4 1
+obj 306 70 3 1
+obj 323 70 2 1
+obj 302 69 6 1
+obj 303 69 5 1
+obj 316 69 4 1
+obj 336 69 3 1
+obj 316 69 2 1
+obj 318 68 6 1
+obj 301 68 5 1
+obj 323 68 4 1
+obj 310 68 3 1
+obj 336 68 2 1
+obj 305 67 4 1
+obj 311 67 3 1
+obj 308 67 2 1
+obj 302 66 3 1
+obj 336 66 2 1
+obj 306 65 3 1
+obj 302 65 2 1
+obj 353 37 7 1
+obj 358 37 6 1
+obj 345 37 5 1
+obj 352 37 4 1
+obj 359 37 3 1
+obj 352 37 2 1
+obj 389 36 7 1
+obj 382 36 6 1
+obj 348 36 5 1
+obj 344 36 4 1
+obj 340 36 3 1
+obj 348 36 2 1
+obj 349 35 7 1
+obj 352 35 6 1
+obj 356 35 5 1
+obj 339 35 4 1
+obj 358 35 3 1
+obj 356 35 2 1
+obj 359 34 7 1
+obj 339 34 6 1
+obj 342 34 5 1
+obj 418 34 4 1
+obj 352 34 3 1
+obj 345 34 2 1
+obj 349 33 6 1
+obj 352 33 5 1
+obj 343 33 4 1
+obj 402 33 3 1
+obj 349 33 2 1
+obj 353 32 6 1
+obj 343 32 5 1
+obj 348 32 4 1
+obj 340 32 3 1
+obj 358 32 2 1
+obj 355 31 6 1
+obj 391 31 5 1
+obj 352 31 4 1
+obj 352 31 3 1
+obj 345 31 2 1
+obj 35 37 18 1
+obj 298 37 17 1
+obj 291 37 16 1
+obj 311 36 18 1
+obj 341 36 17 1
+obj 110 36 16 1
+obj 4 36 15 6
+obj 113 36 14 1
+obj 287 36 13 1
+obj 530 35 18 1
+obj 303 35 17 1
+obj 301 35 16 1
+obj 523 35 15 1
+obj 339 35 14 1
+obj 298 35 13 1
+obj 118 34 18 1
+obj 133 34 17 1
+obj 250 34 16 1
+obj 319 34 15 1
+obj 313 34 14 1
+obj 527 34 13 1
+obj 517 33 18 1
+obj 301 33 17 1
+obj 111 33 16 1
+obj 528 33 15 1
+obj 117 33 14 1
+obj 413 33 13 1
+obj 179 32 18 1
+obj 336 32 17 1
+obj 382 32 16 1
+obj 145 32 15 1
+obj 280 32 14 1
+obj 304 32 13 1
+obj 320 31 18 1
+obj 201 31 17 1
+obj 344 31 16 1
+obj 312 31 15 1
+obj 529 31 14 1
+obj 133 31 13 1
+mon 294 42 12 peaceful=1 asleep=0
+mon 294 60 7 peaceful=1 asleep=0
+mon 294 69 9 peaceful=1 asleep=0
+mon 294 55 13 peaceful=1 asleep=0
+mon 294 67 14 peaceful=1 asleep=0
+mon 294 42 9 peaceful=1 asleep=0
+mon 294 65 4 peaceful=1 asleep=0
+mon 294 32 7 peaceful=1 asleep=0
+mon 294 37 14 peaceful=1 asleep=0
+mon 292 63 17 peaceful=0 asleep=0
+mon 292 50 4 peaceful=0 asleep=0
+mon 292 44 17 peaceful=0 asleep=0
+mon 318 29 17 peaceful=1 asleep=1
+mon 318 28 18 peaceful=1 asleep=1
+mon 317 29 18 peaceful=1 asleep=1
+mon 317 28 17 peaceful=1 asleep=1
+mon 354 10 16 peaceful=1 asleep=1
+mon 358 5 11 peaceful=1 asleep=1
+mon 12 8 15 peaceful=1 asleep=1
+mon 12 13 3 peaceful=1 asleep=1
+mon 327 10 4 peaceful=1 asleep=1
+mon 328 6 13 peaceful=1 asleep=1
+mon 70 8 5 peaceful=1 asleep=1
+mon 184 13 17 peaceful=1 asleep=1
+mon 237 6 7 peaceful=1 asleep=1
+mon 237 5 9 peaceful=1 asleep=1
+mon 296 17 10 peaceful=1 asleep=0
