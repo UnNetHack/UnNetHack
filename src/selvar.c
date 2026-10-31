@@ -235,6 +235,36 @@ selection_not(struct selectionvar *s)
 }
 
 struct selectionvar *
+selection_logical_oper(struct selectionvar *s1, struct selectionvar *s2,
+                       char oper)
+{
+    struct selectionvar *ov = selection_new();
+    int x, y;
+
+    for (x = 0; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            switch (oper) {
+            default:
+            case '|':
+                if (selection_getpoint(x, y, s1)
+                    || selection_getpoint(x, y, s2)) {
+                    selection_setpoint(x, y, ov, 1);
+                }
+                break;
+            case '&':
+                if (selection_getpoint(x, y, s1)
+                    && selection_getpoint(x, y, s2)) {
+                    selection_setpoint(x, y, ov, 1);
+                }
+                break;
+            }
+        }
+    }
+
+    return ov;
+}
+
+struct selectionvar *
 selection_filter_percent(
     struct selectionvar *ov,
     int percent)
@@ -615,9 +645,10 @@ void
 selection_do_gradient(
     struct selectionvar *ov,
     long x, long y,
-    long x2,long y2,
+    long x2, long y2,
     long gtyp,
-    long mind, long maxd)
+    long mind, long maxd,
+    long limit)
 {
     long dx, dy, dofs;
 
@@ -641,7 +672,9 @@ selection_do_gradient(
             for (dy = 0; dy < ROWNO; dy++) {
                 long d0 = line_dist_coord(x, y, x2, y2, dx, dy);
 
-                if (d0 <= mind * mind || (d0 <= maxd * maxd && d0 - mind * mind < rn2(dofs))) {
+                if (d0 <= mind * mind
+                    || ((!limit || d0 <= maxd * maxd)
+                        && d0 - mind * mind < rn2(dofs))) {
                     selection_setpoint(dx, dy, ov, 1);
                 }
             }
@@ -658,7 +691,9 @@ selection_do_gradient(
                 long d5 = line_dist_coord(x, y, x2, y2, dx, dy);
                 long d0 = min(d5, min(max(d1, d2), max(d3, d4)));
 
-                if (d0 <= mind * mind || (d0 <= maxd * maxd && d0 - mind * mind < rn2(dofs))) {
+                if (d0 <= mind * mind
+                    || ((!limit || d0 <= maxd * maxd)
+                        && d0 - mind * mind < rn2(dofs))) {
                     selection_setpoint(dx, dy, ov, 1);
                 }
             }

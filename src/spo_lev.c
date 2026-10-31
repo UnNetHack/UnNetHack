@@ -2157,595 +2157,187 @@ spo_corridor(struct sp_coder *coder)
     opvar_free(srcroom);
 }
 
-struct opvar *
-op_selection_opvar(char *nbuf)
+/*
+ * Selection adapters.
+ *
+ * An opvar selection uses the same COLNO x ROWNO bitmap layout and the
+ * same encoding (stored value - 1) as struct selectionvar, so in-place
+ * operations can run directly on the opvar's string.  Only operations
+ * that allocate a new selection copy the result back.
+ */
+
+static struct selectionvar *
+opsel_view(struct opvar *ov, struct selectionvar *view)
+{
+    view->wid = COLNO;
+    view->hei = ROWNO;
+    view->bounds_dirty = TRUE;
+    view->map = ov->vardata.str;
+    return view;
+}
+
+static struct opvar *
+opsel_new(char *map)
 {
     struct opvar *ov;
-    char buf[(COLNO*ROWNO)+1];
 
-    if (!nbuf) {
-        (void) memset(buf, 1, sizeof(buf));
-        buf[(COLNO*ROWNO)] = '\0';
-        ov = opvar_new_str(buf);
+    if (map) {
+        ov = opvar_new_str(map);
     } else {
-        ov = opvar_new_str(nbuf);
+        char buf[(COLNO * ROWNO) + 1];
+
+        (void) memset(buf, 1, COLNO * ROWNO);
+        buf[COLNO * ROWNO] = '\0';
+        ov = opvar_new_str(buf);
     }
     ov->spovartyp = SPOVAR_SEL;
     return ov;
 }
 
+static struct opvar *
+opsel_from_selection(struct selectionvar *sel)
+{
+    struct opvar *ov = opsel_new(sel->map);
+
+    selection_free(sel, TRUE);
+    return ov;
+}
+
+struct opvar *
+op_selection_opvar(char *nbuf)
+{
+    return opsel_new(nbuf);
+}
+
 coordxy
 op_selection_getpoint(coordxy x, coordxy y, struct opvar *ov)
 {
-    if (!ov || ov->spovartyp != SPOVAR_SEL) {
-        return 0;
-    }
-    if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) {
-        return 0;
-    }
+    struct selectionvar view;
 
-    return (ov->vardata.str[COLNO*y + x] - 1);
+    return selection_getpoint(x, y, opsel_view(ov, &view));
 }
 
 void
 op_selection_setpoint(coordxy x, coordxy y, struct opvar *ov, char c)
 {
-    if (!ov || ov->spovartyp != SPOVAR_SEL) {
-        return;
-    }
-    if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) {
-        return;
-    }
+    struct selectionvar view;
 
-    ov->vardata.str[COLNO*y + x] = (c + 1);
+    selection_setpoint(x, y, opsel_view(ov, &view), c);
 }
 
 struct opvar *
 op_selection_not(struct opvar *s)
 {
-    struct opvar *ov;
-    int x, y;
+    struct selectionvar view;
+    struct opvar *ret;
 
-    ov = op_selection_opvar(NULL);
-    if (!ov) {
-        return NULL;
-    }
-
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (!op_selection_getpoint(x, y, s)) {
-                op_selection_setpoint(x, y, ov, 1);
-            }
-        }
-    }
-
-    return ov;
+    /* selection_not works in place; the opcode frees the input */
+    (void) selection_not(opsel_view(s, &view));
+    ret = opsel_new(view.map);
+    return ret;
 }
 
 struct opvar *
 op_selection_logical_oper(struct opvar *s1, struct opvar *s2, char oper)
 {
-    struct opvar *ov;
-    int x, y;
+    struct selectionvar v1, v2;
 
-    ov = op_selection_opvar(NULL);
-    if (!ov) {
-        return NULL;
-    }
-
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            switch (oper) {
-            default:
-            case '|':
-                if (op_selection_getpoint(x, y, s1) || op_selection_getpoint(x, y, s2)) {
-                    op_selection_setpoint(x, y, ov, 1);
-                }
-                break;
-            case '&':
-                if (op_selection_getpoint(x, y, s1) && op_selection_getpoint(x, y, s2)) {
-                    op_selection_setpoint(x, y, ov, 1);
-                }
-                break;
-            }
-        }
-    }
-
-    return ov;
+    return opsel_from_selection(
+        selection_logical_oper(opsel_view(s1, &v1), opsel_view(s2, &v2),
+                               oper));
 }
 
 struct opvar *
 op_selection_filter_mapchar(struct opvar *ov, struct opvar *mc)
 {
-    int x, y;
-    schar mapc;
-    coordxy lit;
-    struct opvar *ret = op_selection_opvar(NULL);
+    struct selectionvar view;
+    schar mapc = SP_MAPCHAR_TYP(OV_i(mc));
+    coordxy lit = SP_MAPCHAR_LIT(OV_i(mc));
 
-    if (!ov || !mc || !ret) {
-        return NULL;
-    }
-
-    mapc = SP_MAPCHAR_TYP(OV_i(mc));
-    lit = SP_MAPCHAR_LIT(OV_i(mc));
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (op_selection_getpoint(x, y, ov) && (levl[x][y].typ == mapc)) {
-                switch (lit) {
-                default:
-                case -2: op_selection_setpoint(x, y, ret, 1); break;
-                case -1: op_selection_setpoint(x, y, ret, rn2(2)); break;
-                case 0:
-                case 1:
-                         if (levl[x][y].lit == lit) {
-                             op_selection_setpoint(x, y, ret, 1);
-                         }
-                         break;
-                }
-            }
-        }
-    }
-
-    return ret;
+    return opsel_from_selection(
+        selection_filter_mapchar(opsel_view(ov, &view), mapc, lit));
 }
-
 
 void
 op_selection_filter_percent(struct opvar *ov, int percent)
 {
-    int x, y;
+    struct selectionvar view, *res;
 
-    if (!ov) {
-        return;
-    }
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (op_selection_getpoint(x, y, ov) && (rn2(100) >= percent)) {
-                op_selection_setpoint(x, y, ov, 0);
-            }
-        }
-    }
+    res = selection_filter_percent(opsel_view(ov, &view), percent);
+    (void) memcpy(ov->vardata.str, res->map, COLNO * ROWNO);
+    selection_free(res, TRUE);
 }
 
-static int
+int
 op_selection_rndcoord(struct opvar *ov, coordxy *x, coordxy *y, boolean removeit)
 {
-    int idx = 0;
-    int c;
-    int dx, dy;
+    struct selectionvar view;
 
-    for (dx = 0; dx < COLNO; dx++) {
-        for (dy = 0; dy < ROWNO; dy++) {
-            if (isok(dx, dy) && op_selection_getpoint(dx, dy, ov)) {
-                idx++;
-            }
-        }
-    }
-
-    if (idx) {
-        c = rn2(idx);
-        for (dx = 0; dx < COLNO; dx++) {
-            for (dy = 0; dy < ROWNO; dy++) {
-                if (isok(dx, dy) && op_selection_getpoint(dx, dy, ov)) {
-                    if (!c) {
-                        *x = dx;
-                        *y = dy;
-                        if (removeit) {
-                            op_selection_setpoint(dx, dy, ov, 0);
-                        }
-                        return 1;
-                    }
-                    c--;
-                }
-            }
-        }
-    }
-    *x = *y = -1;
-    return 0;
+    return selection_rndcoord(opsel_view(ov, &view), x, y, removeit);
 }
 
 void
 op_selection_do_grow(struct opvar *ov, int dir)
 {
-    int x, y;
-    char tmp[COLNO][ROWNO];
+    struct selectionvar view;
 
-    if (ov->spovartyp != SPOVAR_SEL) {
-        return;
-    }
-    if (!ov) {
-        return;
-    }
-
-    (void) memset(tmp, 0, sizeof(tmp));
-
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            int c = 0;
-            if ((dir &  W_WEST) && (x > 0) && (op_selection_getpoint(x-1, y, ov))) {
-                c++;
-            }
-            if ((dir & (W_WEST|W_NORTH)) && (x > 0) && (y > 0) && (op_selection_getpoint(x-1, y-1, ov))) {
-                c++;
-            }
-            if ((dir &  W_NORTH) && (y > 0) && (op_selection_getpoint(x, y-1, ov))) {
-                c++;
-            }
-            if ((dir & (W_NORTH|W_EAST)) && (y > 0) && (x < COLNO-1) && (op_selection_getpoint(x+1, y-1, ov))) {
-                c++;
-            }
-            if ((dir &  W_EAST) && (x < COLNO-1) && (op_selection_getpoint(x+1, y, ov))) {
-                c++;
-            }
-            if ((dir & (W_EAST|W_SOUTH)) && (x < COLNO-1) && (y < ROWNO-1) && (op_selection_getpoint(x+1, y+1, ov))) {
-                c++;
-            }
-            if ((dir &  W_SOUTH) && (y < ROWNO-1) && (op_selection_getpoint(x, y+1, ov))) {
-                c++;
-            }
-            if ((dir & (W_SOUTH|W_WEST)) && (y < ROWNO-1) && (x > 0) && (op_selection_getpoint(x-1, y+1, ov))) {
-                c++;
-            }
-            if (c) {
-                tmp[x][y] = 1;
-            }
-        }
-    }
-
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (tmp[x][y]) {
-                op_selection_setpoint(x, y, ov, 1);
-            }
-        }
-    }
-}
-
-static int (*selection_flood_check_func)(coordxy, coordxy);
-static schar floodfillchk_match_under_typ;
-
-/* check whethere <x,y> is already in xs[],ys[] */
-static boolean
-sel_flood_havepoint(coordxy x, coordxy y, coordxy *xs, coordxy *ys, int n)
-{
-    coordxy xx = (coordxy) x, yy = (coordxy) y;
-
-    while (n > 0) {
-        --n;
-        if (xs[n] == xx && ys[n] == yy) {
-            return TRUE;
-        }
-    }
-    return FALSE;
+    selection_do_grow(opsel_view(ov, &view), dir);
 }
 
 void
 op_selection_floodfill(struct opvar *ov, coordxy x, coordxy y, boolean diagonals)
 {
-    struct opvar *tmp = op_selection_opvar(NULL);
-#define SEL_FLOOD_STACK (COLNO*ROWNO)
-#define SEL_FLOOD(nx, ny) \
-    do {                                      \
-        if (idx < SEL_FLOOD_STACK) {          \
-            dx[idx] = (nx);                   \
-            dy[idx] = (ny);                   \
-            idx++;                            \
-        } else {                              \
-            panic(floodfill_stack_overrun);   \
-        }                                     \
-    } while (0)
-#define SEL_FLOOD_CHKDIR(mx, my, sel) \
-    do {                                                        \
-        if (isok((mx), (my)) &&                                 \
-            (*selection_flood_check_func)((mx), (my)) &&        \
-            !op_selection_getpoint((mx), (my), (sel)) &&        \
-            !sel_flood_havepoint((mx), (my), dx, dy, idx)) {    \
-            SEL_FLOOD((mx), (my));                              \
-        }                                                       \
-    } while (0)
+    struct selectionvar view;
 
-    static const char floodfill_stack_overrun[] = "floodfill stack overrun";
-    int idx = 0;
-    coordxy dx[SEL_FLOOD_STACK];
-    coordxy dy[SEL_FLOOD_STACK];
-
-    if (selection_flood_check_func == (int (*) (coordxy, coordxy)) 0) {
-        opvar_free(tmp);
-        return;
-    }
-    SEL_FLOOD(x, y);
-    do {
-        idx--;
-        x = dx[idx];
-        y = dy[idx];
-        if (isok(x, y)) {
-            op_selection_setpoint(x, y, ov, 1);
-            op_selection_setpoint(x, y, tmp, 1);
-        }
-        SEL_FLOOD_CHKDIR((x + 1), y, tmp);
-        SEL_FLOOD_CHKDIR((x - 1), y, tmp);
-        SEL_FLOOD_CHKDIR(x, (y + 1), tmp);
-        SEL_FLOOD_CHKDIR(x, (y - 1), tmp);
-        if (diagonals) {
-            SEL_FLOOD_CHKDIR((x + 1), (y + 1), tmp);
-            SEL_FLOOD_CHKDIR((x - 1), (y - 1), tmp);
-            SEL_FLOOD_CHKDIR((x - 1), (y + 1), tmp);
-            SEL_FLOOD_CHKDIR((x + 1), (y - 1), tmp);
-        }
-    } while (idx > 0);
-#undef SEL_FLOOD
-#undef SEL_FLOOD_STACK
-#undef SEL_FLOOD_CHKDIR
-    opvar_free(tmp);
-}
-
-/* McIlroy's Ellipse Algorithm */
-void
-op_selection_do_ellipse(struct opvar *ov, int xc, int yc, int a, int b, int filled)
-{
-    /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
-    int x = 0, y = b;
-    long a2 = (long)a*a, b2 = (long)b*b;
-    long crit1 = -(a2/4 + a%2 + b2);
-    long crit2 = -(b2/4 + b%2 + a2);
-    long crit3 = -(b2/4 + b%2);
-    long t = -a2*y; /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
-    long dxt = 2*b2*x, dyt = -2*a2*y;
-    long d2xt = 2*b2, d2yt = 2*a2;
-    long width = 1;
-    long i;
-
-    if (!ov) {
-        return;
-    }
-
-    filled = !filled;
-
-    if (!filled) {
-        while (y>=0 && x<=a) {
-            op_selection_setpoint(xc+x, yc+y, ov, 1);
-            if (x!=0 || y!=0) {
-                op_selection_setpoint(xc-x, yc-y, ov, 1);
-            }
-            if (x!=0 && y!=0) {
-                op_selection_setpoint(xc+x, yc-y, ov, 1);
-                op_selection_setpoint(xc-x, yc+y, ov, 1);
-            }
-            if (t + b2*x <= crit1 || /* e(x+1,y-1/2) <= 0 */
-                t + a2*y <= crit3) { /* e(x+1/2,y) <= 0 */
-                x++; dxt += d2xt; t += dxt;
-            } else if (t - a2*y > crit2) { /* e(x+1/2,y-1) > 0 */
-                y--; dyt += d2yt; t += dyt;
-            } else {
-                x++; dxt += d2xt; t += dxt;
-                y--; dyt += d2yt; t += dyt;
-            }
-        }
-    } else {
-        while (y >= 0 && x <= a) {
-            if (t + b2*x <= crit1 || /* e(x+1,y-1/2) <= 0 */
-                t + a2*y <= crit3) { /* e(x+1/2,y) <= 0 */
-                x++; dxt += d2xt; t += dxt;
-                width += 2;
-            } else if (t - a2*y > crit2) { /* e(x+1/2,y-1) > 0 */
-                for (i = 0; i < width; i++) {
-                    op_selection_setpoint(xc-x+i, yc-y, ov, 1);
-                }
-                if (y != 0) {
-                    for (i = 0; i < width; i++) {
-                        op_selection_setpoint(xc-x+i, yc+y, ov, 1);
-                    }
-                }
-                y--; dyt += d2yt; t += dyt;
-            } else {
-                for (i = 0; i < width; i++) {
-                    op_selection_setpoint(xc-x+i, yc-y, ov, 1);
-                }
-                if (y != 0) {
-                    for (i = 0; i < width; i++) {
-                        op_selection_setpoint(xc-x+i, yc+y, ov, 1);
-                    }
-                }
-                x++; dxt += d2xt; t += dxt;
-                y--; dyt += d2yt; t += dyt;
-                width += 2;
-            }
-        }
-    }
-}
-
-/* distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
-long
-line_dist_coord(long int x1, long int y1, long int x2, long int y2, long int x3, long int y3)
-{
-    long px = x2-x1;
-    long py = y2-y1;
-
-    if (x1 == x2 && y1 == y2) {
-        return isqrt(dist2(x1, y1, x3, y3));
-    }
-
-    long s = px*px + py*py;
-    float u = ((x3 - x1) * px + (y3 - y1) * py) / (float)s;
-
-    if (u > 1) {
-        u = 1;
-    } else if (u < 0) {
-        u = 0;
-    }
-
-    long x = x1 + u * px;
-    long y = y1 + u * py;
-    long dx = x - x3;
-    long dy = y - y3;
-    long dist = isqrt(dx*dx + dy*dy);
-
-    return dist;
+    selection_floodfill(opsel_view(ov, &view), x, y, diagonals);
 }
 
 void
-op_selection_do_gradient(struct opvar *ov, long int x, long int y, long int x2, long int y2, long int gtyp, long int mind, long int maxd, long int limit)
+op_selection_do_ellipse(struct opvar *ov, int xc, int yc, int a, int b,
+                        int filled)
 {
-    long dx, dy, dofs;
+    struct selectionvar view;
 
-    if (mind > maxd) {
-        long tmp = mind;
-        mind = maxd;
-        maxd = tmp;
-    }
-
-    dofs = maxd - mind;
-    if (dofs < 1) {
-        dofs = 1;
-    }
-
-    switch (gtyp) {
-    default:
-    case SEL_GRADIENT_RADIAL:
-    {
-        for (dx = 0; dx < COLNO; dx++) {
-            for (dy = 0; dy < ROWNO; dy++) {
-                long d = line_dist_coord(x, y, x2, y2, dx, dy);
-                if (d >= mind && (!limit || (d <= maxd))) {
-                    if ((d - mind) > rn2(dofs)) {
-                        op_selection_setpoint(dx, dy, ov, 1);
-                    }
-                }
-            }
-        }
-    }
-    break;
-    case SEL_GRADIENT_SQUARE:
-    {
-        for (dx = 0; dx < COLNO; dx++) {
-            for (dy = 0; dy < ROWNO; dy++) {
-                long d1 = line_dist_coord(x, y, x2, y2, x, dy);
-                long d2 = line_dist_coord(x, y, x2, y2, dx, y);
-                long d3 = line_dist_coord(x, y, x2, y2, x2, dy);
-                long d4 = line_dist_coord(x, y, x2, y2, dx, y2);
-                long d5 = line_dist_coord(x, y, x2, y2, dx, dy);
-                long d = min(d5, min(max(d1, d2), max(d3, d4)));
-
-                if (d >= mind && (!limit || (d <= maxd))) {
-                    if ((d - mind) > rn2(dofs)) {
-                        op_selection_setpoint(dx, dy, ov, 1);
-                    }
-                }
-            }
-        }
-    }
-    break;
-    }
-}
-
-/* bresenham line algo */
-void
-op_selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2, struct opvar *ov)
-{
-    int d, dx, dy, ai, bi, xi, yi;
-
-    if (x1 < x2) {
-        xi = 1;
-        dx = x2 - x1;
-    } else {
-        xi = -1;
-        dx = x1 - x2;
-    }
-
-    if (y1 < y2) {
-        yi = 1;
-        dy = y2 - y1;
-    } else {
-        yi = -1;
-        dy = y1 - y2;
-    }
-
-    op_selection_setpoint(x1, y1, ov, 1);
-
-    if (dx > dy) {
-        ai = (dy - dx) * 2;
-        bi = dy * 2;
-        d  = bi - dx;
-        do {
-            if (d >= 0) {
-                y1 += yi;
-                d += ai;
-            } else {
-                d += bi;
-            }
-            x1 += xi;
-            op_selection_setpoint(x1, y1, ov, 1);
-        } while (x1 != x2);
-    } else {
-        ai = (dx - dy) * 2;
-        bi = dx * 2;
-        d  = bi - dy;
-        do {
-            if (d >= 0) {
-                x1 += xi;
-                d += ai;
-            } else {
-                d += bi;
-            }
-            y1 += yi;
-            op_selection_setpoint(x1, y1, ov, 1);
-        } while (y1 != y2);
-    }
+    selection_do_ellipse(opsel_view(ov, &view), xc, yc, a, b, filled);
 }
 
 void
-op_selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2, schar rough, schar rec, struct opvar *ov)
+op_selection_do_gradient(struct opvar *ov, long x, long y, long x2, long y2,
+                         long gtyp, long mind, long maxd, long limit)
 {
-    int mx, my;
-    int dx, dy;
+    struct selectionvar view;
 
-    if (rec < 1) {
-        return;
-    }
-
-    if ((x2 == x1) && (y2 == y1)) {
-        op_selection_setpoint(x1, y1, ov, 1);
-        return;
-    }
-
-    if (rough > max(abs(x2-x1), abs(y2-y1))) {
-        rough = max(abs(x2-x1), abs(y2-y1));
-    }
-
-    if (rough < 2) {
-        mx = ((x1 + x2) / 2);
-        my = ((y1 + y2) / 2);
-    } else {
-        do {
-            dx = rn2(rough) - (rough / 2);
-            dy = rn2(rough) - (rough / 2);
-            mx = ((x1 + x2) / 2) + dx;
-            my = ((y1 + y2) / 2) + dy;
-        } while ((mx > COLNO-1 || mx < 0 || my < 0 || my > ROWNO-1));
-    }
-
-    op_selection_setpoint(mx, my, ov, 1);
-
-    rough = (rough * 2) / 3;
-
-    rec--;
-
-    op_selection_do_randline(x1, y1, mx, my, rough, rec, ov);
-    op_selection_do_randline(mx, my, x2, y2, rough, rec, ov);
+    selection_do_gradient(opsel_view(ov, &view), x, y, x2, y2, gtyp, mind,
+                          maxd, limit);
 }
 
 void
-op_selection_iterate(struct opvar *ov, void (*func) (coordxy, coordxy, genericptr_t), genericptr_t arg)
+op_selection_do_line(coordxy x1, schar y1, coordxy x2, schar y2,
+                     struct opvar *ov)
 {
-    int x, y;
-    /* yes, this is very naive, but it's not _that_ expensive. */
-    for (x = 0; x < COLNO; x++) {
-        for (y = 0; y < ROWNO; y++) {
-            if (op_selection_getpoint(x, y, ov)) {
-                (*func)(x, y, arg);
-            }
-        }
-    }
+    struct selectionvar view;
+
+    selection_do_line(x1, y1, x2, y2, opsel_view(ov, &view));
+}
+
+void
+op_selection_do_randline(coordxy x1, schar y1, coordxy x2, schar y2,
+                         schar rough, schar rec, struct opvar *ov)
+{
+    struct selectionvar view;
+
+    selection_do_randline(x1, y1, x2, y2, rough, rec,
+                          opsel_view(ov, &view));
+}
+
+void
+op_selection_iterate(struct opvar *ov,
+                     void (*func)(coordxy, coordxy, genericptr_t),
+                     genericptr_t arg)
+{
+    struct selectionvar view;
+
+    selection_iterate(opsel_view(ov, &view), func, arg);
 }
 
 void
@@ -4276,7 +3868,7 @@ sp_level_coder(sp_lev *lvl)
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
             if (isok(x, y)) {
                 struct opvar *pt = op_selection_opvar(NULL);
-                floodfillchk_match_under_typ = levl[x][y].typ;
+                set_floodfillchk_match_under(levl[x][y].typ);
                 op_selection_floodfill(pt, x, y, FALSE);
                 splev_stack_push(coder->stack, pt);
             }

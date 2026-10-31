@@ -909,7 +909,7 @@ l_selection_gradient(lua_State *L)
         y2 = y;
     }
 
-    selection_do_gradient(sel, x, y, x2, y2, type, mindist, maxdist);
+    selection_do_gradient(sel, x, y, x2, y2, type, mindist, maxdist, 0L);
     lua_settop(L, 1);
     return 1;
 }

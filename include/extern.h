@@ -2426,6 +2426,9 @@ extern void selection_recalc_bounds(struct selectionvar *) NONNULLARG1;
 extern coordxy selection_getpoint(coordxy, coordxy, struct selectionvar *) NO_NNARGS;
 extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
 extern struct selectionvar * selection_not(struct selectionvar *);
+extern struct selectionvar *selection_logical_oper(struct selectionvar *,
+                                                   struct selectionvar *,
+                                                   char);
 extern struct selectionvar *selection_filter_percent(struct selectionvar *,
                                                      int);
 extern struct selectionvar *selection_filter_mapchar(struct selectionvar *,
@@ -2439,7 +2442,7 @@ extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
 extern void selection_do_ellipse(struct selectionvar *, int, int, int, int,
                                  int);
 extern void selection_do_gradient(struct selectionvar *, long, long, long,
-                                  long, long, long, long);
+                                  long, long, long, long, long);
 extern void selection_do_line(coordxy, coordxy, coordxy, coordxy,
                               struct selectionvar *);
 extern void selection_do_randline(coordxy, coordxy, coordxy, coordxy,

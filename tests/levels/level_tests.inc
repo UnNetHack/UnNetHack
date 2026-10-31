@@ -374,6 +374,38 @@ START_TEST(test_fill_empty_maze_skips_fully_used_maze)
 END_TEST
 
 /* ------------------------------------------------------------------ */
+/* selection_logical_oper                                              */
+/* ------------------------------------------------------------------ */
+
+START_TEST(test_selection_logical_oper)
+{
+    struct selectionvar *a = selection_new();
+    struct selectionvar *b = selection_new();
+    struct selectionvar *r;
+
+    selection_setpoint(1, 1, a, 1);
+    selection_setpoint(2, 2, a, 1);
+    selection_setpoint(2, 2, b, 1);
+    selection_setpoint(3, 3, b, 1);
+
+    r = selection_logical_oper(a, b, '&');
+    ck_assert_int_eq(selection_getpoint(1, 1, r), 0);
+    ck_assert_int_eq(selection_getpoint(2, 2, r), 1);
+    ck_assert_int_eq(selection_getpoint(3, 3, r), 0);
+    selection_free(r, TRUE);
+
+    r = selection_logical_oper(a, b, '|');
+    ck_assert_int_eq(selection_getpoint(1, 1, r), 1);
+    ck_assert_int_eq(selection_getpoint(2, 2, r), 1);
+    ck_assert_int_eq(selection_getpoint(3, 3, r), 1);
+    selection_free(r, TRUE);
+
+    selection_free(a, TRUE);
+    selection_free(b, TRUE);
+}
+END_TEST
+
+/* ------------------------------------------------------------------ */
 /* ensure_way_out                                                      */
 /* ------------------------------------------------------------------ */
 
@@ -489,6 +521,7 @@ level_suite(void)
     tcase_add_test(tc, test_maze1xy_returns_untouched_odd_coordinate);
     tcase_add_test(tc, test_fill_empty_maze_skips_fully_used_maze);
     tcase_add_test(tc, test_ensure_way_out_creates_escape);
+    tcase_add_test(tc, test_selection_logical_oper);
     tcase_add_test(tc, test_rnddoor_returns_valid_door_state);
 
     return s;

@@ -18,7 +18,7 @@ update=no
 [ "${1:-}" = "--update" ] && update=yes
 
 seeds="42 7 1234"
-des_levels="castle-1 medusa-1 asmod-1 baalz-1 knox-1 oracle valley-1 minetn-1 bigrm-1 soko1-1 juiblex sanctum blkmar-2 Arc-loca sheolfil sheolmid"
+des_levels="castle-1 medusa-1 asmod-1 baalz-1 knox-1 oracle valley-1 minetn-1 bigrm-1 bigrm-13 bigrm-14 soko1-1 juiblex sanctum blkmar-2 Arc-loca Rog-strt town-1 sheolfil sheolmid"
 lua_levels="Arc-strt Bar-strt Mon-strt Ran-strt Val-strt Arc-goal Bar-goal Val-goal Arc-loca Mon-loca Val-loca"
 
 tmp=$(mktemp -d)
