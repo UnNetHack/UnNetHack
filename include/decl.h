@@ -37,6 +37,8 @@ E NEARDATA int nroom;
 E NEARDATA int nsubroom;
 /* cells already written by the active special-level loader */
 E char SpLev_Map[COLNO][ROWNO];
+E boolean splev_init_present;
+E boolean icedpools;
 E NEARDATA int occtime;
 
 #define WARNCOUNT 6         /* number of different warning levels */

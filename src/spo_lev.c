@@ -929,43 +929,6 @@ sp_level_free(sp_lev *lvl)
     return TRUE;
 }
 
-void
-splev_initlev(lev_init *linit)
-{
-    switch (linit->init_style) {
-    default: impossible("Unrecognized level init style."); break;
-    case LVLINIT_NONE: break;
-    case LVLINIT_SOLIDFILL:
-        if (linit->lit == -1) {
-            linit->lit = rn2(2);
-        }
-        lvlfill_solid(linit->filling, linit->lit);
-        break;
-    case LVLINIT_MAZEGRID:
-        lvlfill_maze_grid(2, 0, x_maze_max, y_maze_max, linit->filling);
-        break;
-    case LVLINIT_SHEOL:
-        mksheol(linit);
-        break;
-#ifdef REINCARNATION
-    case LVLINIT_ROGUE:
-        makeroguerooms();
-        break;
-#endif
-    case LVLINIT_MINES:
-        if (linit->lit == -1) {
-            linit->lit = rn2(2);
-            adjust_mines_lightning(linit);
-        }
-        if (linit->filling > -1) {
-            lvlfill_solid(linit->filling, 0);
-        }
-        linit->icedpools = icedpools;
-        mkmap(linit);
-        break;
-    }
-}
-
 struct sp_frame *
 frame_new(long int execptr)
 {
@@ -1749,6 +1712,12 @@ spo_initlevel(struct sp_coder *coder)
     init_lev.filling = OV_i(filling);
 
     coder->lvl_is_joined = OV_i(joined);
+
+    /* the compiled .des format stores the mazegrid fill character in
+       filling; the shared initializer reads bg */
+    if (init_lev.init_style == LVLINIT_MAZEGRID) {
+        init_lev.bg = init_lev.filling;
+    }
 
     splev_initlev(&init_lev);
 
@@ -2862,125 +2831,6 @@ spo_replace_terrain(struct sp_coder *coder)
     opvar_free(from_ter);
     opvar_free(to_ter);
     opvar_free(chance);
-}
-
-static boolean
-generate_way_out_method(int nx, int ny, struct opvar *ov)
-{
-    const int escapeitems[] = {
-        PICK_AXE,
-        DWARVISH_MATTOCK,
-        CRYSTAL_PICK,
-        WAN_DIGGING,
-        WAN_TELEPORTATION,
-        SCR_TELEPORTATION,
-        RIN_TELEPORTATION
-    };
-    struct opvar *ov2 = op_selection_opvar((char *) 0), *ov3;
-    coordxy x, y;
-    boolean res = TRUE;
-
-    op_selection_floodfill(ov2, nx, ny, TRUE);
-    ov3 = opvar_clone(ov2);
-
-    /* try to make a door */
-    while (op_selection_rndcoord(ov3, &x, &y, TRUE)) {
-        if (isok(x+1, y) &&
-             !op_selection_getpoint(x+1, y, ov) && IS_WALL(levl[x+1][y].typ) &&
-            isok(x+2, y) &&
-              op_selection_getpoint(x+2, y, ov) && ACCESSIBLE(levl[x+2][y].typ)) {
-            levl[x+1][y].typ = DOOR;
-            goto gotitdone;
-        }
-        if (isok(x-1, y) &&
-             !op_selection_getpoint(x-1, y, ov) && IS_WALL(levl[x-1][y].typ) &&
-            isok(x-2, y) &&
-             op_selection_getpoint(x-2, y, ov) && ACCESSIBLE(levl[x-2][y].typ)) {
-            levl[x-1][y].typ = DOOR;
-            goto gotitdone;
-        }
-        if (isok(x, y+1) &&
-             !op_selection_getpoint(x, y+1, ov) && IS_WALL(levl[x][y+1].typ) &&
-            isok(x, y+2) &&
-             op_selection_getpoint(x, y+2, ov) && ACCESSIBLE(levl[x][y+2].typ)) {
-            levl[x][y+1].typ = DOOR;
-            goto gotitdone;
-        }
-        if (isok(x, y-1) &&
-             !op_selection_getpoint(x, y-1, ov) && IS_WALL(levl[x][y-1].typ) &&
-            isok(x, y-2) &&
-             op_selection_getpoint(x, y-2, ov) && ACCESSIBLE(levl[x][y-2].typ)) {
-            levl[x][y-1].typ = DOOR;
-            goto gotitdone;
-        }
-    }
-
-    /* try to make a hole or a trapdoor */
-    if (Can_fall_thru(&u.uz)) {
-        opvar_free(ov3);
-        ov3 = opvar_clone(ov2);
-        while (op_selection_rndcoord(ov3, &x, &y, TRUE)) {
-            if (maketrap(x,y, rn2(2) ? HOLE : TRAPDOOR)) {
-                goto gotitdone;
-            }
-        }
-    }
-
-    /* generate one of the escape items */
-    if (op_selection_rndcoord(ov2, &x, &y, FALSE)) {
-        mksobj_at(escapeitems[rn2(SIZE(escapeitems))], x, y, TRUE, FALSE);
-        goto gotitdone;
-    }
-
-    res = FALSE;
- gotitdone:
-    opvar_free(ov2);
-    opvar_free(ov3);
-    return res;
-}
-
-static void
-ensure_way_out(void)
-{
-    struct opvar *ov = op_selection_opvar((char *) 0);
-    struct trap *ttmp = ftrap;
-    int x,y;
-    boolean ret = TRUE;
-    stairway *stway = stairs;
-
-    set_selection_floodfillchk(floodfillchk_match_accessible);
-
-    while (stway) {
-        if (stway->tolev.dnum == u.uz.dnum) {
-            op_selection_floodfill(ov, stway->sx, stway->sy, TRUE);
-        }
-        stway = stway->next;
-    }
-
-    while (ttmp) {
-        if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE || is_hole(ttmp->ttyp)) &&
-             !op_selection_getpoint(ttmp->tx, ttmp->ty, ov)) {
-            op_selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
-        }
-        ttmp = ttmp->ntrap;
-    }
-
-    do {
-        ret = TRUE;
-        for (x = 0; x < COLNO; x++) {
-            for (y = 0; y < ROWNO; y++) {
-                if (ACCESSIBLE(levl[x][y].typ) && !op_selection_getpoint(x, y, ov)) {
-                    if (generate_way_out_method(x,y, ov)) {
-                        op_selection_floodfill(ov, x,y, TRUE);
-                    }
-                    ret = FALSE;
-                    goto outhere;
-                }
-            }
-        }
-    outhere: ;
-    } while (!ret);
-    opvar_free(ov);
 }
 
 void

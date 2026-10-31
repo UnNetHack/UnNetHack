@@ -148,6 +148,8 @@ struct engr *head_engr;
 
 dlevel_t level;     /* level map */
 char SpLev_Map[COLNO][ROWNO];
+boolean splev_init_present = FALSE;
+boolean icedpools = FALSE;
 struct trap *ftrap = (struct trap *)0;
 NEARDATA struct monst youmonst = DUMMY;
 NEARDATA struct permonst upermonst = DUMMY;

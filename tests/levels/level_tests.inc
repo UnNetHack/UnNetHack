@@ -374,6 +374,58 @@ START_TEST(test_fill_empty_maze_skips_fully_used_maze)
 END_TEST
 
 /* ------------------------------------------------------------------ */
+/* ensure_way_out                                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * A sealed accessible pocket must get at least one way out: a secret
+ * door, a hole/trapdoor, or an escape item.
+ */
+START_TEST(test_ensure_way_out_creates_escape)
+{
+    int x, y;
+    boolean escape = FALSE;
+    struct obj *o;
+    struct trap *t;
+
+    reset_level_state();
+    init_objects();
+    memset(levl, STONE, sizeof levl);
+    for (x = 10; x <= 14; x++) {
+        for (y = 10; y <= 14; y++) {
+            levl[x][y].typ = ROOM;
+        }
+    }
+    stairs = NULL;
+    ftrap = NULL;
+
+    ensure_way_out();
+
+    for (x = 0; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            if (levl[x][y].typ == SDOOR) {
+                escape = TRUE;
+            }
+        }
+    }
+    for (t = ftrap; t; t = t->ntrap) {
+        if (t->ttyp == HOLE || t->ttyp == TRAPDOOR) {
+            escape = TRUE;
+        }
+    }
+    for (o = fobj; o; o = o->nobj) {
+        if (o->otyp == PICK_AXE || o->otyp == DWARVISH_MATTOCK
+            || o->otyp == WAN_DIGGING || o->otyp == WAN_TELEPORTATION
+            || o->otyp == SCR_TELEPORTATION || o->otyp == RIN_TELEPORTATION) {
+            escape = TRUE;
+        }
+    }
+
+    ck_assert(escape);
+}
+END_TEST
+
+/* ------------------------------------------------------------------ */
 /* rnddoor                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -436,6 +488,7 @@ level_suite(void)
     tcase_add_test(tc, test_build_room_creates_room_with_requested_size);
     tcase_add_test(tc, test_maze1xy_returns_untouched_odd_coordinate);
     tcase_add_test(tc, test_fill_empty_maze_skips_fully_used_maze);
+    tcase_add_test(tc, test_ensure_way_out_creates_escape);
     tcase_add_test(tc, test_rnddoor_returns_valid_door_state);
 
     return s;

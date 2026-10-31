@@ -578,5 +578,7 @@ int rndtrap(void);
 void lvlfill_solid(schar filling, schar lit);
 void lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling);
 int floodfillchk_match_accessible(coordxy x, coordxy y);
+void ensure_way_out(void);
+void splev_initlev(lev_init *linit);
 
 #endif /* SP_LEV_H */

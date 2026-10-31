@@ -38,12 +38,10 @@ static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 void create_monster(monster *, struct mkroom *);
 void create_altar(altar *, struct mkroom *);
-static void splev_initlev(lev_init *);
 static boolean generate_way_out_method(coordxy nx, coordxy ny,
                                        struct selectionvar *ov);
 static void l_push_wid_hei_table(lua_State *, int, int);
 static boolean good_stair_loc(coordxy, coordxy);
-static void ensure_way_out(void);
 void adjust_mines_lightning(lev_init *);
 
 #if 0
@@ -3147,7 +3145,7 @@ fill_empty_maze(void)
     }
 }
 
-static void
+void
 splev_initlev(lev_init *linit)
 {
     switch (linit->init_style) {
@@ -3181,6 +3179,9 @@ splev_initlev(lev_init *linit)
         }
         linit->icedpools = icedpools;
         mkmap(linit);
+        break;
+    case LVLINIT_SHEOL:
+        mksheol(linit);
         break;
     case LVLINIT_SWAMP:
         if (linit->lit == BOOL_RANDOM) {
@@ -5408,7 +5409,7 @@ generate_way_out_method(
     return res;
 }
 
-static void
+void
 ensure_way_out(void)
 {
     struct selectionvar *ov = selection_new();
@@ -6213,7 +6214,6 @@ lspo_finalize_level(lua_State *L)
     link_doors_rooms();
     remove_boundary_syms();
 
-    /* TODO: ensure_way_out() needs rewrite */
     if (L && gc.coder->check_inaccessibles) {
         ensure_way_out();
     }
@@ -6674,7 +6674,6 @@ load_special_lua(const char *name)
     link_doors_rooms();
     remove_boundary_syms();
 
-    /* TODO: ensure_way_out() needs rewrite */
     if (gc.coder->check_inaccessibles) {
         ensure_way_out();
     }
