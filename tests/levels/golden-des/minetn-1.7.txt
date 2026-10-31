@@ -25,11 +25,11 @@ row 17 001RRRRRRRRRR10000000000Q1R522282228226R522226R522822226RPQ00000522222600
 row 18 005222222222260000000000Q1RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR1Q000000000000000000000
 row 19 000000000000000000000000Q522222222222222222222222222222226Q000000000000000000000
 row 20 00000000000000000000000000000000000000000000000000000000000000000000000000000000
-room 0 26 4 56 18 type=0 doors=13
-room 1 67 6 72 8 type=0 doors=5
+room 0 26 4 56 18 type=0 doors=17
+room 1 67 6 72 8 type=0 doors=7
 room 2 4 3 12 5 type=0 doors=4
-room 3 3 13 12 17 type=0 doors=4
-room 4 65 14 69 16 type=0 doors=4
+room 3 3 13 12 17 type=0 doors=8
+room 4 65 14 69 16 type=0 doors=8
 door 30 10 mask=4 horizontal=1
 door 30 12 mask=4 horizontal=1
 door 33 10 mask=4 horizontal=1
@@ -41,27 +41,36 @@ door 44 7 mask=8 horizontal=0
 door 41 12 mask=4 horizontal=1
 door 47 15 mask=8 horizontal=0
 door 54 9 mask=4 horizontal=1
-door 54 13 mask=4 horizontal=1
 door 57 17 mask=4 horizontal=0
 door 25 4 mask=0 horizontal=0
 door 25 16 mask=0 horizontal=0
 door 57 5 mask=0 horizontal=0
 door 57 8 mask=0 horizontal=0
-door 25 4 mask=0 horizontal=0
-door 57 5 mask=0 horizontal=0
-door 44 7 mask=8 horizontal=0
-door 57 8 mask=0 horizontal=0
+door 54 13 mask=4 horizontal=1
+door 47 15 mask=8 horizontal=0
+door 38 14 mask=8 horizontal=0
+door 41 12 mask=4 horizontal=1
+door 32 12 mask=4 horizontal=1
+door 30 12 mask=4 horizontal=1
+door 33 10 mask=4 horizontal=1
+door 30 10 mask=4 horizontal=1
 door 54 9 mask=4 horizontal=1
-door 54 13 mask=4 horizontal=1
-door 25 16 mask=0 horizontal=0
-door 57 17 mask=4 horizontal=0
+door 48 9 mask=4 horizontal=1
+door 37 9 mask=4 horizontal=1
+door 44 7 mask=8 horizontal=0
 door 66 8 mask=0 horizontal=0
+door 67 9 mask=0 horizontal=1
+door 69 9 mask=4 horizontal=1
 door 68 5 mask=0 horizontal=1
 door 66 6 mask=0 horizontal=0
 door 69 9 mask=4 horizontal=1
 door 67 9 mask=0 horizontal=1
 door 7 6 mask=0 horizontal=1
+door 13 15 mask=0 horizontal=0
+door 13 13 mask=4 horizontal=0
 door 13 4 mask=0 horizontal=0
+door 3 12 mask=0 horizontal=1
+door 6 12 mask=0 horizontal=1
 door 13 4 mask=0 horizontal=0
 door 11 6 mask=8 horizontal=1
 door 6 12 mask=0 horizontal=1
@@ -71,6 +80,11 @@ door 3 12 mask=0 horizontal=1
 door 64 14 mask=0 horizontal=0
 door 68 13 mask=0 horizontal=1
 door 66 13 mask=4 horizontal=1
+door 64 16 mask=0 horizontal=0
+door 54 13 mask=4 horizontal=1
+door 66 13 mask=4 horizontal=1
+door 68 13 mask=0 horizontal=1
+door 64 14 mask=0 horizontal=0
 door 64 16 mask=0 horizontal=0
 trap 68 14 4
 trap 10 4 20

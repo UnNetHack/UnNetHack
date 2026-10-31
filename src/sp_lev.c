@@ -31,23 +31,13 @@ static void flip_vault_guard(int, struct monst *,
                              coordxy, coordxy, coordxy, coordxy);
 static void sel_set_wall_property(coordxy, coordxy, genericptr_t);
 static boolean shared_with_room(int, int, struct mkroom *);
-static void get_location(coordxy *, coordxy *, getloc_flags_t,
-                         struct mkroom *);
 static void set_ok_location_func(boolean (*)(coordxy, coordxy));
-static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *,
-                              packed_coord);
-static boolean create_subroom(struct mkroom *, coordxy, coordxy, coordxy,
-                              coordxy, xint16, xint16);
-static void create_door(room_door *, struct mkroom *);
-static void create_trap(spltrap *, struct mkroom *);
 static int noncoalignment(aligntyp);
 static boolean m_bad_boulder_spot(coordxy, coordxy);
 static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 void create_monster(monster *, struct mkroom *);
 void create_altar(altar *, struct mkroom *);
-static void create_corridor(corridor *);
-static struct mkroom *build_room(room *, struct mkroom *);
 static void splev_initlev(lev_init *);
 static boolean generate_way_out_method(coordxy nx, coordxy ny,
                                        struct selectionvar *ov);
@@ -74,7 +64,6 @@ static void spo_room_door(struct sp_coder *);
 static void spo_wallify(struct sp_coder *);
 #endif
 static int l_create_stairway(lua_State *, boolean);
-static void spo_endroom(struct sp_coder *);
 static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
                                         int);
 static void l_get_lregion(lua_State *, lev_region *);
@@ -1282,7 +1271,7 @@ rndtrap(void)
  * The "humidity" flag is used to ensure that engravings aren't created
  * underwater, or eels on dry land.
  */
-static void
+void
 get_location(
     coordxy *x, coordxy *y,
     getloc_flags_t humidity,
@@ -1493,7 +1482,7 @@ get_room_loc(coordxy *x, coordxy *y, struct mkroom *croom)
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
-static void
+void
 get_free_room_loc(
     coordxy *x, coordxy *y,
     struct mkroom *croom,
@@ -1799,7 +1788,7 @@ create_room(
  * Create a subroom in room proom at pos x,y with width w & height h.
  * x & y are relative to the parent room.
  */
-static boolean
+boolean
 create_subroom(
     struct mkroom *proom,
     coordxy x, coordxy y,
@@ -1855,7 +1844,7 @@ create_subroom(
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
  */
-static void
+void
 create_door(room_door *dd, struct mkroom *broom)
 {
     int x = 0, y = 0;
@@ -1967,7 +1956,7 @@ create_door(room_door *dd, struct mkroom *broom)
 /*
  * Create a trap in a room.
  */
-static void
+void
 create_trap(spltrap *t, struct mkroom *croom)
 {
     coordxy x = -1, y = -1;
@@ -2839,7 +2828,7 @@ dig_corridor(
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
  */
-static void
+void
 create_corridor(corridor *c)
 {
     coord org, dest;
@@ -2980,7 +2969,7 @@ fill_special_room(struct mkroom *croom)
     }
 }
 
-static struct mkroom *
+struct mkroom *
 build_room(room *r, struct mkroom *mkr)
 {
     boolean okroom;
@@ -4309,23 +4298,24 @@ lspo_room(lua_State *L)
     return 0;
 }
 
-static void
-spo_endroom(struct sp_coder *coder UNUSED)
+void
+spo_endroom(struct sp_coder *coder)
 {
-    if (gc.coder->n_subroom > 1) {
-        gc.coder->n_subroom--;
-        gc.coder->tmproomlist[gc.coder->n_subroom] = NULL;
-        gc.coder->failed_room[gc.coder->n_subroom] = TRUE;
-    } else {
-        /* no subroom, get out of top-level room */
-        /* Need to ensure xstart/ystart/xsize/ysize have something sensible,
-           in case there's some stuff to be created outside the outermost
-           room, and there's no MAP. */
-        if (gx.xsize <= 1 && gy.ysize <= 1) {
-            reset_xystart_size();
-        }
+    if (coder->n_subroom > 1) {
+        coder->n_subroom--;
+        coder->tmproomlist[coder->n_subroom] = NULL;
+        coder->failed_room[coder->n_subroom] = TRUE;
+    } else if (gx.xsize <= 1 && gy.ysize <= 1) {
+        /* no subroom, get out of top-level room; ensure the map extent
+           is sensible for contents created outside any room */
+        reset_xystart_size();
     }
-    update_croom();
+
+    if (coder->n_subroom) {
+        coder->croom = coder->tmproomlist[coder->n_subroom - 1];
+    } else {
+        coder->croom = NULL;
+    }
 }
 
 /* callback for is_ok_location.

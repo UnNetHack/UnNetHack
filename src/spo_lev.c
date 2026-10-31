@@ -34,12 +34,7 @@ extern void spo_end_moninvent(void);
 extern void spo_pop_container(void);
 extern void adjust_mines_lightning(lev_init *);
 
-static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
-static void create_corridor(corridor *);
-static void create_trap(spltrap *, struct mkroom *);
 
-static boolean create_subroom(struct mkroom *, coordxy, coordxy,
-                              coordxy, coordxy, xint16, xint16);
 
 long opvar_array_length(struct sp_coder *);
 
@@ -70,8 +65,6 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 
 static boolean sp_level_loader(dlb *, sp_lev *);
-static void create_door(room_door *, struct mkroom *);
-static struct mkroom *build_room(room *, struct mkroom *);
 
 char *lev_message = 0;
 lev_region *lregions = 0;
@@ -557,282 +550,19 @@ fill_rooms(void)
  *  created underwater, or eels on dry land.
  */
 
-static void
-get_location(
-    coordxy *x, coordxy *y,
-    int humidity,
-    struct mkroom *croom)
-{
-    int cpt = 0;
-    int mx, my, sx, sy;
-
-    if (croom) {
-        mx = croom->lx;
-        my = croom->ly;
-        sx = croom->hx - mx + 1;
-        sy = croom->hy - my + 1;
-    } else {
-        mx = gx.xstart;
-        my = gy.ystart;
-        sx = gx.xsize;
-        sy = gy.ysize;
-    }
-
-    if (*x >= 0) { /* normal locations */
-        *x += mx;
-        *y += my;
-    } else { /* random location */
-        do {
-            if (croom) { /* handle irregular areas */
-                coord tmpc;
-                somexy(croom, &tmpc);
-                *x = tmpc.x;
-                *y = tmpc.y;
-            } else {
-                *x = mx + rn2((int)sx);
-                *y = my + rn2((int)sy);
-            }
-            if (is_ok_location(*x, *y, humidity)) {
-                break;
-            }
-        } while (++cpt < 100);
-        if (cpt >= 100) {
-            int xx, yy;
-
-            /* last try */
-            for (xx = 0; xx < sx; xx++) {
-                for (yy = 0; yy < sy; yy++) {
-                    *x = mx + xx;
-                    *y = my + yy;
-                    if (is_ok_location(*x, *y, humidity)) {
-                        goto found_it;
-                    }
-                }
-            }
-            if (!(humidity & NO_LOC_WARN)) {
-                impossible("get_location:  can't find a place!  mx: %d, my: %d, sx: %d, sy: %d",
-                           mx, my, sx, sy);
-            } else {
-                *x = *y = -1;
-            }
-        }
-    }
-found_it:;
-
-    if (!(humidity & ANY_LOC) && !isok(*x, *y)) {
-        if (!(humidity & NO_LOC_WARN)) {
-            warning("get_location:  (%d,%d) out of bounds", *x, *y);
-            *x = x_maze_max; *y = y_maze_max;
-        } else {
-            *x = *y = -1;
-        }
-    }
-}
-
 /*
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
 
-static void
-get_free_room_loc(
-    coordxy *x, coordxy *y,
-    struct mkroom *croom,
-    long int pos)
-{
-    coordxy try_x, try_y;
-    int trycnt = 0;
-
-    get_location_coord(&try_x, &try_y, DRY, croom, pos);
-    if (levl[try_x][try_y].typ != ROOM) {
-        do {
-            try_x = *x,  try_y = *y;
-            get_room_loc(&try_x, &try_y, croom);
-        } while (levl[try_x][try_y].typ != ROOM && ++trycnt <= 100);
-
-        if (trycnt > 100) {
-            panic("get_free_room_loc:  can't find a place!");
-        }
-    }
-    *x = try_x,  *y = try_y;
-}
-
 /*
  * Create a subroom in room proom at pos x,y with width w & height h.
  * x & y are relative to the parent room.
  */
-static boolean
-create_subroom(
-    struct mkroom *proom,
-    coordxy x, coordxy y,
-    coordxy w, coordxy h,
-    xint16 rtype, xint16 rlit)
-{
-    coordxy width, height;
-
-    width = proom->hx - proom->lx + 1;
-    height = proom->hy - proom->ly + 1;
-
-    /* There is a minimum size for the parent room */
-    if (width < 4 || height < 4) {
-        return FALSE;
-    }
-
-    /* Check for random position, size, etc... */
-
-    if (w == -1) {
-        w = rnd(width - 3);
-    }
-    if (h == -1) {
-        h = rnd(height - 3);
-    }
-    if (x == -1) {
-        x = rnd(width - w - 1) - 1;
-    }
-    if (y == -1) {
-        y = rnd(height - h - 1) - 1;
-    }
-    if (x == 1) {
-        x = 0;
-    }
-    if (y == 1) {
-        y = 0;
-    }
-    if ((x + w + 1) == width) {
-        x++;
-    }
-    if ((y + h + 1) == height) {
-        y++;
-    }
-    if (rtype == -1) {
-        rtype = OROOM;
-    }
-    if (rlit == -1) {
-        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-    }
-    add_subroom(proom, proom->lx + x, proom->ly + y,
-                proom->lx + x + w - 1, proom->ly + y + h - 1,
-                rlit, rtype, FALSE);
-    return TRUE;
-}
-
 /*
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
  */
-static void
-create_door(room_door *dd, struct mkroom *broom)
-{
-    int x = 0, y = 0;
-    int trycnt = 0, wtry = 0;
-
-    if (dd->secret == -1) {
-        dd->secret = rn2(2);
-    }
-
-    if (dd->mask == -1) {
-        /* is it a locked door, closed, or a doorway? */
-        if (!dd->secret) {
-            if (!rn2(3)) {
-                if (!rn2(5)) {
-                    dd->mask = D_ISOPEN;
-                } else if (!rn2(6)) {
-                    dd->mask = D_LOCKED;
-                } else {
-                    dd->mask = D_CLOSED;
-                }
-                if (dd->mask != D_ISOPEN && !rn2(25)) {
-                    dd->mask |= D_TRAPPED;
-                }
-            } else {
-                dd->mask = D_NODOOR;
-            }
-        } else {
-            if (!rn2(5)) {
-                dd->mask = D_LOCKED;
-            } else {
-                dd->mask = D_CLOSED;
-            }
-
-            if (!rn2(20)) {
-                dd->mask |= D_TRAPPED;
-            }
-        }
-    }
-
-    do {
-        int dwall, dpos;
-
-        dwall = dd->wall;
-        if (dwall == -1) { /* The wall is RANDOM */
-            dwall = 1 << rn2(4);
-        }
-
-        dpos = dd->pos;
-
-        /* Convert wall and pos into an absolute coordinate! */
-        wtry = rn2(4);
-        switch (wtry) {
-        case 0:
-            if (!(dwall & W_NORTH)) {
-                goto redoloop;
-            }
-            y = broom->ly - 1;
-            x = broom->lx + ((dpos == -1) ? rn2(1+(broom->hx - broom->lx)) : dpos);
-            if (IS_ROCK(levl[x][y-1].typ)) {
-                goto redoloop;
-            }
-            goto outdirloop;
-        case 1:
-            if (!(dwall & W_SOUTH)) {
-                goto redoloop;
-            }
-            y = broom->hy + 1;
-            x = broom->lx + ((dpos == -1) ? rn2(1+(broom->hx - broom->lx)) : dpos);
-            if (IS_ROCK(levl[x][y+1].typ)) {
-                goto redoloop;
-            }
-            goto outdirloop;
-        case 2:
-            if (!(dwall & W_WEST)) {
-                goto redoloop;
-            }
-            x = broom->lx - 1;
-            y = broom->ly + ((dpos == -1) ? rn2(1+(broom->hy - broom->ly)) : dpos);
-            if (IS_ROCK(levl[x-1][y].typ)) {
-                goto redoloop;
-            }
-            goto outdirloop;
-        case 3:
-            if (!(dwall & W_EAST)) {
-                goto redoloop;
-            }
-            x = broom->hx + 1;
-            y = broom->ly + ((dpos == -1) ? rn2(1+(broom->hy - broom->ly)) : dpos);
-            if (IS_ROCK(levl[x+1][y].typ)) {
-                goto redoloop;
-            }
-            goto outdirloop;
-        default:
-            x = y = 0;
-            panic("create_door: No wall for door!");
-            goto outdirloop;
-        }
-outdirloop:
-        if (okdoor(x, y)) {
-            break;
-        }
-redoloop:;
-    } while (++trycnt <= 100);
-    if (trycnt > 100) {
-        impossible("create_door: Can't find a proper place!");
-        return;
-    }
-    add_door(x, y, broom);
-    levl[x][y].typ = (dd->secret ? SDOOR : DOOR);
-    levl[x][y].doormask = dd->mask;
-}
-
 /*
  * Create a secret door in croom on any one of the specified walls.
  */
@@ -885,30 +615,6 @@ create_secret_door(
 /*
  * Create a trap in a room.
  */
-static void
-create_trap(spltrap *t, struct mkroom *croom)
-{
-    coordxy x = -1, y = -1;
-    coord tm;
-
-    if (croom) {
-        get_free_room_loc(&x, &y, croom, t->coord);
-    } else {
-        int trycnt = 0;
-        do {
-            get_location_coord(&x, &y, DRY, croom, t->coord);
-        } while ((levl[x][y].typ == STAIRS || levl[x][y].typ == LADDER) && ++trycnt <= 100);
-        if (trycnt > 100) {
-            return;
-        }
-    }
-
-    tm.x = x;
-    tm.y = y;
-
-    mktrap(t->type, 1, (struct mkroom*) 0, &tm);
-}
-
 static void
 spill_terrain(spill *sp, struct mkroom *croom)
 {
@@ -1026,42 +732,6 @@ replace_terrain(replaceterrain *terr, struct mkroom *croom)
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
  */
-static void
-create_corridor(corridor *c)
-{
-    coord org, dest;
-
-    if (c->src.room == -1) {
-        makecorridors(c->src.door);
-        return;
-    }
-
-    if ( !search_door(&rooms[c->src.room], &org.x, &org.y, c->src.wall,
-                     c->src.door)) {
-        return;
-    }
-
-    if (c->dest.room != -1) {
-        if (!search_door(&rooms[c->dest.room], &dest.x, &dest.y,
-                        c->dest.wall, c->dest.door)) {
-            return;
-        }
-        switch (c->src.wall) {
-        case W_NORTH: org.y--; break;
-        case W_SOUTH: org.y++; break;
-        case W_WEST:  org.x--; break;
-        case W_EAST:  org.x++; break;
-        }
-        switch (c->dest.wall) {
-        case W_NORTH: dest.y--; break;
-        case W_SOUTH: dest.y++; break;
-        case W_WEST:  dest.x--; break;
-        case W_EAST:  dest.x++; break;
-        }
-        (void) dig_corridor(&org, &dest, FALSE, CORR, STONE);
-    }
-}
-
 
 /*
  * Fill a room (shop, zoo, etc...) with appropriate stuff.
@@ -1137,36 +807,6 @@ fill_room(struct mkroom *croom, boolean prefilled)
         level.flags.has_swamp = TRUE;
         break;
     }
-}
-
-static struct mkroom *
-build_room(room *r, struct mkroom *mkr)
-{
-    boolean okroom;
-    struct mkroom   *aroom;
-    xint16 rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
-
-    if (mkr) {
-        aroom = &subrooms[nsubroom];
-        okroom = create_subroom(mkr, r->x, r->y, r->w, r->h,
-                                rtype, r->rlit);
-    } else {
-        aroom = &rooms[nroom];
-        okroom = create_room(r->x, r->y, r->w, r->h, r->xalign,
-                             r->yalign, rtype, r->rlit);
-    }
-
-    if (okroom) {
-#ifdef SPECIALIZATION
-        topologize(aroom, FALSE);        /* set roomno */
-#else
-        topologize(aroom);          /* set roomno */
-#endif
-        aroom->needfill = r->needfill;
-        aroom->needjoining = r->joined;
-        return aroom;
-    }
-    return (struct mkroom *)0;
 }
 
 /*
@@ -2337,28 +1977,6 @@ spo_room(struct sp_coder *coder)
     coder->n_subroom++;
     if (gi.in_mk_themerooms && coder->opcode == SPO_ROOM && !isbigrm) {
         gt.themeroom_failed = TRUE;
-    }
-}
-
-void
-spo_endroom(struct sp_coder *coder)
-{
-    if (coder->n_subroom > 1) {
-        coder->n_subroom--;
-        coder->tmproomlist[coder->n_subroom] = NULL;
-        coder->failed_room[coder->n_subroom] = TRUE;
-    } else {
-        /* no subroom, get out of top-level room */
-        /* Need to ensure gxxstart/gy.ystart/gx.xsize/gy.ysize have something sensible,
-           in case there's some stuff to be created outside the outermost room,
-           and there's no MAP.
-         */
-        if (gx.xsize <= 1 && gy.ysize <= 1) {
-            gx.xstart = 1;
-            gy.ystart = 0;
-            gx.xsize = COLNO-1;
-            gy.ysize = ROWNO;
-        }
     }
 }
 

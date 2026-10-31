@@ -5,8 +5,9 @@
 #
 # The dumps must be produced by the same build as the game data that the
 # drivers read through DLB (FILE_AREA_UNSHARE / NH_DATAAREA of the
-# configured prefix), so run `make` before this script.  Run with
-# --update to accept a change.
+# configured prefix).  Run `make` and then `make dlb`, so nhdat is
+# repacked from the current dat/*.lev; a stale nhdat silently invalidates
+# every dump.  Run with --update to accept a change.
 #
 # Usage: sh tests/levels/run_golden.sh [--update]
 
