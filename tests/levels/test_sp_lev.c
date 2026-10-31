@@ -7,7 +7,6 @@
 
 #include <check.h>
 
-#define TEST_SP_LEV 1
 #define IMPLEMENTATION_NAME "sp_lev"
 
 #include "../../src/sp_lev.c"

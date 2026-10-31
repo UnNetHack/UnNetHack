@@ -34,14 +34,7 @@ extern void spo_end_moninvent(void);
 extern void spo_pop_container(void);
 extern void adjust_mines_lightning(lev_init *);
 
-static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
-static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
-static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
-static void create_corridor(corridor *);
-static void create_trap(spltrap *, struct mkroom *);
 
-static boolean create_subroom(struct mkroom *, coordxy, coordxy,
-                              coordxy, coordxy, xint16, xint16);
 
 long opvar_array_length(struct sp_coder *);
 
@@ -71,21 +64,13 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
 static aligntyp ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 
-static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
-static int rnddoor(void);
-static int rndtrap(void);
-static void light_region(region *);
-static void maze1xy(coord *, int);
 static boolean sp_level_loader(dlb *, sp_lev *);
 static void create_door(room_door *, struct mkroom *);
-static struct mkroom *build_room(room *, struct mkroom *);
 
 char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
 
-static boolean splev_init_present = FALSE;
-static boolean icedpools = FALSE;
 static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
 #define SPLEV_STACK_RESERVE 128
@@ -483,18 +468,6 @@ variable_list_del(struct splev_var *varlist)
     }
 }
 
-void
-lvlfill_solid(schar filling, schar lit)
-{
-    int x, y;
-
-    for (x = 2; x <= x_maze_max; x++) {
-        for (y = 0; y <= y_maze_max; y++) {
-            SET_TYPLIT(x, y, filling, lit);
-        }
-    }
-}
-
 void flip_drawbridge_horizontal(struct rm *lev)
 {
     if (IS_DRAWBRIDGE(lev->typ)) {
@@ -537,32 +510,6 @@ void flip_drawbridge_vertical(struct rm *lev)
         }                                           \
     } while (0)
 
-/*
- * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
- */
-static void
-set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
-{
-    coordxy x, y;
-    struct rm *lev;
-
-    x1 = max(x1, 1);
-    x2 = min(x2, COLNO - 1);
-    y1 = max(y1, 0);
-    y2 = min(y2, ROWNO - 1);
-    for (y = y1; y <= y2; y++) {
-        for (x = x1; x <= x2; x++) {
-            lev = &levl[x][y];
-            if (IS_STWALL(lev->typ) || IS_TREES(lev->typ) ||
-                /* 3.6.2: made iron bars eligible to be flagged nondiggable
-                   (checked by chewing(hack.c) and zap_over_floor(zap.c)) */
-                 lev->typ == IRONBARS) {
-                lev->wall_info |= prop;
-            }
-        }
-    }
-}
-
 static void
 shuffle_alignments(void)
 {
@@ -572,121 +519,6 @@ shuffle_alignments(void)
     i = rn2(3);   atmp=ralign[2]; ralign[2]=ralign[i]; ralign[i]=atmp;
     if (rn2(2)) {
         atmp=ralign[1]; ralign[1]=ralign[0]; ralign[0]=atmp;
-    }
-}
-
-void
-remove_boundary_syms(void)
-{
-    /*
-     * If any CROSSWALLs are found, must change to ROOM after REGION's
-     * are laid out.  CROSSWALLS are used to specify "invisible"
-     * boundaries where DOOR syms look bad or aren't desirable.
-     */
-    coordxy x, y;
-    boolean has_bounds = FALSE;
-
-    for (x = 0; x < COLNO-1; x++) {
-        for (y = 0; y < ROWNO-1; y++) {
-            if (levl[x][y].typ == CROSSWALL) {
-                has_bounds = TRUE;
-                break;
-            }
-        }
-    }
-    if (has_bounds) {
-        for (x = 0; x < x_maze_max; x++) {
-            for (y = 0; y < y_maze_max; y++) {
-                if ((levl[x][y].typ == CROSSWALL) && SpLev_Map[x][y]) {
-                    levl[x][y].typ = ROOM;
-                }
-            }
-        }
-    }
-}
-/* used by sel_set_door() and link_doors_rooms() */
-static void
-set_door_orientation(coordxy x, coordxy y)
-{
-    boolean wleft, wright, wup, wdown;
-
-    /* If there's a wall or door on either the left side or right
-     * side (or both) of this secret door, make it be horizontal.
-     *
-     * It is feasible to put SDOOR in a corner, tee, or crosswall
-     * position, although once the door is found and opened it won't
-     * make a lot sense (diagonal access required).  Still, we try to
-     * handle that as best as possible.  For top or bottom tee, using
-     * horizontal is the best we can do.  For corner or crosswall,
-     * either horizontal or vertical are just as good as each other;
-     * we produce horizontal for corners and vertical for crosswalls.
-     * For left or right tee, using vertical is best.
-     *
-     * A secret door with no adjacent walls is also feasible and makes
-     * even less sense.  It will be displayed as a vertical wall while
-     * hidden and become a vertical door when found.  Before resorting
-     * to that, we check for solid rock which hasn't been wallified
-     * yet (cf lower leftside of leader's room in Cav quest).
-     */
-    wleft  = (isok(x - 1, y) && (IS_WALL(levl[x - 1][y].typ) ||
-                                 IS_DOOR(levl[x - 1][y].typ) ||
-                                 levl[x - 1][y].typ == SDOOR));
-    wright = (isok(x + 1, y) && (IS_WALL(levl[x + 1][y].typ) ||
-                                 IS_DOOR(levl[x + 1][y].typ) ||
-                                 levl[x + 1][y].typ == SDOOR));
-    wup    = (isok(x, y - 1) && (IS_WALL(levl[x][y - 1].typ) ||
-                                 IS_DOOR(levl[x][y - 1].typ) ||
-                                 levl[x][y - 1].typ == SDOOR));
-    wdown  = (isok(x, y + 1) && (IS_WALL(levl[x][y + 1].typ) ||
-                                 IS_DOOR(levl[x][y + 1].typ) ||
-                                 levl[x][y + 1].typ == SDOOR));
-    if (!wleft && !wright && !wup && !wdown) {
-        /* out of bounds is treated as implicit wall; should be academic
-           because we don't expect to have doors so near the level's edge */
-        wleft  = (!isok(x - 1, y) || IS_DOORJOIN(levl[x - 1][y].typ));
-        wright = (!isok(x + 1, y) || IS_DOORJOIN(levl[x + 1][y].typ));
-        wup    = (!isok(x, y - 1) || IS_DOORJOIN(levl[x][y - 1].typ));
-        wdown  = (!isok(x, y + 1) || IS_DOORJOIN(levl[x][y + 1].typ));
-    }
-    levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
-}
-
-static void
-maybe_add_door(coordxy x, coordxy y, struct mkroom *droom)
-{
-    if (droom->hx >= 0 && doorindex < DOORMAX && inside_room(droom, x, y)) {
-        int i;
-        for (i = droom->fdoor; i < droom->fdoor + droom->doorct; i++) {
-            if (doors[i].x == x && doors[i].y == y) {
-                return;
-            }
-        }
-        add_door(x, y, droom);
-    }
-}
-
-static void
-link_doors_rooms(void)
-{
-    int x, y;
-    int tmpi, m;
-
-    for (y = 0; y < ROWNO; y++) {
-        for (x = 0; x < COLNO; x++) {
-            if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
-                /* in case this door was a '+' or 'S' from the
-                   MAP...ENDMAP section without an explicit DOOR
-                   directive, set/clear levl[][].horizontal for it */
-                set_door_orientation(x, y);
-
-                for (tmpi = 0; tmpi < nroom; tmpi++) {
-                    maybe_add_door(x, y, &rooms[tmpi]);
-                    for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
-                        maybe_add_door(x, y, rooms[tmpi].sbrooms[m]);
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -709,51 +541,8 @@ fill_rooms(void)
 }
 
 /*
- * Choose randomly the state (nodoor, open, closed or locked) for a door
- */
-static int
-rnddoor(void)
-{
-    int i = 1 << rn2(5);
-
-    i >>= 1;
-    return i;
-}
-
-/*
  * Select a random trap
  */
-static int
-rndtrap(void)
-{
-    int rtrap;
-
-    do {
-        rtrap = rnd(TRAPNUM-1);
-        switch (rtrap) {
-        case HOLE: /* no random holes on special levels */
-        case VIBRATING_SQUARE:
-        case MAGIC_PORTAL: rtrap = NO_TRAP;
-            break;
-        case TRAPDOOR: if (!Can_dig_down(&u.uz)) {
-            rtrap = NO_TRAP;
-        }
-            break;
-        case LEVEL_TELEP:
-        case TELEP_TRAP:   if (level.flags.noteleport) {
-            rtrap = NO_TRAP;
-        }
-            break;
-        case ROLLING_BOULDER_TRAP:
-        case ROCKTRAP: if (In_endgame(&u.uz)) {
-            rtrap = NO_TRAP;
-        }
-            break;
-        }
-    } while (rtrap == NO_TRAP);
-    return rtrap;
-}
-
 /*
  * Coordinates in special level files are handled specially:
  *
@@ -761,252 +550,16 @@ rndtrap(void)
  *  The "humidity" flag is used to insure that engravings aren't
  *  created underwater, or eels on dry land.
  */
-static boolean is_ok_location(coordxy, coordxy, int);
-
-static void
-get_location(
-    coordxy *x, coordxy *y,
-    int humidity,
-    struct mkroom *croom)
-{
-    int cpt = 0;
-    int mx, my, sx, sy;
-
-    if (croom) {
-        mx = croom->lx;
-        my = croom->ly;
-        sx = croom->hx - mx + 1;
-        sy = croom->hy - my + 1;
-    } else {
-        mx = gx.xstart;
-        my = gy.ystart;
-        sx = gx.xsize;
-        sy = gy.ysize;
-    }
-
-    if (*x >= 0) { /* normal locations */
-        *x += mx;
-        *y += my;
-    } else { /* random location */
-        do {
-            if (croom) { /* handle irregular areas */
-                coord tmpc;
-                somexy(croom, &tmpc);
-                *x = tmpc.x;
-                *y = tmpc.y;
-            } else {
-                *x = mx + rn2((int)sx);
-                *y = my + rn2((int)sy);
-            }
-            if (is_ok_location(*x, *y, humidity)) {
-                break;
-            }
-        } while (++cpt < 100);
-        if (cpt >= 100) {
-            int xx, yy;
-
-            /* last try */
-            for (xx = 0; xx < sx; xx++) {
-                for (yy = 0; yy < sy; yy++) {
-                    *x = mx + xx;
-                    *y = my + yy;
-                    if (is_ok_location(*x, *y, humidity)) {
-                        goto found_it;
-                    }
-                }
-            }
-            if (!(humidity & NO_LOC_WARN)) {
-                impossible("get_location:  can't find a place!  mx: %d, my: %d, sx: %d, sy: %d",
-                           mx, my, sx, sy);
-            } else {
-                *x = *y = -1;
-            }
-        }
-    }
-found_it:;
-
-    if (!(humidity & ANY_LOC) && !isok(*x, *y)) {
-        if (!(humidity & NO_LOC_WARN)) {
-            warning("get_location:  (%d,%d) out of bounds", *x, *y);
-            *x = x_maze_max; *y = y_maze_max;
-        } else {
-            *x = *y = -1;
-        }
-    }
-}
-
-static boolean
-is_ok_location(coordxy x, coordxy y, int humidity)
-{
-    int typ;
-
-    if (Is_waterlevel(&u.uz)) {
-        return TRUE; /* accept any spot */
-    }
-
-    /* TODO: Should perhaps check if wall is diggable/passwall? */
-    if (humidity & ANY_LOC) {
-        return TRUE;
-    }
-
-    if ((humidity & SOLID) && IS_ROCK(levl[x][y].typ)) {
-        return TRUE;
-    }
-    if (humidity & DRY) {
-        typ = levl[x][y].typ;
-        if (typ == ROOM || typ == AIR ||
-            typ == CLOUD || typ == ICE || typ == CORR)
-            return TRUE;
-    }
-    if ((humidity & SPACELOC) && SPACE_POS(levl[x][y].typ)) {
-        return TRUE;
-    }
-    if ((humidity & WET) && is_pool(x, y)) {
-        return TRUE;
-    }
-    if ((humidity & HOT) && is_lava(x, y)) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-unpacked_coord
-get_unpacked_coord(long int loc, int defhumidity)
-{
-    static unpacked_coord c;
-
-    if (loc & SP_COORD_IS_RANDOM) {
-        c.x = c.y = -1;
-        c.is_random = 1;
-        c.getloc_flags = (loc & ~SP_COORD_IS_RANDOM);
-        if (!c.getloc_flags) {
-            c.getloc_flags = defhumidity;
-        }
-    } else {
-        c.is_random = 0;
-        c.getloc_flags = defhumidity;
-        c.x = SP_COORD_X(loc);
-        c.y = SP_COORD_Y(loc);
-    }
-    return c;
-}
 
 /*
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
-
-static void
-get_room_loc(coordxy *x, coordxy *y, struct mkroom *croom)
-{
-    coord c;
-
-    if (*x <0 && *y <0) {
-        if (somexy(croom, &c)) {
-            *x = c.x;
-            *y = c.y;
-        } else {
-            panic("get_room_loc : can't find a place!");
-        }
-    } else {
-        if (*x < 0) {
-            *x = rn2(croom->hx - croom->lx + 1);
-        }
-        if (*y < 0) {
-            *y = rn2(croom->hy - croom->ly + 1);
-        }
-        *x += croom->lx;
-        *y += croom->ly;
-    }
-}
-
-/*
- * Get a relative position inside a room.
- * negative values for x or y means RANDOM!
- */
-
-static void
-get_free_room_loc(
-    coordxy *x, coordxy *y,
-    struct mkroom *croom,
-    long int pos)
-{
-    coordxy try_x, try_y;
-    int trycnt = 0;
-
-    get_location_coord(&try_x, &try_y, DRY, croom, pos);
-    if (levl[try_x][try_y].typ != ROOM) {
-        do {
-            try_x = *x,  try_y = *y;
-            get_room_loc(&try_x, &try_y, croom);
-        } while (levl[try_x][try_y].typ != ROOM && ++trycnt <= 100);
-
-        if (trycnt > 100) {
-            panic("get_free_room_loc:  can't find a place!");
-        }
-    }
-    *x = try_x,  *y = try_y;
-}
 
 /*
  * Create a subroom in room proom at pos x,y with width w & height h.
  * x & y are relative to the parent room.
  */
-static boolean
-create_subroom(
-    struct mkroom *proom,
-    coordxy x, coordxy y,
-    coordxy w, coordxy h,
-    xint16 rtype, xint16 rlit)
-{
-    coordxy width, height;
-
-    width = proom->hx - proom->lx + 1;
-    height = proom->hy - proom->ly + 1;
-
-    /* There is a minimum size for the parent room */
-    if (width < 4 || height < 4) {
-        return FALSE;
-    }
-
-    /* Check for random position, size, etc... */
-
-    if (w == -1) {
-        w = rnd(width - 3);
-    }
-    if (h == -1) {
-        h = rnd(height - 3);
-    }
-    if (x == -1) {
-        x = rnd(width - w - 1) - 1;
-    }
-    if (y == -1) {
-        y = rnd(height - h - 1) - 1;
-    }
-    if (x == 1) {
-        x = 0;
-    }
-    if (y == 1) {
-        y = 0;
-    }
-    if ((x + w + 1) == width) {
-        x++;
-    }
-    if ((y + h + 1) == height) {
-        y++;
-    }
-    if (rtype == -1) {
-        rtype = OROOM;
-    }
-    if (rlit == -1) {
-        rlit = (rnd(1 + abs(depth(&u.uz))) < 11 && rn2(77)) ? TRUE : FALSE;
-    }
-    add_subroom(proom, proom->lx + x, proom->ly + y,
-                proom->lx + x + w - 1, proom->ly + y + h - 1,
-                rlit, rtype, FALSE);
-    return TRUE;
-}
-
 /*
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
@@ -1177,30 +730,6 @@ create_secret_door(
  * Create a trap in a room.
  */
 static void
-create_trap(spltrap *t, struct mkroom *croom)
-{
-    coordxy x = -1, y = -1;
-    coord tm;
-
-    if (croom) {
-        get_free_room_loc(&x, &y, croom, t->coord);
-    } else {
-        int trycnt = 0;
-        do {
-            get_location_coord(&x, &y, DRY, croom, t->coord);
-        } while ((levl[x][y].typ == STAIRS || levl[x][y].typ == LADDER) && ++trycnt <= 100);
-        if (trycnt > 100) {
-            return;
-        }
-    }
-
-    tm.x = x;
-    tm.y = y;
-
-    mktrap(t->type, 1, (struct mkroom*) 0, &tm);
-}
-
-static void
 spill_terrain(spill *sp, struct mkroom *croom)
 {
     coordxy x, y, nx, ny, qx, qy;
@@ -1312,96 +841,11 @@ replace_terrain(replaceterrain *terr, struct mkroom *croom)
 /*
  * Search for a door in a room on a specified wall.
  */
-static boolean
-search_door(
-    struct mkroom *croom,
-    coordxy *x, coordxy *y,
-    xint16 wall, int cnt)
-{
-    int dx, dy;
-    int xx, yy;
-
-    switch (wall) {
-    case W_NORTH:
-        dy = 0; dx = 1;
-        xx = croom->lx;
-        yy = croom->hy + 1;
-        break;
-    case W_SOUTH:
-        dy = 0; dx = 1;
-        xx = croom->lx;
-        yy = croom->ly - 1;
-        break;
-    case W_EAST:
-        dy = 1; dx = 0;
-        xx = croom->hx + 1;
-        yy = croom->ly;
-        break;
-    case W_WEST:
-        dy = 1; dx = 0;
-        xx = croom->lx - 1;
-        yy = croom->ly;
-        break;
-    default:
-        dx = dy = xx = yy = 0;
-        panic("search_door: Bad wall!");
-        break;
-    }
-    while (xx <= croom->hx+1 && yy <= croom->hy+1) {
-        if (IS_DOOR(levl[xx][yy].typ) || levl[xx][yy].typ == SDOOR) {
-            *x = xx;
-            *y = yy;
-            if (cnt-- <= 0) {
-                return TRUE;
-            }
-        }
-        xx += dx;
-        yy += dy;
-    }
-    return FALSE;
-}
-
 /*
  * Corridors always start from a door. But it can end anywhere...
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
  */
-static void
-create_corridor(corridor *c)
-{
-    coord org, dest;
-
-    if (c->src.room == -1) {
-        makecorridors(c->src.door);
-        return;
-    }
-
-    if ( !search_door(&rooms[c->src.room], &org.x, &org.y, c->src.wall,
-                     c->src.door)) {
-        return;
-    }
-
-    if (c->dest.room != -1) {
-        if (!search_door(&rooms[c->dest.room], &dest.x, &dest.y,
-                        c->dest.wall, c->dest.door)) {
-            return;
-        }
-        switch (c->src.wall) {
-        case W_NORTH: org.y--; break;
-        case W_SOUTH: org.y++; break;
-        case W_WEST:  org.x--; break;
-        case W_EAST:  org.x++; break;
-        }
-        switch (c->dest.wall) {
-        case W_NORTH: dest.y--; break;
-        case W_SOUTH: dest.y++; break;
-        case W_WEST:  dest.x--; break;
-        case W_EAST:  dest.x++; break;
-        }
-        (void) dig_corridor(&org, &dest, FALSE, CORR, STONE);
-    }
-}
-
 
 /*
  * Fill a room (shop, zoo, etc...) with appropriate stuff.
@@ -1479,93 +923,15 @@ fill_room(struct mkroom *croom, boolean prefilled)
     }
 }
 
-static struct mkroom *
-build_room(room *r, struct mkroom *mkr)
-{
-    boolean okroom;
-    struct mkroom   *aroom;
-    xint16 rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
-
-    if (mkr) {
-        aroom = &subrooms[nsubroom];
-        okroom = create_subroom(mkr, r->x, r->y, r->w, r->h,
-                                rtype, r->rlit);
-    } else {
-        aroom = &rooms[nroom];
-        okroom = create_room(r->x, r->y, r->w, r->h, r->xalign,
-                             r->yalign, rtype, r->rlit);
-    }
-
-    if (okroom) {
-#ifdef SPECIALIZATION
-        topologize(aroom, FALSE);        /* set roomno */
-#else
-        topologize(aroom);          /* set roomno */
-#endif
-        aroom->needfill = r->needfill;
-        aroom->needjoining = r->joined;
-        return aroom;
-    }
-    return (struct mkroom *)0;
-}
-
 /*
  * set lighting in a region that will not become a room.
  */
-static void
-light_region(region *tmpregion)
-{
-    boolean litstate = tmpregion->rlit ? 1 : 0;
-    int hiy = tmpregion->y2;
-    int x, y;
-    struct rm *lev;
-    int lowy = tmpregion->y1;
-    int lowx = tmpregion->x1, hix = tmpregion->x2;
-
-    if (litstate) {
-        /* adjust region size for walls, but only if lighted */
-        lowx = max(lowx-1, 1);
-        hix = min(hix+1, COLNO-1);
-        lowy = max(lowy-1, 0);
-        hiy = min(hiy+1, ROWNO-1);
-    }
-    for (x = lowx; x <= hix; x++) {
-        lev = &levl[x][lowy];
-        for (y = lowy; y <= hiy; y++) {
-            if (lev->typ != LAVAPOOL) { /* this overrides normal lighting */
-                lev->lit = litstate;
-            }
-            lev++;
-        }
-    }
-}
-
 /*
  * Select a random coordinate in the maze.
  *
  * We want a place not 'touched' by the loader.  That is, a place in
  * the maze outside every part of the special level.
  */
-static void
-maze1xy(coord *m, int humidity)
-{
-    int x, y, tryct = 2000;
-    /* tryct:  normally it won't take more than ten or so tries due
-       to the circumstances under which we'll be called, but the
-       `humidity' screening might drastically change the chances */
-
-    do {
-        x = rn1(x_maze_max - 3, 3);
-        y = rn1(y_maze_max - 3, 3);
-        if (--tryct < 0) {
-            break; /* give up */
-        }
-    } while (!(x % 2) || !(y % 2) || !SpLev_Map[x][y] ||
-             !is_ok_location((schar)x, (schar)y, humidity));
-
-    m->x = (coordxy)x,  m->y = (coordxy)y;
-}
-
 /*
  * If there's a significant portion of maze unused by the special level,
  * we don't want it empty.
@@ -1573,62 +939,6 @@ maze1xy(coord *m, int humidity)
  * Makes the number of traps, monsters, etc. proportional
  * to the size of the maze.
  */
-static void
-fill_empty_maze(void)
-{
-    int mapcountmax, mapcount, mapfact;
-    coordxy x, y;
-    coord mm;
-
-    mapcountmax = mapcount = (x_maze_max - 2) * (y_maze_max - 2);
-    mapcountmax = mapcountmax / 2;
-
-    for (x = 2; x < x_maze_max; x++) {
-        for (y = 0; y < y_maze_max; y++) {
-            if (!SpLev_Map[x][y]) {
-                mapcount--;
-            }
-        }
-    }
-
-    if ((mapcount > (int) (mapcountmax / 10))) {
-        mapfact = (int) ((mapcount * 100L) / mapcountmax);
-        for (x = rnd((int) (20 * mapfact) / 100); x; x--) {
-            maze1xy(&mm, DRY);
-            (void) mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS,
-                            mm.x, mm.y, TRUE);
-        }
-        for (x = rnd((int) (12 * mapfact) / 100); x; x--) {
-            maze1xy(&mm, DRY);
-            (void) mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
-        }
-        for (x = rn2(2); x; x--) {
-            maze1xy(&mm, DRY);
-            (void) makemon(&mons[PM_MINOTAUR], mm.x, mm.y, NO_MM_FLAGS);
-        }
-        for (x = rnd((int) (12 * mapfact) / 100); x; x--) {
-            maze1xy(&mm, DRY);
-            (void) makemon((struct permonst *) 0, mm.x, mm.y, NO_MM_FLAGS);
-        }
-        for (x = rn2((int) (15 * mapfact) / 100); x; x--) {
-            maze1xy(&mm, DRY);
-            (void) mkgold(0L, mm.x, mm.y);
-        }
-        for (x = rn2((int) (15 * mapfact) / 100); x; x--) {
-            int trytrap;
-
-            maze1xy(&mm, DRY);
-            trytrap = rndtrap();
-            if (sobj_at(BOULDER, mm.x, mm.y)) {
-                while (is_pit(trytrap) || is_hole(trytrap)) {
-                    trytrap = rndtrap();
-                }
-            }
-            (void) maketrap(mm.x, mm.y, trytrap);
-        }
-    }
-}
-
 /*
  * special level loader
  */
@@ -2785,28 +2095,6 @@ spo_room(struct sp_coder *coder)
 }
 
 void
-spo_endroom(struct sp_coder *coder)
-{
-    if (coder->n_subroom > 1) {
-        coder->n_subroom--;
-        coder->tmproomlist[coder->n_subroom] = NULL;
-        coder->failed_room[coder->n_subroom] = TRUE;
-    } else {
-        /* no subroom, get out of top-level room */
-        /* Need to ensure gxxstart/gy.ystart/gx.xsize/gy.ysize have something sensible,
-           in case there's some stuff to be created outside the outermost room,
-           and there's no MAP.
-         */
-        if (gx.xsize <= 1 && gy.ysize <= 1) {
-            gx.xstart = 1;
-            gy.ystart = 0;
-            gx.xsize = COLNO-1;
-            gy.ysize = ROWNO;
-        }
-    }
-}
-
-void
 spo_stair(struct sp_coder *coder)
 {
     coordxy x, y;
@@ -3261,14 +2549,6 @@ op_selection_do_grow(struct opvar *ov, int dir)
 static int (*selection_flood_check_func)(coordxy, coordxy);
 static schar floodfillchk_match_under_typ;
 
-static int
-floodfillchk_match_accessible(coordxy x, coordxy y)
-{
-    return (ACCESSIBLE(levl[x][y].typ) ||
-            levl[x][y].typ == SDOOR ||
-            levl[x][y].typ == SCORR);
-}
-
 /* check whethere <x,y> is already in xs[],ys[] */
 static boolean
 sel_flood_havepoint(coordxy x, coordxy y, coordxy *xs, coordxy *ys, int n)
@@ -3611,58 +2891,6 @@ op_selection_iterate(struct opvar *ov, void (*func) (coordxy, coordxy, genericpt
             }
         }
     }
-}
-
-void
-sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
-{
-    if (levl[x][y].typ == STAIRS) {
-        return;
-    }
-    terrain terr;
-
-    terr = (*(terrain *)arg);
-    SET_TYPLIT(x, y, terr.ter, terr.tlit);
-    /* handle doors and secret doors */
-    if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
-        if (levl[x][y].typ == SDOOR) {
-            levl[x][y].doormask = D_CLOSED;
-        }
-        if (x && (IS_WALL(levl[x-1][y].typ) ||
-                  levl[x-1][y].horizontal))
-            levl[x][y].horizontal = 1;
-    }
-}
-
-void
-sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
-{
-    if (IS_FURNITURE(levl[x][y].typ)) {
-        return;
-    }
-    levl[x][y].typ = (*(int *)arg);
-}
-
-void
-sel_set_door(coordxy dx, coordxy dy, genericptr_t arg)
-{
-    coordxy typ = (*(coordxy *)arg);
-    coordxy x = dx;
-    coordxy y = dy;
-
-    /*get_location(&x, &y, DRY, (struct mkroom *)0);*/
-    if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR) {
-        levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
-    }
-    if (typ & D_SECRET) {
-        typ &= ~D_SECRET;
-        if (typ < D_CLOSED) {
-            typ = D_CLOSED;
-        }
-    }
-    set_door_orientation(x, y); /* set/clear levl[x][y].horizontal */
-    levl[x][y].doormask = typ;
-    SpLev_Map[x][y] = 1;
 }
 
 void

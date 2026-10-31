@@ -22,7 +22,6 @@ extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 extern void mkmap(lev_init *);
 
 static void map_cleanup(void);
-static void lvlfill_solid(schar, schar);
 static void lvlfill_swamp(schar, schar, schar);
 static void flip_dbridge_horizontal(struct rm *);
 static void flip_dbridge_vertical(struct rm *);
@@ -31,38 +30,15 @@ static int flip_encoded_dir_bits(int, int);
 static void flip_vault_guard(int, struct monst *,
                              coordxy, coordxy, coordxy, coordxy);
 static void sel_set_wall_property(coordxy, coordxy, genericptr_t);
-static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
-static void remove_boundary_syms(void);
-static void set_door_orientation(int, int);
 static boolean shared_with_room(int, int, struct mkroom *);
-static void maybe_add_door(int, int, struct mkroom *);
-static void link_doors_rooms(void);
-static int rnddoor(void);
-static int rndtrap(void);
-static void get_location(coordxy *, coordxy *, getloc_flags_t,
-                         struct mkroom *);
 static void set_ok_location_func(boolean (*)(coordxy, coordxy));
-static boolean is_ok_location(coordxy, coordxy, getloc_flags_t);
-static unpacked_coord get_unpacked_coord(long, int);
-static void get_room_loc(coordxy *, coordxy *, struct mkroom *);
-static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *,
-                              packed_coord);
-static boolean create_subroom(struct mkroom *, coordxy, coordxy, coordxy,
-                              coordxy, xint16, xint16);
 static void create_door(room_door *, struct mkroom *);
-static void create_trap(spltrap *, struct mkroom *);
 static int noncoalignment(aligntyp);
 static boolean m_bad_boulder_spot(coordxy, coordxy);
 static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 void create_monster(monster *, struct mkroom *);
 void create_altar(altar *, struct mkroom *);
-static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
-static void create_corridor(corridor *);
-static struct mkroom *build_room(room *, struct mkroom *);
-static void light_region(region *);
-static void maze1xy(coord *, int);
-static void fill_empty_maze(void);
 static void splev_initlev(lev_init *);
 static boolean generate_way_out_method(coordxy nx, coordxy ny,
                                        struct selectionvar *ov);
@@ -73,7 +49,6 @@ void adjust_mines_lightning(lev_init *);
 
 #if 0
 /* macosx complains that these are unused */
-static long sp_code_jmpaddr(long, long);
 static void spo_room(struct sp_coder *);
 static void spo_trap(struct sp_coder *);
 static void spo_gold(struct sp_coder *);
@@ -88,10 +63,8 @@ static void spo_mazewalk(struct sp_coder *);
 static void spo_wall_property(struct sp_coder *);
 static void spo_room_door(struct sp_coder *);
 static void spo_wallify(struct sp_coder *);
-static void sel_set_wallify(coordxy, coordxy, genericptr_t);
 #endif
 static int l_create_stairway(lua_State *, boolean);
-static void spo_endroom(struct sp_coder *);
 static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
                                         int);
 static void l_get_lregion(lua_State *, lev_region *);
@@ -99,16 +72,12 @@ static void sel_set_lit(coordxy, coordxy, genericptr_t);
 static void add_doors_to_room(struct mkroom *);
 static void get_table_coords_or_region(lua_State *,
                              coordxy *, coordxy *, coordxy *, coordxy *);
-static void sel_set_ter(coordxy, coordxy, genericptr_t);
-static void sel_set_door(coordxy, coordxy, genericptr_t);
-static void sel_set_feature(coordxy, coordxy, genericptr_t);
 static void levregion_add(lev_region *);
 static void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
 static int get_table_region(lua_State *, const char *, lua_Integer *,
                         lua_Integer *, lua_Integer *, lua_Integer *, boolean);
 static void set_wallprop_in_selection(lua_State *, int);
 static int floodfillchk_match_under(coordxy, coordxy);
-static int floodfillchk_match_accessible(coordxy, coordxy);
 static void l_push_mkroom_table(lua_State *, struct mkroom *);
 static int get_table_align(lua_State *);
 static int get_table_monclass(lua_State *);
@@ -192,7 +161,6 @@ int lspo_wallify(lua_State *);
      * No need for 'struct instance_globals g' to contain these.
      * sp_level_coder_init() always re-initializes them prior to use.
      */
-static boolean splev_init_present, icedpools;
 #define MAX_CONTAINMENT 10
 static int container_idx = 0; /* next slot in container_obj[] to use */
 static struct obj *container_obj[MAX_CONTAINMENT];
@@ -389,7 +357,7 @@ lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling)
     }
 }
 
-static void
+void
 lvlfill_solid(schar filling, schar lit)
 {
     int x, y;
@@ -1058,7 +1026,7 @@ sel_set_wall_property(coordxy x, coordxy y, genericptr_t arg)
 /*
  * Make walls of the area (x1, y1, x2, y2) non diggable/non passwall-able
  */
-static void
+void
 set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
 {
     coordxy x, y;
@@ -1074,7 +1042,7 @@ set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
     }
 }
 
-static void
+void
 remove_boundary_syms(void)
 {
     /*
@@ -1105,7 +1073,7 @@ remove_boundary_syms(void)
 }
 
 /* used by sel_set_door() and link_doors_rooms() */
-static void
+void
 set_door_orientation(int x, int y)
 {
     boolean wleft, wright, wup, wdown;
@@ -1179,19 +1147,45 @@ shared_with_room(int x, int y, struct mkroom *droom)
 }
 
 /* maybe add door at x,y to room droom */
-static void
+void
 maybe_add_door(int x, int y, struct mkroom *droom)
 {
-    if (droom->hx >= 0 &&
-        ((!droom->irregular && inside_room(droom, x, y)) ||
-         (int) levl[x][y].roomno == (droom - rooms) + ROOMOFFSET ||
-         shared_with_room(x, y, droom))) {
-        add_door(x, y, droom);
+    boolean door_fits;
+    boolean inside_regular_room;
+    boolean carries_room_number;
+    boolean shared_with_neighbor;
+    int i;
+
+    if (droom->hx < 0 || doorindex >= DOORMAX) {
+        return;
     }
+
+    /* the door is inside a regular room, carries this room's number,
+       or is shared with a neighboring room */
+    inside_regular_room = !droom->irregular && inside_room(droom, x, y);
+    carries_room_number = (int) levl[x][y].roomno
+                          == (droom - rooms) + ROOMOFFSET;
+    shared_with_neighbor = shared_with_room(x, y, droom);
+
+    door_fits = inside_regular_room || carries_room_number
+                || shared_with_neighbor;
+    if (!door_fits) {
+        return;
+    }
+
+    /* link_doors_rooms() and add_doors_to_room() can both run for the
+       same room, so do not store the same door twice */
+    for (i = droom->fdoor; i < droom->fdoor + droom->doorct; i++) {
+        if (doors[i].x == x && doors[i].y == y) {
+            return;
+        }
+    }
+
+    add_door(x, y, droom);
 }
 
 /* link all doors in the map to their corresponding rooms */
-static void
+void
 link_doors_rooms(void)
 {
     int x, y;
@@ -1219,7 +1213,7 @@ link_doors_rooms(void)
 /*
  * Choose randomly the state (nodoor, open, closed or locked) for a door
  */
-static int
+int
 rnddoor(void)
 {
     static int state[] = { D_NODOOR, D_BROKEN, D_ISOPEN, D_CLOSED, D_LOCKED };
@@ -1230,7 +1224,7 @@ rnddoor(void)
 /*
  * Select a random trap
  */
-static int
+int
 rndtrap(void)
 {
     int rtrap;
@@ -1278,7 +1272,7 @@ rndtrap(void)
  * The "humidity" flag is used to ensure that engravings aren't created
  * underwater, or eels on dry land.
  */
-static void
+void
 get_location(
     coordxy *x, coordxy *y,
     getloc_flags_t humidity,
@@ -1361,7 +1355,7 @@ set_ok_location_func(boolean (*func)(coordxy, coordxy))
     is_ok_location_func = func;
 }
 
-static boolean
+boolean
 is_ok_location(coordxy x, coordxy y, getloc_flags_t humidity)
 {
     int typ = levl[x][y].typ;
@@ -1411,7 +1405,7 @@ pm_good_location(coordxy x, coordxy y, struct permonst *pm)
     return is_ok_location(x, y, pm_to_humidity(pm));
 }
 
-static unpacked_coord
+unpacked_coord
 get_unpacked_coord(long loc, int defhumidity)
 {
     static unpacked_coord c;
@@ -1461,7 +1455,7 @@ get_location_coord(
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
-static void
+void
 get_room_loc(coordxy *x, coordxy *y, struct mkroom *croom)
 {
     coord c;
@@ -1489,7 +1483,7 @@ get_room_loc(coordxy *x, coordxy *y, struct mkroom *croom)
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
-static void
+void
 get_free_room_loc(
     coordxy *x, coordxy *y,
     struct mkroom *croom,
@@ -1795,7 +1789,7 @@ create_room(
  * Create a subroom in room proom at pos x,y with width w & height h.
  * x & y are relative to the parent room.
  */
-static boolean
+boolean
 create_subroom(
     struct mkroom *proom,
     coordxy x, coordxy y,
@@ -1963,7 +1957,7 @@ create_door(room_door *dd, struct mkroom *broom)
 /*
  * Create a trap in a room.
  */
-static void
+void
 create_trap(spltrap *t, struct mkroom *croom)
 {
     coordxy x = -1, y = -1;
@@ -2656,7 +2650,7 @@ create_altar(altar *a, struct mkroom *croom)
 /*
  * Search for a door in a room on a specified wall.
  */
-static boolean
+boolean
 search_door(
     struct mkroom *croom,
     coordxy *x, coordxy *y,
@@ -2835,7 +2829,7 @@ dig_corridor(
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
  */
-static void
+void
 create_corridor(corridor *c)
 {
     coord org, dest;
@@ -2976,7 +2970,7 @@ fill_special_room(struct mkroom *croom)
     }
 }
 
-static struct mkroom *
+struct mkroom *
 build_room(room *r, struct mkroom *mkr)
 {
     boolean okroom;
@@ -3008,7 +3002,7 @@ build_room(room *r, struct mkroom *mkr)
 /*
  * set lighting in a region that will not become a room.
  */
-static void
+void
 light_region(region *tmpregion)
 {
     boolean litstate = tmpregion->rlit ? 1 : 0;
@@ -3071,7 +3065,7 @@ wallify_map(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
  * We want a place not 'touched' by the loader.  That is, a place in
  * the maze outside every part of the special level.
  */
-static void
+void
 maze1xy(coord *m, int humidity)
 {
     int x, y, tryct = 2000;
@@ -3098,7 +3092,7 @@ maze1xy(coord *m, int humidity)
  * Makes the number of traps, monsters, etc. proportional
  * to the size of the maze.
  */
-static void
+void
 fill_empty_maze(void)
 {
     int mapcountmax, mapcount, mapfact;
@@ -3197,15 +3191,6 @@ splev_initlev(lev_init *linit)
         break;
     }
 }
-
-#if 0
-static long
-sp_code_jmpaddr(long curpos, long jmpaddr)
-{
-    return (curpos + jmpaddr);
-}
-#endif
-
 
 /*ARGUSED*/
 void
@@ -4314,23 +4299,24 @@ lspo_room(lua_State *L)
     return 0;
 }
 
-static void
-spo_endroom(struct sp_coder *coder UNUSED)
+void
+spo_endroom(struct sp_coder *coder)
 {
-    if (gc.coder->n_subroom > 1) {
-        gc.coder->n_subroom--;
-        gc.coder->tmproomlist[gc.coder->n_subroom] = NULL;
-        gc.coder->failed_room[gc.coder->n_subroom] = TRUE;
-    } else {
-        /* no subroom, get out of top-level room */
-        /* Need to ensure xstart/ystart/xsize/ysize have something sensible,
-           in case there's some stuff to be created outside the outermost
-           room, and there's no MAP. */
-        if (gx.xsize <= 1 && gy.ysize <= 1) {
-            reset_xystart_size();
-        }
+    if (coder->n_subroom > 1) {
+        coder->n_subroom--;
+        coder->tmproomlist[coder->n_subroom] = NULL;
+        coder->failed_room[coder->n_subroom] = TRUE;
+    } else if (gx.xsize <= 1 && gy.ysize <= 1) {
+        /* no subroom, get out of top-level room; ensure the map extent
+           is sensible for contents created outside any room */
+        reset_xystart_size();
     }
-    update_croom();
+
+    if (coder->n_subroom) {
+        coder->croom = coder->tmproomlist[coder->n_subroom - 1];
+    } else {
+        coder->croom = NULL;
+    }
 }
 
 /* callback for is_ok_location.
@@ -4792,7 +4778,7 @@ set_floodfillchk_match_under(coordxy typ)
     set_selection_floodfillchk(floodfillchk_match_under);
 }
 
-static int
+int
 floodfillchk_match_accessible(coordxy x, coordxy y)
 {
     return (ACCESSIBLE(levl[x][y].typ)
@@ -4801,7 +4787,7 @@ floodfillchk_match_accessible(coordxy x, coordxy y)
 }
 
 /* change map location terrain type during level creation */
-static void
+void
 sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 {
     terrain terr;
@@ -4828,7 +4814,7 @@ sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
     }
 }
 
-static void
+void
 sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
 {
     if (!isok(x, y)) {
@@ -4843,7 +4829,7 @@ sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
     levl[x][y].typ = (*(int *) arg);
 }
 
-static void
+void
 sel_set_door(coordxy dx, coordxy dy, genericptr_t arg)
 {
     coordxy typ = *(coordxy *) arg;
@@ -6165,15 +6151,6 @@ lspo_non_passwall(lua_State *L)
     set_wallprop_in_selection(L, W_NONPASSWALL);
     return 0;
 }
-
-#if 0
-/*ARGSUSED*/
-static void
-sel_set_wallify(coordxy x, coordxy y, genericptr_t arg UNUSED)
-{
-    wallify_map(x, y, x, y);
-}
-#endif
 
 /* TODO: wallify(selection) */
 /* wallify({ x1=NN,y1=NN, x2=NN,y2=NN }); */

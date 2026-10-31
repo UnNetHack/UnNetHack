@@ -550,6 +550,32 @@ struct mapfragment {
  * spo_lev.c (.des).  Defined once in sp_lev.c.
  */
 void solidify_map(void);
+void get_room_loc(coordxy *x, coordxy *y, struct mkroom *croom);
+int rnddoor(void);
+void set_door_orientation(int x, int y);
+void maybe_add_door(int x, int y, struct mkroom *droom);
+void link_doors_rooms(void);
+void set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop);
+void remove_boundary_syms(void);
+void sel_set_door(coordxy dx, coordxy dy, genericptr_t arg);
+void sel_set_feature(coordxy x, coordxy y, genericptr_t arg);
+void sel_set_ter(coordxy x, coordxy y, genericptr_t arg);
+boolean search_door(struct mkroom *croom, coordxy *x, coordxy *y, xint16 wall, int cnt);
+void get_free_room_loc(coordxy *x, coordxy *y, struct mkroom *croom, packed_coord pos);
+void get_location(coordxy *x, coordxy *y, getloc_flags_t humidity, struct mkroom *croom);
+void spo_endroom(struct sp_coder *coder);
+void create_trap(spltrap *t, struct mkroom *croom);
+void create_corridor(corridor *c);
+boolean create_subroom(struct mkroom *proom, coordxy x, coordxy y, coordxy w, coordxy h, xint16 rtype, xint16 rlit);
+struct mkroom *build_room(room *r, struct mkroom *mkr);
+unpacked_coord get_unpacked_coord(long loc, int defhumidity);
+void light_region(region *tmpregion);
+boolean is_ok_location(coordxy x, coordxy y, getloc_flags_t humidity);
+void maze1xy(coord *m, int humidity);
+void fill_empty_maze(void);
+int rndtrap(void);
+void lvlfill_solid(schar filling, schar lit);
 void lvlfill_maze_grid(int x1, int y1, int x2, int y2, schar filling);
+int floodfillchk_match_accessible(coordxy x, coordxy y);
 
 #endif /* SP_LEV_H */

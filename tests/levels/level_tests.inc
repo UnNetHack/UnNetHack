@@ -7,9 +7,7 @@
  * test_spo_lev.c.  Including the .c file directly makes the otherwise
  * static helpers visible without touching production code.
  *
- * Tests describe the behaviour the two implementations must share.
- * Where the implementations have already diverged, the test documents
- * the divergence explicitly with #ifdef TEST_SP_LEV / TEST_SPO_LEV.
+ * Tests describe the behaviour the two implementations share.
  */
 
 #include <string.h>
@@ -71,6 +69,26 @@ START_TEST(test_lvlfill_solid_sets_lit)
     lvlfill_solid(STONE, TRUE);
 
     ck_assert_int_eq(levl[10][10].lit, 1);
+}
+END_TEST
+
+START_TEST(test_lvlfill_solid_resets_tile_state)
+{
+    reset_level_state();
+    levl[10][10].typ = ROOM;
+    levl[10][10].flags = 31;
+    levl[10][10].horizontal = 1;
+    levl[10][10].roomno = 12;
+    levl[10][10].edge = 1;
+
+    lvlfill_solid(STONE, FALSE);
+
+    ck_assert_int_eq(levl[10][10].typ, STONE);
+    ck_assert_int_eq(levl[10][10].lit, 0);
+    ck_assert_int_eq(levl[10][10].flags, 0);
+    ck_assert_int_eq(levl[10][10].horizontal, 0);
+    ck_assert_int_eq(levl[10][10].roomno, 0);
+    ck_assert_int_eq(levl[10][10].edge, 0);
 }
 END_TEST
 
@@ -147,6 +165,7 @@ START_TEST(test_set_wall_property_applies_to_walls_only)
     levl[11][10].typ = TREE;
     levl[12][10].typ = IRONBARS;
     levl[13][10].typ = ROOM;
+    levl[14][10].typ = DEADTREE;
 
     set_wall_property(5, 5, 20, 20, W_NONDIGGABLE);
 
@@ -154,6 +173,7 @@ START_TEST(test_set_wall_property_applies_to_walls_only)
     ck_assert_int_eq(levl[11][10].wall_info, W_NONDIGGABLE);
     ck_assert_int_eq(levl[12][10].wall_info, W_NONDIGGABLE);
     ck_assert_int_eq(levl[13][10].wall_info, 0);
+    ck_assert_int_eq(levl[14][10].wall_info, 0);
 }
 END_TEST
 
@@ -304,8 +324,8 @@ END_TEST
  * level loader (SpLev_Map == 0), is odd/odd and lies inside the maze.
  *
  * With seed 42 the first candidate is (11,17).  Marking only that cell
- * as used makes the two loop guards pick different results, so the
- * assertions are exact and deterministic rather than probabilistic.
+ * as used verifies that the guard skips used cells; the assertions are
+ * exact and deterministic rather than probabilistic.
  */
 START_TEST(test_maze1xy_returns_untouched_odd_coordinate)
 {
@@ -316,7 +336,6 @@ START_TEST(test_maze1xy_returns_untouched_odd_coordinate)
     memset(SpLev_Map, 0, sizeof SpLev_Map);
     SpLev_Map[11][17] = 1; /* the first candidate is already used */
 
-#ifdef TEST_SP_LEV
     maze1xy(&m, DRY);
 
     ck_assert_int_ge(m.x, 3);
@@ -329,20 +348,6 @@ START_TEST(test_maze1xy_returns_untouched_odd_coordinate)
     ck_assert_int_eq(m.x, 59);
     ck_assert_int_eq(m.y, 7);
     ck_assert_int_eq(SpLev_Map[m.x][m.y], 0);
-#else
-    /*
-     * Known divergence: spo_lev.c still has the pre-2022 test inverted
-     * and accepts a cell the loader has already used.  It therefore
-     * returns the first candidate instead of skipping it.  This branch
-     * pins the current (wrong) behaviour and must be deleted when the
-     * implementations are merged.
-     */
-    maze1xy(&m, DRY);
-
-    ck_assert_int_eq(m.x, 11);
-    ck_assert_int_eq(m.y, 17);
-    ck_assert_int_eq(SpLev_Map[m.x][m.y], 1);
-#endif
 }
 END_TEST
 
@@ -363,18 +368,42 @@ START_TEST(test_fill_empty_maze_skips_fully_used_maze)
 
     fill_empty_maze();
 
-#ifdef TEST_SP_LEV
     ck_assert_ptr_null(fobj);
     ck_assert_ptr_null(fmon);
-#else
-    /*
-     * Known divergence: spo_lev.c counts used cells with the opposite
-     * test and therefore believes the maze is empty.  This assertion
-     * documents the bug; it must be replaced by the sp_lev.c behaviour
-     * once the implementations are merged.
-     */
-    ck_assert_ptr_nonnull(fobj);
-#endif
+}
+END_TEST
+
+/* ------------------------------------------------------------------ */
+/* rnddoor                                                             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * rnddoor must only produce complete door states.  Both historical
+ * implementations map rn2(5) onto {0, 1, 2, 4, 8}; this pins that set so
+ * a future rewrite cannot return a bare D_TRAPPED (16).
+ */
+START_TEST(test_rnddoor_returns_valid_door_state)
+{
+    int i, saw_nodoor = 0, saw_locked = 0;
+
+    reset_level_state();
+
+    for (i = 0; i < 1000; i++) {
+        int state = rnddoor();
+
+        ck_assert(state == D_NODOOR || state == D_BROKEN
+                  || state == D_ISOPEN || state == D_CLOSED
+                  || state == D_LOCKED);
+        if (state == D_NODOOR) {
+            saw_nodoor = 1;
+        }
+        if (state == D_LOCKED) {
+            saw_locked = 1;
+        }
+    }
+
+    ck_assert(saw_nodoor);
+    ck_assert(saw_locked);
 }
 END_TEST
 
@@ -392,6 +421,7 @@ level_suite(void)
 
     tcase_add_test(tc, test_lvlfill_solid_covers_maze_area);
     tcase_add_test(tc, test_lvlfill_solid_sets_lit);
+    tcase_add_test(tc, test_lvlfill_solid_resets_tile_state);
     tcase_add_test(tc, test_lvlfill_maze_grid_pattern);
     tcase_add_test(tc, test_lvlfill_maze_grid_row_zero_and_one_are_stone);
     tcase_add_test(tc, test_lvlfill_maze_grid_corrmaze_is_all_stone);
@@ -406,6 +436,7 @@ level_suite(void)
     tcase_add_test(tc, test_build_room_creates_room_with_requested_size);
     tcase_add_test(tc, test_maze1xy_returns_untouched_odd_coordinate);
     tcase_add_test(tc, test_fill_empty_maze_skips_fully_used_maze);
+    tcase_add_test(tc, test_rnddoor_returns_valid_door_state);
 
     return s;
 }

@@ -1,24 +1,24 @@
 level juiblex.lev seed 7
 flags maze=1 corrmaze=0 temperature=0
-wallhash 60bc75fc
+wallhash 9ef207ca
 lithash 0d596b05
-stair 7 7 up stair
-stair 5 14 down stair
+stair 4 4 up stair
+stair 9 8 down stair
 row 00 0KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 row 01 0KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKRRKRRKKKKKKKKKKKKKRRKKKKKKKKKKKKRRK
 row 02 0KKKKKKKKKRRKRKKRKKKKKKKKKKKKKKKKKKKKRKKKKKKKRRRRRKKKKKKRRRKKKKRRRRRRRRRRRRRRRRK
 row 03 0KKRKKKKKRRRRRRRRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRRKKKKKKKKKKKKKK
-row 04 0KKRRKKKKRRRRRRRKKKRKKKKKRRKKKRRKKKKKRRKKKRRKKKKKRRKKKRRKKKKKRKKKRKKKKKKKRKKKKKK
+row 04 0KKRSKKKKRRRRRRRKKKRKKKKKRRKKKRRKKKKKRRKKKRRKKKKKRRKKKRRKKKKKRKKKRKKKKKKKRKKKKKK
 row 05 0KKRRRRKKKRRRRRKKKRRRKKRRKKRKRKKRKKRKKKRRRKKKRKKKRRKKKRRKKKKRRRKKKKKRKKKRRRKKKKK
 row 06 0KKKRRRKKKRRRKRRKKKRKKRKKKRKKRKKRKKRRRKKRKKRRRRRKKRRRRRKRRRRKRKKKRKKRKKRRRKKKKKK
-row 07 0KKKRRRSRRKKRKKRRKKKRRKKKRKKRKKRKKRRKKRRRRRKKRKKKRKKRKKKKKKKKKKKRRRRRKKKKKKKKKKK
-row 08 0KKKKKRRRRKKRKKRKKKRRKKKKKRKKRKKRKKRRRKKKKKRRRRRKKRKKKKKKRRRRRKKKRRRRRRRRRRRRKKK
+row 07 0KKKRRRRRRKKRKKRRKKKRRKKKRKKRKKRKKRRKKRRRRRKKRKKKRKKRKKKKKKKKKKKRRRRRKKKKKKKKKKK
+row 08 0KKKKKRRRSKKRKKRKKKRRKKKKKRKKRKKRKKRRRKKKKKRRRRRKKRKKKKKKRRRRRKKKRRRRRRRRRRRRKKK
 row 09 0KKKKKRRRRRRRRRKKKRRKKRRRKKRRKKRKKKRKKKRRRKKKRKKKRKRKKKKRRJRJRRKKKRRRRRKKRRRRKKK
 row 10 0KKKKKKKKKKRRKKKKRKKKKRRRKKKKKRKRRRKKKRRJRRKKKRKRKKKRKKKKRRRRRKKKKRRRRRKKKKKKKKK
 row 11 0KKKKKKKKKKRKRKKRKKKKRKKRKRRKRKKKKKKKRRJRJRRKKKRKKKRKKRRKKRRRKKKKRRRRRRKKKKKKKKK
 row 12 0KKKKKKKKKKRKRRRKKKKRKKKKRRRRKKKKKRKKKRRJRRKKKRKKKKRKKRRKKRRRKKKRKRRRRRKKKKKKKKK
 row 13 0KKKKKKKKKKRKKKKKKKRRKKRKKRRKKKKRRRKKKKRRRKKKRKKKKKRKKKKRKKKKKKRKKRRRRRRRRRRKKKK
-row 14 0KRRKSKRRKKRKKKKKKRRRKKRRRKKKRRKKKKKKKKKKKKRRRRRKKKKRKKRRRKRRKRKKKRKKKRRRRRRRRKK
+row 14 0KRRKRKRRKKRKKKKKKRRRKKRRRKKKRRKKKKKKKKKKKKRRRRRKKKKRKKRRRKRRKRKKKRKKKRRRRRRRRKK
 row 15 0KKKKKKKKRRRKKKRKKKRRKKRKKKKRRRRKKRRKKKRRKKRRRRRKKKKRKKKRKRRRRKKKRKKKKKRKKKRRRKK
 row 16 0KKRRRKKKRRRKKKRRKKKRKKKKRRKKRRKKRRKKRRKKRRKKRKKKRRKRKRRKKKRRKKKRRKKKKKKKKKRRRRK
 row 17 0KKKRRRKKRRRRKKRKKKRKKKKRRRRKKKKRRKKRRRRKKKKKKKRRRKKKRRRRKKKKRKKKRKKKKKKKKRRRRRK
@@ -26,147 +26,100 @@ row 18 0KKKKRKKKKKRKKKKKKRURKKKRRRRKKKRRKKKRRRRKKKRRKKRRRKKKRRRRKKKRRRKKKKKKKKKK
 row 19 0KKKKKKKKKKKKKKRKKKRKKKKKRRKKKRRKKKKKRRKKKRRKKKKKRRKKKRRKKKKKRKKKRKKKKKKKKKKKKKK
 row 20 0KKKKKKKKKKKKKKRRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRKKKKKRRKKKKKKKKKKKKKK
 room 0 15 3 65 19 type=3 doors=0
-trap 25 16 20
-trap 33 10 20
+trap 27 13 20
+trap 48 10 20
 trap 31 19 21
-trap 20 8 21
-trap 32 6 8
-trap 37 19 8
-trap 15 17 3
-trap 27 17 2
-trap 33 17 2
-trap 65 7 10
-trap 41 9 7
-trap 19 5 22
-trap 41 5 14
-trap 27 9 9
-trap 47 11 18
-trap 39 17 12
-trap 61 15 5
-trap 23 9 14
-trap 35 9 1
-trap 37 11 5
-trap 19 19 5
-trap 15 15 11
-trap 63 13 12
-trap 65 15 22
-trap 55 19 9
-trap 37 17 8
-trap 59 9 2
-trap 61 5 12
-trap 61 9 1
-obj 535 59 6 1
-obj 295 52 7 1
-obj 295 29 8 1
-obj 291 28 12 1
-obj 316 22 6 1
-obj 317 20 8 1
-obj 305 60 18 1
-obj 313 60 12 1
-obj 318 59 12 1
-obj 319 58 12 1
-obj 534 60 9 10
-obj 520 58 9 1
-obj 535 35 15 1
-obj 497 15 3 67
-obj 497 59 11 26
-obj 497 45 15 28
-obj 497 41 7 73
-obj 497 39 15 7
-obj 497 47 15 34
-obj 497 33 13 86
-obj 497 61 15 13
-obj 497 59 15 29
-obj 497 43 11 35
-obj 497 19 5 12
-obj 497 29 5 110
-obj 535 27 17 1
-obj 535 59 11 1
-obj 535 29 11 1
-obj 535 15 7 1
-obj 342 39 7 1
-obj 1 19 9 9
-obj 225 19 5 1
-obj 305 47 15 1
-obj 522 55 5 2
-obj 353 51 9 1
-obj 390 39 9 1
-obj 497 65 19 15
-obj 497 37 19 27
-obj 497 55 19 15
-obj 497 23 15 10
-obj 497 5 17 58
-obj 535 45 7 1
-obj 535 43 11 1
-obj 535 19 17 1
-obj 535 33 17 1
-obj 535 23 5 1
-obj 535 61 15 1
-obj 535 65 7 1
-obj 535 23 5 1
-obj 535 47 11 1
-obj 535 61 9 1
-obj 520 45 7 1
-obj 295 45 5 1
-obj 524 25 7 1
-obj 272 45 13 1
-obj 526 13 11 1
-obj 534 19 17 7
-obj 218 25 19 1
-obj 318 61 9 1
-obj 291 23 15 1
-obj 511 65 19 1
-obj 520 37 17 2
-obj 527 5 17 1
-obj 321 37 11 1
+trap 45 15 21
+trap 48 18 8
+trap 56 13 8
+trap 9 3 10
+trap 5 5 6
+trap 75 9 20
+trap 11 3 21
+trap 75 15 19
+trap 9 15 4
+trap 67 7 16
+trap 73 9 20
+obj 535 28 3 1
+obj 298 45 7 1
+obj 295 17 10 1
+obj 295 58 20 1
+obj 301 31 18 1
+obj 312 27 18 1
+obj 323 24 5 1
+obj 305 60 12 1
+obj 320 59 12 1
+obj 336 58 12 1
+obj 527 60 9 1
+obj 522 58 9 1
+obj 497 67 13 22
+obj 497 9 7 4
+obj 497 7 7 76
+obj 497 75 15 76
+obj 497 71 15 52
+obj 535 11 13 1
+obj 535 71 15 1
+obj 535 67 13 1
+obj 535 75 13 1
+obj 535 77 17 1
+obj 528 73 13 1
+obj 511 13 9 1
+obj 536 11 3 1
+obj 536 75 15 1
+obj 497 77 15 18
+obj 497 75 9 23
+obj 497 11 3 60
+obj 535 9 7 1
+obj 535 13 3 1
+obj 520 75 15 1
+obj 534 67 13 10
+obj 519 7 9 1
+obj 528 9 15 1
+obj 523 67 9 1
 obj 535 71 6 1
 obj 535 3 16 1
-mon 344 26 14 peaceful=0 asleep=0
-mon 344 17 20 peaceful=0 asleep=0
-mon 67 30 5 peaceful=0 asleep=0
-mon 67 16 4 peaceful=0 asleep=0
-mon 172 19 20 peaceful=0 asleep=0
-mon 169 47 8 peaceful=0 asleep=0
-mon 169 42 13 peaceful=0 asleep=0
-mon 8 53 9 peaceful=0 asleep=0
-mon 8 17 15 peaceful=0 asleep=0
-mon 9 56 6 peaceful=0 asleep=0
-mon 221 62 17 peaceful=0 asleep=0
-mon 220 27 6 peaceful=0 asleep=0
-mon 220 64 10 peaceful=0 asleep=0
-mon 220 16 15 peaceful=0 asleep=0
-mon 59 47 10 peaceful=0 asleep=0
-mon 59 46 9 peaceful=0 asleep=0
-mon 59 25 15 peaceful=0 asleep=0
-mon 59 48 8 peaceful=0 asleep=0
+mon 344 51 10 peaceful=0 asleep=0
+mon 344 53 9 peaceful=0 asleep=0
+mon 67 57 13 peaceful=0 asleep=0
+mon 67 21 18 peaceful=0 asleep=0
+mon 169 17 3 peaceful=0 asleep=0
+mon 169 21 17 peaceful=0 asleep=0
+mon 170 64 6 peaceful=0 asleep=0
+mon 8 36 9 peaceful=0 asleep=0
+mon 8 16 15 peaceful=0 asleep=0
+mon 10 55 16 peaceful=0 asleep=0
+mon 220 18 3 peaceful=0 asleep=0
+mon 220 49 2 peaceful=0 asleep=0
+mon 220 48 3 peaceful=0 asleep=0
+mon 220 52 16 peaceful=0 asleep=0
+mon 60 28 11 peaceful=0 asleep=0
+mon 59 60 4 peaceful=0 asleep=0
+mon 59 51 16 peaceful=0 asleep=0
+mon 59 32 7 peaceful=0 asleep=0
 mon 59 40 13 peaceful=0 asleep=0
-mon 8 41 12 peaceful=0 asleep=0
+mon 9 41 12 peaceful=0 asleep=0
 mon 220 39 12 peaceful=0 asleep=0
-mon 175 42 11 peaceful=0 asleep=0
-mon 169 38 11 peaceful=0 asleep=0
+mon 174 42 11 peaceful=0 asleep=0
+mon 170 38 11 peaceful=0 asleep=0
 mon 220 41 10 peaceful=0 asleep=0
 mon 8 39 10 peaceful=0 asleep=0
-mon 61 40 9 peaceful=0 asleep=0
+mon 59 40 9 peaceful=0 asleep=0
 mon 55 60 11 peaceful=0 asleep=0
-mon 55 59 12 peaceful=0 asleep=0
+mon 55 59 11 peaceful=0 asleep=0
 mon 55 58 11 peaceful=0 asleep=0
 mon 329 40 11 peaceful=0 asleep=0
 mon 69 61 18 peaceful=0 asleep=0
 mon 69 19 5 peaceful=0 asleep=0
-mon 69 62 5 peaceful=0 asleep=0
-mon 350 61 15 peaceful=0 asleep=0
-mon 350 65 19 peaceful=0 asleep=0
-mon 122 64 7 peaceful=0 asleep=0
-mon 122 65 7 peaceful=0 asleep=0
-mon 188 15 15 peaceful=0 asleep=0
-mon 14 37 17 peaceful=0 asleep=0
-mon 169 59 11 peaceful=0 asleep=0
-mon 169 49 7 peaceful=0 asleep=0
-mon 169 49 5 peaceful=0 asleep=0
-mon 350 23 13 peaceful=0 asleep=0
-mon 15 61 19 peaceful=0 asleep=0
-mon 93 30 14 peaceful=0 asleep=0
-mon 93 29 15 peaceful=0 asleep=0
-mon 62 45 7 peaceful=0 asleep=0
-mon 350 19 19 peaceful=0 asleep=0
-mon 350 61 5 peaceful=0 asleep=0
+mon 69 61 5 peaceful=0 asleep=0
+mon 14 75 17 peaceful=0 asleep=0
+mon 350 5 7 peaceful=0 asleep=0
+mon 255 75 13 peaceful=0 asleep=0
+mon 93 11 15 peaceful=0 asleep=0
+mon 350 67 16 peaceful=0 asleep=0
+mon 74 77 1 peaceful=0 asleep=0
+mon 350 11 3 peaceful=0 asleep=0
+mon 122 14 3 peaceful=0 asleep=0
+mon 122 13 3 peaceful=0 asleep=0
+mon 169 75 15 peaceful=0 asleep=0
+mon 350 69 9 peaceful=0 asleep=0
+mon 350 11 11 peaceful=0 asleep=0
