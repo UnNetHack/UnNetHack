@@ -559,6 +559,8 @@ void set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
 void remove_boundary_syms(void);
 void sel_set_door(coordxy dx, coordxy dy, genericptr_t arg);
 void sel_set_feature(coordxy x, coordxy y, genericptr_t arg);
+void sel_set_ter(coordxy x, coordxy y, genericptr_t arg);
+boolean search_door(struct mkroom *croom, coordxy *x, coordxy *y, xint16 wall, int cnt);
 unpacked_coord get_unpacked_coord(long loc, int defhumidity);
 void light_region(region *tmpregion);
 boolean is_ok_location(coordxy x, coordxy y, getloc_flags_t humidity);

@@ -35,7 +35,6 @@ extern void spo_pop_container(void);
 extern void adjust_mines_lightning(lev_init *);
 
 static void get_free_room_loc(coordxy *, coordxy *, struct mkroom *, packed_coord);
-static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static void create_trap(spltrap *, struct mkroom *);
 
@@ -78,8 +77,6 @@ char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
 
-static boolean splev_init_present = FALSE;
-static boolean icedpools = FALSE;
 static int mines_prize_count = 0, soko_prize_count = 0; /* achievements */
 
 #define SPLEV_STACK_RESERVE 128
@@ -1024,55 +1021,6 @@ replace_terrain(replaceterrain *terr, struct mkroom *croom)
 /*
  * Search for a door in a room on a specified wall.
  */
-static boolean
-search_door(
-    struct mkroom *croom,
-    coordxy *x, coordxy *y,
-    xint16 wall, int cnt)
-{
-    int dx, dy;
-    int xx, yy;
-
-    switch (wall) {
-    case W_NORTH:
-        dy = 0; dx = 1;
-        xx = croom->lx;
-        yy = croom->hy + 1;
-        break;
-    case W_SOUTH:
-        dy = 0; dx = 1;
-        xx = croom->lx;
-        yy = croom->ly - 1;
-        break;
-    case W_EAST:
-        dy = 1; dx = 0;
-        xx = croom->hx + 1;
-        yy = croom->ly;
-        break;
-    case W_WEST:
-        dy = 1; dx = 0;
-        xx = croom->lx - 1;
-        yy = croom->ly;
-        break;
-    default:
-        dx = dy = xx = yy = 0;
-        panic("search_door: Bad wall!");
-        break;
-    }
-    while (xx <= croom->hx+1 && yy <= croom->hy+1) {
-        if (IS_DOOR(levl[xx][yy].typ) || levl[xx][yy].typ == SDOOR) {
-            *x = xx;
-            *y = yy;
-            if (cnt-- <= 0) {
-                return TRUE;
-            }
-        }
-        xx += dx;
-        yy += dy;
-    }
-    return FALSE;
-}
-
 /*
  * Corridors always start from a door. But it can end anywhere...
  * Basically we search for door coordinates or for endpoints coordinates
@@ -3210,27 +3158,6 @@ op_selection_iterate(struct opvar *ov, void (*func) (coordxy, coordxy, genericpt
                 (*func)(x, y, arg);
             }
         }
-    }
-}
-
-void
-sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
-{
-    if (levl[x][y].typ == STAIRS) {
-        return;
-    }
-    terrain terr;
-
-    terr = (*(terrain *)arg);
-    SET_TYPLIT(x, y, terr.ter, terr.tlit);
-    /* handle doors and secret doors */
-    if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
-        if (levl[x][y].typ == SDOOR) {
-            levl[x][y].doormask = D_CLOSED;
-        }
-        if (x && (IS_WALL(levl[x-1][y].typ) ||
-                  levl[x-1][y].horizontal))
-            levl[x][y].horizontal = 1;
     }
 }
 

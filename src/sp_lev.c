@@ -46,7 +46,6 @@ static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 void create_monster(monster *, struct mkroom *);
 void create_altar(altar *, struct mkroom *);
-static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static struct mkroom *build_room(room *, struct mkroom *);
 static void splev_initlev(lev_init *);
@@ -83,7 +82,6 @@ static void sel_set_lit(coordxy, coordxy, genericptr_t);
 static void add_doors_to_room(struct mkroom *);
 static void get_table_coords_or_region(lua_State *,
                              coordxy *, coordxy *, coordxy *, coordxy *);
-static void sel_set_ter(coordxy, coordxy, genericptr_t);
 static void levregion_add(lev_region *);
 static void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
 static int get_table_region(lua_State *, const char *, lua_Integer *,
@@ -173,7 +171,6 @@ int lspo_wallify(lua_State *);
      * No need for 'struct instance_globals g' to contain these.
      * sp_level_coder_init() always re-initializes them prior to use.
      */
-static boolean splev_init_present, icedpools;
 #define MAX_CONTAINMENT 10
 static int container_idx = 0; /* next slot in container_obj[] to use */
 static struct obj *container_obj[MAX_CONTAINMENT];
@@ -2663,7 +2660,7 @@ create_altar(altar *a, struct mkroom *croom)
 /*
  * Search for a door in a room on a specified wall.
  */
-static boolean
+boolean
 search_door(
     struct mkroom *croom,
     coordxy *x, coordxy *y,
@@ -4799,7 +4796,7 @@ floodfillchk_match_accessible(coordxy x, coordxy y)
 }
 
 /* change map location terrain type during level creation */
-static void
+void
 sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 {
     terrain terr;
