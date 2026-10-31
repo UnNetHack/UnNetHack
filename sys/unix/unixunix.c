@@ -418,6 +418,14 @@ make_file_name(const char *filearea, const char *filename)
 {
     char *buf;
     int lenarea;
+    const char *override = nh_getenv("NETHACK_DATA");
+
+    /* NETHACK_DATA lets tests and headless runs use an uninstalled data
+       directory instead of the compile-time FILE_AREA_* paths. */
+    if (override && *override && filename[0] != '/') {
+        filearea = override;
+    }
+
     if (filearea && filename[0]!='/') {
         lenarea = strlen(filearea);
         buf = (char *)alloc(lenarea+strlen(filename)+2);

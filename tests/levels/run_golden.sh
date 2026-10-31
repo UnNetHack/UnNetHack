@@ -3,17 +3,21 @@
 # Regenerate the special-level dumps and compare them with the committed
 # golden files.
 #
-# The dumps must be produced by the same build as the game data that the
-# drivers read through DLB (FILE_AREA_UNSHARE / NH_DATAAREA of the
-# configured prefix).  Run `make` and then `make dlb`, so nhdat is
-# repacked from the current dat/*.lev; a stale nhdat silently invalidates
-# every dump.  Run with --update to accept a change.
+# The dumps are produced by the game binary itself (--dump-level), which
+# reads data through DLB.  NETHACK_DATA points DLB at this checkout's dat/
+# directory, so no install is needed.  Run `make` and then `make dlb`, so
+# nhdat is repacked from the current dat/*.lev; a stale nhdat silently
+# invalidates every dump.  Run with --update to accept a change.
 #
 # Usage: sh tests/levels/run_golden.sh [--update]
 
 set -u
 
-here=$(dirname "$0")
+here=$(cd "$(dirname "$0")" && pwd)
+root=$(cd "$here/../.." && pwd)
+game="$root/src/unnethack"
+datadir="$root/dat"
+export NETHACK_DATA="$datadir"
 update=no
 [ "${1:-}" = "--update" ] && update=yes
 
@@ -26,22 +30,22 @@ trap 'rm -rf "$tmp"' EXIT
 
 failed=0
 
-# run <driver> <golden-dir> <extension> <level> <seed>
+# run <golden-dir> <extension> <level> <seed>
 run() {
-    driver=$1
-    goldendir=$2
-    ext=$3
-    level=$4
-    seed=$5
+    goldendir=$1
+    ext=$2
+    level=$3
+    seed=$4
     name="$level.$seed.txt"
 
-    if [ ! -x "$driver" ]; then
-        echo "missing $driver; run: make -C tests $(basename "$driver")" >&2
+    if [ ! -x "$game" ]; then
+        echo "missing $game; build the game first" >&2
         exit 2
     fi
 
-    if ! "$driver" "$level$ext" "$seed" >/dev/null 2>"$tmp/$name"; then
-        echo "driver failed: $level seed $seed" >&2
+    if ! "$game" -d "$datadir" --dump-level "$level$ext" --seed "$seed" \
+         --dump-file "$tmp/$name" >/dev/null 2>&1; then
+        echo "dump failed: $level seed $seed" >&2
         failed=1
         return
     fi
@@ -56,13 +60,13 @@ run() {
 
 for lv in $des_levels; do
     for seed in $seeds; do
-        run "$here/dump_des" golden-des .lev "$lv" "$seed"
+        run golden-des .lev "$lv" "$seed"
     done
 done
 
 for lv in $lua_levels; do
     for seed in $seeds; do
-        run "$here/dump_lua" golden-lua .lua "$lv" "$seed"
+        run golden-lua .lua "$lv" "$seed"
     done
 done
 

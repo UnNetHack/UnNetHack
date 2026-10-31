@@ -63,20 +63,7 @@ levels/test_spo_lev: levels/test_spo_lev.c levels/level_tests.inc
 	    $(LUA_LIBS) -lm $(CURSES_LIBS) $(CHECK_LIBS) -o $@
 	./$@
 
-# Golden-master driver: loads a compiled special level and prints a
-# canonical dump on stderr.  Links the whole game (both loaders).
-levels/dump_des: levels/dump_des.c levels/dump_common.h
-	$(CC) $(LEVEL_CFLAGS) -g $< \
-	    $(LEVEL_OBJS) \
-	    $(LUA_LIBS) -lm $(CURSES_LIBS) -o $@
-
-levels/dump_lua: levels/dump_lua.c levels/dump_common.h
-	$(CC) $(LEVEL_CFLAGS) -g $< \
-	    $(LEVEL_OBJS) \
-	    $(LUA_LIBS) -lm $(CURSES_LIBS) -o $@
-
-# Golden-master comparison.  Not part of `all`: the driver reads the
-# installed data directory through DLB, so the game must be built (and
-# its data reachable) first.
-golden: levels/dump_des
+# Golden-master comparison.  Not part of `all`: it uses the game binary
+# and DLB data, so build the game and run `make dlb` first.
+golden:
 	sh levels/run_golden.sh

@@ -214,7 +214,7 @@ HACKCSRC = $(srcdir)/allmain.c $(srcdir)/alloc.c $(srcdir)/apply.c \
 	$(srcdir)/were.c $(srcdir)/wield.c $(srcdir)/windows.c \
 	$(srcdir)/wizard.c $(srcdir)/worm.c $(srcdir)/worn.c $(srcdir)/write.c \
 	$(srcdir)/zap.c \
-	$(srcdir)/dump.c $(srcdir)/tutorial.c \
+	$(srcdir)/dump.c $(srcdir)/dumplevel.c $(srcdir)/tutorial.c \
 	$(srcdir)/sfstruct.c \
 	$(srcdir)/livelog.c
 
@@ -269,7 +269,7 @@ HOBJ = $(FIRSTOBJ) allmain.o apply.o artifact.o attrib.o ball.o \
 	base32.o \
 	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
 	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
-	drawing.o dump.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
+	drawing.o dump.o dumplevel.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
 	extralev.o files.o fountain.o hack.o hacklib.o insight.o invent.o light.o \
 	lock.o mail.o makemon.o mapglyph.o mcastu.o mhitm.o mhitu.o \
 	minion.o mklev.o mkmap.o \
@@ -785,6 +785,7 @@ dokick.o: $(srcdir)/dokick.c $(HACK_H)
 dothrow.o: $(srcdir)/dothrow.c $(HACK_H)
 drawing.o: $(srcdir)/drawing.c $(HACK_H) ../include/tcap.h
 dump.o: $(srcdir)/dump.c $(HACK_H) ../include/nhversion.h
+dumplevel.o: $(srcdir)/dumplevel.c $(HACK_H) ../include/dlb.h
 dungeon.o: $(srcdir)/dungeon.c $(HACK_H) ../include/dlb.h
 eat.o: $(srcdir)/eat.c $(HACK_H)
 end.o: $(srcdir)/end.c $(HACK_H) ../include/dlb.h

@@ -170,6 +170,15 @@ main(int argc, char *argv[])
     chdirx(dir,1);
 #endif
 
+    {
+        extern int dump_level_main(int, char **);
+        int dump_rc = dump_level_main(argc, argv);
+
+        if (dump_rc >= 0) {
+            exit(dump_rc);
+        }
+    }
+
 #ifdef _M_UNIX
     check_sco_console();
 #endif
